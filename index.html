@@ -1,557 +1,277 @@
-
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<title>Brasserie Naturelle — Marketplace du Bénin</title>
+<meta name="theme-color" content="#D4781A"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --or:#D4781A;--or-l:#FDF0E0;--or-d:#9E5610;
-  --vert:#2E6B1A;--vert-l:#EAF3DE;--vert-d:#1A4210;
-  --bleu:#185FA5;--bleu-l:#E6F1FB;--bleu-d:#0C447C;
-  --rouge-l:#FDECEA;--jaune-l:#FEF3D7;
-  --teal:#1D7A5A;--teal-l:#E1F5EE;
-  --gray50:#F8F7F4;--gray100:#EFEFEB;--gray200:#D3D1C7;--gray400:#888780;--gray700:#444441;
-}
-body{font-family:var(--font-sans);background:var(--color-background-tertiary);color:var(--color-text-primary)}
-.app{max-width:680px;margin:0 auto}
-
-.header{background:var(--or);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-radius:var(--border-radius-lg) var(--border-radius-lg) 0 0}
-.h-brand{font-size:17px;font-weight:500;color:white}
-.h-sub{font-size:10px;color:rgba(255,255,255,0.78);margin-top:1px}
-.h-right{display:flex;align-items:center;gap:8px}
-.cart-btn{background:var(--vert);border:none;color:white;border-radius:var(--border-radius-md);padding:7px 12px;cursor:pointer;font-size:12px;font-weight:500;display:flex;align-items:center;gap:5px}
-.prod-btn{background:var(--bleu);border:none;color:white;border-radius:var(--border-radius-md);padding:7px 12px;cursor:pointer;font-size:12px;font-weight:500;display:flex;align-items:center;gap:5px}
-.cart-count{background:white;color:var(--or);border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
-
-.nav-tabs{display:flex;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary)}
-.tab{flex:1;padding:9px 4px;text-align:center;font-size:11px;font-weight:500;cursor:pointer;color:var(--color-text-secondary);border:none;background:none;border-bottom:2px solid transparent;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all 0.2s}
-.tab i{font-size:17px}
-.tab.active{color:var(--or);border-bottom-color:var(--or)}
-
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--or:#D4781A;--or-l:#FDF0E0;--or-d:#9E5610;--vert:#2E6B1A;--vert-l:#EAF3DE;--vert-d:#1A4210;--bleu:#185FA5;--bleu-l:#E6F1FB;--bleu-d:#0C447C;--teal:#1D7A5A;--rouge-l:#FDECEA;--jaune-l:#FEF3D7;--g50:#F8F7F4;--g100:#EFEFEB;--g200:#D3D1C7;--g400:#888780;--g700:#444441;--g900:#1A1A18;--w:#fff;--rsm:8px;--rmd:12px;--rlg:16px}
+html,body{width:100%;min-height:100vh;background:var(--g50);font-family:'DM Sans',sans-serif;color:var(--g900);-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+.app{width:100%;min-height:100vh;display:flex;flex-direction:column;background:var(--g50)}
+@media(min-width:600px){body{background:#D3D1C7;display:flex;justify-content:center;align-items:flex-start;min-height:100vh}.app{max-width:480px;min-height:100vh;box-shadow:0 0 40px rgba(0,0,0,.15);border-radius:0}}
+.header{background:var(--or);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.h-title{font-size:17px;font-weight:600;color:#fff;line-height:1.2}
+.h-sub{font-size:10px;color:rgba(255,255,255,.75);margin-top:1px}
+.h-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
+.cart-btn,.prod-btn{border:none;color:#fff;border-radius:var(--rsm);padding:7px 11px;cursor:pointer;font-size:12px;font-weight:500;font-family:inherit;display:flex;align-items:center;gap:5px}
+.cart-btn{background:var(--vert)}.prod-btn{background:var(--bleu)}
+.btn-lbl{display:none}@media(min-width:380px){.btn-lbl{display:inline}}
+.cart-count{background:#fff;color:var(--or);border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.nav-tabs{display:flex;background:#fff;border-bottom:1px solid var(--g100);position:sticky;top:52px;z-index:99}
+.tab{flex:1;padding:9px 2px;text-align:center;font-size:11px;font-weight:500;cursor:pointer;color:var(--g400);border:none;background:none;border-bottom:2px solid transparent;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .2s}
+.tab i{font-size:18px}.tab.active{color:var(--or);border-bottom-color:var(--or)}
 .page{display:none}.page.active{display:block}
-
-.search-bar{background:var(--color-background-primary);padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:0.5px solid var(--color-border-tertiary)}
-.search-bar input{flex:1;border:0.5px solid var(--color-border-secondary);border-radius:20px;padding:7px 12px;font-size:12px;background:var(--color-background-secondary);color:var(--color-text-primary);outline:none;font-family:inherit;min-width:0}
-.loc-badge{background:var(--or-l);color:var(--or-d);font-size:10px;font-weight:500;padding:4px 9px;border-radius:20px;white-space:nowrap;display:flex;align-items:center;gap:3px;flex-shrink:0}
-
-.home-body{padding:14px;display:flex;flex-direction:column;gap:14px}
-.hero{background:var(--or);border-radius:var(--border-radius-lg);padding:18px;color:white}
+.sbar{background:#fff;padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--g100)}
+.si{color:var(--g400);font-size:17px;flex-shrink:0}
+.sbar input{flex:1;min-width:0;border:1px solid var(--g200);border-radius:20px;padding:7px 12px;font-size:13px;font-family:inherit;background:var(--g50);color:var(--g900);outline:none}
+.sbar input:focus{border-color:var(--or)}
+.loc{background:var(--or-l);color:var(--or-d);font-size:10px;font-weight:500;padding:4px 9px;border-radius:20px;white-space:nowrap;display:flex;align-items:center;gap:3px;flex-shrink:0}
+.hbody{padding:14px;display:flex;flex-direction:column;gap:14px}
+.hero{background:var(--or);border-radius:var(--rlg);padding:18px;color:#fff}
 .hero-tag{font-size:11px;opacity:.85;margin-bottom:4px}
-.hero-title{font-size:18px;font-weight:500;margin-bottom:12px;line-height:1.3}
-.hero-actions{display:flex;gap:8px;flex-wrap:wrap}
-.hero-btn{background:white;color:var(--or);border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
-.hero-btn2{background:rgba(255,255,255,0.2);color:white;border:1px solid rgba(255,255,255,0.5);border-radius:20px;padding:7px 16px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
-
-.sec-label{font-size:13px;font-weight:500;color:var(--color-text-primary);display:flex;align-items:center;gap:6px}
-.sec-label i{color:var(--or);font-size:16px}
-
-.cat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.cat-box{background:var(--color-background-primary);border-radius:var(--border-radius-md);padding:10px 4px;text-align:center;border:0.5px solid var(--color-border-tertiary);cursor:pointer;transition:all 0.15s}
-.cat-box:hover{border-color:var(--or);background:var(--or-l)}
-.cat-box.active{border-color:var(--or);background:var(--or-l)}
-.cat-emoji{font-size:22px;display:block;margin-bottom:4px}
-.cat-label{font-size:10px;color:var(--color-text-secondary);font-weight:500}
-
-.producers-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.producer-card{background:var(--color-background-primary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:12px}
-.prod-avatar{width:36px;height:36px;border-radius:50%;background:var(--bleu-l);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;color:var(--bleu-d);margin-bottom:8px}
-.prod-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
-.prod-loc{font-size:11px;color:var(--color-text-secondary);display:flex;align-items:center;gap:3px;margin-top:2px}
-.prod-badge{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:500;margin-top:6px;display:inline-block}
-.pb-ver{background:var(--vert-l);color:var(--vert-d)}
-.pb-att{background:var(--jaune-l);color:#7A5500}
-
-.cat-scroll{display:flex;gap:8px;padding:10px 14px;overflow-x:auto;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);scrollbar-width:none}
-.cat-scroll::-webkit-scrollbar{display:none}
-.cat-pill{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--color-text-secondary);font-family:inherit;transition:all 0.15s}
-.cat-pill.active{background:var(--or-l);color:var(--or-d);border-color:var(--or)}
-
-.products-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;background:var(--color-background-tertiary)}
-.product-card{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);overflow:hidden;transition:transform 0.15s}
-.product-card:hover{transform:translateY(-2px)}
-.p-img{width:100%;height:90px;display:flex;align-items:center;justify-content:center;font-size:40px;background:var(--color-background-secondary)}
-.p-info{padding:9px 11px}
-.p-name{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px}
-.p-seller{font-size:10px;color:var(--bleu);display:flex;align-items:center;gap:3px;margin-bottom:2px}
-.p-origin{font-size:10px;color:var(--color-text-secondary);margin-bottom:6px}
-.p-bottom{display:flex;align-items:center;justify-content:space-between}
-.p-price{font-size:13px;font-weight:500;color:var(--or)}
-.p-unit{font-size:9px;color:var(--color-text-secondary)}
-.p-dispo{font-size:9px;color:var(--teal);margin-top:1px}
-.add-btn{background:var(--or);color:white;border:none;border-radius:50%;width:26px;height:26px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
-.add-btn:active{background:var(--or-d);transform:scale(0.9)}
-.badge{font-size:9px;padding:2px 5px;border-radius:6px;font-weight:500}
-.b-nat{background:var(--vert-l);color:var(--vert-d)}
-.b-promo{background:var(--jaune-l);color:#7A5500}
-.b-local{background:var(--rouge-l);color:#8B1A1A}
-.b-new{background:var(--bleu-l);color:var(--bleu-d)}
-
-.cart-body{padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--color-background-tertiary)}
-.c-card{background:var(--color-background-primary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:13px 15px}
-.c-title{font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:11px;display:flex;align-items:center;gap:6px}
-.c-title i{color:var(--or);font-size:15px}
-
-.seller-group{margin-bottom:10px;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:10px}
-.seller-group:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.sg-header{display:flex;align-items:center;gap:6px;margin-bottom:8px;font-size:11px;font-weight:500;color:var(--bleu)}
-.sg-header i{font-size:13px}
-
-.c-item{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
-.c-item:last-child{border-bottom:none}
-.c-emoji{font-size:24px;width:32px;text-align:center;flex-shrink:0}
-.c-info{flex:1;min-width:0}
-.c-name{font-size:12px;font-weight:500;color:var(--color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.c-price{font-size:10px;color:var(--color-text-secondary)}
-.c-from{font-size:10px;color:var(--bleu)}
+.hero-title{font-size:18px;font-weight:600;line-height:1.3;margin-bottom:12px}
+.hero-acts{display:flex;gap:8px;flex-wrap:wrap}
+.hbtn{background:#fff;color:var(--or);border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer}
+.hbtn2{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:7px 16px;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer}
+.slbl{font-size:13px;font-weight:600;color:var(--g700);display:flex;align-items:center;gap:6px}
+.slbl i{color:var(--or);font-size:16px}
+.cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.cbox{background:#fff;border-radius:var(--rmd);padding:10px 4px;text-align:center;border:1px solid var(--g100);cursor:pointer;transition:all .15s}
+.cbox:active{background:var(--or-l);border-color:var(--or)}
+.cemoji{font-size:22px;display:block;margin-bottom:4px}
+.clabel{font-size:10px;color:var(--g400);font-weight:500}
+.prow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pcard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g100);padding:12px}
+.pav{width:34px;height:34px;border-radius:50%;background:var(--bleu-l);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--bleu-d);margin-bottom:7px}
+.pname{font-size:12px;font-weight:600;color:var(--g900)}
+.ploc{font-size:10px;color:var(--g400);display:flex;align-items:center;gap:3px;margin-top:2px}
+.pprod{font-size:10px;color:var(--g400);margin-top:4px}
+.pbadge{font-size:9px;padding:2px 6px;border-radius:7px;font-weight:500;margin-top:6px;display:inline-flex;align-items:center;gap:3px;background:var(--vert-l);color:var(--vert-d)}
+.icard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g100);padding:13px}
+.icard-title{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.icard-title i{color:var(--or);font-size:16px}
+.zirow{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:5px 0;border-bottom:1px solid var(--g100)}
+.zirow:last-child{border-bottom:none}
+.zirow span:first-child{color:var(--g400)}
+.zip{color:var(--vert);font-weight:600}.zipb{color:var(--bleu);font-weight:600}
+.paybadges{display:flex;gap:8px;flex-wrap:wrap}
+.pbdg{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--g100);border-radius:var(--rsm);padding:7px 10px;font-size:11px;font-weight:500;color:var(--g700)}
+.dmtn{width:9px;height:9px;border-radius:50%;background:#F0A500;flex-shrink:0}
+.dmoov{width:9px;height:9px;border-radius:50%;background:#1D7A5A;flex-shrink:0}
+.cscroll{display:flex;gap:8px;padding:10px 14px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--g100);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.cscroll::-webkit-scrollbar{display:none}
+.cpill{background:var(--g50);border:1px solid var(--g200);border-radius:20px;padding:5px 13px;font-size:11px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;color:var(--g400);transition:all .15s}
+.cpill.active{background:var(--or-l);color:var(--or-d);border-color:var(--or)}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;background:var(--g50)}
+.prcard{background:#fff;border-radius:var(--rlg);border:1px solid var(--g100);overflow:hidden;transition:transform .15s}
+.prcard:active{transform:scale(.98)}
+.pimg{width:100%;height:90px;display:flex;align-items:center;justify-content:center;font-size:40px;background:var(--g50)}
+.pinfo{padding:9px 11px}
+.pn{font-size:12px;font-weight:600;color:var(--g900);margin-bottom:2px;line-height:1.3}
+.ps{font-size:10px;color:var(--bleu);display:flex;align-items:center;gap:3px;margin-bottom:1px}
+.po{font-size:10px;color:var(--g400);margin-bottom:6px;display:flex;align-items:center;gap:3px;flex-wrap:wrap}
+.pb{display:flex;align-items:center;justify-content:space-between}
+.pp{font-size:13px;font-weight:600;color:var(--or)}
+.pu{font-size:9px;color:var(--g400)}
+.pd{font-size:9px;color:var(--teal);margin-top:1px}
+.addbtn{background:var(--or);color:#fff;border:none;border-radius:50%;width:27px;height:27px;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0}
+.addbtn:active{background:var(--or-d);transform:scale(.9)}
+.bdg{font-size:9px;padding:2px 5px;border-radius:6px;font-weight:500}
+.bnat{background:var(--vert-l);color:var(--vert-d)}.bpromo{background:var(--jaune-l);color:#7A5500}.blocal{background:var(--rouge-l);color:#8B1A1A}.bnew{background:var(--bleu-l);color:var(--bleu-d)}
+.nores{grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--g400)}
+.nores i{font-size:32px;display:block;margin-bottom:8px}
+.cbody{padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--g50)}
+.ecart{background:#fff;border-radius:var(--rlg);border:1px solid var(--g100);text-align:center;padding:48px 20px;color:var(--g400)}
+.ecart i{font-size:44px;display:block;margin-bottom:10px}
+.bbtn{margin-top:12px;background:var(--or);color:#fff;border:none;border-radius:var(--rsm);padding:9px 20px;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer}
+.ccard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g100);padding:13px 14px}
+.ctitle{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:11px;display:flex;align-items:center;gap:6px}
+.ctitle i{color:var(--or);font-size:15px}
+.sgroup{margin-bottom:10px;border-bottom:1px solid var(--g100);padding-bottom:10px}
+.sgroup:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sghdr{display:flex;align-items:center;gap:6px;margin-bottom:7px;font-size:11px;font-weight:600;color:var(--bleu)}
+.sghdr i{font-size:12px}
+.citem{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--g100)}
+.citem:last-child{border-bottom:none}
+.cemj{font-size:24px;width:32px;text-align:center;flex-shrink:0}
+.cinf{flex:1;min-width:0}
+.cn{font-size:12px;font-weight:600;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cf{font-size:10px;color:var(--bleu)}
+.cp{font-size:10px;color:var(--g400)}
 .qty{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.q-btn{background:var(--color-background-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);width:24px;height:24px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--color-text-primary);font-family:inherit}
-.q-num{font-size:12px;font-weight:500;min-width:16px;text-align:center}
-
-.grouped-banner{background:var(--bleu-l);border:0.5px solid rgba(24,95,165,0.2);border-radius:var(--border-radius-md);padding:10px 12px;display:flex;align-items:flex-start;gap:8px}
-.grouped-banner i{color:var(--bleu);font-size:18px;flex-shrink:0;margin-top:1px}
-.gb-title{font-size:12px;font-weight:500;color:var(--bleu-d)}
-.gb-sub{font-size:11px;color:var(--bleu);margin-top:2px}
-.gb-toggle{margin-top:8px;display:flex;gap:8px}
-.gb-opt{border:1px solid rgba(24,95,165,0.3);border-radius:var(--border-radius-md);padding:6px 10px;font-size:11px;font-weight:500;cursor:pointer;color:var(--bleu-d);background:white;font-family:inherit;transition:all 0.15s}
-.gb-opt.active{background:var(--bleu);color:white;border-color:var(--bleu)}
-
-.zone-opt{border:1.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px 11px;margin-bottom:7px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all 0.15s}
-.zone-opt:last-child{margin-bottom:0}
-.zone-opt:hover,.zone-opt.selected{border-color:var(--or);background:var(--or-l)}
-.z-radio{width:15px;height:15px;border-radius:50%;border:2px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.zone-opt.selected .z-radio{border-color:var(--or)}
-.z-dot{width:7px;height:7px;border-radius:50%;background:var(--or);opacity:0}
-.zone-opt.selected .z-dot{opacity:1}
-.z-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
-.z-detail{font-size:10px;color:var(--color-text-secondary);margin-top:1px}
-.z-price{font-size:12px;font-weight:500;color:var(--vert);white-space:nowrap}
-.z-free{font-size:12px;font-weight:500;color:var(--teal);white-space:nowrap}
-
-.pay-opt{border:1.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:9px 11px;margin-bottom:7px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all 0.15s}
-.pay-opt:last-child{margin-bottom:0}
-.pay-opt:hover,.pay-opt.selected{border-color:var(--or);background:var(--or-l)}
-.p-radio{width:15px;height:15px;border-radius:50%;border:2px solid var(--color-border-secondary);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.pay-opt.selected .p-radio{border-color:var(--or)}
-.p-dot{width:7px;height:7px;border-radius:50%;background:var(--or);opacity:0}
-.pay-opt.selected .p-dot{opacity:1}
-.pay-name{font-size:12px;font-weight:500;color:var(--color-text-primary)}
-.pay-sub{font-size:10px;color:var(--color-text-secondary)}
-
-.sum-card{background:var(--or-l);border-radius:var(--border-radius-md);padding:12px 14px;border:0.5px solid rgba(212,120,26,0.18)}
-.sum-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--or-d)}
-.sum-total{display:flex;justify-content:space-between;font-size:15px;font-weight:500;padding:7px 0 0;border-top:0.5px solid rgba(212,120,26,0.25);margin-top:5px;color:var(--or)}
-
-.order-btn{width:100%;background:var(--or);color:white;border:none;border-radius:var(--border-radius-md);padding:13px;font-size:14px;font-family:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:background 0.15s}
-.order-btn:disabled{background:var(--color-border-tertiary);color:var(--color-text-secondary);cursor:not-allowed}
-
-.register-body{padding:14px;display:flex;flex-direction:column;gap:12px}
-.reg-card{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);padding:16px}
-.reg-title{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;display:flex;align-items:center;gap:7px}
-.reg-title i{color:var(--bleu);font-size:18px}
-.reg-sub{font-size:12px;color:var(--color-text-secondary);margin-bottom:14px}
-.form-group{margin-bottom:10px}
-.form-label{font-size:11px;font-weight:500;color:var(--color-text-secondary);margin-bottom:4px;display:block}
-.form-input{width:100%;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px 11px;font-size:12px;font-family:inherit;background:var(--color-background-secondary);color:var(--color-text-primary);outline:none}
-.form-input:focus{border-color:var(--or)}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.form-select{width:100%;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);padding:8px 11px;font-size:12px;font-family:inherit;background:var(--color-background-secondary);color:var(--color-text-primary);outline:none}
-.submit-btn{width:100%;background:var(--bleu);color:white;border:none;border-radius:var(--border-radius-md);padding:12px;font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
-.commission-info{background:var(--bleu-l);border-radius:var(--border-radius-md);padding:10px 12px;display:flex;gap:8px;align-items:flex-start;font-size:11px;color:var(--bleu-d)}
-.commission-info i{color:var(--bleu);font-size:16px;flex-shrink:0;margin-top:1px}
-
-.confirm-page{padding:40px 20px;text-align:center;background:var(--color-background-primary)}
-.confirm-icon{font-size:56px;color:var(--vert);margin-bottom:14px}
-.confirm-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:13px;text-align:left;margin:16px 0;border:0.5px solid var(--color-border-tertiary)}
-.cf-row{display:flex;justify-content:space-between;font-size:12px;padding:5px 0;border-bottom:0.5px solid var(--color-border-tertiary)}
-.cf-row:last-child{border-bottom:none}
-.new-btn{background:var(--or);color:white;border:none;border-radius:var(--border-radius-md);padding:11px 28px;font-size:13px;font-family:inherit;font-weight:500;cursor:pointer}
-
-.empty-cart{background:var(--color-background-primary);border-radius:var(--border-radius-lg);border:0.5px solid var(--color-border-tertiary);text-align:center;padding:48px 20px;color:var(--color-text-secondary)}
-.empty-cart i{font-size:44px;display:block;margin-bottom:10px}
-.browse-btn{margin-top:12px;background:var(--or);color:white;border:none;border-radius:var(--border-radius-md);padding:9px 20px;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer}
+.qbtn{background:var(--g50);border:1px solid var(--g200);border-radius:var(--rsm);width:25px;height:25px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--g900);font-family:inherit}
+.qnum{font-size:12px;font-weight:600;min-width:16px;text-align:center;color:var(--g900)}
+.gbanner{background:var(--bleu-l);border:1px solid rgba(24,95,165,.15);border-radius:var(--rmd);padding:12px;display:flex;align-items:flex-start;gap:9px}
+.gbanner i{color:var(--bleu);font-size:20px;flex-shrink:0;margin-top:1px}
+.gbt{font-size:12px;font-weight:600;color:var(--bleu-d)}
+.gbs{font-size:11px;color:var(--bleu);margin-top:2px;line-height:1.5}
+.gbtog{margin-top:9px;display:flex;gap:7px;flex-wrap:wrap}
+.gbopt{border:1px solid rgba(24,95,165,.3);border-radius:var(--rsm);padding:6px 10px;font-size:11px;font-weight:500;cursor:pointer;color:var(--bleu-d);background:#fff;font-family:inherit;transition:all .15s}
+.gbopt.active{background:var(--bleu);color:#fff;border-color:var(--bleu)}
+.zopt{border:1.5px solid var(--g200);border-radius:var(--rsm);padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .15s}
+.zopt:last-child{margin-bottom:0}
+.zopt:active,.zopt.selected{border-color:var(--or);background:var(--or-l)}
+.zradio{width:15px;height:15px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.zopt.selected .zradio{border-color:var(--or)}
+.zdot{width:7px;height:7px;border-radius:50%;background:var(--or);opacity:0}
+.zopt.selected .zdot{opacity:1}
+.zico{font-size:19px}
+.zn{font-size:12px;font-weight:600;color:var(--g900)}
+.zd{font-size:10px;color:var(--g400);margin-top:1px}
+.zprice{font-size:12px;font-weight:600;color:var(--vert);white-space:nowrap}
+.zfree{font-size:12px;font-weight:600;color:var(--teal);white-space:nowrap}
+.popt{border:1.5px solid var(--g200);border-radius:var(--rsm);padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .15s}
+.popt:last-child{margin-bottom:0}
+.popt:active,.popt.selected{border-color:var(--or);background:var(--or-l)}
+.pradio{width:15px;height:15px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.popt.selected .pradio{border-color:var(--or)}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--or);opacity:0}
+.popt.selected .pdot{opacity:1}
+.pico{font-size:20px}
+.pnm{font-size:12px;font-weight:600;color:var(--g900)}
+.psb{font-size:10px;color:var(--g400)}
+.scard{background:var(--or-l);border-radius:var(--rmd);padding:13px 14px;border:1px solid rgba(212,120,26,.18)}
+.srow{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--or-d)}
+.stotal{display:flex;justify-content:space-between;font-size:15px;font-weight:600;padding:8px 0 0;border-top:1px solid rgba(212,120,26,.25);margin-top:5px;color:var(--or)}
+.obtn{width:100%;background:var(--or);color:#fff;border:none;border-radius:var(--rmd);padding:14px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 12px rgba(212,120,26,.25);transition:background .15s}
+.obtn:active:not(:disabled){background:var(--or-d)}
+.obtn:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed;box-shadow:none}
+.regbody{padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--g50)}
+.commbox{background:var(--bleu-l);border:1px solid rgba(24,95,165,.15);border-radius:var(--rmd);padding:11px 13px;display:flex;gap:9px;align-items:flex-start;font-size:11px;color:var(--bleu-d);line-height:1.5}
+.commbox i{color:var(--bleu);font-size:17px;flex-shrink:0;margin-top:1px}
+.regcard{background:#fff;border-radius:var(--rlg);border:1px solid var(--g100);padding:15px}
+.regtit{font-size:14px;font-weight:600;color:var(--g900);margin-bottom:3px;display:flex;align-items:center;gap:7px}
+.regtit i{color:var(--bleu);font-size:18px}
+.regsub{font-size:12px;color:var(--g400);margin-bottom:14px;line-height:1.5}
+.fg{margin-bottom:10px}
+.fl{font-size:11px;font-weight:500;color:var(--g400);margin-bottom:4px;display:block}
+.fi{width:100%;border:1px solid var(--g200);border-radius:var(--rmd);padding:9px 12px;font-size:13px;font-family:inherit;background:var(--g50);color:var(--g900);outline:none}
+.fi:focus{border-color:var(--or)}
+textarea.fi{resize:vertical;min-height:80px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sbtn{width:100%;background:var(--bleu);color:#fff;border:none;border-radius:var(--rmd);padding:13px;font-size:13px;font-family:inherit;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
+.pendcard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g100);padding:13px 14px}
+.pendtit{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.pendtit i{color:var(--bleu);font-size:15px}
+.penditem{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--g100)}
+.penditem:last-child{border-bottom:none}
+.pav2{width:32px;height:32px;border-radius:50%;background:var(--jaune-l);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#7A5500;flex-shrink:0}
+.pavi{flex:1}
+.pavname{font-size:12px;font-weight:600;color:var(--g900)}
+.pavsub{font-size:10px;color:var(--g400);margin-top:1px}
+.battente{font-size:9px;padding:2px 7px;border-radius:7px;font-weight:500;background:var(--jaune-l);color:#7A5500;white-space:nowrap}
+.confpage{padding:48px 20px;text-align:center;background:#fff;min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.conficon{font-size:60px;color:var(--vert);margin-bottom:14px}
+.conftit{font-size:20px;font-weight:600;color:var(--g900);margin-bottom:7px}
+.confsub{font-size:13px;color:var(--g400);line-height:1.6;margin-bottom:20px;max-width:300px}
+.confcard{background:var(--g50);border-radius:var(--rmd);padding:13px;width:100%;text-align:left;margin-bottom:22px;border:1px solid var(--g100)}
+.crow{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 0;border-bottom:1px solid var(--g100)}
+.crow:last-child{border-bottom:none}
+.clbl{color:var(--g400)}.cval{font-weight:600;color:var(--g900);text-align:right}.ctot{font-weight:700;color:var(--or);font-size:14px}
+.newbtn{background:var(--or);color:#fff;border:none;border-radius:var(--rmd);padding:12px 30px;font-size:13px;font-family:inherit;font-weight:600;cursor:pointer}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--g900);color:#fff;padding:9px 16px;border-radius:20px;font-size:12px;font-weight:500;z-index:999;transition:transform .3s;white-space:nowrap;display:flex;align-items:center;gap:7px;max-width:92vw}
+.toast.show{transform:translateX(-50%) translateY(0)}
 </style>
-
+</head>
+<body>
 <div class="app">
-<div class="header">
-  <div>
-    <div class="h-brand">🌴 Brasserie Naturelle</div>
-    <div class="h-sub">Marketplace · Produits du Bénin</div>
-  </div>
+<header class="header">
+  <div><div class="h-title">🌴 Brasserie Naturelle</div><div class="h-sub">Marketplace · Produits du Bénin</div></div>
   <div class="h-right">
-    <button class="prod-btn" onclick="showTab('register')"><i class="ti ti-user-plus" aria-hidden="true"></i>Producteur</button>
-    <button class="cart-btn" onclick="showTab('cart')"><i class="ti ti-shopping-cart" aria-hidden="true"></i>Panier <span class="cart-count" id="cartCount">0</span></button>
+    <button class="prod-btn" onclick="showTab('register')"><i class="ti ti-user-plus"></i><span class="btn-lbl">Producteur</span></button>
+    <button class="cart-btn" onclick="showTab('cart')"><i class="ti ti-shopping-cart"></i><span class="btn-lbl">Panier</span><span class="cart-count" id="cartCount">0</span></button>
   </div>
-</div>
-
+</header>
 <nav class="nav-tabs">
-  <button class="tab active" id="tab-home" onclick="showTab('home')"><i class="ti ti-home" aria-hidden="true"></i>Accueil</button>
-  <button class="tab" id="tab-products" onclick="showTab('products')"><i class="ti ti-basket" aria-hidden="true"></i>Produits</button>
-  <button class="tab" id="tab-cart" onclick="showTab('cart')"><i class="ti ti-shopping-cart" aria-hidden="true"></i>Panier</button>
-  <button class="tab" id="tab-register" onclick="showTab('register')"><i class="ti ti-building-store" aria-hidden="true"></i>Espace Pro</button>
+  <button class="tab active" id="tab-home" onclick="showTab('home')"><i class="ti ti-home"></i><span>Accueil</span></button>
+  <button class="tab" id="tab-products" onclick="showTab('products')"><i class="ti ti-basket"></i><span>Produits</span></button>
+  <button class="tab" id="tab-cart" onclick="showTab('cart')"><i class="ti ti-shopping-cart"></i><span>Panier</span></button>
+  <button class="tab" id="tab-register" onclick="showTab('register')"><i class="ti ti-building-store"></i><span>Espace Pro</span></button>
 </nav>
-
 <div id="page-home" class="page active">
-  <div class="search-bar">
-    <i class="ti ti-search" style="color:var(--color-text-secondary);font-size:17px" aria-hidden="true"></i>
-    <input type="text" placeholder="Rechercher gari, mangue, vin de palme..." oninput="filtrer(this.value)" />
-    <span class="loc-badge"><i class="ti ti-map-pin" style="font-size:11px" aria-hidden="true"></i>Bénin</span>
-  </div>
-  <div class="home-body">
-    <div class="hero">
-      <div class="hero-tag">Marketplace multi-producteurs · Livraison groupée disponible</div>
-      <div class="hero-title">Produits naturels du Bénin<br>directement des producteurs 🌴</div>
-      <div class="hero-actions">
-        <button class="hero-btn" onclick="showTab('products')">Voir les produits →</button>
-        <button class="hero-btn2" onclick="showTab('register')">Devenir producteur</button>
-      </div>
+  <div class="sbar"><i class="ti ti-search si"></i><input type="text" placeholder="Rechercher gari, mangue, poisson..." oninput="filtrer(this.value)"/><span class="loc"><i class="ti ti-map-pin"></i> Bénin</span></div>
+  <div class="hbody">
+    <div class="hero"><div class="hero-tag">Marketplace multi-producteurs · Livraison groupée</div><div class="hero-title">Produits naturels du Bénin<br>directement des producteurs 🌴</div><div class="hero-acts"><button class="hbtn" onclick="showTab('products')">Voir les produits →</button><button class="hbtn2" onclick="showTab('register')">Devenir producteur</button></div></div>
+    <div class="slbl"><i class="ti ti-category"></i>Catégories</div>
+    <div class="cgrid" id="homeCatGrid"></div>
+    <div class="slbl"><i class="ti ti-users"></i>Producteurs vérifiés</div>
+    <div class="prow" id="producersRow"></div>
+    <div class="icard">
+      <div class="icard-title"><i class="ti ti-truck"></i>Zones de livraison</div>
+      <div class="zirow"><span>🏪 Retrait point relais</span><span class="zip">Gratuit</span></div>
+      <div class="zirow"><span>🛵 Cotonou ville (&lt;5 km)</span><span class="zip">500 FCFA</span></div>
+      <div class="zirow"><span>🚐 Cotonou périphérie (5–15 km)</span><span class="zip">1 000 FCFA</span></div>
+      <div class="zirow"><span>🚚 Abomey-Calavi</span><span class="zip">1 500 FCFA</span></div>
+      <div class="zirow"><span>📦 Livraison groupée multi-vendeurs</span><span class="zipb">+500 FCFA</span></div>
     </div>
-    <div class="sec-label"><i class="ti ti-category" aria-hidden="true"></i>Catégories</div>
-    <div class="cat-grid" id="homeCatGrid"></div>
-    <div class="sec-label"><i class="ti ti-users" aria-hidden="true"></i>Producteurs vérifiés</div>
-    <div class="producers-row" id="producersRow"></div>
-    <div style="background:var(--color-background-primary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:13px">
-      <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-truck" style="color:var(--or);font-size:16px" aria-hidden="true"></i>Zones de livraison</div>
-      <div style="display:flex;flex-direction:column;gap:5px">
-        <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="color:var(--color-text-secondary)">🏪 Retrait point relais</span><span style="color:var(--vert);font-weight:500">Gratuit</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="color:var(--color-text-secondary)">🛵 Cotonou ville</span><span style="color:var(--vert);font-weight:500">500 FCFA</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="color:var(--color-text-secondary)">🚐 Cotonou périphérie</span><span style="color:var(--vert);font-weight:500">1 000 FCFA</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-bottom:0.5px solid var(--color-border-tertiary)"><span style="color:var(--color-text-secondary)">🚚 Abomey-Calavi</span><span style="color:var(--vert);font-weight:500">1 500 FCFA</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0"><span style="color:var(--color-text-secondary)">📦 Livraison groupée (multi-vendeurs)</span><span style="color:var(--bleu);font-weight:500">+500 FCFA</span></div>
-      </div>
+    <div class="paybadges">
+      <div class="pbdg"><span class="dmtn"></span>MTN Mobile Money</div>
+      <div class="pbdg"><span class="dmoov"></span>Moov Money</div>
+      <div class="pbdg"><i class="ti ti-cash"></i>Paiement livraison</div>
     </div>
   </div>
 </div>
-
 <div id="page-products" class="page">
-  <div class="search-bar">
-    <i class="ti ti-search" style="color:var(--color-text-secondary);font-size:17px" aria-hidden="true"></i>
-    <input type="text" placeholder="Rechercher un produit..." oninput="filtrer(this.value)" />
-  </div>
-  <div class="cat-scroll" id="catScroll"></div>
-  <div class="products-grid" id="productsGrid"></div>
+  <div class="sbar"><i class="ti ti-search si"></i><input type="text" placeholder="Rechercher un produit ou producteur..." oninput="filtrer(this.value)"/></div>
+  <div class="cscroll" id="catScroll"></div>
+  <div class="pgrid" id="productsGrid"></div>
 </div>
-
-<div id="page-cart" class="page">
-  <div id="cart-content"></div>
+<div id="page-cart" class="page"><div id="cart-content"></div></div>
+<div id="page-register" class="page"><div id="register-content"></div></div>
+<div id="page-confirm" class="page"><div id="confirm-content"></div></div>
 </div>
-
-<div id="page-register" class="page">
-  <div class="register-body" id="registerBody"></div>
-</div>
-
-<div id="page-confirm" class="page">
-  <div id="confirm-content"></div>
-</div>
-</div>
-
 <script>
-var PRODUCTEURS = [
-  { id:'p1', nom:'Kokou Agbossou', initiales:'KA', ville:'Savalou', region:'Centre', produits:'Gari, Farine de manioc', statut:'verifie' },
-  { id:'p2', nom:'Mariama Traoré', initiales:'MT', ville:'Tanguiéta', region:'Nord', produits:'Mangue, Karité', statut:'verifie' },
-  { id:'p3', nom:'Jean-Baptiste Dossou', initiales:'JD', ville:'Abomey', region:'Zou', produits:'Galette, Pâte d\'arachide', statut:'verifie' },
-  { id:'p4', nom:'Fatou Alabi', initiales:'FA', ville:'Lokossa', region:'Mono', produits:'Huile de palme, Noix', statut:'verifie' },
-  { id:'p5', nom:'Sènan Houénou', initiales:'SH', ville:'Grand-Popo', region:'Littoral', produits:'Poisson, Crevettes', statut:'verifie' },
-  { id:'p6', nom:'Ibrahim Kané', initiales:'IK', ville:'Parakou', region:'Nord', produits:'Tchoukoutou, Bière de mil', statut:'attente' },
-];
-
-var PRODUITS = [
-  { id:1,  nom:'Gari de Savalou',      vendeur:'Kokou Agbossou', origine:'Savalou',    emoji:'🌾', prix:600,  unite:'kg',     cat:'Épicerie',    badge:'local',  dispo:'50 kg dispo', pid:'p1' },
-  { id:2,  nom:'Mangue de Tanguiéta',  vendeur:'Mariama Traoré', origine:'Tanguiéta',  emoji:'🥭', prix:800,  unite:'kg',     cat:'Fruits',      badge:'nat',    dispo:'200 kg dispo', pid:'p2' },
-  { id:3,  nom:'Galette d\'Abomey',    vendeur:'J.-B. Dossou',   origine:'Abomey',     emoji:'🥙', prix:1000, unite:'sachet', cat:'Épicerie',    badge:'local',  dispo:'30 sachets', pid:'p3' },
-  { id:4,  nom:'Huile de Palme',       vendeur:'Fatou Alabi',    origine:'Lokossa',    emoji:'🫙', prix:1200, unite:'litre',  cat:'Huiles',      badge:'nat',    dispo:'80 litres', pid:'p4' },
-  { id:5,  nom:'Tilapia frais',        vendeur:'Sènan Houénou',  origine:'Grand-Popo', emoji:'🐟', prix:2500, unite:'kg',     cat:'Poissons',    badge:'nat',    dispo:'40 kg dispo', pid:'p5' },
-  { id:6,  nom:'Poisson chat',         vendeur:'Sènan Houénou',  origine:'Grand-Popo', emoji:'🐠', prix:2000, unite:'kg',     cat:'Poissons',    badge:'local',  dispo:'25 kg dispo', pid:'p5' },
-  { id:7,  nom:'Crevettes fumées',     vendeur:'Sènan Houénou',  origine:'Grand-Popo', emoji:'🦐', prix:3500, unite:'kg',     cat:'Crustacés',   badge:'nat',    dispo:'15 kg dispo', pid:'p5' },
-  { id:8,  nom:'Viande de mouton',     vendeur:'Kokou Agbossou', origine:'Savalou',    emoji:'🍖', prix:4000, unite:'kg',     cat:'Viandes',     badge:'local',  dispo:'20 kg dispo', pid:'p1' },
-  { id:9,  nom:'Viande de bœuf',       vendeur:'Kokou Agbossou', origine:'Savalou',    emoji:'🥩', prix:3500, unite:'kg',     cat:'Viandes',     badge:'local',  dispo:'35 kg dispo', pid:'p1' },
-  { id:10, nom:'Viande de porc',       vendeur:'J.-B. Dossou',   origine:'Abomey',     emoji:'🥓', prix:3000, unite:'kg',     cat:'Viandes',     badge:'local',  dispo:'18 kg dispo', pid:'p3' },
-  { id:11, nom:'Tomates fraîches',     vendeur:'Mariama Traoré', origine:'Tanguiéta',  emoji:'🍅', prix:500,  unite:'kg',     cat:'Légumes',     badge:'nat',    dispo:'100 kg dispo', pid:'p2' },
-  { id:12, nom:'Piment vert',          vendeur:'Mariama Traoré', origine:'Tanguiéta',  emoji:'🌶', prix:600,  unite:'kg',     cat:'Légumes',     badge:'nat',    dispo:'30 kg dispo', pid:'p2' },
-  { id:13, nom:'Gombo frais',          vendeur:'Fatou Alabi',    origine:'Lokossa',    emoji:'🫛', prix:400,  unite:'kg',     cat:'Légumes',     badge:'nat',    dispo:'60 kg dispo', pid:'p4' },
-  { id:14, nom:'Oignon local',         vendeur:'Kokou Agbossou', origine:'Savalou',    emoji:'🧅', prix:700,  unite:'kg',     cat:'Légumes',     badge:'local',  dispo:'90 kg dispo', pid:'p1' },
-  { id:15, nom:'Oeuf de poule',        vendeur:'J.-B. Dossou',   origine:'Abomey',     emoji:'🥚', prix:150,  unite:'unité',  cat:'Oeufs',       badge:'nat',    dispo:'500 unités', pid:'p3' },
-  { id:16, nom:'Oeuf de pintade',      vendeur:'Mariama Traoré', origine:'Tanguiéta',  emoji:'🥚', prix:250,  unite:'unité',  cat:'Oeufs',       badge:'local',  dispo:'120 unités', pid:'p2' },
-  { id:17, nom:'Oeuf de canard',       vendeur:'Fatou Alabi',    origine:'Lokossa',    emoji:'🥚', prix:200,  unite:'unité',  cat:'Oeufs',       badge:'nat',    dispo:'80 unités', pid:'p4' },
-  { id:18, nom:'Oeuf de caille',       vendeur:'Sènan Houénou',  origine:'Grand-Popo', emoji:'🫙', prix:100,  unite:'unité',  cat:'Oeufs',       badge:'new',    dispo:'300 unités', pid:'p5' },
-  { id:19, nom:'Vin de Palme',         vendeur:'Fatou Alabi',    origine:'Lokossa',    emoji:'🍶', prix:500,  unite:'litre',  cat:'Brasserie',   badge:'nat',    dispo:'60 litres', pid:'p4' },
-  { id:20, nom:'Piment séché du Bénin',vendeur:'Mariama Traoré', origine:'Tanguiéta',  emoji:'🌶', prix:500,  unite:'250g',   cat:'Épices',      badge:'nat',    dispo:'40 sachets', pid:'p2' },
-  { id:21, nom:'Poivre de Sélim',      vendeur:'Kokou Agbossou', origine:'Savalou',    emoji:'🫙', prix:800,  unite:'100g',   cat:'Épices',      badge:'nat',    dispo:'50 sachets', pid:'p1' },
-  { id:22, nom:'Bissap séché',         vendeur:'J.-B. Dossou',   origine:'Abomey',     emoji:'🌺', prix:600,  unite:'250g',   cat:'Épices',      badge:'local',  dispo:'35 sachets', pid:'p3' },
-];
-
-var HOME_CATS = [
-  { emoji:'🌾', label:'Épicerie',   cat:'Épicerie' },
-  { emoji:'🥩', label:'Viandes',    cat:'Viandes' },
-  { emoji:'🐟', label:'Poissons',   cat:'Poissons' },
-  { emoji:'🦐', label:'Crustacés',  cat:'Crustacés' },
-  { emoji:'🥚', label:'Oeufs',      cat:'Oeufs' },
-  { emoji:'🥦', label:'Légumes',    cat:'Légumes' },
-  { emoji:'🍶', label:'Brasserie',  cat:'Brasserie' },
-  { emoji:'🌶', label:'Épices',     cat:'Épices' },
-  { emoji:'🫙', label:'Huiles',     cat:'Huiles' },
-  { emoji:'🍍', label:'Fruits',     cat:'Fruits' },
-  { emoji:'🛒', label:'Tout voir',  cat:'Tous' },
-  { emoji:'⭐', label:'Promos',     cat:'_promo' },
-];
-
-var ZONES = [
-  { id:'retrait',   nom:'Point relais Cotonou',   detail:'Retrait gratuit · Disponible J+2', prix:0,    icon:'🏪' },
-  { id:'cot-ville', nom:'Cotonou ville',           detail:'< 5 km · Livraison sous 2h',       prix:500,  icon:'🛵' },
-  { id:'cot-peri',  nom:'Cotonou périphérie',      detail:'5–15 km · Livraison sous 4h',       prix:1000, icon:'🚐' },
-  { id:'abomey',    nom:'Abomey-Calavi',            detail:'Livraison sous 5–7h',               prix:1500, icon:'🚚' },
-];
-
-var PAIEMENTS = [
-  { id:'mtn',       nom:'MTN Mobile Money',        sub:'*880# pour payer',   icon:'📱' },
-  { id:'moov',      nom:'Moov Money',               sub:'*155# pour payer',   icon:'💚' },
-  { id:'livraison', nom:'Paiement à la livraison',  sub:'Espèces acceptées',  icon:'💵' },
-];
-
-var panier={}, catActive='Tous', zoneActive=null, paiementActif=null, recherche='', livraisonGroupee=true;
-
-function fcfa(p){ return p.toLocaleString('fr-FR')+' FCFA'; }
-function getProduit(id){ return PRODUITS.find(function(p){ return p.id===id; }); }
-function getZone(id){ return ZONES.find(function(z){ return z.id===id; }); }
-function totalPanier(){ var t=0; for(var k in panier) t+=panier[k]; return t; }
-function sousTotal(){ var t=0; for(var k in panier){ var p=getProduit(parseInt(k)); if(p) t+=p.prix*panier[k]; } return t; }
-function nbVendeurs(){ var v={}; for(var k in panier){ var p=getProduit(parseInt(k)); if(p) v[p.pid]=1; } return Object.keys(v).length; }
-
-function ajouterPanier(id){ panier[id]=(panier[id]||0)+1; majCompteur(); var p=getProduit(id); if(p) showToast(p.nom+' ajouté', p.emoji); }
-function retirerPanier(id){ if(!panier[id]) return; if(panier[id]>1) panier[id]--; else delete panier[id]; majCompteur(); renderPanier(); }
-function augQty(id){ if(!panier[id]) return; panier[id]++; majCompteur(); renderPanier(); }
-function majCompteur(){ document.getElementById('cartCount').textContent=totalPanier(); }
-
+var PRODUCTEURS=[{id:'p1',nom:'Kokou Agbossou',ini:'KA',ville:'Savalou',region:'Collines',produits:'Gari, Viandes',statut:'verifie'},{id:'p2',nom:'Mariama Traoré',ini:'MT',ville:'Tanguiéta',region:'Atacora',produits:'Mangue, Légumes, Oeufs',statut:'verifie'},{id:'p3',nom:'Jean-Baptiste Dossou',ini:'JD',ville:'Abomey',region:'Zou',produits:'Galette, Oeufs',statut:'verifie'},{id:'p4',nom:'Fatou Alabi',ini:'FA',ville:'Lokossa',region:'Mono',produits:'Huile, Oeufs',statut:'verifie'},{id:'p5',nom:'Sènan Houénou',ini:'SH',ville:'Grand-Popo',region:'Littoral',produits:'Poisson, Crevettes',statut:'verifie'},{id:'p6',nom:'Ibrahim Kané',ini:'IK',ville:'Parakou',region:'Borgou',produits:'Tchoukoutou',statut:'attente'}];
+var PRODUITS=[{id:1,nom:'Gari de Savalou',v:'Kokou Agbossou',o:'Savalou',e:'🌾',p:600,u:'kg',c:'Épicerie',b:'local',d:'50 kg',pid:'p1'},{id:2,nom:'Mangue de Tanguiéta',v:'Mariama Traoré',o:'Tanguiéta',e:'🥭',p:800,u:'kg',c:'Fruits',b:'nat',d:'200 kg',pid:'p2'},{id:3,nom:"Galette d'Abomey",v:'J.-B. Dossou',o:'Abomey',e:'🥙',p:1000,u:'sachet',c:'Épicerie',b:'local',d:'30 pcs',pid:'p3'},{id:4,nom:'Huile de Palme Rouge',v:'Fatou Alabi',o:'Lokossa',e:'🫙',p:1200,u:'litre',c:'Huiles',b:'nat',d:'80 L',pid:'p4'},{id:5,nom:'Tilapia frais',v:'Sènan Houénou',o:'Grand-Popo',e:'🐟',p:2500,u:'kg',c:'Poissons',b:'nat',d:'40 kg',pid:'p5'},{id:6,nom:'Poisson chat',v:'Sènan Houénou',o:'Grand-Popo',e:'🐠',p:2000,u:'kg',c:'Poissons',b:'local',d:'25 kg',pid:'p5'},{id:7,nom:'Crevettes fumées',v:'Sènan Houénou',o:'Grand-Popo',e:'🦐',p:3500,u:'kg',c:'Crustacés',b:'nat',d:'15 kg',pid:'p5'},{id:8,nom:'Viande de mouton',v:'Kokou Agbossou',o:'Savalou',e:'🍖',p:4000,u:'kg',c:'Viandes',b:'local',d:'20 kg',pid:'p1'},{id:9,nom:'Viande de bœuf',v:'Kokou Agbossou',o:'Savalou',e:'🥩',p:3500,u:'kg',c:'Viandes',b:'local',d:'35 kg',pid:'p1'},{id:10,nom:'Viande de porc',v:'J.-B. Dossou',o:'Abomey',e:'🥓',p:3000,u:'kg',c:'Viandes',b:'local',d:'18 kg',pid:'p3'},{id:11,nom:'Tomates fraîches',v:'Mariama Traoré',o:'Tanguiéta',e:'🍅',p:500,u:'kg',c:'Légumes',b:'nat',d:'100 kg',pid:'p2'},{id:12,nom:'Piment vert',v:'Mariama Traoré',o:'Tanguiéta',e:'🌶',p:600,u:'kg',c:'Légumes',b:'nat',d:'30 kg',pid:'p2'},{id:13,nom:'Gombo frais',v:'Fatou Alabi',o:'Lokossa',e:'🫛',p:400,u:'kg',c:'Légumes',b:'nat',d:'60 kg',pid:'p4'},{id:14,nom:'Oignon local',v:'Kokou Agbossou',o:'Savalou',e:'🧅',p:700,u:'kg',c:'Légumes',b:'local',d:'90 kg',pid:'p1'},{id:15,nom:'Oeuf de poule',v:'J.-B. Dossou',o:'Abomey',e:'🥚',p:150,u:'unité',c:'Oeufs',b:'nat',d:'500 u.',pid:'p3'},{id:16,nom:'Oeuf de pintade',v:'Mariama Traoré',o:'Tanguiéta',e:'🥚',p:250,u:'unité',c:'Oeufs',b:'local',d:'120 u.',pid:'p2'},{id:17,nom:'Oeuf de canard',v:'Fatou Alabi',o:'Lokossa',e:'🥚',p:200,u:'unité',c:'Oeufs',b:'nat',d:'80 u.',pid:'p4'},{id:18,nom:'Oeuf de caille',v:'Sènan Houénou',o:'Grand-Popo',e:'🥚',p:100,u:'unité',c:'Oeufs',b:'new',d:'300 u.',pid:'p5'},{id:19,nom:'Vin de Palme',v:'Fatou Alabi',o:'Lokossa',e:'🍶',p:500,u:'litre',c:'Brasserie',b:'nat',d:'60 L',pid:'p4'},{id:20,nom:'Piment séché du Bénin',v:'Mariama Traoré',o:'Tanguiéta',e:'🌶',p:500,u:'250g',c:'Épices',b:'nat',d:'40 pcs',pid:'p2'},{id:21,nom:'Poivre de Sélim',v:'Kokou Agbossou',o:'Savalou',e:'🫙',p:800,u:'100g',c:'Épices',b:'nat',d:'50 pcs',pid:'p1'},{id:22,nom:'Bissap séché',v:'J.-B. Dossou',o:'Abomey',e:'🌺',p:600,u:'250g',c:'Épices',b:'local',d:'35 pcs',pid:'p3'}];
+var HCATS=[{e:'🥩',l:'Viandes',c:'Viandes'},{e:'🐟',l:'Poissons',c:'Poissons'},{e:'🦐',l:'Crustacés',c:'Crustacés'},{e:'🥚',l:'Oeufs',c:'Oeufs'},{e:'🥦',l:'Légumes',c:'Légumes'},{e:'🍍',l:'Fruits',c:'Fruits'},{e:'🌾',l:'Épicerie',c:'Épicerie'},{e:'🫙',l:'Huiles',c:'Huiles'},{e:'🍶',l:'Brasserie',c:'Brasserie'},{e:'🌶',l:'Épices',c:'Épices'},{e:'🛒',l:'Tout voir',c:'Tous'},{e:'⭐',l:'Promos',c:'_promo'}];
+var ZONES=[{id:'retrait',n:'Point relais Cotonou',d:'Retrait gratuit · J+2',p:0,i:'🏪'},{id:'cot-ville',n:'Cotonou ville',d:'< 5 km · sous 2h',p:500,i:'🛵'},{id:'cot-peri',n:'Cotonou périphérie',d:'5–15 km · sous 4h',p:1000,i:'🚐'},{id:'abomey',n:'Abomey-Calavi',d:'Livraison sous 5–7h',p:1500,i:'🚚'}];
+var PAYS=[{id:'mtn',n:'MTN Mobile Money',s:'*880# pour payer',i:'📱'},{id:'moov',n:'Moov Money',s:'*155# pour payer',i:'💚'},{id:'liv',n:'Paiement à la livraison',s:'Espèces acceptées',i:'💵'}];
+var panier={},catA='Tous',zoneA=null,payA=null,rech='',groupe=true;
+function fcfa(p){return p.toLocaleString('fr-FR')+' FCFA'}
+function gp(id){return PRODUITS.find(function(p){return p.id===id})}
+function gz(id){return ZONES.find(function(z){return z.id===id})}
+function tot(){var t=0;for(var k in panier)t+=panier[k];return t}
+function stot(){var t=0;for(var k in panier){var p=gp(parseInt(k));if(p)t+=p.p*panier[k]}return t}
+function nv(){var v={};for(var k in panier){var p=gp(parseInt(k));if(p)v[p.pid]=1}return Object.keys(v).length}
 var tt;
-function showToast(msg,icon){
-  var el=document.querySelector('.toast'); if(el) el.remove();
-  var t=document.createElement('div');
-  t.style.cssText='position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(60px);background:#1A1A18;color:white;padding:9px 16px;border-radius:20px;font-size:12px;font-weight:500;z-index:999;transition:transform 0.3s;white-space:nowrap;display:flex;align-items:center;gap:7px;max-width:90vw;font-family:var(--font-sans)';
-  t.innerHTML='<span>'+(icon||'✅')+'</span><span>'+msg+'</span>';
-  document.body.appendChild(t);
-  setTimeout(function(){ t.style.transform='translateX(-50%) translateY(0)'; },10);
-  if(tt) clearTimeout(tt);
-  tt=setTimeout(function(){ t.style.transform='translateX(-50%) translateY(60px)'; setTimeout(function(){ if(t.parentNode) t.remove(); },300); },2000);
-}
-
-function buildHomeCats(){
-  var g=document.getElementById('homeCatGrid'); if(!g) return;
-  var h='';
-  HOME_CATS.forEach(function(c){ h+='<div class="cat-box" onclick="setCategory(\''+c.cat+'\')"><span class="cat-emoji">'+c.emoji+'</span><div class="cat-label">'+c.label+'</div></div>'; });
-  g.innerHTML=h;
-}
-
-function buildProducers(){
-  var g=document.getElementById('producersRow'); if(!g) return;
-  var verif=PRODUCTEURS.filter(function(p){ return p.statut==='verifie'; }).slice(0,4);
-  var h='';
-  verif.forEach(function(p){
-    h+='<div class="producer-card">'
-      +'<div class="prod-avatar">'+p.initiales+'</div>'
-      +'<div class="prod-name">'+p.nom+'</div>'
-      +'<div class="prod-loc"><i class="ti ti-map-pin" style="font-size:11px" aria-hidden="true"></i>'+p.ville+' · '+p.region+'</div>'
-      +'<div style="font-size:10px;color:var(--color-text-secondary);margin-top:4px">'+p.produits+'</div>'
-      +'<span class="prod-badge pb-ver"><i class="ti ti-circle-check" style="font-size:10px"></i> Vérifié</span>'
-      +'</div>';
-  });
-  g.innerHTML=h;
-}
-
-function getCategories(){
-  var cats=['Tous'];
-  PRODUITS.forEach(function(p){ if(cats.indexOf(p.cat)===-1) cats.push(p.cat); });
-  return cats;
-}
-function renderCategories(){
-  var s=document.getElementById('catScroll'); if(!s) return;
-  var h='';
-  getCategories().forEach(function(c){ h+='<button class="cat-pill'+(c===catActive?' active':'')+'" onclick="setCategory(\''+c+'\')">'+c+'</button>'; });
-  s.innerHTML=h;
-}
-function setCategory(cat){ catActive=cat; renderCategories(); renderProduits(); if(document.getElementById('page-products').style.display==='none') showTab('products'); }
-function filtrer(val){ recherche=val||''; renderProduits(); }
-
-function getProduitsFiltres(){
-  return PRODUITS.filter(function(p){
-    var mC=catActive==='Tous'||(catActive==='_promo'?p.badge==='promo':p.cat===catActive);
-    var mQ=!recherche||p.nom.toLowerCase().indexOf(recherche.toLowerCase())!==-1||p.vendeur.toLowerCase().indexOf(recherche.toLowerCase())!==-1;
-    return mC&&mQ;
-  });
-}
-function renderProduits(){
-  var g=document.getElementById('productsGrid'); if(!g) return;
-  var f=getProduitsFiltres();
-  if(!f.length){ g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--color-text-secondary)"><i class="ti ti-search-off" style="font-size:32px;display:block;margin-bottom:8px" aria-hidden="true"></i>Aucun produit trouvé</div>'; return; }
-  var h='';
-  f.forEach(function(p){
-    var b=p.badge==='nat'?'<span class="badge b-nat">Naturel</span>':p.badge==='promo'?'<span class="badge b-promo">Promo</span>':p.badge==='local'?'<span class="badge b-local">Local</span>':p.badge==='new'?'<span class="badge b-new">Nouveau</span>':'';
-    h+='<div class="product-card">'
-      +'<div class="p-img">'+p.emoji+'</div>'
-      +'<div class="p-info">'
-      +'<div class="p-name">'+p.nom+'</div>'
-      +'<div class="p-seller"><i class="ti ti-user" style="font-size:10px" aria-hidden="true"></i>'+p.vendeur+'</div>'
-      +'<div class="p-origin">📍 '+p.origine+' '+b+'</div>'
-      +'<div class="p-bottom">'
-      +'<div><div class="p-price">'+fcfa(p.prix)+'</div><div class="p-unit">/'+p.unite+'</div><div class="p-dispo">'+p.dispo+'</div></div>'
-      +'<button class="add-btn" onclick="ajouterPanier('+p.id+')" aria-label="Ajouter '+p.nom+'">+</button>'
-      +'</div></div></div>';
-  });
-  g.innerHTML=h;
-}
-
-function renderPanier(){
-  var div=document.getElementById('cart-content'); if(!div) return;
-  var keys=Object.keys(panier).map(Number);
-  if(!keys.length){
-    div.innerHTML='<div class="cart-body"><div class="empty-cart"><i class="ti ti-shopping-cart-off" aria-hidden="true"></i><div style="font-size:14px;color:var(--color-text-primary);margin-bottom:5px">Panier vide</div><small>Ajoutez des produits de nos producteurs</small><br><button class="browse-btn" onclick="showTab(\'products\')">Voir les produits</button></div></div>';
-    return;
-  }
-
-  var vendeurGroups={};
-  keys.forEach(function(id){ var p=getProduit(id); if(!p) return; if(!vendeurGroups[p.pid]) vendeurGroups[p.pid]=[]; vendeurGroups[p.pid].push(id); });
-  var nv=Object.keys(vendeurGroups).length;
-
-  var itemsH='';
-  Object.keys(vendeurGroups).forEach(function(pid){
-    var prod=PRODUCTEURS.find(function(x){ return x.id===pid; });
-    itemsH+='<div class="seller-group">'
-      +'<div class="sg-header"><i class="ti ti-building-store" aria-hidden="true"></i>'+(prod?prod.nom+' · '+prod.ville:'Producteur')+'</div>';
-    vendeurGroups[pid].forEach(function(id){
-      var p=getProduit(id); if(!p) return;
-      itemsH+='<div class="c-item"><div class="c-emoji">'+p.emoji+'</div><div class="c-info"><div class="c-name">'+p.nom+'</div><div class="c-from">📍 '+p.origine+'</div><div class="c-price">'+fcfa(p.prix)+' / '+p.unite+'</div></div><div class="qty"><button class="q-btn" onclick="retirerPanier('+id+')">−</button><span class="q-num">'+panier[id]+'</span><button class="q-btn" onclick="augQty('+id+')">+</button></div></div>';
-    });
-    itemsH+='</div>';
-  });
-
-  var groupBanner='';
-  if(nv>1){
-    groupBanner='<div class="grouped-banner">'
-      +'<i class="ti ti-package" aria-hidden="true"></i>'
-      +'<div><div class="gb-title">Livraison groupée disponible</div>'
-      +'<div class="gb-sub">Vos articles viennent de '+nv+' producteurs différents. Regrouper en une seule livraison ?</div>'
-      +'<div class="gb-toggle">'
-      +'<button class="gb-opt'+(livraisonGroupee?' active':'')+'" onclick="toggleGroupe(true)">Oui · regrouper (+500 FCFA)</button>'
-      +'<button class="gb-opt'+(!livraisonGroupee?' active':'')+'" onclick="toggleGroupe(false)">Non · livraisons séparées</button>'
-      +'</div></div></div>';
-  }
-
-  var zH='';
-  ZONES.forEach(function(z){ var sel=zoneActive===z.id?' selected':''; var pEl=z.prix===0?'<span class="z-free">Gratuit</span>':'<span class="z-price">'+fcfa(z.prix)+'</span>'; zH+='<div class="zone-opt'+sel+'" onclick="selectZone(\''+z.id+'\')"><div class="z-radio"><div class="z-dot"></div></div><div style="font-size:18px">'+z.icon+'</div><div style="flex:1"><div class="z-name">'+z.nom+'</div><div class="z-detail">'+z.detail+'</div></div>'+pEl+'</div>'; });
-
-  var pH='';
-  PAIEMENTS.forEach(function(pay){ var sel=paiementActif===pay.id?' selected':''; pH+='<div class="pay-opt'+sel+'" onclick="selectPaiement(\''+pay.id+'\')"><div class="p-radio"><div class="p-dot"></div></div><div style="font-size:20px">'+pay.icon+'</div><div style="flex:1"><div class="pay-name">'+pay.nom+'</div><div class="pay-sub">'+pay.sub+'</div></div></div>'; });
-
-  var st=sousTotal();
-  var z=zoneActive?getZone(zoneActive):null;
-  var lf=z?z.prix:0;
-  var gf=(nv>1&&livraisonGroupee)?500:0;
-  var tot=st+lf+gf;
-  var ok=zoneActive&&paiementActif;
-  var btnLabel=!zoneActive?'Choisissez une zone':!paiementActif?'Choisissez un paiement':'Confirmer la commande';
-
-  div.innerHTML='<div class="cart-body">'
-    +'<div class="c-card"><div class="c-title"><i class="ti ti-basket" aria-hidden="true"></i>Mes articles ('+keys.length+' · '+nv+' producteur'+(nv>1?'s':'')+')</div>'+itemsH+'</div>'
-    +groupBanner
-    +'<div class="c-card"><div class="c-title"><i class="ti ti-truck" aria-hidden="true"></i>Mode de livraison</div>'+zH+'</div>'
-    +'<div class="c-card"><div class="c-title"><i class="ti ti-credit-card" aria-hidden="true"></i>Mode de paiement</div>'+pH+'</div>'
-    +'<div class="sum-card">'
-    +'<div class="sum-row"><span>Sous-total produits</span><span>'+fcfa(st)+'</span></div>'
-    +(zoneActive?'<div class="sum-row"><span>Frais de livraison</span><span>'+( lf===0?'Gratuit':fcfa(lf))+'</span></div>':'')
-    +(gf>0?'<div class="sum-row"><span>Livraison groupée</span><span>'+fcfa(gf)+'</span></div>':'')
-    +'<div class="sum-total"><span>Total</span><span>'+(ok?fcfa(tot):'—')+'</span></div>'
-    +'</div>'
-    +'<button class="order-btn" onclick="passerCommande()"'+(ok?'':' disabled')+'><i class="ti ti-check" aria-hidden="true"></i> '+btnLabel+'</button>'
-    +'</div>';
-}
-
-function toggleGroupe(val){ livraisonGroupee=val; renderPanier(); }
-function selectZone(id){ zoneActive=id; renderPanier(); }
-function selectPaiement(id){ paiementActif=id; renderPanier(); }
-
-function renderRegister(){
-  var div=document.getElementById('registerBody'); if(!div) return;
-  div.innerHTML=
-    '<div class="commission-info"><i class="ti ti-info-circle" aria-hidden="true"></i><div><strong>Commission plateforme : 5% par vente</strong><br>Inscription gratuite · Votre compte sera validé par notre équipe sous 24–48h.</div></div>'
-    +'<div class="reg-card">'
-    +'<div class="reg-title"><i class="ti ti-user-plus" aria-hidden="true"></i>Créer mon espace producteur</div>'
-    +'<div class="reg-sub">Renseignez vos informations pour rejoindre la marketplace. Notre équipe validera votre profil avant publication.</div>'
-    +'<div class="form-group"><label class="form-label">Nom complet *</label><input class="form-input" type="text" placeholder="Ex: Mariama Traoré" /></div>'
-    +'<div class="form-row">'
-    +'<div class="form-group"><label class="form-label">Téléphone *</label><input class="form-input" type="tel" placeholder="+229 ..." /></div>'
-    +'<div class="form-group"><label class="form-label">WhatsApp</label><input class="form-input" type="tel" placeholder="+229 ..." /></div>'
-    +'</div>'
-    +'<div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" placeholder="votre@email.com" /></div>'
-    +'<div class="form-row">'
-    +'<div class="form-group"><label class="form-label">Ville *</label><input class="form-input" type="text" placeholder="Ex: Tanguiéta" /></div>'
-    +'<div class="form-group"><label class="form-label">Région *</label><select class="form-select"><option value="">Choisir...</option><option>Alibori</option><option>Atacora</option><option>Atlantique</option><option>Borgou</option><option>Collines</option><option>Couffo</option><option>Donga</option><option>Littoral</option><option>Mono</option><option>Ouémé</option><option>Plateau</option><option>Zou</option></select></div>'
-    +'</div>'
-    +'<div class="form-group"><label class="form-label">Type de produits *</label><select class="form-select"><option value="">Choisir une catégorie...</option><option>Épicerie</option><option>Viandes</option><option>Poissons & Crustacés</option><option>Oeufs</option><option>Légumes</option><option>Fruits</option><option>Brasserie naturelle</option><option>Huiles</option><option>Épices</option><option>Plusieurs catégories</option></select></div>'
-    +'<div class="form-group"><label class="form-label">Capacité de production (description)</label><input class="form-input" type="text" placeholder="Ex: 500 kg de mangue / semaine" /></div>'
-    +'<div class="form-group"><label class="form-label">Délais de livraison vers les villes</label><input class="form-input" type="text" placeholder="Ex: Cotonou J+2, Parakou J+1, Porto-Novo J+1" /></div>'
-    +'<div class="form-group"><label class="form-label">Description de votre activité</label><textarea class="form-input" rows="3" placeholder="Racontez votre activité, vos produits, votre méthode de production..."></textarea></div>'
-    +'<button class="submit-btn" onclick="submitRegister()"><i class="ti ti-send" aria-hidden="true"></i>Soumettre ma demande</button>'
-    +'</div>'
-    +'<div style="background:var(--color-background-primary);border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-tertiary);padding:13px">'
-    +'<div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-users" style="color:var(--bleu);font-size:15px" aria-hidden="true"></i>Producteurs en attente de validation</div>'
-    +PRODUCTEURS.filter(function(p){ return p.statut==='attente'; }).map(function(p){
-      return '<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:0.5px solid var(--color-border-tertiary)">'
-        +'<div style="width:32px;height:32px;border-radius:50%;background:var(--jaune-l);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#7A5500;flex-shrink:0">'+p.initiales+'</div>'
-        +'<div style="flex:1"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary)">'+p.nom+'</div><div style="font-size:10px;color:var(--color-text-secondary)">'+p.ville+' · '+p.produits+'</div></div>'
-        +'<span class="prod-badge pb-att">En attente</span>'
-        +'</div>';
-    }).join('')
-    +'</div>';
-}
-
-function submitRegister(){
-  showToast('Demande envoyée ! Validation sous 24–48h', '📩');
-}
-
-function passerCommande(){
-  if(!zoneActive||!paiementActif) return;
-  var z=getZone(zoneActive);
-  var pay=PAIEMENTS.find(function(p){ return p.id===paiementActif; });
-  var st=sousTotal(), lf=z?z.prix:0, nv=nbVendeurs();
-  var gf=(nv>1&&livraisonGroupee)?500:0;
-  var total=st+lf+gf;
-  var num='BN-'+Math.floor(Math.random()*90000+10000);
-  var dateStr=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
-  document.getElementById('confirm-content').innerHTML=
-    '<div class="confirm-page">'
-    +'<div class="confirm-icon"><i class="ti ti-circle-check" aria-hidden="true"></i></div>'
-    +'<div style="font-size:19px;font-weight:500;color:var(--color-text-primary);margin-bottom:7px">Commande confirmée !</div>'
-    +'<div style="font-size:13px;color:var(--color-text-secondary);line-height:1.6;margin-bottom:0">Merci ! Votre commande a été transmise aux producteurs. Confirmation par SMS.</div>'
-    +'<div class="confirm-card">'
-    +'<div class="cf-row"><span style="color:var(--color-text-secondary)">Numéro</span><span style="font-weight:500">'+num+'</span></div>'
-    +'<div class="cf-row"><span style="color:var(--color-text-secondary)">Date</span><span style="font-weight:500">'+dateStr+'</span></div>'
-    +'<div class="cf-row"><span style="color:var(--color-text-secondary)">Producteurs</span><span style="font-weight:500">'+nv+' producteur'+(nv>1?'s':'')+'</span></div>'
-    +'<div class="cf-row"><span style="color:var(--color-text-secondary)">Livraison</span><span style="font-weight:500">'+(z?z.icon+' '+z.nom:'')+(gf>0?' · Groupée':'')+' </span></div>'
-    +'<div class="cf-row"><span style="color:var(--color-text-secondary)">Paiement</span><span style="font-weight:500">'+(pay?pay.icon+' '+pay.nom:'')+'</span></div>'
-    +'<div class="cf-row"><span style="color:var(--color-text-secondary)">Total</span><span style="font-weight:500;color:var(--or)">'+fcfa(total)+'</span></div>'
-    +'</div>'
-    +'<button class="new-btn" onclick="reinit()">Nouvelle commande</button>'
-    +'</div>';
-  panier={}; zoneActive=null; paiementActif=null; livraisonGroupee=true; majCompteur();
-  showTabRaw('confirm');
-}
-
-function reinit(){ showTab('home'); }
-
-function showTabRaw(name){
-  ['home','products','cart','register','confirm'].forEach(function(t){
-    var p=document.getElementById('page-'+t);
-    if(p){ p.style.display=t===name?'block':'none'; p.className='page'+(t===name?' active':''); }
-  });
-  ['home','products','cart','register'].forEach(function(t){
-    var el=document.getElementById('tab-'+t);
-    if(el) el.className='tab'+(t===name?' active':'');
-  });
-}
-function showTab(name){
-  showTabRaw(name);
-  if(name==='products'){ renderCategories(); renderProduits(); }
-  if(name==='cart') renderPanier();
-  if(name==='register') renderRegister();
-}
-
-buildHomeCats();
-buildProducers();
-renderCategories();
-renderProduits();
+function toast(msg,ic){var el=document.querySelector('.toast');if(el)el.remove();var t=document.createElement('div');t.className='toast';t.innerHTML='<span>'+(ic||'✅')+'</span><span>'+msg+'</span>';document.body.appendChild(t);setTimeout(function(){t.classList.add('show')},10);if(tt)clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');setTimeout(function(){if(t.parentNode)t.remove()},300)},2000)}
+function add(id){panier[id]=(panier[id]||0)+1;mc();var p=gp(id);if(p)toast(p.nom+' ajouté',p.e)}
+function rm(id){if(!panier[id])return;if(panier[id]>1)panier[id]--;else delete panier[id];mc();rpc()}
+function inc(id){if(!panier[id])return;panier[id]++;mc();rpc()}
+function mc(){document.getElementById('cartCount').textContent=tot()}
+function buildHC(){var g=document.getElementById('homeCatGrid');if(!g)return;var h='';HCATS.forEach(function(c){h+='<div class="cbox" onclick="setC(\''+c.c+'\')"><span class="cemoji">'+c.e+'</span><div class="clabel">'+c.l+'</div></div>'});g.innerHTML=h}
+function buildProd(){var g=document.getElementById('producersRow');if(!g)return;var h='';PRODUCTEURS.filter(function(p){return p.statut==='verifie'}).slice(0,4).forEach(function(p){h+='<div class="pcard"><div class="pav">'+p.ini+'</div><div class="pname">'+p.nom+'</div><div class="ploc"><i class="ti ti-map-pin" style="font-size:10px"></i>'+p.ville+' · '+p.region+'</div><div class="pprod">'+p.produits+'</div><span class="pbadge"><i class="ti ti-circle-check" style="font-size:10px"></i> Vérifié</span></div>'});g.innerHTML=h}
+function getCats(){var c=['Tous'];PRODUITS.forEach(function(p){if(c.indexOf(p.c)===-1)c.push(p.c)});return c}
+function rdc(){var s=document.getElementById('catScroll');if(!s)return;var h='';getCats().forEach(function(c){h+='<button class="cpill'+(c===catA?' active':'')+'" onclick="setC(\''+c+'\')">'+c+'</button>'});s.innerHTML=h}
+function setC(c){catA=c;rdc();rdp();if(document.getElementById('page-products').style.display==='none')showTab('products')}
+function filtrer(v){rech=v||'';rdp()}
+function getFil(){return PRODUITS.filter(function(p){var mc=catA==='Tous'||(catA==='_promo'?p.b==='promo':p.c===catA);var mq=!rech||p.nom.toLowerCase().indexOf(rech.toLowerCase())!==-1||p.v.toLowerCase().indexOf(rech.toLowerCase())!==-1;return mc&&mq})}
+function rdp(){var g=document.getElementById('productsGrid');if(!g)return;var f=getFil();if(!f.length){g.innerHTML='<div class="nores"><i class="ti ti-search-off"></i>Aucun produit trouvé</div>';return}var h='';f.forEach(function(p){var b=p.b==='nat'?'<span class="bdg bnat">Naturel</span>':p.b==='promo'?'<span class="bdg bpromo">Promo</span>':p.b==='local'?'<span class="bdg blocal">Local</span>':p.b==='new'?'<span class="bdg bnew">Nouveau</span>':'';h+='<div class="prcard"><div class="pimg">'+p.e+'</div><div class="pinfo"><div class="pn">'+p.nom+'</div><div class="ps"><i class="ti ti-user" style="font-size:10px"></i>'+p.v+'</div><div class="po">📍 '+p.o+' '+b+'</div><div class="pb"><div><div class="pp">'+fcfa(p.p)+'</div><div class="pu">/'+p.u+'</div><div class="pd">'+p.d+'</div></div><button class="addbtn" onclick="add('+p.id+')" aria-label="Ajouter '+p.nom+'">+</button></div></div></div>'});g.innerHTML=h}
+function rpc(){var div=document.getElementById('cart-content');if(!div)return;var keys=Object.keys(panier).map(Number);if(!keys.length){div.innerHTML='<div class="cbody"><div class="ecart"><i class="ti ti-shopping-cart-off"></i><div style="font-size:14px;color:#444;margin-bottom:5px">Panier vide</div><small>Ajoutez des produits de nos producteurs</small><br><button class="bbtn" onclick="showTab(\'products\')">Voir les produits</button></div></div>';return}
+var vg={};keys.forEach(function(id){var p=gp(id);if(!p)return;if(!vg[p.pid])vg[p.pid]=[];vg[p.pid].push(id)});var nvc=Object.keys(vg).length;
+var iH='';Object.keys(vg).forEach(function(pid){var pr=PRODUCTEURS.find(function(x){return x.id===pid});iH+='<div class="sgroup"><div class="sghdr"><i class="ti ti-building-store"></i>'+(pr?pr.nom+' · '+pr.ville:'Producteur')+'</div>';vg[pid].forEach(function(id){var p=gp(id);if(!p)return;iH+='<div class="citem"><div class="cemj">'+p.e+'</div><div class="cinf"><div class="cn">'+p.nom+'</div><div class="cf">📍 '+p.o+'</div><div class="cp">'+fcfa(p.p)+' / '+p.u+'</div></div><div class="qty"><button class="qbtn" onclick="rm('+id+')">−</button><span class="qnum">'+panier[id]+'</span><button class="qbtn" onclick="inc('+id+')">+</button></div></div>'});iH+='</div>'});
+var gb='';if(nvc>1){gb='<div class="gbanner"><i class="ti ti-package"></i><div><div class="gbt">Livraison groupée disponible</div><div class="gbs">Articles de '+nvc+' producteurs différents. Regrouper ?</div><div class="gbtog"><button class="gbopt'+(groupe?' active':'')+'" onclick="tog(true)">Oui · regrouper (+500 FCFA)</button><button class="gbopt'+(!groupe?' active':'')+'" onclick="tog(false)">Non · séparées</button></div></div></div>'}
+var zH='';ZONES.forEach(function(z){var sel=zoneA===z.id?' selected':'';var pe=z.p===0?'<span class="zfree">Gratuit</span>':'<span class="zprice">'+fcfa(z.p)+'</span>';zH+='<div class="zopt'+sel+'" onclick="sz(\''+z.id+'\')"><div class="zradio"><div class="zdot"></div></div><div class="zico">'+z.i+'</div><div style="flex:1"><div class="zn">'+z.n+'</div><div class="zd">'+z.d+'</div></div>'+pe+'</div>'});
+var pH='';PAYS.forEach(function(pay){var sel=payA===pay.id?' selected':'';pH+='<div class="popt'+sel+'" onclick="sp(\''+pay.id+'\')"><div class="pradio"><div class="pdot"></div></div><div class="pico">'+pay.i+'</div><div style="flex:1"><div class="pnm">'+pay.n+'</div><div class="psb">'+pay.s+'</div></div></div>'});
+var st=stot(),z=zoneA?gz(zoneA):null,lf=z?z.p:0,gf=(nvc>1&&groupe)?500:0,total=st+lf+gf,ok=zoneA&&payA;
+var bl=!zoneA?'Choisissez une zone de livraison':!payA?'Choisissez un mode de paiement':'Confirmer la commande';
+div.innerHTML='<div class="cbody"><div class="ccard"><div class="ctitle"><i class="ti ti-basket"></i>Mes articles ('+keys.length+' · '+nvc+' producteur'+(nvc>1?'s':'')+')</div>'+iH+'</div>'+gb+'<div class="ccard"><div class="ctitle"><i class="ti ti-truck"></i>Mode de livraison</div>'+zH+'</div><div class="ccard"><div class="ctitle"><i class="ti ti-credit-card"></i>Mode de paiement</div>'+pH+'</div><div class="scard"><div class="srow"><span>Sous-total</span><span>'+fcfa(st)+'</span></div>'+(zoneA?'<div class="srow"><span>Livraison</span><span>'+(lf===0?'Gratuit':fcfa(lf))+'</span></div>':'')+(gf>0?'<div class="srow"><span>Livraison groupée</span><span>'+fcfa(gf)+'</span></div>':'')+'<div class="stotal"><span>Total</span><span>'+(ok?fcfa(total):'—')+'</span></div></div><button class="obtn" onclick="cmd()"'+(ok?'':' disabled')+'><i class="ti ti-check"></i> '+bl+'</button></div>'}
+function tog(v){groupe=v;rpc()}
+function sz(id){zoneA=id;rpc()}
+function sp(id){payA=id;rpc()}
+function rreg(){var div=document.getElementById('register-content');if(!div)return;var ph=PRODUCTEURS.filter(function(p){return p.statut==='attente'}).map(function(p){return'<div class="penditem"><div class="pav2">'+p.ini+'</div><div class="pavi"><div class="pavname">'+p.nom+'</div><div class="pavsub">'+p.ville+' · '+p.produits+'</div></div><span class="battente">En attente</span></div>'}).join('');
+div.innerHTML='<div class="regbody"><div class="commbox"><i class="ti ti-info-circle"></i><div><strong>Commission plateforme : 5% par vente</strong><br>Inscription gratuite. Validation par notre équipe sous 24–48h.</div></div><div class="regcard"><div class="regtit"><i class="ti ti-user-plus"></i>Créer mon espace producteur</div><div class="regsub">Renseignez vos informations. Notre équipe validera votre profil avant publication.</div><div class="fg"><label class="fl">Nom complet *</label><input class="fi" type="text" placeholder="Ex: Mariama Traoré"/></div><div class="frow"><div class="fg"><label class="fl">Téléphone *</label><input class="fi" type="tel" placeholder="+229 ..."/></div><div class="fg"><label class="fl">WhatsApp</label><input class="fi" type="tel" placeholder="+229 ..."/></div></div><div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="votre@email.com"/></div><div class="frow"><div class="fg"><label class="fl">Ville *</label><input class="fi" type="text" placeholder="Ex: Tanguiéta"/></div><div class="fg"><label class="fl">Région *</label><select class="fi"><option value="">Choisir...</option><option>Alibori</option><option>Atacora</option><option>Atlantique</option><option>Borgou</option><option>Collines</option><option>Couffo</option><option>Donga</option><option>Littoral</option><option>Mono</option><option>Ouémé</option><option>Plateau</option><option>Zou</option></select></div></div><div class="fg"><label class="fl">Type de produits *</label><select class="fi"><option value="">Choisir...</option><option>Viandes</option><option>Poissons & Crustacés</option><option>Oeufs</option><option>Légumes</option><option>Fruits</option><option>Épicerie</option><option>Huiles</option><option>Brasserie naturelle</option><option>Épices</option><option>Plusieurs catégories</option></select></div><div class="fg"><label class="fl">Capacité de production</label><input class="fi" type="text" placeholder="Ex: 500 kg de mangue / semaine"/></div><div class="fg"><label class="fl">Délais de livraison par ville</label><input class="fi" type="text" placeholder="Ex: Cotonou J+2, Parakou J+1"/></div><div class="fg"><label class="fl">Description</label><textarea class="fi" placeholder="Votre activité, vos produits, votre méthode de production..."></textarea></div><button class="sbtn" onclick="toast(\'Demande envoyée ! Validation sous 24–48h\',\'📩\')"><i class="ti ti-send"></i>Soumettre ma demande</button></div><div class="pendcard"><div class="pendtit"><i class="ti ti-clock"></i>En attente de validation</div>'+ph+'</div></div>'}
+function cmd(){if(!zoneA||!payA)return;var z=gz(zoneA),pay=PAYS.find(function(p){return p.id===payA}),st=stot(),lf=z?z.p:0,gf=(nv()>1&&groupe)?500:0,total=st+lf+gf,num='BN-'+(Math.floor(Math.random()*90000)+10000),d=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
+document.getElementById('confirm-content').innerHTML='<div class="confpage"><div class="conficon"><i class="ti ti-circle-check"></i></div><div class="conftit">Commande confirmée !</div><div class="confsub">Votre commande a été transmise aux producteurs. Confirmation par SMS sous peu.</div><div class="confcard"><div class="crow"><span class="clbl">Numéro</span><span class="cval">'+num+'</span></div><div class="crow"><span class="clbl">Date</span><span class="cval">'+d+'</span></div><div class="crow"><span class="clbl">Producteurs</span><span class="cval">'+nv()+' producteur'+(nv()>1?'s':'')+'</span></div><div class="crow"><span class="clbl">Livraison</span><span class="cval">'+(z?z.i+' '+z.n:'')+(gf>0?' · Groupée':'')+'</span></div><div class="crow"><span class="clbl">Paiement</span><span class="cval">'+(pay?pay.i+' '+pay.n:'')+'</span></div><div class="crow"><span class="clbl">Total</span><span class="ctot">'+fcfa(total)+'</span></div></div><button class="newbtn" onclick="reinit()">Nouvelle commande</button></div>';
+panier={};zoneA=null;payA=null;groupe=true;mc();showTabRaw('confirm')}
+function reinit(){showTab('home')}
+function showTabRaw(n){['home','products','cart','register','confirm'].forEach(function(t){var p=document.getElementById('page-'+t);if(p){p.style.display=t===n?'block':'none';p.className='page'+(t===n?' active':'')}});['home','products','cart','register'].forEach(function(t){var el=document.getElementById('tab-'+t);if(el)el.className='tab'+(t===n?' active':'')});window.scrollTo(0,0)}
+function showTab(n){showTabRaw(n);if(n==='products'){rdc();rdp()}if(n==='cart')rpc();if(n==='register')rreg()}
+document.addEventListener('DOMContentLoaded',function(){buildHC();buildProd();rdc();rdp()});
 </script>
+</body>
+</html>
