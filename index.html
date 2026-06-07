@@ -3,275 +3,1205 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<title>Brasserie Naturelle — Marketplace du Bénin</title>
-<meta name="theme-color" content="#D4781A"/>
+<title>Yéyé Market — Marketplace du Bénin</title>
+<meta name="theme-color" content="#1A6B35"/>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"/>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--or:#D4781A;--or-l:#FDF0E0;--or-d:#9E5610;--vert:#2E6B1A;--vert-l:#EAF3DE;--vert-d:#1A4210;--bleu:#185FA5;--bleu-l:#E6F1FB;--bleu-d:#0C447C;--teal:#1D7A5A;--rouge-l:#FDECEA;--jaune-l:#FEF3D7;--g50:#F8F7F4;--g100:#EFEFEB;--g200:#D3D1C7;--g400:#888780;--g700:#444441;--g900:#1A1A18;--w:#fff;--rsm:8px;--rmd:12px;--rlg:16px}
+:root{
+  --v:#1A6B35;--vl:#E8F5EE;--vd:#0F4020;--vm:#2E8B50;
+  --j:#F5C518;--jl:#FFFBE6;--jd:#8B7000;
+  --bl:#1A5FA5;--bll:#E6F0FB;--bld:#0C3A6E;
+  --r:#C0392B;--rl:#FDECEA;
+  --g50:#F5F5F5;--g100:#EDEFEB;--g200:#CDD4CA;--g400:#7A8A76;--g700:#3A4A36;--g900:#1A2018;
+  --w:#fff;
+}
 html,body{width:100%;min-height:100vh;background:var(--g50);font-family:'DM Sans',sans-serif;color:var(--g900);-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
-.app{width:100%;min-height:100vh;display:flex;flex-direction:column;background:var(--g50)}
-@media(min-width:600px){body{background:#D3D1C7;display:flex;justify-content:center;align-items:flex-start;min-height:100vh}.app{max-width:480px;min-height:100vh;box-shadow:0 0 40px rgba(0,0,0,.15);border-radius:0}}
-.header{background:var(--or);padding:12px 14px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
-.h-title{font-size:17px;font-weight:600;color:#fff;line-height:1.2}
-.h-sub{font-size:10px;color:rgba(255,255,255,.75);margin-top:1px}
-.h-right{display:flex;align-items:center;gap:7px;flex-shrink:0}
-.cart-btn,.prod-btn{border:none;color:#fff;border-radius:var(--rsm);padding:7px 11px;cursor:pointer;font-size:12px;font-weight:500;font-family:inherit;display:flex;align-items:center;gap:5px}
-.cart-btn{background:var(--vert)}.prod-btn{background:var(--bleu)}
-.btn-lbl{display:none}@media(min-width:380px){.btn-lbl{display:inline}}
-.cart-count{background:#fff;color:var(--or);border-radius:50%;width:18px;height:18px;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.nav-tabs{display:flex;background:#fff;border-bottom:1px solid var(--g100);position:sticky;top:52px;z-index:99}
-.tab{flex:1;padding:9px 2px;text-align:center;font-size:11px;font-weight:500;cursor:pointer;color:var(--g400);border:none;background:none;border-bottom:2px solid transparent;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .2s}
-.tab i{font-size:18px}.tab.active{color:var(--or);border-bottom-color:var(--or)}
+.app{width:100%;min-height:100vh;display:flex;flex-direction:column;background:var(--g50);position:relative}
+@media(min-width:600px){body{background:#ddd;display:flex;justify-content:center}.app{max-width:430px;box-shadow:0 0 40px rgba(0,0,0,.15)}}
+
+/* GEO MODAL */
+.geo-ov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:999;display:flex;align-items:flex-end;justify-content:center}
+.geo-sh{background:var(--w);border-radius:20px 20px 0 0;padding:0 0 32px;width:100%;max-width:430px;max-height:88vh;overflow-y:auto}
+.geo-hd{width:36px;height:4px;background:var(--g200);border-radius:4px;margin:14px auto 0}
+.geo-bd{padding:18px 16px 0}
+.geo-t{font-size:16px;font-weight:600;color:var(--g900);display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.geo-s{font-size:12px;color:var(--g400);margin-bottom:14px;line-height:1.5}
+.geo-gps{background:var(--g50);border:1px solid var(--g200);border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:11px;cursor:pointer;margin-bottom:12px}
+.geo-gps-ic{width:36px;height:36px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.geo-gps-t{font-size:13px;font-weight:500;color:var(--g900)}
+.geo-gps-s{font-size:11px;color:var(--g400);margin-top:1px}
+.geo-div{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.geo-div span{font-size:11px;color:var(--g400);white-space:nowrap}
+.geo-ln{flex:1;height:0.5px;background:var(--g200)}
+.geo-gr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.geo-z{border:1px solid var(--g200);border-radius:12px;padding:11px 8px;text-align:center;cursor:pointer;background:var(--w);font-family:inherit}
+.geo-z:active{border-color:var(--v);background:var(--vl)}
+.geo-z.sel{border:1.5px solid var(--v);background:var(--vl)}
+.geo-ze{font-size:22px;display:block;margin-bottom:4px}
+.geo-zn{font-size:12px;font-weight:500;color:var(--g900)}
+.geo-zc{font-size:10px;color:var(--g400);margin-top:2px}
+.geo-btn{width:100%;background:var(--v);color:var(--w);border:none;border-radius:12px;padding:13px;font-size:14px;font-family:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.geo-btn:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed}
+
+/* TOP BAR */
+.top-bar{background:var(--v);padding:10px 14px 0;position:sticky;top:0;z-index:100}
+.loc-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.loc-left{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#fff;cursor:pointer}
+.loc-right{display:flex;align-items:center;gap:10px}
+.icon-b{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;position:relative;cursor:pointer}
+.nb-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--j);border:1.5px solid var(--v)}
+.search-row{background:var(--w);border-radius:20px 20px 0 0;padding:10px 14px;display:flex;align-items:center;gap:8px}
+.search-inp{flex:1;font-size:13px;color:#aaa;display:flex;align-items:center;gap:6px}
+.search-b{background:var(--j);color:var(--jd);border:none;border-radius:16px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+
+/* PAGES */
 .page{display:none}.page.active{display:block}
-.sbar{background:#fff;padding:10px 14px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--g100)}
-.si{color:var(--g400);font-size:17px;flex-shrink:0}
-.sbar input{flex:1;min-width:0;border:1px solid var(--g200);border-radius:20px;padding:7px 12px;font-size:13px;font-family:inherit;background:var(--g50);color:var(--g900);outline:none}
-.sbar input:focus{border-color:var(--or)}
-.loc{background:var(--or-l);color:var(--or-d);font-size:10px;font-weight:500;padding:4px 9px;border-radius:20px;white-space:nowrap;display:flex;align-items:center;gap:3px;flex-shrink:0}
-.hbody{padding:14px;display:flex;flex-direction:column;gap:14px}
-.hero{background:var(--or);border-radius:var(--rlg);padding:18px;color:#fff}
-.hero-tag{font-size:11px;opacity:.85;margin-bottom:4px}
-.hero-title{font-size:18px;font-weight:600;line-height:1.3;margin-bottom:12px}
-.hero-acts{display:flex;gap:8px;flex-wrap:wrap}
-.hbtn{background:#fff;color:var(--or);border:none;border-radius:20px;padding:7px 16px;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer}
-.hbtn2{background:rgba(255,255,255,.2);color:#fff;border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:7px 16px;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer}
-.slbl{font-size:13px;font-weight:600;color:var(--g700);display:flex;align-items:center;gap:6px}
-.slbl i{color:var(--or);font-size:16px}
-.cgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.cbox{background:#fff;border-radius:var(--rmd);padding:10px 4px;text-align:center;border:1px solid var(--g100);cursor:pointer;transition:all .15s}
-.cbox:active{background:var(--or-l);border-color:var(--or)}
-.cemoji{font-size:22px;display:block;margin-bottom:4px}
-.clabel{font-size:10px;color:var(--g400);font-weight:500}
-.prow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.pcard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g100);padding:12px}
-.pav{width:34px;height:34px;border-radius:50%;background:var(--bleu-l);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--bleu-d);margin-bottom:7px}
-.pname{font-size:12px;font-weight:600;color:var(--g900)}
-.ploc{font-size:10px;color:var(--g400);display:flex;align-items:center;gap:3px;margin-top:2px}
-.pprod{font-size:10px;color:var(--g400);margin-top:4px}
-.pbadge{font-size:9px;padding:2px 6px;border-radius:7px;font-weight:500;margin-top:6px;display:inline-flex;align-items:center;gap:3px;background:var(--vert-l);color:var(--vert-d)}
-.icard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g100);padding:13px}
-.icard-title{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.icard-title i{color:var(--or);font-size:16px}
-.zirow{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:5px 0;border-bottom:1px solid var(--g100)}
-.zirow:last-child{border-bottom:none}
-.zirow span:first-child{color:var(--g400)}
-.zip{color:var(--vert);font-weight:600}.zipb{color:var(--bleu);font-weight:600}
-.paybadges{display:flex;gap:8px;flex-wrap:wrap}
-.pbdg{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--g100);border-radius:var(--rsm);padding:7px 10px;font-size:11px;font-weight:500;color:var(--g700)}
-.dmtn{width:9px;height:9px;border-radius:50%;background:#F0A500;flex-shrink:0}
-.dmoov{width:9px;height:9px;border-radius:50%;background:#1D7A5A;flex-shrink:0}
-.cscroll{display:flex;gap:8px;padding:10px 14px;overflow-x:auto;background:#fff;border-bottom:1px solid var(--g100);scrollbar-width:none;-webkit-overflow-scrolling:touch}
-.cscroll::-webkit-scrollbar{display:none}
-.cpill{background:var(--g50);border:1px solid var(--g200);border-radius:20px;padding:5px 13px;font-size:11px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap;color:var(--g400);transition:all .15s}
-.cpill.active{background:var(--or-l);color:var(--or-d);border-color:var(--or)}
-.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px;background:var(--g50)}
-.prcard{background:#fff;border-radius:var(--rlg);border:1px solid var(--g100);overflow:hidden;transition:transform .15s}
-.prcard:active{transform:scale(.98)}
-.pimg{width:100%;height:90px;display:flex;align-items:center;justify-content:center;font-size:40px;background:var(--g50)}
-.pinfo{padding:9px 11px}
-.pn{font-size:12px;font-weight:600;color:var(--g900);margin-bottom:2px;line-height:1.3}
-.ps{font-size:10px;color:var(--bleu);display:flex;align-items:center;gap:3px;margin-bottom:1px}
-.po{font-size:10px;color:var(--g400);margin-bottom:6px;display:flex;align-items:center;gap:3px;flex-wrap:wrap}
-.pb{display:flex;align-items:center;justify-content:space-between}
-.pp{font-size:13px;font-weight:600;color:var(--or)}
+
+/* ACCUEIL */
+.home-content{background:var(--g50);padding-bottom:70px}
+.white-section{background:var(--w);margin-bottom:8px}
+.divider{height:8px;background:var(--g50)}
+
+/* CATEGORIES */
+.cats-wrap{padding:12px 12px 4px;background:var(--w)}
+.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0}
+.cat-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 2px}
+.cat-ic{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:23px;position:relative}
+.cat-lbl{font-size:10px;color:var(--g700);text-align:center;line-height:1.2}
+.cat-bdg{position:absolute;top:-3px;right:-3px;font-size:8px;font-weight:700;padding:1px 4px;border-radius:8px}
+
+/* BANNER */
+.banner{margin:0 10px 0;border-radius:12px;overflow:hidden;display:flex;align-items:stretch;border:0.5px solid var(--g100)}
+.ban-img{width:110px;display:flex;align-items:center;justify-content:center;font-size:42px;flex-shrink:0;background:var(--vl)}
+.ban-txt{padding:12px;flex:1;background:#FFFDF5}
+.ban-tag{background:var(--v);color:#fff;font-size:9px;font-weight:600;padding:2px 7px;border-radius:10px;display:inline-block;margin-bottom:5px}
+.ban-title{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:3px;line-height:1.3}
+.ban-sub{font-size:10px;color:var(--g400)}
+.ban-price{font-size:15px;font-weight:700;color:var(--r);margin-top:5px}
+
+/* SECTION HEADERS */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 8px;background:var(--w)}
+.sec-t{font-size:14px;font-weight:600;color:var(--g900);display:flex;align-items:center;gap:6px}
+.sec-more{font-size:11px;color:var(--g400);display:flex;align-items:center;gap:2px;cursor:pointer}
+
+/* PRODUCTS SCROLL */
+.prods-scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 12px 12px;background:var(--w)}
+.prods-scroll::-webkit-scrollbar{display:none}
+.pc{flex-shrink:0;width:118px;border-radius:10px;overflow:hidden;background:var(--g50);border:0.5px solid var(--g100)}
+.pc-img{width:118px;height:88px;display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--w);position:relative}
+.pc-t{position:absolute;top:5px;left:5px;font-size:8px;font-weight:700;padding:2px 6px;border-radius:8px}
+.pc-add{position:absolute;bottom:5px;right:5px;width:22px;height:22px;border-radius:50%;background:var(--v);color:#fff;border:none;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1}
+.pc-add:active{background:var(--vd)}
+.pc-inf{padding:6px 7px}
+.pc-n{font-size:11px;font-weight:600;color:var(--g900);margin-bottom:1px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-sh{font-size:10px;color:var(--g400);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pc-p{font-size:12px;font-weight:700;color:var(--r)}
+.pc-old{font-size:9px;color:#bbb;text-decoration:line-through;margin-left:3px}
+
+/* LIVREURS SCROLL */
+.liv-scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 12px 12px;background:var(--w)}
+.liv-scroll::-webkit-scrollbar{display:none}
+.lchip{flex-shrink:0;background:var(--g50);border:0.5px solid var(--g100);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px}
+.lav{width:34px;height:34px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:1.5px solid var(--v);position:relative}
+.ldot{position:absolute;bottom:0;right:0;width:8px;height:8px;border-radius:50%;background:#22C55E;border:1.5px solid var(--w)}
+.ln{font-size:11px;font-weight:600;color:var(--g900)}
+.leta{font-size:10px;color:var(--v);font-weight:500}
+.lnote{font-size:10px;color:var(--g400)}
+
+/* GRID 2 COLS */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 12px;background:var(--w)}
+.gcrd{background:var(--g50);border-radius:10px;overflow:hidden;border:0.5px solid var(--g100)}
+.gc-img{width:100%;height:80px;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--w);position:relative}
+.gc-bdg{position:absolute;top:5px;left:5px;font-size:8px;font-weight:700;padding:2px 6px;border-radius:8px}
+.gc-inf{padding:7px 8px}
+.gc-n{font-size:11px;font-weight:600;color:var(--g900);margin-bottom:1px;line-height:1.3}
+.gc-sh{font-size:10px;color:var(--g400);margin-bottom:4px}
+.gc-row{display:flex;align-items:center;justify-content:space-between}
+.gc-p{font-size:12px;font-weight:700;color:var(--r)}
+.gc-add{background:var(--v);color:#fff;border:none;border-radius:12px;padding:4px 9px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit}
+.gc-add:active{background:var(--vd)}
+
+/* FLASH */
+.flash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 12px;background:var(--w)}
+.fcrd{background:var(--w);border-radius:10px;border:0.5px solid var(--g100);display:flex;align-items:center;gap:8px;padding:9px}
+.fe{font-size:28px;flex-shrink:0;width:38px;text-align:center}
+.fi2{flex:1;min-width:0}
+.fn{font-size:11px;font-weight:600;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fs{font-size:10px;color:var(--g400);margin-top:1px}
+.fp{font-size:12px;font-weight:700;color:var(--r);margin-top:2px}
+.fo{font-size:9px;color:#bbb;text-decoration:line-through;margin-left:3px;font-weight:400}
+
+/* BOUTIQUES PAGE */
+.page-content{padding:12px;background:var(--g50);min-height:100vh;padding-bottom:70px}
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.bcrd{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);overflow:hidden;cursor:pointer}
+.bcrd:active{opacity:.9}
+.bban{height:52px;display:flex;align-items:center;justify-content:center;font-size:24px}
+.binf{padding:8px 10px}
+.bn{font-size:12px;font-weight:600;color:var(--g900)}
+.bc{font-size:10px;color:var(--g400);margin-top:1px}
+.blo{font-size:10px;color:var(--bl);margin-top:3px}
+.bmeta{display:flex;gap:7px;margin-top:4px}
+.bmm{font-size:9px;color:var(--g400)}
+.bver{display:inline-flex;align-items:center;gap:3px;font-size:9px;padding:2px 6px;border-radius:6px;background:var(--vl);color:var(--vd);margin-top:4px;font-weight:500}
+
+/* CATALOGUE PAGE */
+.sbar{background:var(--w);padding:10px 12px;display:flex;align-items:center;gap:8px;border-bottom:0.5px solid var(--g100);position:sticky;top:52px;z-index:90}
+.sbar input{flex:1;min-width:0;border:1px solid var(--g200);border-radius:20px;padding:7px 12px;font-size:12px;font-family:inherit;background:var(--g50);color:var(--g900);outline:none}
+.sbar input:focus{border-color:var(--v)}
+.cscr{display:flex;gap:8px;padding:10px 12px;overflow-x:auto;background:var(--w);border-bottom:0.5px solid var(--g100);scrollbar-width:none;position:sticky;top:100px;z-index:89}
+.cscr::-webkit-scrollbar{display:none}
+.cpill{background:var(--g50);border:1px solid var(--g200);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--g400);font-family:inherit}
+.cpill.active{background:var(--vl);color:var(--vd);border-color:var(--v)}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;background:var(--g50)}
+.pcard{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);overflow:hidden}
+.pcard:active{transform:scale(.98)}
+.pimg{width:100%;height:85px;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--g50);position:relative}
+.ptag{position:absolute;top:5px;left:5px;font-size:8px;font-weight:700;padding:2px 6px;border-radius:8px}
+.padd{position:absolute;bottom:5px;right:5px;width:24px;height:24px;border-radius:50%;background:var(--v);color:#fff;border:none;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1}
+.padd:active{background:var(--vd)}
+.pinf{padding:8px 10px}
+.pn{font-size:12px;font-weight:600;color:var(--g900);margin-bottom:1px;line-height:1.3}
+.psh{font-size:10px;color:var(--bl);margin-bottom:1px}
+.por{font-size:10px;color:var(--g400);margin-bottom:5px}
+.pp{font-size:13px;font-weight:700;color:var(--r)}
 .pu{font-size:9px;color:var(--g400)}
-.pd{font-size:9px;color:var(--teal);margin-top:1px}
-.addbtn{background:var(--or);color:#fff;border:none;border-radius:50%;width:27px;height:27px;font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0}
-.addbtn:active{background:var(--or-d);transform:scale(.9)}
+.pst{font-size:9px;color:var(--vm);margin-top:1px}
 .bdg{font-size:9px;padding:2px 5px;border-radius:6px;font-weight:500}
-.bnat{background:var(--vert-l);color:var(--vert-d)}.bpromo{background:var(--jaune-l);color:#7A5500}.blocal{background:var(--rouge-l);color:#8B1A1A}.bnew{background:var(--bleu-l);color:var(--bleu-d)}
-.nores{grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--g400)}
-.nores i{font-size:32px;display:block;margin-bottom:8px}
-.cbody{padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--g50)}
-.ecart{background:#fff;border-radius:var(--rlg);border:1px solid var(--g100);text-align:center;padding:48px 20px;color:var(--g400)}
-.ecart i{font-size:44px;display:block;margin-bottom:10px}
-.bbtn{margin-top:12px;background:var(--or);color:#fff;border:none;border-radius:var(--rsm);padding:9px 20px;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer}
-.ccard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g100);padding:13px 14px}
-.ctitle{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:11px;display:flex;align-items:center;gap:6px}
-.ctitle i{color:var(--or);font-size:15px}
-.sgroup{margin-bottom:10px;border-bottom:1px solid var(--g100);padding-bottom:10px}
-.sgroup:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.sghdr{display:flex;align-items:center;gap:6px;margin-bottom:7px;font-size:11px;font-weight:600;color:var(--bleu)}
-.sghdr i{font-size:12px}
-.citem{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--g100)}
-.citem:last-child{border-bottom:none}
+.bnat{background:var(--vl);color:var(--vd)}.bloc{background:var(--rl);color:#8B1A1A}.bpromo{background:var(--jl);color:var(--jd)}
+
+/* LIVREUR FORMS */
+.lbody{padding:12px;display:flex;flex-direction:column;gap:12px;background:var(--g50);padding-bottom:70px}
+.lhero-b{background:linear-gradient(135deg,#1A5FA5,#2A7DD4);border-radius:12px;padding:16px;color:#fff}
+.lhero-v{background:linear-gradient(135deg,#1A6B35,#2E8B50);border-radius:12px;padding:16px;color:#fff}
+.lhero-b h2,.lhero-v h2{font-size:16px;font-weight:600;margin-bottom:5px}
+.lhero-b p,.lhero-v p{font-size:11px;opacity:.85;margin-bottom:12px;line-height:1.5}
+.tcrd{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);padding:13px}
+.trow{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:0.5px solid var(--g100);align-items:center}
+.trow:last-child{border-bottom:none}
+.trow span:first-child{color:var(--g400)}.tval{font-weight:600;color:var(--v)}
+.rcrd{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);padding:14px}
+.rt{font-size:14px;font-weight:600;color:var(--g900);margin-bottom:3px;display:flex;align-items:center;gap:7px}
+.rs{font-size:11px;color:var(--g400);margin-bottom:13px;line-height:1.5}
+.tabf{display:flex;background:var(--g50);border-radius:10px;padding:3px;margin-bottom:13px;gap:3px}
+.tf{flex:1;padding:7px 4px;text-align:center;font-size:10px;font-weight:500;cursor:pointer;border-radius:8px;color:var(--g400);font-family:inherit;border:none;background:none}
+.tf.active{background:var(--w);color:var(--v);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.fg{margin-bottom:10px}
+.fl{font-size:11px;font-weight:500;color:var(--g400);margin-bottom:4px;display:block}
+.fi{width:100%;border:1px solid var(--g200);border-radius:10px;padding:9px 12px;font-size:12px;font-family:inherit;background:var(--g50);color:var(--g900);outline:none}
+.fi:focus{border-color:var(--v)}
+textarea.fi{resize:vertical;min-height:70px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.upb{border:2px dashed var(--g200);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:var(--g50)}
+.upb.done{border-color:var(--v);background:var(--vl)}
+.upic{font-size:24px;display:block;margin-bottom:5px}
+.upt{font-size:12px;font-weight:500;color:var(--g700)}.ups{font-size:10px;color:var(--g400);margin-top:2px}
+.upb.done .upt{color:var(--v)}
+.sbtn{width:100%;background:var(--v);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
+.sbtn-b{background:var(--bl)}
+
+/* LIVREURS LIST */
+.lcrd{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);padding:13px;display:flex;align-items:center;gap:11px}
+.lav2{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid var(--v);position:relative;background:var(--vl)}
+.lonl{position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;background:#22C55E;border:2px solid #fff}
+.linf{flex:1}
+.lnm{font-size:13px;font-weight:600;color:var(--g900)}
+.lzo{font-size:11px;color:var(--g400);margin-top:1px}
+.ltel{font-size:12px;color:var(--bl);font-weight:500;margin-top:4px}
+.lmeta2{display:flex;gap:8px;margin-top:4px}
+.lm{font-size:10px;color:var(--g400)}
+.lright{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.lst{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500}
+.lsd{background:var(--vl);color:var(--vd)}.lso{background:#FEF0E0;color:#8B4000}
+.ctcbtn{background:var(--v);color:#fff;border:none;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit}
+.ctcbtn:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed}
+
+/* CART */
+.cbody{padding:12px;display:flex;flex-direction:column;gap:12px;background:var(--g50);padding-bottom:70px}
+.ecrt{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);text-align:center;padding:48px 20px;color:var(--g400)}
+.ecrt i{font-size:44px;display:block;margin-bottom:10px}
+.bbtn{margin-top:12px;background:var(--v);color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer}
+.ccrd{background:var(--w);border-radius:10px;border:0.5px solid var(--g100);padding:13px 14px}
+.cttl{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.cttl i{color:var(--v);font-size:15px}
+.sg{margin-bottom:10px;border-bottom:0.5px solid var(--g100);padding-bottom:10px}
+.sg:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sgh{display:flex;align-items:center;gap:6px;margin-bottom:7px;font-size:11px;font-weight:600;color:var(--bl)}
+.ci{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:0.5px solid var(--g100)}
+.ci:last-child{border-bottom:none}
 .cemj{font-size:24px;width:32px;text-align:center;flex-shrink:0}
 .cinf{flex:1;min-width:0}
 .cn{font-size:12px;font-weight:600;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cf{font-size:10px;color:var(--bleu)}
-.cp{font-size:10px;color:var(--g400)}
+.cf{font-size:10px;color:var(--bl)}.cp{font-size:10px;color:var(--g400)}
 .qty{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.qbtn{background:var(--g50);border:1px solid var(--g200);border-radius:var(--rsm);width:25px;height:25px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--g900);font-family:inherit}
-.qnum{font-size:12px;font-weight:600;min-width:16px;text-align:center;color:var(--g900)}
-.gbanner{background:var(--bleu-l);border:1px solid rgba(24,95,165,.15);border-radius:var(--rmd);padding:12px;display:flex;align-items:flex-start;gap:9px}
-.gbanner i{color:var(--bleu);font-size:20px;flex-shrink:0;margin-top:1px}
-.gbt{font-size:12px;font-weight:600;color:var(--bleu-d)}
-.gbs{font-size:11px;color:var(--bleu);margin-top:2px;line-height:1.5}
-.gbtog{margin-top:9px;display:flex;gap:7px;flex-wrap:wrap}
-.gbopt{border:1px solid rgba(24,95,165,.3);border-radius:var(--rsm);padding:6px 10px;font-size:11px;font-weight:500;cursor:pointer;color:var(--bleu-d);background:#fff;font-family:inherit;transition:all .15s}
-.gbopt.active{background:var(--bleu);color:#fff;border-color:var(--bleu)}
-.zopt{border:1.5px solid var(--g200);border-radius:var(--rsm);padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .15s}
-.zopt:last-child{margin-bottom:0}
-.zopt:active,.zopt.selected{border-color:var(--or);background:var(--or-l)}
-.zradio{width:15px;height:15px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.zopt.selected .zradio{border-color:var(--or)}
-.zdot{width:7px;height:7px;border-radius:50%;background:var(--or);opacity:0}
-.zopt.selected .zdot{opacity:1}
-.zico{font-size:19px}
-.zn{font-size:12px;font-weight:600;color:var(--g900)}
-.zd{font-size:10px;color:var(--g400);margin-top:1px}
-.zprice{font-size:12px;font-weight:600;color:var(--vert);white-space:nowrap}
-.zfree{font-size:12px;font-weight:600;color:var(--teal);white-space:nowrap}
-.popt{border:1.5px solid var(--g200);border-radius:var(--rsm);padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:all .15s}
-.popt:last-child{margin-bottom:0}
-.popt:active,.popt.selected{border-color:var(--or);background:var(--or-l)}
-.pradio{width:15px;height:15px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.popt.selected .pradio{border-color:var(--or)}
-.pdot{width:7px;height:7px;border-radius:50%;background:var(--or);opacity:0}
-.popt.selected .pdot{opacity:1}
-.pico{font-size:20px}
-.pnm{font-size:12px;font-weight:600;color:var(--g900)}
-.psb{font-size:10px;color:var(--g400)}
-.scard{background:var(--or-l);border-radius:var(--rmd);padding:13px 14px;border:1px solid rgba(212,120,26,.18)}
-.srow{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--or-d)}
-.stotal{display:flex;justify-content:space-between;font-size:15px;font-weight:600;padding:8px 0 0;border-top:1px solid rgba(212,120,26,.25);margin-top:5px;color:var(--or)}
-.obtn{width:100%;background:var(--or);color:#fff;border:none;border-radius:var(--rmd);padding:14px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 12px rgba(212,120,26,.25);transition:background .15s}
-.obtn:active:not(:disabled){background:var(--or-d)}
+.qb{background:var(--g50);border:1px solid var(--g200);border-radius:8px;width:25px;height:25px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--g900);font-family:inherit}
+.qn{font-size:12px;font-weight:600;min-width:16px;text-align:center}
+.zopt{border:1.5px solid var(--g200);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:9px}
+.zopt:last-child{margin-bottom:0}.zopt.sel{border-color:var(--v);background:var(--vl)}
+.zr{width:15px;height:15px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.zopt.sel .zr{border-color:var(--v)}.zd{width:7px;height:7px;border-radius:50%;background:var(--v);opacity:0}
+.zopt.sel .zd{opacity:1}
+.zn{font-size:12px;font-weight:600;color:var(--g900)}.zdt{font-size:10px;color:var(--g400);margin-top:1px}
+.zprc{font-size:12px;font-weight:600;color:var(--v);white-space:nowrap}.zfree{font-size:12px;font-weight:600;color:var(--vm);white-space:nowrap}
+.lsug{background:var(--vl);border:1px solid rgba(26,107,53,.2);border-radius:10px;padding:12px}
+.lstt{font-size:12px;font-weight:600;color:var(--vd);margin-bottom:9px;display:flex;align-items:center;gap:6px}
+.lsc{background:var(--w);border-radius:10px;border:0.5px solid var(--g100);padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer}
+.lsc:last-child{margin-bottom:0}.lsc.sel{border-color:var(--v);background:var(--vl)}
+.lsav{width:38px;height:38px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:2px solid var(--v);position:relative}
+.lsonl{position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:#22C55E;border:1.5px solid #fff}
+.lsn{font-size:12px;font-weight:600;color:var(--g900)}.lsz{font-size:10px;color:var(--g400);margin-top:1px}
+.lsph{font-size:11px;color:var(--bl);font-weight:500;margin-top:3px}
+.lsr{width:15px;height:15px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto}
+.lsc.sel .lsr{border-color:var(--v)}.lsrd{width:8px;height:8px;border-radius:50%;background:var(--v);opacity:0}
+.lsc.sel .lsrd{opacity:1}
+.popt{border:1.5px solid var(--g200);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:9px}
+.popt:last-child{margin-bottom:0}.popt.sel{border-color:var(--v);background:var(--vl)}
+.pr{width:15px;height:15px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.popt.sel .pr{border-color:var(--v)}.prd{width:7px;height:7px;border-radius:50%;background:var(--v);opacity:0}
+.popt.sel .prd{opacity:1}
+.pnm{font-size:12px;font-weight:600;color:var(--g900)}.psb{font-size:10px;color:var(--g400)}
+.scrd{background:var(--vl);border-radius:10px;padding:13px 14px;border:1px solid rgba(26,107,53,.2)}
+.sr{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--vd)}
+.stot{display:flex;justify-content:space-between;font-size:15px;font-weight:600;padding:8px 0 0;border-top:1px solid rgba(26,107,53,.2);margin-top:5px;color:var(--v)}
+.obtn{width:100%;background:var(--v);color:#fff;border:none;border-radius:10px;padding:14px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 12px rgba(26,107,53,.25)}
 .obtn:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed;box-shadow:none}
-.regbody{padding:14px;display:flex;flex-direction:column;gap:12px;background:var(--g50)}
-.commbox{background:var(--bleu-l);border:1px solid rgba(24,95,165,.15);border-radius:var(--rmd);padding:11px 13px;display:flex;gap:9px;align-items:flex-start;font-size:11px;color:var(--bleu-d);line-height:1.5}
-.commbox i{color:var(--bleu);font-size:17px;flex-shrink:0;margin-top:1px}
-.regcard{background:#fff;border-radius:var(--rlg);border:1px solid var(--g100);padding:15px}
-.regtit{font-size:14px;font-weight:600;color:var(--g900);margin-bottom:3px;display:flex;align-items:center;gap:7px}
-.regtit i{color:var(--bleu);font-size:18px}
-.regsub{font-size:12px;color:var(--g400);margin-bottom:14px;line-height:1.5}
-.fg{margin-bottom:10px}
-.fl{font-size:11px;font-weight:500;color:var(--g400);margin-bottom:4px;display:block}
-.fi{width:100%;border:1px solid var(--g200);border-radius:var(--rmd);padding:9px 12px;font-size:13px;font-family:inherit;background:var(--g50);color:var(--g900);outline:none}
-.fi:focus{border-color:var(--or)}
-textarea.fi{resize:vertical;min-height:80px}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.sbtn{width:100%;background:var(--bleu);color:#fff;border:none;border-radius:var(--rmd);padding:13px;font-size:13px;font-family:inherit;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
-.pendcard{background:#fff;border-radius:var(--rmd);border:1px solid var(--g100);padding:13px 14px}
-.pendtit{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.pendtit i{color:var(--bleu);font-size:15px}
-.penditem{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--g100)}
-.penditem:last-child{border-bottom:none}
-.pav2{width:32px;height:32px;border-radius:50%;background:var(--jaune-l);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#7A5500;flex-shrink:0}
-.pavi{flex:1}
-.pavname{font-size:12px;font-weight:600;color:var(--g900)}
-.pavsub{font-size:10px;color:var(--g400);margin-top:1px}
-.battente{font-size:9px;padding:2px 7px;border-radius:7px;font-weight:500;background:var(--jaune-l);color:#7A5500;white-space:nowrap}
-.confpage{padding:48px 20px;text-align:center;background:#fff;min-height:70vh;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.conficon{font-size:60px;color:var(--vert);margin-bottom:14px}
-.conftit{font-size:20px;font-weight:600;color:var(--g900);margin-bottom:7px}
-.confsub{font-size:13px;color:var(--g400);line-height:1.6;margin-bottom:20px;max-width:300px}
-.confcard{background:var(--g50);border-radius:var(--rmd);padding:13px;width:100%;text-align:left;margin-bottom:22px;border:1px solid var(--g100)}
-.crow{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 0;border-bottom:1px solid var(--g100)}
-.crow:last-child{border-bottom:none}
-.clbl{color:var(--g400)}.cval{font-weight:600;color:var(--g900);text-align:right}.ctot{font-weight:700;color:var(--or);font-size:14px}
-.newbtn{background:var(--or);color:#fff;border:none;border-radius:var(--rmd);padding:12px 30px;font-size:13px;font-family:inherit;font-weight:600;cursor:pointer}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--g900);color:#fff;padding:9px 16px;border-radius:20px;font-size:12px;font-weight:500;z-index:999;transition:transform .3s;white-space:nowrap;display:flex;align-items:center;gap:7px;max-width:92vw}
+
+/* DASHBOARDS */
+.dbody{padding:12px;display:flex;flex-direction:column;gap:12px;background:var(--g50);padding-bottom:70px}
+.dhv{background:linear-gradient(135deg,#1A6B35,#2E8B50);border-radius:12px;padding:16px;color:#fff}
+.dhl{background:linear-gradient(135deg,#1A5FA5,#2A7DD4);border-radius:12px;padding:16px;color:#fff}
+.dav{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:9px;border:2px solid rgba(255,255,255,.3);position:relative}
+.davo{position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;background:#22C55E;border:2px solid #fff}
+.dnm{font-size:16px;font-weight:600}.dsh{font-size:11px;opacity:.8;margin-top:1px}
+.dsts{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;font-size:10px;margin-top:7px}
+.dsgr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px}
+.ds{background:rgba(255,255,255,.15);border-radius:10px;padding:10px 8px;text-align:center}
+.dsn{font-size:17px;font-weight:600;color:#fff}.dsl{font-size:9px;color:rgba(255,255,255,.7);margin-top:1px}
+.dcrd{background:var(--w);border-radius:10px;border:0.5px solid var(--g100);padding:13px 14px}
+.dctt{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.dctl{display:flex;align-items:center;gap:6px}.dctl i{color:var(--v);font-size:15px}
+.dact{font-size:11px;color:var(--bl);cursor:pointer;border:none;background:none;font-family:inherit}
+.oit{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--g100)}.oit:last-child{border-bottom:none}
+.oe{font-size:20px;width:30px;text-align:center;flex-shrink:0}.oi{flex:1}
+.on{font-size:12px;font-weight:600;color:var(--g900)}.od{font-size:10px;color:var(--g400);margin-top:1px}
+.os{font-size:10px;padding:2px 7px;border-radius:7px;font-weight:500;white-space:nowrap}
+.os-n{background:var(--jl);color:var(--jd)}.os-s{background:var(--bll);color:var(--bld)}.os-d{background:var(--vl);color:var(--vd)}
+.pit{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--g100)}.pit:last-child{border-bottom:none}
+.pie{font-size:20px;width:30px;text-align:center}.pii{flex:1}
+.pin{font-size:12px;font-weight:600;color:var(--g900)}.pid{font-size:10px;color:var(--g400)}
+.pia{display:flex;gap:5px}.pab{border:1px solid var(--g200);background:none;border-radius:8px;padding:4px 8px;font-size:10px;cursor:pointer;color:var(--g700);font-family:inherit}
+.apb{width:100%;background:var(--bl);color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
+.togb{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:500;color:#fff;cursor:pointer;font-family:inherit}
+.togb.on{background:#22C55E;border-color:#22C55E}
+.ncrd{background:#FFFBE6;border:1px solid rgba(245,197,24,.3);border-radius:10px;padding:12px}
+.nct{font-size:12px;font-weight:600;color:var(--jd);margin-bottom:9px}
+.nac{display:flex;gap:8px;margin-top:10px}
+.na-a{flex:1;background:var(--v);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer}
+.na-r{flex:1;background:var(--rl);color:var(--r);border:1px solid var(--r);border-radius:8px;padding:9px;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer}
+.lo{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--g100)}.lo:last-child{border-bottom:none}
+.loe{font-size:20px;width:30px;text-align:center;flex-shrink:0}.loi{flex:1}
+.lon{font-size:12px;font-weight:600;color:var(--g900)}.lod{font-size:10px;color:var(--g400);margin-top:1px}
+.log{font-size:12px;font-weight:600;color:var(--v);white-space:nowrap}
+
+/* BOTTOM NAV */
+.bot-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--w);border-top:0.5px solid var(--g100);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 0 18px;z-index:200}
+.nav-it{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.nav-ic{width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:18px;border-radius:50%}
+.nav-ic.on{background:var(--vl)}
+.nav-lbl{font-size:10px;color:var(--g400)}
+.nav-lbl.on{color:var(--v);font-weight:600}
+.nav-center-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;margin-top:-14px}
+.nav-center-btn{width:46px;height:46px;border-radius:50%;background:var(--v);display:flex;align-items:center;justify-content:center;border:3px solid var(--g50)}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--g900);color:#fff;padding:9px 16px;border-radius:20px;font-size:12px;font-weight:500;z-index:9999;transition:transform .3s;white-space:nowrap;display:flex;align-items:center;gap:7px;max-width:92vw}
 .toast.show{transform:translateX(-50%) translateY(0)}
+
+/* FLASH COUNTDOWN */
+.flash-count{background:var(--rl);color:var(--r);font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
 </style>
 </head>
 <body>
 <div class="app">
-<header class="header">
-  <div><div class="h-title">🌴 Brasserie Naturelle</div><div class="h-sub">Marketplace · Produits du Bénin</div></div>
-  <div class="h-right">
-    <button class="prod-btn" onclick="showTab('register')"><i class="ti ti-user-plus"></i><span class="btn-lbl">Producteur</span></button>
-    <button class="cart-btn" onclick="showTab('cart')"><i class="ti ti-shopping-cart"></i><span class="btn-lbl">Panier</span><span class="cart-count" id="cartCount">0</span></button>
+
+<!-- GEO MODAL -->
+<div class="geo-ov" id="geoOv">
+  <div class="geo-sh">
+    <div class="geo-hd"></div>
+    <div class="geo-bd">
+      <div class="geo-t"><i class="ti ti-map-pin" style="color:var(--v);font-size:20px" aria-hidden="true"></i>Où vous trouvez-vous ?</div>
+      <div class="geo-s">Choisissez votre ville pour voir les boutiques et livreurs près de chez vous.</div>
+      <div class="geo-gps" onclick="detectGPS()">
+        <div class="geo-gps-ic"><i class="ti ti-current-location" id="gpsIc" style="color:var(--v);font-size:18px" aria-hidden="true"></i></div>
+        <div style="flex:1">
+          <div class="geo-gps-t" id="gpsT">Utiliser ma position GPS</div>
+          <div class="geo-gps-s" id="gpsS">Détection automatique de votre quartier</div>
+        </div>
+        <i class="ti ti-chevron-right" style="color:var(--g400);font-size:16px" aria-hidden="true"></i>
+      </div>
+      <div class="geo-div"><div class="geo-ln"></div><span>ou choisissez votre ville</span><div class="geo-ln"></div></div>
+      <div class="geo-gr" id="geoGr"></div>
+      <button class="geo-btn" id="geoBtnConf" disabled onclick="confirmGeo()">
+        <i class="ti ti-check" aria-hidden="true"></i>Choisissez une ville
+      </button>
+    </div>
   </div>
-</header>
-<nav class="nav-tabs">
-  <button class="tab active" id="tab-home" onclick="showTab('home')"><i class="ti ti-home"></i><span>Accueil</span></button>
-  <button class="tab" id="tab-products" onclick="showTab('products')"><i class="ti ti-basket"></i><span>Produits</span></button>
-  <button class="tab" id="tab-cart" onclick="showTab('cart')"><i class="ti ti-shopping-cart"></i><span>Panier</span></button>
-  <button class="tab" id="tab-register" onclick="showTab('register')"><i class="ti ti-building-store"></i><span>Espace Pro</span></button>
-</nav>
+</div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="loc-row">
+    <div class="loc-left" onclick="openGeo()">
+      <i class="ti ti-map-pin" style="font-size:14px" aria-hidden="true"></i>
+      <span id="locTxt">Choisir ma ville</span>
+      <i class="ti ti-chevron-down" style="font-size:12px" aria-hidden="true"></i>
+    </div>
+    <div class="loc-right">
+      <div class="icon-b"><i class="ti ti-message-circle" style="font-size:14px" aria-hidden="true"></i><span class="nb-dot"></span></div>
+      <div class="icon-b"><i class="ti ti-bell" style="font-size:14px" aria-hidden="true"></i></div>
+    </div>
+  </div>
+  <div class="search-row">
+    <div class="search-inp">
+      <i class="ti ti-search" style="font-size:15px;color:#ccc" aria-hidden="true"></i>
+      <span style="font-size:13px;color:#bbb" onclick="goTab('catalogue')">Gari, tilapia, mangue...</span>
+    </div>
+    <button class="search-b" onclick="goTab('catalogue')">Chercher</button>
+  </div>
+</div>
+
+<!-- ACCUEIL -->
 <div id="page-home" class="page active">
-  <div class="sbar"><i class="ti ti-search si"></i><input type="text" placeholder="Rechercher gari, mangue, poisson..." oninput="filtrer(this.value)"/><span class="loc"><i class="ti ti-map-pin"></i> Bénin</span></div>
-  <div class="hbody">
-    <div class="hero"><div class="hero-tag">Marketplace multi-producteurs · Livraison groupée</div><div class="hero-title">Produits naturels du Bénin<br>directement des producteurs 🌴</div><div class="hero-acts"><button class="hbtn" onclick="showTab('products')">Voir les produits →</button><button class="hbtn2" onclick="showTab('register')">Devenir producteur</button></div></div>
-    <div class="slbl"><i class="ti ti-category"></i>Catégories</div>
-    <div class="cgrid" id="homeCatGrid"></div>
-    <div class="slbl"><i class="ti ti-users"></i>Producteurs vérifiés</div>
-    <div class="prow" id="producersRow"></div>
-    <div class="icard">
-      <div class="icard-title"><i class="ti ti-truck"></i>Zones de livraison</div>
-      <div class="zirow"><span>🏪 Retrait point relais</span><span class="zip">Gratuit</span></div>
-      <div class="zirow"><span>🛵 Cotonou ville (&lt;5 km)</span><span class="zip">500 FCFA</span></div>
-      <div class="zirow"><span>🚐 Cotonou périphérie (5–15 km)</span><span class="zip">1 000 FCFA</span></div>
-      <div class="zirow"><span>🚚 Abomey-Calavi</span><span class="zip">1 500 FCFA</span></div>
-      <div class="zirow"><span>📦 Livraison groupée multi-vendeurs</span><span class="zipb">+500 FCFA</span></div>
+<div class="home-content">
+
+  <!-- CATEGORIES -->
+  <div class="cats-wrap">
+    <div class="cat-grid">
+      <div class="cat-item" onclick="goTab('catalogue')">
+        <div class="cat-ic" style="background:#E8F5EE">🛒<span class="cat-bdg" style="background:#F5C518;color:#8B7000">HOT</span></div>
+        <span class="cat-lbl">Marché</span>
+      </div>
+      <div class="cat-item" onclick="setC('Viandes');goTab('catalogue')">
+        <div class="cat-ic" style="background:#FEF0E0">🥩</div>
+        <span class="cat-lbl">Viandes</span>
+      </div>
+      <div class="cat-item" onclick="setC('Poissons');goTab('catalogue')">
+        <div class="cat-ic" style="background:#E6F0FB">🐟</div>
+        <span class="cat-lbl">Poissons</span>
+      </div>
+      <div class="cat-item" onclick="setC('Oeufs');goTab('catalogue')">
+        <div class="cat-ic" style="background:#FEF3D7">🥚</div>
+        <span class="cat-lbl">Oeufs</span>
+      </div>
+      <div class="cat-item" onclick="setC('Légumes');goTab('catalogue')">
+        <div class="cat-ic" style="background:#E8F5EE">🥦</div>
+        <span class="cat-lbl">Légumes</span>
+      </div>
+      <div class="cat-item" onclick="setC('Fruits');goTab('catalogue')">
+        <div class="cat-ic" style="background:#FEF0E0">🍍</div>
+        <span class="cat-lbl">Fruits</span>
+      </div>
+      <div class="cat-item" onclick="setC('Épicerie');goTab('catalogue')">
+        <div class="cat-ic" style="background:#FEF3D7">🌾</div>
+        <span class="cat-lbl">Épicerie</span>
+      </div>
+      <div class="cat-item" onclick="setC('Brasserie');goTab('catalogue')">
+        <div class="cat-ic" style="background:#FDECEA">🍶<span class="cat-bdg" style="background:#C0392B;color:#fff">NEW</span></div>
+        <span class="cat-lbl">Brasserie</span>
+      </div>
+      <div class="cat-item" onclick="setC('Huiles');goTab('catalogue')">
+        <div class="cat-ic" style="background:#E1F5EE">🫙</div>
+        <span class="cat-lbl">Huiles</span>
+      </div>
+      <div class="cat-item" onclick="setC('Épices');goTab('catalogue')">
+        <div class="cat-ic" style="background:#FDECEA">🌶</div>
+        <span class="cat-lbl">Épices</span>
+      </div>
     </div>
-    <div class="paybadges">
-      <div class="pbdg"><span class="dmtn"></span>MTN Mobile Money</div>
-      <div class="pbdg"><span class="dmoov"></span>Moov Money</div>
-      <div class="pbdg"><i class="ti ti-cash"></i>Paiement livraison</div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- BANNER -->
+  <div style="padding:0 10px 10px;background:#fff">
+    <div class="banner">
+      <div class="ban-img">🌿</div>
+      <div class="ban-txt">
+        <span class="ban-tag">OFFRE DU JOUR</span>
+        <div class="ban-title">Produits frais livrés en 2h à <span id="banCity">Cotonou</span></div>
+        <div class="ban-sub">Ferme Agbossou · Savalou</div>
+        <div style="display:flex;align-items:baseline;gap:4px;margin-top:5px">
+          <span class="ban-price">600 FCFA</span>
+          <span style="font-size:10px;color:#1A6B35;font-weight:600">/kg · 0 frais</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- PRODUITS POPULAIRES -->
+  <div class="sec-hdr" style="background:#fff">
+    <div class="sec-t">🔥 Populaires près de vous</div>
+    <div class="sec-more" onclick="goTab('catalogue')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
+  </div>
+  <div class="prods-scroll">
+    <div class="pc">
+      <div class="pc-img">🌾<span class="pc-t" style="background:#1A6B35;color:#fff">Naturel</span><button class="pc-add" onclick="quickAdd(1)">+</button></div>
+      <div class="pc-inf"><div class="pc-n">Gari de Savalou</div><div class="pc-sh">Ferme Agbossou</div><div><span class="pc-p">600</span><span style="font-size:9px;color:#C0392B"> FCFA/kg</span></div></div>
+    </div>
+    <div class="pc">
+      <div class="pc-img">🐟<span class="pc-t" style="background:#1A6B35;color:#fff">Frais</span><button class="pc-add" onclick="quickAdd(5)">+</button></div>
+      <div class="pc-inf"><div class="pc-n">Tilapia frais</div><div class="pc-sh">Pêcherie Littoral</div><div><span class="pc-p">2 500</span><span style="font-size:9px;color:#C0392B"> FCFA/kg</span></div></div>
+    </div>
+    <div class="pc">
+      <div class="pc-img">🥭<span class="pc-t" style="background:#C0392B;color:#fff">Promo</span><button class="pc-add" onclick="quickAdd(2)">+</button></div>
+      <div class="pc-inf"><div class="pc-n">Mangue Tanguiéta</div><div class="pc-sh">Verger Tanguiéta</div><div><span class="pc-p">800</span><span class="pc-old">1200</span></div></div>
+    </div>
+    <div class="pc">
+      <div class="pc-img">🥩<span class="pc-t" style="background:#C0392B;color:#fff">Local</span><button class="pc-add" onclick="quickAdd(7)">+</button></div>
+      <div class="pc-inf"><div class="pc-n">Viande de boeuf</div><div class="pc-sh">Ferme Agbossou</div><div><span class="pc-p">3 500</span><span style="font-size:9px;color:#C0392B"> FCFA/kg</span></div></div>
+    </div>
+    <div class="pc">
+      <div class="pc-img">🫙<span class="pc-t" style="background:#1A6B35;color:#fff">Naturel</span><button class="pc-add" onclick="quickAdd(4)">+</button></div>
+      <div class="pc-inf"><div class="pc-n">Huile de Palme</div><div class="pc-sh">Huilerie Lokossa</div><div><span class="pc-p">1 200</span><span style="font-size:9px;color:#C0392B"> FCFA/L</span></div></div>
+    </div>
+    <div class="pc">
+      <div class="pc-img">🦐<span class="pc-t" style="background:#1A6B35;color:#fff">Frais</span><button class="pc-add" onclick="quickAdd(6)">+</button></div>
+      <div class="pc-inf"><div class="pc-n">Crevettes fumées</div><div class="pc-sh">Pêcherie Littoral</div><div><span class="pc-p">3 500</span><span style="font-size:9px;color:#C0392B"> FCFA/kg</span></div></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- LIVREURS -->
+  <div class="sec-hdr" style="background:#fff">
+    <div class="sec-t">🛵 Livreurs disponibles</div>
+    <div class="sec-more" onclick="goTab('livreurs')">Voir tout <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
+  </div>
+  <div class="liv-scroll">
+    <div class="lchip"><div class="lav">🧑🏾<div class="ldot"></div></div><div><div class="ln">Kofi D.</div><div class="leta">~15 min</div><div class="lnote">⭐4.9 · 32 livr.</div></div></div>
+    <div class="lchip"><div class="lav">👩🏾<div class="ldot"></div></div><div><div class="ln">Aminatou S.</div><div class="leta">~22 min</div><div class="lnote">⭐4.8 · 28 livr.</div></div></div>
+    <div class="lchip"><div class="lav">👩🏿<div class="ldot"></div></div><div><div class="ln">Rosine K.</div><div class="leta">~18 min</div><div class="lnote">⭐4.9 · 41 livr.</div></div></div>
+    <div class="lchip"><div class="lav">🧑🏾<div class="ldot"></div></div><div><div class="ln">Maxime A.</div><div class="leta">~25 min</div><div class="lnote">⭐4.6 · 15 livr.</div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- OFFRES SPECIALES -->
+  <div class="sec-hdr" style="background:#fff">
+    <div class="sec-t">⭐ Offres spéciales</div>
+    <div class="sec-more" onclick="goTab('catalogue')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
+  </div>
+  <div class="grid2">
+    <div class="gcrd"><div class="gc-img">🦐<span class="gc-bdg" style="background:#C0392B;color:#fff">-30%</span></div><div class="gc-inf"><div class="gc-n">Crevettes fumées</div><div class="gc-sh">Pêcherie Littoral</div><div class="gc-row"><div><span class="gc-p">2 450 </span><span style="font-size:9px;color:#bbb;text-decoration:line-through">3 500</span></div><button class="gc-add" onclick="quickAdd(6)">+ Ajouter</button></div></div></div>
+    <div class="gcrd"><div class="gc-img">🍶<span class="gc-bdg" style="background:#1A6B35;color:#fff">Nouveau</span></div><div class="gc-inf"><div class="gc-n">Vin de Palme</div><div class="gc-sh">Brasserie Parakou</div><div class="gc-row"><span class="gc-p">500 FCFA</span><button class="gc-add" onclick="quickAdd(12)">+ Ajouter</button></div></div></div>
+    <div class="gcrd"><div class="gc-img">🥚<span class="gc-bdg" style="background:#F5C518;color:#8B7000">Populaire</span></div><div class="gc-inf"><div class="gc-n">Oeufs de poule</div><div class="gc-sh">Ferme Agbossou</div><div class="gc-row"><span class="gc-p">150 FCFA</span><button class="gc-add" onclick="quickAdd(11)">+ Ajouter</button></div></div></div>
+    <div class="gcrd"><div class="gc-img">🌶<span class="gc-bdg" style="background:#1A6B35;color:#fff">Naturel</span></div><div class="gc-inf"><div class="gc-n">Piment séché</div><div class="gc-sh">Épices Abomey</div><div class="gc-row"><span class="gc-p">500 FCFA</span><button class="gc-add" onclick="quickAdd(13)">+ Ajouter</button></div></div></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- FLASH VENTES -->
+  <div class="sec-hdr" style="background:#fff">
+    <div class="sec-t">⚡ Flash ventes <span class="flash-count" id="flashTimer">02:47:33</span></div>
+    <div class="sec-more" onclick="goTab('catalogue')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
+  </div>
+  <div class="flash-grid" style="background:#fff">
+    <div class="fcrd"><div class="fe">🧅</div><div class="fi2"><div class="fn">Oignon local</div><div class="fs">Ferme Agbossou</div><div class="fp">350<span class="fo">700</span></div></div></div>
+    <div class="fcrd"><div class="fe">🥬</div><div class="fi2"><div class="fn">Gombo frais</div><div class="fs">Huilerie Lokossa</div><div class="fp">200<span class="fo">400</span></div></div></div>
+    <div class="fcrd"><div class="fe">🍅</div><div class="fi2"><div class="fn">Tomates fraîches</div><div class="fs">Verger Tanguiéta</div><div class="fp">250<span class="fo">500</span></div></div></div>
+    <div class="fcrd"><div class="fe">🌰</div><div class="fi2"><div class="fn">Noix de cajou</div><div class="fs">Verger Tanguiéta</div><div class="fp">2000<span class="fo">3000</span></div></div></div>
+  </div>
+
+  <!-- BOUTIQUES -->
+  <div class="divider"></div>
+  <div class="sec-hdr" style="background:#fff">
+    <div class="sec-t">🏪 Boutiques <span id="homeBoutT">vedettes</span></div>
+    <div class="sec-more" onclick="goTab('boutiques')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
+  </div>
+  <div class="grid2" id="homeBout"></div>
+  <div style="height:8px;background:#fff"></div>
+
+</div>
+</div>
+
+<!-- CATALOGUE -->
+<div id="page-catalogue" class="page">
+  <div class="sbar">
+    <i class="ti ti-search" style="color:var(--g400);font-size:17px;flex-shrink:0" aria-hidden="true"></i>
+    <input type="text" placeholder="Rechercher un produit ou boutique..." oninput="filtrer(this.value)"/>
+  </div>
+  <div class="cscr" id="catScroll"></div>
+  <div class="pgrid" id="prodGrid"></div>
+</div>
+
+<!-- BOUTIQUES -->
+<div id="page-boutiques" class="page">
+  <div class="sbar">
+    <i class="ti ti-search" style="color:var(--g400);font-size:17px;flex-shrink:0" aria-hidden="true"></i>
+    <input type="text" placeholder="Rechercher une boutique..." oninput="filtB(this.value)"/>
+  </div>
+  <div class="page-content"><div class="bgrid" id="boutGrid"></div></div>
+</div>
+
+<!-- LIVREURS -->
+<div id="page-livreurs" class="page">
+  <div class="sbar">
+    <i class="ti ti-search" style="color:var(--g400);font-size:17px;flex-shrink:0" aria-hidden="true"></i>
+    <input type="text" placeholder="Rechercher par nom ou zone..." oninput="filtL(this.value)"/>
+  </div>
+  <div class="lbody" id="livList"></div>
+</div>
+
+<!-- INSCRIPTION LIVREUR -->
+<div id="page-livreur" class="page">
+  <div class="lbody">
+    <div class="lhero-b">
+      <h2>🛵 Devenez livreur Yéyé Market</h2>
+      <p>Inscription gratuite. Gains hebdomadaires via MTN ou Moov Money.</p>
+      <button style="background:var(--j);color:var(--jd);border:none;border-radius:10px;padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit" onclick="goTab('dash-l')">Voir dashboard démo</button>
+    </div>
+    <div class="tcrd">
+      <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-coin" style="color:var(--v);font-size:16px" aria-hidden="true"></i>Gains par livraison</div>
+      <div class="trow"><span>Cotonou ville</span><span class="tval">500 FCFA</span></div>
+      <div class="trow"><span>Cotonou périphérie</span><span class="tval">1 000 FCFA</span></div>
+      <div class="trow"><span>Abomey-Calavi</span><span class="tval">1 500 FCFA</span></div>
+      <div class="trow"><span>Bonus livraison groupée</span><span class="tval">+300 FCFA</span></div>
+      <div class="trow"><span>Paiement des gains</span><span class="tval">Chaque vendredi</span></div>
+    </div>
+    <div class="rcrd">
+      <div class="rt"><i class="ti ti-id-badge" style="color:var(--bl);font-size:18px" aria-hidden="true"></i>Créer mon profil livreur</div>
+      <div class="rs">Notre équipe vérifie votre profil sous 24h avant activation.</div>
+      <div class="tabf">
+        <button class="tf active" onclick="swL('perso')">Infos</button>
+        <button class="tf" onclick="swL('moto')">Véhicule</button>
+        <button class="tf" onclick="swL('docs')">Documents</button>
+      </div>
+      <div id="lf-perso">
+        <div class="fg"><label class="fl">Nom complet *</label><input class="fi" type="text" placeholder="Ex: Akobi Mensah"/></div>
+        <div class="frow"><div class="fg"><label class="fl">Téléphone *</label><input class="fi" type="tel" placeholder="+229 ..."/></div><div class="fg"><label class="fl">WhatsApp *</label><input class="fi" type="tel" placeholder="+229 ..."/></div></div>
+        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="votre@email.com"/></div>
+        <div class="frow"><div class="fg"><label class="fl">Ville *</label><input class="fi" type="text" placeholder="Ex: Cotonou"/></div><div class="fg"><label class="fl">Zone *</label><select class="fi"><option>Cotonou centre</option><option>Cotonou nord</option><option>Cotonou sud</option><option>Abomey-Calavi</option><option>Porto-Novo</option><option>Toutes zones</option></select></div></div>
+        <div class="fg"><label class="fl">Numéro MTN Mobile Money *</label><input class="fi" type="tel" placeholder="+229 ..."/></div>
+        <button class="sbtn" onclick="swL('moto')">Suivant : Véhicule</button>
+      </div>
+      <div id="lf-moto" style="display:none">
+        <div class="fg"><label class="fl">Type de véhicule *</label><select class="fi"><option>Moto (Zémidjan)</option><option>Tricycle</option><option>Voiture</option><option>Vélo motorisé</option></select></div>
+        <div class="frow"><div class="fg"><label class="fl">Marque</label><input class="fi" type="text" placeholder="Ex: Yamaha"/></div><div class="fg"><label class="fl">Immatriculation</label><input class="fi" type="text" placeholder="Ex: BJ 1234 AB"/></div></div>
+        <div class="fg"><label class="fl">Disponibilité</label><select class="fi"><option>Temps plein</option><option>Matin (6h-12h)</option><option>Après-midi (12h-18h)</option><option>Soir (18h-21h)</option></select></div>
+        <div class="frow"><button class="sbtn" style="background:var(--g200);color:var(--g700)" onclick="swL('perso')">Retour</button><button class="sbtn" onclick="swL('docs')">Suivant</button></div>
+      </div>
+      <div id="lf-docs" style="display:none">
+        <div class="fg"><label class="fl">📸 Photo de profil *</label><div class="upb" id="up-ph" onclick="simUp('up-ph')"><span class="upic">📷</span><div class="upt">Appuyez pour prendre une photo</div><div class="ups">JPG ou PNG · Max 5 MB</div></div></div>
+        <div class="fg"><label class="fl">🪪 Pièce d'identité recto *</label><div class="upb" id="up-r" onclick="simUp('up-r')"><span class="upic">🪪</span><div class="upt">CNI, Passeport ou Permis (recto)</div><div class="ups">JPG, PNG ou PDF · Max 5 MB</div></div></div>
+        <div class="fg"><label class="fl">🪪 Pièce d'identité verso *</label><div class="upb" id="up-v" onclick="simUp('up-v')"><span class="upic">🪪</span><div class="upt">CNI, Passeport ou Permis (verso)</div><div class="ups">JPG, PNG ou PDF · Max 5 MB</div></div></div>
+        <div style="background:var(--bll);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--bld);margin-bottom:12px">🔒 Vos documents sont chiffrés et sécurisés. Utilisés uniquement pour vérification.</div>
+        <div class="frow"><button class="sbtn" style="background:var(--g200);color:var(--g700)" onclick="swL('moto')">Retour</button><button class="sbtn sbtn-b" onclick="subLiv()">Soumettre</button></div>
+      </div>
     </div>
   </div>
 </div>
-<div id="page-products" class="page">
-  <div class="sbar"><i class="ti ti-search si"></i><input type="text" placeholder="Rechercher un produit ou producteur..." oninput="filtrer(this.value)"/></div>
-  <div class="cscroll" id="catScroll"></div>
-  <div class="pgrid" id="productsGrid"></div>
+
+<!-- VENDRE -->
+<div id="page-vendre" class="page">
+  <div class="lbody">
+    <div class="lhero-v">
+      <h2>💼 Ouvrir ma boutique sur Yéyé Market</h2>
+      <p>Rejoignez 312 vendeurs actifs. 5% de commission seulement, inscription gratuite.</p>
+      <button style="background:var(--j);color:var(--jd);border:none;border-radius:10px;padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit" onclick="goTab('dash-v')">Voir dashboard démo</button>
+    </div>
+    <div class="tcrd">
+      <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-percentage" style="color:var(--v);font-size:16px" aria-hidden="true"></i>Tarifs vendeur</div>
+      <div class="trow"><span>Inscription</span><span class="tval">Gratuit</span></div>
+      <div class="trow"><span>Commission par vente</span><span class="tval">5%</span></div>
+      <div class="trow"><span>Abonnement mensuel</span><span class="tval">0 FCFA</span></div>
+      <div class="trow"><span>Paiement des gains</span><span class="tval">Chaque semaine</span></div>
+    </div>
+    <div class="rcrd">
+      <div class="rt"><i class="ti ti-building-store" style="color:var(--v);font-size:18px" aria-hidden="true"></i>Créer ma boutique</div>
+      <div class="rs">Inscription gratuite. Boutique active sous 24-48h après validation.</div>
+      <div class="tabf">
+        <button class="tf active" onclick="swV('info')">Infos</button>
+        <button class="tf" onclick="swV('bout')">Boutique</button>
+        <button class="tf" onclick="swV('prod')">Produits</button>
+      </div>
+      <div id="vf-info">
+        <div class="fg"><label class="fl">Nom complet *</label><input class="fi" type="text" placeholder="Ex: Kokou Agbossou"/></div>
+        <div class="frow"><div class="fg"><label class="fl">Téléphone *</label><input class="fi" type="tel" placeholder="+229 ..."/></div><div class="fg"><label class="fl">WhatsApp</label><input class="fi" type="tel" placeholder="+229 ..."/></div></div>
+        <div class="frow"><div class="fg"><label class="fl">Ville *</label><input class="fi" type="text" placeholder="Ex: Savalou"/></div><div class="fg"><label class="fl">Région *</label><select class="fi"><option>Alibori</option><option>Atacora</option><option>Atlantique</option><option>Borgou</option><option>Collines</option><option>Couffo</option><option>Donga</option><option>Littoral</option><option>Mono</option><option>Ouémé</option><option>Plateau</option><option>Zou</option></select></div></div>
+        <div class="fg"><label class="fl">Numéro MTN Mobile Money *</label><input class="fi" type="tel" placeholder="+229 ..."/></div>
+        <button class="sbtn" onclick="swV('bout')">Suivant : Ma boutique</button>
+      </div>
+      <div id="vf-bout" style="display:none">
+        <div class="fg"><label class="fl">Nom de votre boutique *</label><input class="fi" type="text" placeholder="Ex: Ferme Agbossou"/></div>
+        <div class="fg"><label class="fl">Catégorie principale *</label><select class="fi"><option>Viandes et Volailles</option><option>Poissons et Crustacés</option><option>Oeufs</option><option>Légumes</option><option>Fruits</option><option>Épicerie</option><option>Huiles naturelles</option><option>Brasserie naturelle</option><option>Épices</option></select></div>
+        <div class="fg"><label class="fl">Zones de livraison</label><input class="fi" type="text" placeholder="Ex: Cotonou J+2, Abomey J+1"/></div>
+        <div class="fg"><label class="fl">Description *</label><textarea class="fi" placeholder="Votre activité, vos produits..."></textarea></div>
+        <div class="frow"><button class="sbtn" style="background:var(--g200);color:var(--g700)" onclick="swV('info')">Retour</button><button class="sbtn" onclick="swV('prod')">Suivant</button></div>
+      </div>
+      <div id="vf-prod" style="display:none">
+        <div class="fg"><label class="fl">Produit 1 *</label><input class="fi" type="text" placeholder="Ex: Gari de Savalou"/></div>
+        <div class="frow"><div class="fg"><label class="fl">Prix (FCFA) *</label><input class="fi" type="number" placeholder="600"/></div><div class="fg"><label class="fl">Unité *</label><select class="fi"><option>kg</option><option>litre</option><option>pièce</option><option>sachet</option><option>unité</option></select></div></div>
+        <div class="fg"><label class="fl">Produit 2</label><input class="fi" type="text" placeholder="Optionnel"/></div>
+        <div class="fg"><label class="fl">Produit 3</label><input class="fi" type="text" placeholder="Optionnel"/></div>
+        <div class="frow"><button class="sbtn" style="background:var(--g200);color:var(--g700)" onclick="swV('bout')">Retour</button><button class="sbtn" onclick="subVend()">Soumettre</button></div>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- DASHBOARD VENDEUR -->
+<div id="page-dash-v" class="page">
+  <div class="dbody">
+    <div class="dhv">
+      <div class="dav">🧑🏾</div>
+      <div class="dnm">Kokou Agbossou</div>
+      <div class="dsh">🏪 Ferme Agbossou · Savalou</div>
+      <div class="dsts">Boutique active et vérifiée</div>
+      <div class="dsgr">
+        <div class="ds"><div class="dsn">24</div><div class="dsl">Commandes</div></div>
+        <div class="ds"><div class="dsn">186k</div><div class="dsl">FCFA gains</div></div>
+        <div class="ds"><div class="dsn">8</div><div class="dsl">Produits</div></div>
+      </div>
+    </div>
+    <div class="dcrd">
+      <div class="dctt"><div class="dctl"><i class="ti ti-shopping-bag" aria-hidden="true"></i>Commandes récentes</div><button class="dact">Voir tout</button></div>
+      <div class="oit"><div class="oe">🌾</div><div class="oi"><div class="on">Gari de Savalou x 5 kg</div><div class="od">Afi K. · Cotonou · Livreur Kofi en route</div></div><span class="os os-s">En livraison</span></div>
+      <div class="oit"><div class="oe">🥩</div><div class="oi"><div class="on">Viande de boeuf x 2 kg</div><div class="od">Mede R. · Abomey-Calavi · 7 000 FCFA</div></div><span class="os os-n">Nouveau</span></div>
+      <div class="oit"><div class="oe">🧅</div><div class="oi"><div class="on">Oignon local x 10 kg</div><div class="od">Seto A. · Cotonou · 7 000 FCFA</div></div><span class="os os-d">Livré</span></div>
+    </div>
+    <div class="dcrd">
+      <div class="dctt"><div class="dctl"><i class="ti ti-package" aria-hidden="true"></i>Mes produits</div><button class="dact">+ Ajouter</button></div>
+      <div class="pit"><div class="pie">🌾</div><div class="pii"><div class="pin">Gari de Savalou</div><div class="pid">600 FCFA/kg · 50 kg dispo</div></div><div class="pia"><button class="pab">✏️</button><button class="pab">👁️</button></div></div>
+      <div class="pit"><div class="pie">🥩</div><div class="pii"><div class="pin">Viande de boeuf</div><div class="pid">3 500 FCFA/kg · 35 kg dispo</div></div><div class="pia"><button class="pab">✏️</button><button class="pab">👁️</button></div></div>
+      <div class="pit"><div class="pie">🧅</div><div class="pii"><div class="pin">Oignon local</div><div class="pid">700 FCFA/kg · 90 kg dispo</div></div><div class="pia"><button class="pab">✏️</button><button class="pab">👁️</button></div></div>
+      <button class="apb">+ Ajouter un produit</button>
+    </div>
+    <div class="dcrd">
+      <div class="dctt"><div class="dctl"><i class="ti ti-chart-bar" aria-hidden="true"></i>Revenus ce mois</div></div>
+      <div style="background:var(--vl);border-radius:10px;padding:13px;text-align:center">
+        <div style="font-size:24px;font-weight:600;color:var(--v)">186 500 FCFA</div>
+        <div style="font-size:11px;color:var(--vd);margin-top:4px">+22% vs mois dernier</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:7px">Prochain paiement : Vendredi via MTN Money</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD LIVREUR -->
+<div id="page-dash-l" class="page">
+  <div class="dbody">
+    <div class="dhl">
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
+        <div class="dav" style="margin-bottom:0">🧑🏾<div class="davo"></div></div>
+        <div style="flex:1">
+          <div class="dnm">Kofi Dossou</div>
+          <div class="dsh">📍 Cotonou centre et nord</div>
+          <div style="font-size:12px;color:var(--j);font-weight:500;margin-top:3px">📱 +229 97 00 11 22</div>
+        </div>
+        <button class="togb on" id="dispoBtn" onclick="togD()">🟢 Disponible</button>
+      </div>
+      <div class="dsgr">
+        <div class="ds"><div class="dsn">32</div><div class="dsl">Livraisons</div></div>
+        <div class="ds"><div class="dsn">48k</div><div class="dsl">FCFA gains</div></div>
+        <div class="ds"><div class="dsn">4.9</div><div class="dsl">Note</div></div>
+      </div>
+    </div>
+    <div class="ncrd">
+      <div class="nct">🔔 Nouvelle commande assignée !</div>
+      <div style="background:#fff;border-radius:10px;padding:11px;border:1px solid rgba(245,197,24,.3)">
+        <div style="font-size:12px;font-weight:600;color:var(--g900);margin-bottom:3px">🌾 Gari x 5 kg + 🥩 Boeuf x 2 kg</div>
+        <div style="font-size:11px;color:var(--g400);margin-bottom:6px">📍 Ferme Agbossou, Savalou → Cotonou nord</div>
+        <div style="font-size:12px;font-weight:600;color:var(--v)">Gain estimé : 1 000 FCFA</div>
+        <div class="nac"><button class="na-a" onclick="showToast('Commande acceptée !','✅')">✅ Accepter</button><button class="na-r" onclick="showToast('Commande refusée','❌')">❌ Refuser</button></div>
+      </div>
+    </div>
+    <div class="dcrd">
+      <div class="dctt"><div class="dctl"><i class="ti ti-clock" aria-hidden="true"></i>Livraisons récentes</div><button class="dact">Voir tout</button></div>
+      <div class="lo"><div class="loe">🛵</div><div class="loi"><div class="lon">Tilapia x 3 kg → Cotonou sud</div><div class="lod">Pêcherie du Littoral · Aujourd'hui 10h30</div></div><div><div class="log">+500 FCFA</div><span class="os os-d" style="font-size:9px">Livré</span></div></div>
+      <div class="lo"><div class="loe">🛵</div><div class="loi"><div class="lon">Huile x 2L → Cotonou nord</div><div class="lod">Huilerie Lokossa · Hier 15h20</div></div><div><div class="log">+1 000 FCFA</div><span class="os os-d" style="font-size:9px">Livré</span></div></div>
+    </div>
+    <div class="dcrd">
+      <div class="dctt"><div class="dctl"><i class="ti ti-chart-bar" aria-hidden="true"></i>Gains ce mois</div></div>
+      <div style="background:var(--bll);border-radius:10px;padding:13px;text-align:center">
+        <div style="font-size:24px;font-weight:600;color:var(--bl)">48 000 FCFA</div>
+        <div style="font-size:11px;color:var(--bld);margin-top:4px">32 livraisons effectuées</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:7px">Prochain paiement : Vendredi via MTN Money</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PANIER -->
 <div id="page-cart" class="page"><div id="cart-content"></div></div>
-<div id="page-register" class="page"><div id="register-content"></div></div>
-<div id="page-confirm" class="page"><div id="confirm-content"></div></div>
+
+<!-- MON COMPTE -->
+<div id="page-compte" class="page">
+  <div class="lbody">
+    <div style="background:linear-gradient(135deg,#1A6B35,#2E8B50);border-radius:12px;padding:20px;text-align:center;color:#fff">
+      <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 10px;border:2px solid rgba(255,255,255,.4)">👤</div>
+      <div style="font-size:15px;font-weight:600">Connectez-vous</div>
+      <div style="font-size:11px;opacity:.8;margin:5px 0 14px">pour accéder à vos commandes et votre profil</div>
+      <button style="background:var(--j);color:var(--jd);border:none;border-radius:10px;padding:10px 28px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Se connecter</button>
+    </div>
+    <div class="tcrd">
+      <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">Rejoindre Yéyé Market</div>
+      <div class="trow" style="cursor:pointer" onclick="goTab('vendre')"><span style="color:var(--g900)">💼 Ouvrir ma boutique</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
+      <div class="trow" style="cursor:pointer" onclick="goTab('livreur')"><span style="color:var(--g900)">🛵 Devenir livreur</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
+      <div class="trow" style="cursor:pointer" onclick="goTab('dash-v')"><span style="color:var(--g900)">📊 Dashboard Vendeur (démo)</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
+      <div class="trow" style="cursor:pointer;border:none" onclick="goTab('dash-l')"><span style="color:var(--g900)">🛵 Dashboard Livreur (démo)</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
+    </div>
+  </div>
 </div>
+
+<!-- BOTTOM NAV -->
+<div class="bot-nav">
+  <div class="nav-it" onclick="goTab('home')">
+    <div class="nav-ic on" id="bic-home"><i class="ti ti-home" style="font-size:18px;color:var(--v)" aria-hidden="true"></i></div>
+    <span class="nav-lbl on" id="blbl-home">Accueil</span>
+  </div>
+  <div class="nav-it" onclick="goTab('catalogue')">
+    <div class="nav-ic" id="bic-catalogue"><i class="ti ti-basket" style="font-size:18px;color:var(--g400)" aria-hidden="true"></i></div>
+    <span class="nav-lbl" id="blbl-catalogue">Catalogue</span>
+  </div>
+  <div class="nav-center-wrap" onclick="goTab('home')">
+    <div class="nav-center-btn"><span style="font-size:24px">🌿</span></div>
+    <span class="nav-lbl" style="color:var(--v);font-weight:600;font-size:10px">Yéyé</span>
+  </div>
+  <div class="nav-it" onclick="goTab('cart')">
+    <div class="nav-ic" id="bic-cart" style="position:relative">
+      <i class="ti ti-shopping-cart" style="font-size:18px;color:var(--g400)" aria-hidden="true"></i>
+      <span id="cartBadge" style="display:none;position:absolute;top:-3px;right:-3px;background:var(--r);color:#fff;font-size:8px;font-weight:700;width:14px;height:14px;border-radius:50%;align-items:center;justify-content:center">0</span>
+    </div>
+    <span class="nav-lbl" id="blbl-cart">Panier</span>
+  </div>
+  <div class="nav-it" onclick="goTab('compte')">
+    <div class="nav-ic" id="bic-compte"><i class="ti ti-user" style="font-size:18px;color:var(--g400)" aria-hidden="true"></i></div>
+    <span class="nav-lbl" id="blbl-compte">Mon compte</span>
+  </div>
+</div>
+
+</div>
+
 <script>
-var PRODUCTEURS=[{id:'p1',nom:'Kokou Agbossou',ini:'KA',ville:'Savalou',region:'Collines',produits:'Gari, Viandes',statut:'verifie'},{id:'p2',nom:'Mariama Traoré',ini:'MT',ville:'Tanguiéta',region:'Atacora',produits:'Mangue, Légumes, Oeufs',statut:'verifie'},{id:'p3',nom:'Jean-Baptiste Dossou',ini:'JD',ville:'Abomey',region:'Zou',produits:'Galette, Oeufs',statut:'verifie'},{id:'p4',nom:'Fatou Alabi',ini:'FA',ville:'Lokossa',region:'Mono',produits:'Huile, Oeufs',statut:'verifie'},{id:'p5',nom:'Sènan Houénou',ini:'SH',ville:'Grand-Popo',region:'Littoral',produits:'Poisson, Crevettes',statut:'verifie'},{id:'p6',nom:'Ibrahim Kané',ini:'IK',ville:'Parakou',region:'Borgou',produits:'Tchoukoutou',statut:'attente'}];
-var PRODUITS=[{id:1,nom:'Gari de Savalou',v:'Kokou Agbossou',o:'Savalou',e:'🌾',p:600,u:'kg',c:'Épicerie',b:'local',d:'50 kg',pid:'p1'},{id:2,nom:'Mangue de Tanguiéta',v:'Mariama Traoré',o:'Tanguiéta',e:'🥭',p:800,u:'kg',c:'Fruits',b:'nat',d:'200 kg',pid:'p2'},{id:3,nom:"Galette d'Abomey",v:'J.-B. Dossou',o:'Abomey',e:'🥙',p:1000,u:'sachet',c:'Épicerie',b:'local',d:'30 pcs',pid:'p3'},{id:4,nom:'Huile de Palme Rouge',v:'Fatou Alabi',o:'Lokossa',e:'🫙',p:1200,u:'litre',c:'Huiles',b:'nat',d:'80 L',pid:'p4'},{id:5,nom:'Tilapia frais',v:'Sènan Houénou',o:'Grand-Popo',e:'🐟',p:2500,u:'kg',c:'Poissons',b:'nat',d:'40 kg',pid:'p5'},{id:6,nom:'Poisson chat',v:'Sènan Houénou',o:'Grand-Popo',e:'🐠',p:2000,u:'kg',c:'Poissons',b:'local',d:'25 kg',pid:'p5'},{id:7,nom:'Crevettes fumées',v:'Sènan Houénou',o:'Grand-Popo',e:'🦐',p:3500,u:'kg',c:'Crustacés',b:'nat',d:'15 kg',pid:'p5'},{id:8,nom:'Viande de mouton',v:'Kokou Agbossou',o:'Savalou',e:'🍖',p:4000,u:'kg',c:'Viandes',b:'local',d:'20 kg',pid:'p1'},{id:9,nom:'Viande de bœuf',v:'Kokou Agbossou',o:'Savalou',e:'🥩',p:3500,u:'kg',c:'Viandes',b:'local',d:'35 kg',pid:'p1'},{id:10,nom:'Viande de porc',v:'J.-B. Dossou',o:'Abomey',e:'🥓',p:3000,u:'kg',c:'Viandes',b:'local',d:'18 kg',pid:'p3'},{id:11,nom:'Tomates fraîches',v:'Mariama Traoré',o:'Tanguiéta',e:'🍅',p:500,u:'kg',c:'Légumes',b:'nat',d:'100 kg',pid:'p2'},{id:12,nom:'Piment vert',v:'Mariama Traoré',o:'Tanguiéta',e:'🌶',p:600,u:'kg',c:'Légumes',b:'nat',d:'30 kg',pid:'p2'},{id:13,nom:'Gombo frais',v:'Fatou Alabi',o:'Lokossa',e:'🫛',p:400,u:'kg',c:'Légumes',b:'nat',d:'60 kg',pid:'p4'},{id:14,nom:'Oignon local',v:'Kokou Agbossou',o:'Savalou',e:'🧅',p:700,u:'kg',c:'Légumes',b:'local',d:'90 kg',pid:'p1'},{id:15,nom:'Oeuf de poule',v:'J.-B. Dossou',o:'Abomey',e:'🥚',p:150,u:'unité',c:'Oeufs',b:'nat',d:'500 u.',pid:'p3'},{id:16,nom:'Oeuf de pintade',v:'Mariama Traoré',o:'Tanguiéta',e:'🥚',p:250,u:'unité',c:'Oeufs',b:'local',d:'120 u.',pid:'p2'},{id:17,nom:'Oeuf de canard',v:'Fatou Alabi',o:'Lokossa',e:'🥚',p:200,u:'unité',c:'Oeufs',b:'nat',d:'80 u.',pid:'p4'},{id:18,nom:'Oeuf de caille',v:'Sènan Houénou',o:'Grand-Popo',e:'🥚',p:100,u:'unité',c:'Oeufs',b:'new',d:'300 u.',pid:'p5'},{id:19,nom:'Vin de Palme',v:'Fatou Alabi',o:'Lokossa',e:'🍶',p:500,u:'litre',c:'Brasserie',b:'nat',d:'60 L',pid:'p4'},{id:20,nom:'Piment séché du Bénin',v:'Mariama Traoré',o:'Tanguiéta',e:'🌶',p:500,u:'250g',c:'Épices',b:'nat',d:'40 pcs',pid:'p2'},{id:21,nom:'Poivre de Sélim',v:'Kokou Agbossou',o:'Savalou',e:'🫙',p:800,u:'100g',c:'Épices',b:'nat',d:'50 pcs',pid:'p1'},{id:22,nom:'Bissap séché',v:'J.-B. Dossou',o:'Abomey',e:'🌺',p:600,u:'250g',c:'Épices',b:'local',d:'35 pcs',pid:'p3'}];
-var HCATS=[{e:'🥩',l:'Viandes',c:'Viandes'},{e:'🐟',l:'Poissons',c:'Poissons'},{e:'🦐',l:'Crustacés',c:'Crustacés'},{e:'🥚',l:'Oeufs',c:'Oeufs'},{e:'🥦',l:'Légumes',c:'Légumes'},{e:'🍍',l:'Fruits',c:'Fruits'},{e:'🌾',l:'Épicerie',c:'Épicerie'},{e:'🫙',l:'Huiles',c:'Huiles'},{e:'🍶',l:'Brasserie',c:'Brasserie'},{e:'🌶',l:'Épices',c:'Épices'},{e:'🛒',l:'Tout voir',c:'Tous'},{e:'⭐',l:'Promos',c:'_promo'}];
-var ZONES=[{id:'retrait',n:'Point relais Cotonou',d:'Retrait gratuit · J+2',p:0,i:'🏪'},{id:'cot-ville',n:'Cotonou ville',d:'< 5 km · sous 2h',p:500,i:'🛵'},{id:'cot-peri',n:'Cotonou périphérie',d:'5–15 km · sous 4h',p:1000,i:'🚐'},{id:'abomey',n:'Abomey-Calavi',d:'Livraison sous 5–7h',p:1500,i:'🚚'}];
-var PAYS=[{id:'mtn',n:'MTN Mobile Money',s:'*880# pour payer',i:'📱'},{id:'moov',n:'Moov Money',s:'*155# pour payer',i:'💚'},{id:'liv',n:'Paiement à la livraison',s:'Espèces acceptées',i:'💵'}];
-var panier={},catA='Tous',zoneA=null,payA=null,rech='',groupe=true;
-function fcfa(p){return p.toLocaleString('fr-FR')+' FCFA'}
-function gp(id){return PRODUITS.find(function(p){return p.id===id})}
-function gz(id){return ZONES.find(function(z){return z.id===id})}
-function tot(){var t=0;for(var k in panier)t+=panier[k];return t}
-function stot(){var t=0;for(var k in panier){var p=gp(parseInt(k));if(p)t+=p.p*panier[k]}return t}
-function nv(){var v={};for(var k in panier){var p=gp(parseInt(k));if(p)v[p.pid]=1}return Object.keys(v).length}
-var tt;
-function toast(msg,ic){var el=document.querySelector('.toast');if(el)el.remove();var t=document.createElement('div');t.className='toast';t.innerHTML='<span>'+(ic||'✅')+'</span><span>'+msg+'</span>';document.body.appendChild(t);setTimeout(function(){t.classList.add('show')},10);if(tt)clearTimeout(tt);tt=setTimeout(function(){t.classList.remove('show');setTimeout(function(){if(t.parentNode)t.remove()},300)},2000)}
-function add(id){panier[id]=(panier[id]||0)+1;mc();var p=gp(id);if(p)toast(p.nom+' ajouté',p.e)}
-function rm(id){if(!panier[id])return;if(panier[id]>1)panier[id]--;else delete panier[id];mc();rpc()}
-function inc(id){if(!panier[id])return;panier[id]++;mc();rpc()}
-function mc(){document.getElementById('cartCount').textContent=tot()}
-function buildHC(){var g=document.getElementById('homeCatGrid');if(!g)return;var h='';HCATS.forEach(function(c){h+='<div class="cbox" onclick="setC(\''+c.c+'\')"><span class="cemoji">'+c.e+'</span><div class="clabel">'+c.l+'</div></div>'});g.innerHTML=h}
-function buildProd(){var g=document.getElementById('producersRow');if(!g)return;var h='';PRODUCTEURS.filter(function(p){return p.statut==='verifie'}).slice(0,4).forEach(function(p){h+='<div class="pcard"><div class="pav">'+p.ini+'</div><div class="pname">'+p.nom+'</div><div class="ploc"><i class="ti ti-map-pin" style="font-size:10px"></i>'+p.ville+' · '+p.region+'</div><div class="pprod">'+p.produits+'</div><span class="pbadge"><i class="ti ti-circle-check" style="font-size:10px"></i> Vérifié</span></div>'});g.innerHTML=h}
-function getCats(){var c=['Tous'];PRODUITS.forEach(function(p){if(c.indexOf(p.c)===-1)c.push(p.c)});return c}
-function rdc(){var s=document.getElementById('catScroll');if(!s)return;var h='';getCats().forEach(function(c){h+='<button class="cpill'+(c===catA?' active':'')+'" onclick="setC(\''+c+'\')">'+c+'</button>'});s.innerHTML=h}
-function setC(c){catA=c;rdc();rdp();if(document.getElementById('page-products').style.display==='none')showTab('products')}
-function filtrer(v){rech=v||'';rdp()}
-function getFil(){return PRODUITS.filter(function(p){var mc=catA==='Tous'||(catA==='_promo'?p.b==='promo':p.c===catA);var mq=!rech||p.nom.toLowerCase().indexOf(rech.toLowerCase())!==-1||p.v.toLowerCase().indexOf(rech.toLowerCase())!==-1;return mc&&mq})}
-function rdp(){var g=document.getElementById('productsGrid');if(!g)return;var f=getFil();if(!f.length){g.innerHTML='<div class="nores"><i class="ti ti-search-off"></i>Aucun produit trouvé</div>';return}var h='';f.forEach(function(p){var b=p.b==='nat'?'<span class="bdg bnat">Naturel</span>':p.b==='promo'?'<span class="bdg bpromo">Promo</span>':p.b==='local'?'<span class="bdg blocal">Local</span>':p.b==='new'?'<span class="bdg bnew">Nouveau</span>':'';h+='<div class="prcard"><div class="pimg">'+p.e+'</div><div class="pinfo"><div class="pn">'+p.nom+'</div><div class="ps"><i class="ti ti-user" style="font-size:10px"></i>'+p.v+'</div><div class="po">📍 '+p.o+' '+b+'</div><div class="pb"><div><div class="pp">'+fcfa(p.p)+'</div><div class="pu">/'+p.u+'</div><div class="pd">'+p.d+'</div></div><button class="addbtn" onclick="add('+p.id+')" aria-label="Ajouter '+p.nom+'">+</button></div></div></div>'});g.innerHTML=h}
-function rpc(){var div=document.getElementById('cart-content');if(!div)return;var keys=Object.keys(panier).map(Number);if(!keys.length){div.innerHTML='<div class="cbody"><div class="ecart"><i class="ti ti-shopping-cart-off"></i><div style="font-size:14px;color:#444;margin-bottom:5px">Panier vide</div><small>Ajoutez des produits de nos producteurs</small><br><button class="bbtn" onclick="showTab(\'products\')">Voir les produits</button></div></div>';return}
-var vg={};keys.forEach(function(id){var p=gp(id);if(!p)return;if(!vg[p.pid])vg[p.pid]=[];vg[p.pid].push(id)});var nvc=Object.keys(vg).length;
-var iH='';Object.keys(vg).forEach(function(pid){var pr=PRODUCTEURS.find(function(x){return x.id===pid});iH+='<div class="sgroup"><div class="sghdr"><i class="ti ti-building-store"></i>'+(pr?pr.nom+' · '+pr.ville:'Producteur')+'</div>';vg[pid].forEach(function(id){var p=gp(id);if(!p)return;iH+='<div class="citem"><div class="cemj">'+p.e+'</div><div class="cinf"><div class="cn">'+p.nom+'</div><div class="cf">📍 '+p.o+'</div><div class="cp">'+fcfa(p.p)+' / '+p.u+'</div></div><div class="qty"><button class="qbtn" onclick="rm('+id+')">−</button><span class="qnum">'+panier[id]+'</span><button class="qbtn" onclick="inc('+id+')">+</button></div></div>'});iH+='</div>'});
-var gb='';if(nvc>1){gb='<div class="gbanner"><i class="ti ti-package"></i><div><div class="gbt">Livraison groupée disponible</div><div class="gbs">Articles de '+nvc+' producteurs différents. Regrouper ?</div><div class="gbtog"><button class="gbopt'+(groupe?' active':'')+'" onclick="tog(true)">Oui · regrouper (+500 FCFA)</button><button class="gbopt'+(!groupe?' active':'')+'" onclick="tog(false)">Non · séparées</button></div></div></div>'}
-var zH='';ZONES.forEach(function(z){var sel=zoneA===z.id?' selected':'';var pe=z.p===0?'<span class="zfree">Gratuit</span>':'<span class="zprice">'+fcfa(z.p)+'</span>';zH+='<div class="zopt'+sel+'" onclick="sz(\''+z.id+'\')"><div class="zradio"><div class="zdot"></div></div><div class="zico">'+z.i+'</div><div style="flex:1"><div class="zn">'+z.n+'</div><div class="zd">'+z.d+'</div></div>'+pe+'</div>'});
-var pH='';PAYS.forEach(function(pay){var sel=payA===pay.id?' selected':'';pH+='<div class="popt'+sel+'" onclick="sp(\''+pay.id+'\')"><div class="pradio"><div class="pdot"></div></div><div class="pico">'+pay.i+'</div><div style="flex:1"><div class="pnm">'+pay.n+'</div><div class="psb">'+pay.s+'</div></div></div>'});
-var st=stot(),z=zoneA?gz(zoneA):null,lf=z?z.p:0,gf=(nvc>1&&groupe)?500:0,total=st+lf+gf,ok=zoneA&&payA;
-var bl=!zoneA?'Choisissez une zone de livraison':!payA?'Choisissez un mode de paiement':'Confirmer la commande';
-div.innerHTML='<div class="cbody"><div class="ccard"><div class="ctitle"><i class="ti ti-basket"></i>Mes articles ('+keys.length+' · '+nvc+' producteur'+(nvc>1?'s':'')+')</div>'+iH+'</div>'+gb+'<div class="ccard"><div class="ctitle"><i class="ti ti-truck"></i>Mode de livraison</div>'+zH+'</div><div class="ccard"><div class="ctitle"><i class="ti ti-credit-card"></i>Mode de paiement</div>'+pH+'</div><div class="scard"><div class="srow"><span>Sous-total</span><span>'+fcfa(st)+'</span></div>'+(zoneA?'<div class="srow"><span>Livraison</span><span>'+(lf===0?'Gratuit':fcfa(lf))+'</span></div>':'')+(gf>0?'<div class="srow"><span>Livraison groupée</span><span>'+fcfa(gf)+'</span></div>':'')+'<div class="stotal"><span>Total</span><span>'+(ok?fcfa(total):'—')+'</span></div></div><button class="obtn" onclick="cmd()"'+(ok?'':' disabled')+'><i class="ti ti-check"></i> '+bl+'</button></div>'}
-function tog(v){groupe=v;rpc()}
-function sz(id){zoneA=id;rpc()}
-function sp(id){payA=id;rpc()}
-function rreg(){var div=document.getElementById('register-content');if(!div)return;var ph=PRODUCTEURS.filter(function(p){return p.statut==='attente'}).map(function(p){return'<div class="penditem"><div class="pav2">'+p.ini+'</div><div class="pavi"><div class="pavname">'+p.nom+'</div><div class="pavsub">'+p.ville+' · '+p.produits+'</div></div><span class="battente">En attente</span></div>'}).join('');
-div.innerHTML='<div class="regbody"><div class="commbox"><i class="ti ti-info-circle"></i><div><strong>Commission plateforme : 5% par vente</strong><br>Inscription gratuite. Validation par notre équipe sous 24–48h.</div></div><div class="regcard"><div class="regtit"><i class="ti ti-user-plus"></i>Créer mon espace producteur</div><div class="regsub">Renseignez vos informations. Notre équipe validera votre profil avant publication.</div><div class="fg"><label class="fl">Nom complet *</label><input class="fi" type="text" placeholder="Ex: Mariama Traoré"/></div><div class="frow"><div class="fg"><label class="fl">Téléphone *</label><input class="fi" type="tel" placeholder="+229 ..."/></div><div class="fg"><label class="fl">WhatsApp</label><input class="fi" type="tel" placeholder="+229 ..."/></div></div><div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="votre@email.com"/></div><div class="frow"><div class="fg"><label class="fl">Ville *</label><input class="fi" type="text" placeholder="Ex: Tanguiéta"/></div><div class="fg"><label class="fl">Région *</label><select class="fi"><option value="">Choisir...</option><option>Alibori</option><option>Atacora</option><option>Atlantique</option><option>Borgou</option><option>Collines</option><option>Couffo</option><option>Donga</option><option>Littoral</option><option>Mono</option><option>Ouémé</option><option>Plateau</option><option>Zou</option></select></div></div><div class="fg"><label class="fl">Type de produits *</label><select class="fi"><option value="">Choisir...</option><option>Viandes</option><option>Poissons & Crustacés</option><option>Oeufs</option><option>Légumes</option><option>Fruits</option><option>Épicerie</option><option>Huiles</option><option>Brasserie naturelle</option><option>Épices</option><option>Plusieurs catégories</option></select></div><div class="fg"><label class="fl">Capacité de production</label><input class="fi" type="text" placeholder="Ex: 500 kg de mangue / semaine"/></div><div class="fg"><label class="fl">Délais de livraison par ville</label><input class="fi" type="text" placeholder="Ex: Cotonou J+2, Parakou J+1"/></div><div class="fg"><label class="fl">Description</label><textarea class="fi" placeholder="Votre activité, vos produits, votre méthode de production..."></textarea></div><button class="sbtn" onclick="toast(\'Demande envoyée ! Validation sous 24–48h\',\'📩\')"><i class="ti ti-send"></i>Soumettre ma demande</button></div><div class="pendcard"><div class="pendtit"><i class="ti ti-clock"></i>En attente de validation</div>'+ph+'</div></div>'}
-function cmd(){if(!zoneA||!payA)return;var z=gz(zoneA),pay=PAYS.find(function(p){return p.id===payA}),st=stot(),lf=z?z.p:0,gf=(nv()>1&&groupe)?500:0,total=st+lf+gf,num='BN-'+(Math.floor(Math.random()*90000)+10000),d=new Date().toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'});
-document.getElementById('confirm-content').innerHTML='<div class="confpage"><div class="conficon"><i class="ti ti-circle-check"></i></div><div class="conftit">Commande confirmée !</div><div class="confsub">Votre commande a été transmise aux producteurs. Confirmation par SMS sous peu.</div><div class="confcard"><div class="crow"><span class="clbl">Numéro</span><span class="cval">'+num+'</span></div><div class="crow"><span class="clbl">Date</span><span class="cval">'+d+'</span></div><div class="crow"><span class="clbl">Producteurs</span><span class="cval">'+nv()+' producteur'+(nv()>1?'s':'')+'</span></div><div class="crow"><span class="clbl">Livraison</span><span class="cval">'+(z?z.i+' '+z.n:'')+(gf>0?' · Groupée':'')+'</span></div><div class="crow"><span class="clbl">Paiement</span><span class="cval">'+(pay?pay.i+' '+pay.n:'')+'</span></div><div class="crow"><span class="clbl">Total</span><span class="ctot">'+fcfa(total)+'</span></div></div><button class="newbtn" onclick="reinit()">Nouvelle commande</button></div>';
-panier={};zoneA=null;payA=null;groupe=true;mc();showTabRaw('confirm')}
-function reinit(){showTab('home')}
-function showTabRaw(n){['home','products','cart','register','confirm'].forEach(function(t){var p=document.getElementById('page-'+t);if(p){p.style.display=t===n?'block':'none';p.className='page'+(t===n?' active':'')}});['home','products','cart','register'].forEach(function(t){var el=document.getElementById('tab-'+t);if(el)el.className='tab'+(t===n?' active':'')});window.scrollTo(0,0)}
-function showTab(n){showTabRaw(n);if(n==='products'){rdc();rdp()}if(n==='cart')rpc();if(n==='register')rreg()}
-document.addEventListener('DOMContentLoaded',function(){buildHC();buildProd();rdc();rdp()});
+var GZ = [
+  {id:'cot',name:'Cotonou',       e:'🏙️',nb:6,nl:12},
+  {id:'abc',name:'Abomey-Calavi', e:'🌆',nb:4,nl:7},
+  {id:'pnv',name:'Porto-Novo',    e:'🏛️',nb:3,nl:5},
+  {id:'abo',name:'Abomey',        e:'👑',nb:2,nl:3},
+  {id:'par',name:'Parakou',       e:'🌍',nb:3,nl:4},
+  {id:'nat',name:'Natitingou',    e:'⛰️',nb:2,nl:2}
+];
+var LIVS = [
+  {id:'l1',nom:'Kofi Dossou',  e:'🧑🏾',zone:'Cotonou centre',  tel:'+229 97 00 11 22',note:4.9,nb:32,ok:true, geo:['cot']},
+  {id:'l2',nom:'Aminatou Sow', e:'👩🏾',zone:'Cotonou sud',     tel:'+229 96 44 55 66',note:4.8,nb:28,ok:true, geo:['cot','abc']},
+  {id:'l3',nom:'Brice Adjovi', e:'🧑🏿',zone:'Abomey-Calavi',   tel:'+229 95 33 22 11',note:4.7,nb:19,ok:false,geo:['abc']},
+  {id:'l4',nom:'Rosine Koudou',e:'👩🏿',zone:'Cotonou nord',    tel:'+229 97 88 99 00',note:4.9,nb:41,ok:true, geo:['cot']},
+  {id:'l5',nom:'Maxime Ahovey',e:'🧑🏾',zone:'Cotonou',         tel:'+229 96 11 22 33',note:4.6,nb:15,ok:true, geo:['cot','pnv']},
+  {id:'l6',nom:'Theo Kossou',  e:'🧑🏾',zone:'Porto-Novo',      tel:'+229 95 77 88 99',note:4.7,nb:11,ok:true, geo:['pnv']},
+  {id:'l7',nom:'Ibrahim Kane', e:'🧑🏾',zone:'Parakou',          tel:'+229 94 55 66 77',note:4.8,nb:22,ok:true, geo:['par']},
+  {id:'l8',nom:'Dede Houngbo', e:'🧑🏿',zone:'Abomey',          tel:'+229 93 44 55 66',note:4.6,nb:8, ok:true, geo:['abo']}
+];
+var BOUTS = [
+  {id:'b1',nom:'Ferme Agbossou',   e:'🌾',bg:'#EAF3DE',cat:'Épicerie et Viandes',   ville:'Savalou',  np:6, note:4.8,ver:true, geo:['cot','abc']},
+  {id:'b2',nom:'Pêcherie Littoral',e:'🐟',bg:'#E6F1FB',cat:'Poissons et Crustacés', ville:'Grand-Popo',np:8, note:4.9,ver:true, geo:['cot']},
+  {id:'b3',nom:'Verger Tanguieta', e:'🥭',bg:'#FEF0E0',cat:'Fruits et Légumes',     ville:'Tanguieta', np:11,note:4.7,ver:true, geo:['cot','abc','pnv']},
+  {id:'b4',nom:'Huilerie Lokossa', e:'🫙',bg:'#FEF3D7',cat:'Huiles naturelles',     ville:'Lokossa',   np:5, note:4.6,ver:true, geo:['cot','abc']},
+  {id:'b5',nom:'Brasserie Parakou',e:'🍶',bg:'#FDECEA',cat:'Brasserie naturelle',   ville:'Parakou',   np:4, note:4.5,ver:false,geo:['par']},
+  {id:'b6',nom:'Epices Abomey',   e:'🌶',bg:'#E1F5EE',cat:'Épices et Condiments',  ville:'Abomey',    np:9, note:4.8,ver:true, geo:['abo','cot']},
+  {id:'b7',nom:'Marche Porto-Novo',e:'🏛️',bg:'#F0E8FB',cat:'Produits locaux',      ville:'Porto-Novo',np:7, note:4.7,ver:true, geo:['pnv']},
+  {id:'b8',nom:'Greniers du Nord', e:'🌾',bg:'#E8F5EE',cat:'Céréales et Farines',  ville:'Parakou',   np:5, note:4.5,ver:true, geo:['par','nat']}
+];
+var PRODS = [
+  {id:1, nom:'Gari de Savalou',  sh:'Ferme Agbossou',   o:'Savalou',   e:'🌾',p:600,  u:'kg',    c:'Épicerie', b:'local',d:'50 kg', bid:'b1'},
+  {id:2, nom:'Mangue Tanguieta', sh:'Verger Tanguieta', o:'Tanguieta', e:'🥭',p:800,  u:'kg',    c:'Fruits',   b:'nat',  d:'200 kg',bid:'b3'},
+  {id:3, nom:'Galette Abomey',   sh:'Epices Abomey',    o:'Abomey',    e:'🥙',p:1000, u:'sachet',c:'Épicerie', b:'local',d:'30 pcs',bid:'b6'},
+  {id:4, nom:'Huile de Palme',   sh:'Huilerie Lokossa', o:'Lokossa',   e:'🫙',p:1200, u:'litre', c:'Huiles',   b:'nat',  d:'80 L',  bid:'b4'},
+  {id:5, nom:'Tilapia frais',    sh:'Pêcherie Littoral',o:'Grand-Popo',e:'🐟',p:2500, u:'kg',    c:'Poissons', b:'nat',  d:'40 kg', bid:'b2'},
+  {id:6, nom:'Crevettes fumees', sh:'Pêcherie Littoral',o:'Grand-Popo',e:'🦐',p:3500, u:'kg',    c:'Crustacés',b:'nat',  d:'15 kg', bid:'b2'},
+  {id:7, nom:'Viande de boeuf',  sh:'Ferme Agbossou',   o:'Savalou',   e:'🥩',p:3500, u:'kg',    c:'Viandes',  b:'local',d:'35 kg', bid:'b1'},
+  {id:8, nom:'Viande de mouton', sh:'Ferme Agbossou',   o:'Savalou',   e:'🍖',p:4000, u:'kg',    c:'Viandes',  b:'local',d:'20 kg', bid:'b1'},
+  {id:9, nom:'Tomates fraiches', sh:'Verger Tanguieta', o:'Tanguieta', e:'🍅',p:500,  u:'kg',    c:'Légumes',  b:'nat',  d:'100 kg',bid:'b3'},
+  {id:10,nom:'Oignon local',     sh:'Ferme Agbossou',   o:'Savalou',   e:'🧅',p:700,  u:'kg',    c:'Légumes',  b:'local',d:'90 kg', bid:'b1'},
+  {id:11,nom:'Oeuf de poule',    sh:'Ferme Agbossou',   o:'Savalou',   e:'🥚',p:150,  u:'unité', c:'Oeufs',    b:'nat',  d:'500 u.',bid:'b1'},
+  {id:12,nom:'Vin de Palme',     sh:'Brasserie Parakou',o:'Parakou',   e:'🍶',p:500,  u:'litre', c:'Brasserie',b:'nat',  d:'60 L',  bid:'b5'},
+  {id:13,nom:'Piment seche',     sh:'Epices Abomey',    o:'Abomey',    e:'🌶',p:500,  u:'250g',  c:'Épices',   b:'nat',  d:'40 pcs',bid:'b6'},
+  {id:14,nom:'Huile Arachide',   sh:'Huilerie Lokossa', o:'Lokossa',   e:'🫒',p:1500, u:'litre', c:'Huiles',   b:'nat',  d:'50 L',  bid:'b4'},
+  {id:15,nom:'Noix de Cajou',    sh:'Verger Tanguieta', o:'Tanguieta', e:'🌰',p:3000, u:'kg',    c:'Épicerie', b:'promo',d:'30 kg', bid:'b3'},
+  {id:16,nom:'Oeuf de pintade',  sh:'Ferme Agbossou',   o:'Savalou',   e:'🥚',p:250,  u:'unité', c:'Oeufs',    b:'local',d:'120 u.',bid:'b1'}
+];
+var ZONES_LIV = [
+  {id:'ret',n:'Point relais Cotonou',d:'Retrait gratuit',        p:0,   i:'🏪'},
+  {id:'cot',n:'Cotonou ville',       d:'moins de 5 km, sous 2h', p:500, i:'🛵'},
+  {id:'per',n:'Cotonou périphérie',  d:'5 à 15 km, sous 4h',     p:1000,i:'🚐'},
+  {id:'abc',n:'Abomey-Calavi',       d:'Livraison sous 5 à 7h',  p:1500,i:'🚚'}
+];
+var PAYS = [
+  {id:'mtn', n:'MTN Mobile Money',       s:'*880#',  i:'📱'},
+  {id:'moov',n:'Moov Money',             s:'*155#',  i:'💚'},
+  {id:'cash',n:'Paiement à la livraison',s:'Espèces',i:'💵'}
+];
+
+var panier={},catA='Tous',zoneA=null,payA=null,livA=null,rech='',rechB='',rechL='',groupe=true;
+var selGeo=null,curGeo=null;
+
+function fcfa(p){return p.toLocaleString('fr-FR')+' FCFA';}
+function gp(id){for(var i=0;i<PRODS.length;i++){if(PRODS[i].id===id)return PRODS[i];}return null;}
+function gz(id){for(var i=0;i<ZONES_LIV.length;i++){if(ZONES_LIV[i].id===id)return ZONES_LIV[i];}return null;}
+function gl(id){for(var i=0;i<LIVS.length;i++){if(LIVS[i].id===id)return LIVS[i];}return null;}
+function tot(){var t=0;for(var k in panier)t+=panier[k];return t;}
+function stot(){var t=0;for(var k in panier){var p=gp(parseInt(k));if(p)t+=p.p*panier[k];}return t;}
+function nvend(){var v={};for(var k in panier){var p=gp(parseInt(k));if(p)v[p.bid]=1;}return Object.keys(v).length;}
+
+var tT;
+function showToast(msg,ic){
+  var el=document.querySelector('.toast');if(el)el.remove();
+  var t=document.createElement('div');t.className='toast';
+  t.innerHTML='<span>'+(ic||'✅')+'</span><span>'+msg+'</span>';
+  document.body.appendChild(t);
+  setTimeout(function(){t.classList.add('show');},10);
+  if(tT)clearTimeout(tT);
+  tT=setTimeout(function(){t.classList.remove('show');setTimeout(function(){if(t.parentNode)t.remove();},300);},2500);
+}
+
+function quickAdd(id){
+  panier[id]=(panier[id]||0)+1;mc();
+  var p=gp(id);if(p)showToast(p.nom+' ajouté au panier',p.e);
+}
+function addCart(id){panier[id]=(panier[id]||0)+1;mc();var p=gp(id);if(p)showToast(p.nom+' ajouté',p.e);}
+function rmCart(id){if(!panier[id])return;if(panier[id]>1)panier[id]--;else delete panier[id];mc();renderCart();}
+function incCart(id){if(!panier[id])return;panier[id]++;mc();renderCart();}
+function mc(){
+  var n=tot();
+  document.querySelectorAll('.cart-count-badge').forEach(function(el){el.textContent=n;});
+  var cb=document.getElementById('cartBadge');
+  if(cb){cb.textContent=n;cb.style.display=n>0?'flex':'none';}
+}
+
+function buildGeoGr(){
+  var g=document.getElementById('geoGr');if(!g)return;
+  var h='';
+  for(var i=0;i<GZ.length;i++){
+    var z=GZ[i];
+    h+='<button class="geo-z" id="gz-'+z.id+'" onclick="selGeoZ(\''+z.id+'\')">'
+      +'<span class="geo-ze">'+z.e+'</span>'
+      +'<div class="geo-zn">'+z.name+'</div>'
+      +'<div class="geo-zc">'+z.nb+' boutiques · '+z.nl+' livreurs</div>'
+      +'</button>';
+  }
+  g.innerHTML=h;
+}
+function selGeoZ(id){
+  selGeo=id;
+  document.querySelectorAll('.geo-z').forEach(function(b){b.classList.remove('sel');});
+  var b=document.getElementById('gz-'+id);if(b)b.classList.add('sel');
+  var z=null;for(var j=0;j<GZ.length;j++){if(GZ[j].id===id){z=GZ[j];break;}}
+  var cb=document.getElementById('geoBtnConf');
+  if(cb&&z){cb.disabled=false;cb.innerHTML='<i class="ti ti-check"></i> Confirmer : '+z.name;}
+}
+function detectGPS(){
+  var t=document.getElementById('gpsT');var s=document.getElementById('gpsS');var ic=document.getElementById('gpsIc');
+  if(t)t.textContent='Localisation en cours...';
+  if(s)s.textContent='Vérification de votre position GPS...';
+  if(ic)ic.className='ti ti-loader';
+  setTimeout(function(){
+    selGeoZ('cot');
+    if(t)t.textContent='Position détectée : Cotonou';
+    if(s)s.textContent='Quartier Akpakpa · à 1.2 km du centre';
+    if(ic){ic.className='ti ti-circle-check';ic.style.color='#1A6B35';}
+  },1500);
+}
+function confirmGeo(){
+  if(!selGeo)return;
+  var z=null;for(var i=0;i<GZ.length;i++){if(GZ[i].id===selGeo){z=GZ[i];break;}}
+  if(!z)return;
+  curGeo=z;
+  try{localStorage.setItem('yeye_geo',JSON.stringify({id:z.id,name:z.name,e:z.e}));}catch(e){}
+  var ov=document.getElementById('geoOv');if(ov)ov.style.display='none';
+  var lt=document.getElementById('locTxt');if(lt)lt.textContent=z.e+' '+z.name;
+  var bc=document.getElementById('banCity');if(bc)bc.textContent=z.name;
+  var ht=document.getElementById('homeBoutT');if(ht)ht.textContent='dans votre zone';
+  buildHomeBout();renderProds();buildBout();buildLivsList();
+  showToast(z.name+' · '+z.nb+' boutiques disponibles','📍');
+}
+function openGeo(){var ov=document.getElementById('geoOv');if(ov)ov.style.display='flex';}
+
+function boutCard(b){
+  return '<div class="bcrd" onclick="goTab(\'catalogue\')">'
+    +'<div class="bban" style="background:'+b.bg+'">'+b.e+'</div>'
+    +'<div class="binf"><div class="bn">'+b.nom+'</div><div class="bc">'+b.cat+'</div>'
+    +'<div class="blo">📍 '+b.ville+'</div>'
+    +'<div class="bmeta"><span class="bmm">⭐ '+b.note+'</span><span class="bmm"> · '+b.np+' produits</span></div>'
+    +(b.ver?'<div class="bver">✓ Vérifié</div>':'')
+    +'</div></div>';
+}
+function getFilterBouts(){
+  if(!curGeo)return BOUTS.slice(0,4);
+  return BOUTS.filter(function(b){return b.geo.indexOf(curGeo.id)!==-1;});
+}
+function buildHomeBout(){
+  var g=document.getElementById('homeBout');if(!g)return;
+  var bouts=getFilterBouts();
+  var h='';for(var i=0;i<Math.min(bouts.length,4);i++)h+=boutCard(bouts[i]);
+  g.innerHTML=h||'<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--g400);background:#fff">Aucune boutique dans cette zone</div>';
+}
+function buildBout(){
+  var g=document.getElementById('boutGrid');if(!g)return;
+  var bouts=rechB?BOUTS.filter(function(b){return b.nom.toLowerCase().indexOf(rechB.toLowerCase())!==-1;}):getFilterBouts();
+  var h='';for(var i=0;i<bouts.length;i++)h+=boutCard(bouts[i]);
+  g.innerHTML=h||'<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--g400)">Aucune boutique trouvée</div>';
+}
+function filtB(v){rechB=v||'';buildBout();}
+function buildLivsList(){
+  var g=document.getElementById('livList');if(!g)return;
+  var livs=curGeo?LIVS.filter(function(l){return l.geo.indexOf(curGeo.id)!==-1;}):LIVS;
+  if(rechL)livs=livs.filter(function(l){return l.nom.toLowerCase().indexOf(rechL.toLowerCase())!==-1||l.zone.toLowerCase().indexOf(rechL.toLowerCase())!==-1;});
+  var h='';
+  for(var i=0;i<livs.length;i++){
+    var l=livs[i];
+    h+='<div class="lcrd">'
+      +'<div class="lav2">'+l.e+(l.ok?'<div class="lonl"></div>':'')+'</div>'
+      +'<div class="linf"><div class="lnm">'+l.nom+'</div>'
+      +'<div class="lzo">📍 '+l.zone+'</div>'
+      +'<div class="ltel">📱 '+l.tel+'</div>'
+      +'<div class="lmeta2"><span class="lm">⭐ '+l.note+'</span><span class="lm"> · '+l.nb+' livraisons</span></div></div>'
+      +'<div class="lright">'
+      +'<span class="lst '+(l.ok?'lsd':'lso')+'">'+(l.ok?'Disponible':'Occupé')+'</span>'
+      +'<button class="ctcbtn"'+(l.ok?'':' disabled')+' onclick="showToast(\''+l.nom+' contacté\',\'📱\')">Contacter</button>'
+      +'</div></div>';
+  }
+  if(!h)h='<div style="text-align:center;padding:40px;color:var(--g400)">Aucun livreur dans cette zone</div>';
+  g.innerHTML=h;
+}
+function filtL(v){rechL=v||'';buildLivsList();}
+
+function getCats(){var c=['Tous'];for(var i=0;i<PRODS.length;i++){if(c.indexOf(PRODS[i].c)===-1)c.push(PRODS[i].c);}return c;}
+function renderCats(){
+  var s=document.getElementById('catScroll');if(!s)return;
+  var cats=getCats();var h='';
+  for(var i=0;i<cats.length;i++){h+='<button class="cpill'+(cats[i]===catA?' active':'')+'" onclick="setC(\''+cats[i]+'\')">'+cats[i]+'</button>';}
+  s.innerHTML=h;
+}
+function setC(c){catA=c;renderCats();renderProds();}
+function filtrer(v){rech=v||'';renderProds();}
+function getFil(){
+  return PRODS.filter(function(p){
+    var mc=catA==='Tous'||p.c===catA;
+    var mq=!rech||p.nom.toLowerCase().indexOf(rech.toLowerCase())!==-1||p.sh.toLowerCase().indexOf(rech.toLowerCase())!==-1;
+    var mg=true;
+    if(curGeo){var b=null;for(var i=0;i<BOUTS.length;i++){if(BOUTS[i].id===p.bid){b=BOUTS[i];break;}}if(b)mg=b.geo.indexOf(curGeo.id)!==-1;}
+    return mc&&mq&&mg;
+  });
+}
+function renderProds(){
+  var g=document.getElementById('prodGrid');if(!g)return;
+  var f=getFil();
+  if(!f.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--g400)">Aucun produit trouvé dans cette zone</div>';return;}
+  var h='';
+  for(var i=0;i<f.length;i++){
+    var p=f[i];
+    var bt=p.b==='nat'?'<span class="ptag" style="background:#1A6B35;color:#fff">Naturel</span>':p.b==='promo'?'<span class="ptag" style="background:#C0392B;color:#fff">Promo</span>':p.b==='local'?'<span class="ptag" style="background:#E07B1A;color:#fff">Local</span>':'';
+    h+='<div class="pcard"><div class="pimg">'+p.e+bt+'<button class="padd" onclick="addCart('+p.id+')">+</button></div><div class="pinf">'
+      +'<div class="pn">'+p.nom+'</div>'
+      +'<div class="psh">🏪 '+p.sh+'</div>'
+      +'<div class="por">📍 '+p.o+'</div>'
+      +'<div><span class="pp">'+fcfa(p.p)+'</span><span style="font-size:9px;color:var(--g400)"> /'+p.u+'</span></div>'
+      +'<div class="pst">'+p.d+'</div>'
+      +'</div></div>';
+  }
+  g.innerHTML=h;
+}
+
+function getLivD(zid){
+  if(!zid||zid==='ret')return[];
+  var m={'cot':['l1','l2','l4','l5'],'per':['l2','l3','l5'],'abc':['l3','l5']};
+  var ids=m[zid]||[];var res=[];
+  for(var i=0;i<ids.length;i++){var l=gl(ids[i]);if(l&&l.ok)res.push(l);}
+  return res;
+}
+function renderCart(){
+  var div=document.getElementById('cart-content');if(!div)return;
+  var keys=[];for(var k in panier)keys.push(parseInt(k));
+  if(!keys.length){
+    div.innerHTML='<div class="cbody"><div class="ecrt"><i class="ti ti-shopping-cart-off" aria-hidden="true"></i>'
+      +'<div style="font-size:14px;color:#444;margin-bottom:5px">Panier vide</div>'
+      +'<small>Parcourez notre catalogue</small><br>'
+      +'<button class="bbtn" onclick="goTab(\'catalogue\')">Voir les produits</button>'
+      +'</div></div>';
+    return;
+  }
+  var vg={};
+  for(var i=0;i<keys.length;i++){var p=gp(keys[i]);if(p){if(!vg[p.bid])vg[p.bid]=[];vg[p.bid].push(keys[i]);}}
+  var nvc=Object.keys(vg).length;
+  var iH='';
+  for(var bid in vg){
+    var bo=null;for(var bi=0;bi<BOUTS.length;bi++){if(BOUTS[bi].id===bid){bo=BOUTS[bi];break;}}
+    iH+='<div class="sg"><div class="sgh">🏪 '+(bo?bo.e+' '+bo.nom:'Boutique')+'</div>';
+    for(var j=0;j<vg[bid].length;j++){
+      var pid=vg[bid][j];var prod=gp(pid);if(!prod)continue;
+      iH+='<div class="ci"><div class="cemj">'+prod.e+'</div><div class="cinf">'
+        +'<div class="cn">'+prod.nom+'</div><div class="cf">📍 '+prod.o+'</div>'
+        +'<div class="cp">'+fcfa(prod.p)+' / '+prod.u+'</div></div>'
+        +'<div class="qty"><button class="qb" onclick="rmCart('+pid+')">-</button>'
+        +'<span class="qn">'+panier[pid]+'</span>'
+        +'<button class="qb" onclick="incCart('+pid+')">+</button></div></div>';
+    }
+    iH+='</div>';
+  }
+  var gb='';
+  if(nvc>1){
+    gb='<div class="ccrd" style="background:var(--vl);border-color:rgba(26,107,53,.2)">'
+      +'<b style="font-size:12px;color:var(--vd)">📦 Livraison groupée disponible</b>'
+      +'<div style="font-size:11px;color:var(--v);margin:5px 0">Articles de '+nvc+' boutiques. Regrouper ?</div>'
+      +'<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">'
+      +'<button style="border:1px solid var(--v);border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:inherit;'+(groupe?'background:var(--v);color:#fff':'background:#fff;color:var(--vd)')+'" onclick="setG(true)">Oui (+500 FCFA)</button>'
+      +'<button style="border:1px solid var(--v);border-radius:8px;padding:6px 12px;font-size:11px;cursor:pointer;font-family:inherit;'+(!groupe?'background:var(--v);color:#fff':'background:#fff;color:var(--vd)')+'" onclick="setG(false)">Non, séparées</button>'
+      +'</div></div>';
+  }
+  var zH='';
+  for(var zi=0;zi<ZONES_LIV.length;zi++){
+    var z=ZONES_LIV[zi];var sel=zoneA===z.id?' sel':'';
+    var pe=z.p===0?'<span class="zfree">Gratuit</span>':'<span class="zprc">'+fcfa(z.p)+'</span>';
+    zH+='<div class="zopt'+sel+'" onclick="setZ(\''+z.id+'\')">'
+      +'<div class="zr"><div class="zd"></div></div>'
+      +'<div style="font-size:18px">'+z.i+'</div>'
+      +'<div style="flex:1"><div class="zn">'+z.n+'</div><div class="zdt">'+z.d+'</div></div>'
+      +pe+'</div>';
+  }
+  var livH='';
+  var ld=getLivD(zoneA);
+  if(zoneA&&zoneA!=='ret'&&ld.length){
+    livH='<div class="lsug"><div class="lstt"><i class="ti ti-motorbike" style="color:var(--v);font-size:14px" aria-hidden="true"></i> Livreurs disponibles dans votre zone</div>';
+    for(var li=0;li<ld.length;li++){
+      var lv=ld[li];var sel2=livA===lv.id?' sel':'';
+      livH+='<div class="lsc'+sel2+'" onclick="setLv(\''+lv.id+'\')">'
+        +'<div class="lsav">'+lv.e+'<div class="lsonl"></div></div>'
+        +'<div style="flex:1"><div class="lsn">'+lv.nom+'</div><div class="lsz">📍 '+lv.zone+'</div><div class="lsph">📱 '+lv.tel+'</div>'
+        +'<div style="font-size:10px;color:var(--g400);margin-top:2px">⭐ '+lv.note+' · '+lv.nb+' livraisons</div></div>'
+        +'<div class="lsr"><div class="lsrd"></div></div></div>';
+    }
+    livH+='</div>';
+  } else if(zoneA==='ret'){
+    livH='<div style="background:var(--vl);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--vd)">📍 Retrait au point relais · Pas de livreur nécessaire</div>';
+  }
+  var pH='';
+  for(var pi2=0;pi2<PAYS.length;pi2++){
+    var pay=PAYS[pi2];var sel3=payA===pay.id?' sel':'';
+    pH+='<div class="popt'+sel3+'" onclick="setP(\''+pay.id+'\')">'
+      +'<div class="pr"><div class="prd"></div></div>'
+      +'<div style="font-size:20px">'+pay.i+'</div>'
+      +'<div style="flex:1"><div class="pnm">'+pay.n+'</div><div class="psb">'+pay.s+'</div></div></div>';
+  }
+  var st=stot();var zo=zoneA?gz(zoneA):null;var lf=zo?zo.p:0;
+  var gf=nvc>1&&groupe?500:0;var total=st+lf+gf;
+  var ok=zoneA&&payA&&(zoneA==='ret'||livA);
+  var bl=!zoneA?'Choisissez une zone':(!livA&&zoneA!=='ret')?'Choisissez un livreur':!payA?'Choisissez un paiement':'Confirmer la commande';
+  div.innerHTML='<div class="cbody"><div class="ccrd"><div class="cttl"><i class="ti ti-basket" aria-hidden="true"></i>Panier ('+keys.length+' · '+nvc+' boutique'+(nvc>1?'s':'')+')</div>'+iH+'</div>'+gb
+    +'<div class="ccrd"><div class="cttl"><i class="ti ti-map-pin" aria-hidden="true"></i>Zone de livraison</div>'+zH+'</div>'
+    +livH
+    +'<div class="ccrd"><div class="cttl"><i class="ti ti-credit-card" aria-hidden="true"></i>Paiement</div>'+pH+'</div>'
+    +'<div class="scrd"><div class="sr"><span>Sous-total</span><span>'+fcfa(st)+'</span></div>'
+    +(zoneA?'<div class="sr"><span>Livraison</span><span>'+(lf===0?'Gratuit':fcfa(lf))+'</span></div>':'')
+    +(gf>0?'<div class="sr"><span>Livraison groupée</span><span>'+fcfa(gf)+'</span></div>':'')
+    +'<div class="stot"><span>Total</span><span>'+(ok?fcfa(total):'—')+'</span></div></div>'
+    +'<button class="obtn" onclick="commander()"'+(ok?'':' disabled')+'>✓ '+bl+'</button></div>';
+}
+function setG(v){groupe=v;renderCart();}
+function setZ(id){zoneA=id;livA=null;renderCart();}
+function setP(id){payA=id;renderCart();}
+function setLv(id){livA=id;renderCart();}
+function commander(){
+  if(!zoneA||!payA)return;
+  var num='YM-'+(Math.floor(Math.random()*90000)+10000);
+  var lv=livA?gl(livA):null;
+  showToast('Commande '+num+' confirmée !'+(lv?' · Livreur: '+lv.nom:''),'🎉');
+  panier={};zoneA=null;payA=null;livA=null;groupe=true;mc();goTab('home');
+}
+function togD(){
+  var btn=document.getElementById('dispoBtn');if(!btn)return;
+  if(btn.classList.contains('on')){btn.classList.remove('on');btn.innerHTML='⚫ Hors ligne';showToast('Vous êtes hors ligne','⚫');}
+  else{btn.classList.add('on');btn.innerHTML='🟢 Disponible';showToast('Vous êtes disponible','🟢');}
+}
+function simUp(id){
+  var b=document.getElementById(id);if(!b)return;
+  b.classList.add('done');
+  b.innerHTML='<span class="upic">✅</span><div class="upt">Fichier téléchargé</div><div class="ups">Cliquez pour changer</div>';
+  showToast('Document ajouté !','📄');
+}
+function swL(tab){
+  var tabs=['perso','moto','docs'];
+  for(var i=0;i<tabs.length;i++){var el=document.getElementById('lf-'+tabs[i]);if(el)el.style.display=tabs[i]===tab?'block':'none';}
+  var btns=document.querySelectorAll('#page-livreur .tf');
+  for(var j=0;j<btns.length;j++){btns[j].className='tf'+(tabs[j]===tab?' active':'');}
+}
+function swV(tab){
+  var tabs=['info','bout','prod'];
+  for(var i=0;i<tabs.length;i++){var el=document.getElementById('vf-'+tabs[i]);if(el)el.style.display=tabs[i]===tab?'block':'none';}
+  var btns=document.querySelectorAll('#page-vendre .tf');
+  for(var j=0;j<btns.length;j++){btns[j].className='tf'+(tabs[j]===tab?' active':'');}
+}
+function subLiv(){showToast('Demande envoyée ! Validation sous 24h','🛵');goTab('home');}
+function subVend(){showToast('Boutique soumise ! Validation sous 24-48h','🏪');goTab('home');}
+
+var ALL_TABS=['home','catalogue','boutiques','livreurs','vendre','livreur','dash-v','dash-l','cart','compte'];
+var NAV_TABS=['home','catalogue','cart','compte'];
+function goTab(name){
+  for(var i=0;i<ALL_TABS.length;i++){
+    var t=ALL_TABS[i];
+    var pg=document.getElementById('page-'+t);
+    if(pg){pg.style.display=t===name?'block':'none';pg.className='page'+(t===name?' active':'');}
+  }
+  for(var j=0;j<NAV_TABS.length;j++){
+    var nt=NAV_TABS[j];
+    var bic=document.getElementById('bic-'+nt);
+    var blbl=document.getElementById('blbl-'+nt);
+    if(bic)bic.className='nav-ic'+(nt===name?' on':'');
+    if(blbl)blbl.className='nav-lbl'+(nt===name?' on':'');
+    if(bic){
+      var ico=bic.querySelector('i');
+      if(ico)ico.style.color=nt===name?'var(--v)':'var(--g400)';
+    }
+  }
+  if(name==='catalogue'){renderCats();renderProds();}
+  if(name==='cart')renderCart();
+  if(name==='boutiques')buildBout();
+  if(name==='livreurs')buildLivsList();
+  window.scrollTo(0,0);
+}
+
+var flashSec=9*3600+47*60+33;
+function updateFlash(){
+  flashSec--;if(flashSec<0)flashSec=10*3600;
+  var h=Math.floor(flashSec/3600);var m=Math.floor((flashSec%3600)/60);var s=flashSec%60;
+  var el=document.getElementById('flashTimer');
+  if(el)el.textContent=(h<10?'0'+h:h)+':'+(m<10?'0'+m:m)+':'+(s<10?'0'+s:s);
+}
+setInterval(updateFlash,1000);
+
+document.addEventListener('DOMContentLoaded',function(){
+  buildGeoGr();
+  buildHomeBout();
+  renderCats();
+  renderProds();
+  try{
+    var saved=localStorage.getItem('yeye_geo');
+    if(saved){
+      var gz2=JSON.parse(saved);
+      for(var i=0;i<GZ.length;i++){if(GZ[i].id===gz2.id){curGeo=GZ[i];break;}}
+      if(curGeo){
+        var ov=document.getElementById('geoOv');if(ov)ov.style.display='none';
+        var lt=document.getElementById('locTxt');if(lt)lt.textContent=curGeo.e+' '+curGeo.name;
+        var bc=document.getElementById('banCity');if(bc)bc.textContent=curGeo.name;
+        var ht=document.getElementById('homeBoutT');if(ht)ht.textContent='dans votre zone';
+        buildHomeBout();renderProds();buildBout();buildLivsList();
+      }
+    }
+  }catch(e){}
+});
 </script>
 </body>
 </html>
