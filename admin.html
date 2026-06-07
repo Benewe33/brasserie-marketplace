@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Yéyé Market — Dashboard Admin</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--v:#1A6B35;--vl:#E8F5EE;--vd:#0F4020;--j:#F5C518;--jd:#8B7000;--r:#C0392B;--rl:#FDECEA;--bl:#1A5FA5;--bll:#E6F0FB;--g50:#F7F9F7;--g100:#EDEFEB;--g200:#CDD4CA;--g400:#7A8A76;--g700:#3A4A36;--g900:#1A2018;--w:#fff}
+body{font-family:'DM Sans',sans-serif;background:var(--g50);color:var(--g900)}
+.layout{display:flex;min-height:100vh}
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--vd);color:#fff;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100}
+.sb-logo{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:10px}
+.sb-logo-ic{width:36px;height:36px;background:var(--j);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sb-logo-t{font-size:15px;font-weight:600}
+.sb-logo-s{font-size:10px;opacity:.6;margin-top:1px}
+.sb-nav{padding:12px 0;flex:1;overflow-y:auto}
+.sb-section{font-size:10px;font-weight:600;color:rgba(255,255,255,.4);padding:10px 16px 5px;text-transform:uppercase;letter-spacing:.5px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:10px 16px;cursor:pointer;font-size:13px;color:rgba(255,255,255,.75);border-left:3px solid transparent;transition:all .15s}
+.sb-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.sb-item.active{background:rgba(255,255,255,.12);color:#fff;border-left-color:var(--j)}
+.sb-item-ic{font-size:17px;width:22px;text-align:center}
+.sb-footer{padding:14px 16px;border-top:1px solid rgba(255,255,255,.1);font-size:11px;color:rgba(255,255,255,.5)}
+/* MAIN */
+.main{margin-left:220px;flex:1;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--w);border-bottom:1px solid var(--g100);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:90}
+.topbar-title{font-size:16px;font-weight:600;color:var(--g900)}
+.topbar-right{display:flex;align-items:center;gap:10px}
+.btn{border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:all .15s}
+.btn-v{background:var(--v);color:#fff}.btn-v:hover{background:var(--vd)}
+.btn-r{background:var(--rl);color:var(--r)}.btn-r:hover{background:#f5c6c3}
+.btn-b{background:var(--bll);color:var(--bl)}.btn-b:hover{background:#d0e6f9}
+.btn-g{background:var(--g100);color:var(--g700)}.btn-g:hover{background:var(--g200)}
+.content{padding:24px;flex:1}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--w);border-radius:12px;border:1px solid var(--g100);padding:16px}
+.stat-ic{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px}
+.stat-n{font-size:24px;font-weight:600;color:var(--g900)}
+.stat-l{font-size:12px;color:var(--g400);margin-top:2px}
+.stat-delta{font-size:11px;margin-top:6px;font-weight:500}
+/* TABLE */
+.table-card{background:var(--w);border-radius:12px;border:1px solid var(--g100);overflow:hidden}
+.table-hdr{padding:16px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between}
+.table-title{font-size:14px;font-weight:600;color:var(--g900);display:flex;align-items:center;gap:8px}
+.table-actions{display:flex;gap:8px;align-items:center}
+.search-inp{border:1px solid var(--g200);border-radius:8px;padding:7px 12px;font-size:12px;font-family:inherit;background:var(--g50);color:var(--g900);outline:none;width:200px}
+.search-inp:focus{border-color:var(--v)}
+table{width:100%;border-collapse:collapse}
+th{background:var(--g50);padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--g100)}
+td{padding:12px 16px;font-size:13px;border-bottom:0.5px solid var(--g100);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--g50)}
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px}
+.badge-g{background:var(--vl);color:var(--vd)}
+.badge-r{background:var(--rl);color:var(--r)}
+.badge-y{background:#FEF3D7;color:#8B5000}
+.badge-b{background:var(--bll);color:var(--bl)}
+.avatar{width:32px;height:32px;border-radius:50%;object-fit:cover;border:1px solid var(--g100)}
+.avatar-placeholder{width:32px;height:32px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.row-actions{display:flex;gap:6px}
+.action-btn{border:1px solid var(--g200);background:none;border-radius:6px;padding:4px 8px;font-size:11px;cursor:pointer;font-family:inherit;color:var(--g700);transition:all .15s}
+.action-btn:hover{border-color:var(--v);color:var(--v)}
+.action-btn.del:hover{border-color:var(--r);color:var(--r)}
+/* MODAL */
+.modal-ov{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:500;align-items:center;justify-content:center}
+.modal-ov.open{display:flex}
+.modal{background:var(--w);border-radius:16px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-hdr{padding:20px 24px 16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:16px;font-weight:600;color:var(--g900)}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--g400);padding:2px 6px;border-radius:6px}
+.modal-close:hover{background:var(--g100)}
+.modal-body{padding:20px 24px}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--g100);display:flex;gap:10px;justify-content:flex-end}
+.fg{margin-bottom:14px}
+.fl{font-size:12px;font-weight:500;color:var(--g400);margin-bottom:5px;display:block}
+.fi{width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:var(--g50);color:var(--g900);outline:none}
+.fi:focus{border-color:var(--v)}
+textarea.fi{resize:vertical;min-height:80px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* PHOTO UPLOAD */
+.upload-zone{border:2px dashed var(--g200);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--g50)}
+.upload-zone:hover{border-color:var(--v);background:var(--vl)}
+.upload-zone.done{border-color:var(--v);background:var(--vl)}
+.upload-preview{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;display:none}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--g900);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.toast.show{transform:translateY(0);opacity:1}
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:48px;color:var(--g400);gap:10px}
+.spinner{width:20px;height:20px;border:2px solid var(--g200);border-top-color:var(--v);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* EMPTY */
+.empty{text-align:center;padding:48px 20px;color:var(--g400)}
+.empty-ic{font-size:40px;display:block;margin-bottom:10px}
+/* PAGE */
+.page{display:none}.page.active{display:block}
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{width:60px}.sidebar .sb-logo-t,.sidebar .sb-logo-s,.sidebar .sb-item span,.sidebar .sb-section,.sidebar .sb-footer{display:none}
+  .main{margin-left:60px}.stats-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-ic">🌿</div>
+    <div><div class="sb-logo-t">Yéyé Market</div><div class="sb-logo-s">Dashboard Admin</div></div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-section">Principal</div>
+    <div class="sb-item active" onclick="showPage('dashboard')"><span class="sb-item-ic">📊</span><span>Tableau de bord</span></div>
+    <div class="sb-item" onclick="showPage('produits')"><span class="sb-item-ic">📦</span><span>Produits</span></div>
+    <div class="sb-item" onclick="showPage('boutiques')"><span class="sb-item-ic">🏪</span><span>Boutiques</span></div>
+    <div class="sb-item" onclick="showPage('restaurants')"><span class="sb-item-ic">🍽️</span><span>Restaurants</span></div>
+    <div class="sb-item" onclick="showPage('livreurs')"><span class="sb-item-ic">🛵</span><span>Livreurs</span></div>
+    <div class="sb-item" onclick="showPage('commandes')"><span class="sb-item-ic">🧾</span><span>Commandes</span></div>
+    <div class="sb-section">Paramètres</div>
+    <div class="sb-item" onclick="showPage('categories')"><span class="sb-item-ic">🏷️</span><span>Catégories</span></div>
+    <div class="sb-item" onclick="showPage('zones')"><span class="sb-item-ic">📍</span><span>Zones</span></div>
+  </div>
+  <div class="sb-footer">Yéyé Market v1.0</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+<div class="topbar">
+  <div class="topbar-title" id="pageTitle">Tableau de bord</div>
+  <div class="topbar-right">
+    <span style="font-size:12px;color:var(--g400)" id="connStatus">⏳ Connexion...</span>
+    <a href="/" style="text-decoration:none"><button class="btn btn-g">🌍 Voir le site</button></a>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="stats-grid" id="statsGrid">
+    <div class="stat-card"><div class="stat-ic" style="background:var(--vl)">🏪</div><div class="stat-n" id="stat-boutiques">-</div><div class="stat-l">Boutiques actives</div></div>
+    <div class="stat-card"><div class="stat-ic" style="background:#FEF3D7">📦</div><div class="stat-n" id="stat-produits">-</div><div class="stat-l">Produits disponibles</div></div>
+    <div class="stat-card"><div class="stat-ic" style="background:var(--bll)">🛵</div><div class="stat-n" id="stat-livreurs">-</div><div class="stat-l">Livreurs actifs</div></div>
+    <div class="stat-card"><div class="stat-ic" style="background:var(--rl)">🧾</div><div class="stat-n" id="stat-commandes">-</div><div class="stat-l">Commandes total</div></div>
+  </div>
+  <div class="table-card">
+    <div class="table-hdr"><div class="table-title">⏳ Boutiques en attente de validation</div></div>
+    <div id="pendingBoutiques"><div class="loading"><div class="spinner"></div> Chargement...</div></div>
+  </div>
+</div>
+
+<!-- PRODUITS -->
+<div id="page-produits" class="page">
+  <div class="table-card">
+    <div class="table-hdr">
+      <div class="table-title">📦 Produits <span id="prodCount" style="font-size:12px;color:var(--g400);font-weight:400"></span></div>
+      <div class="table-actions">
+        <input class="search-inp" type="text" placeholder="Rechercher..." oninput="rechercherProduits(this.value)"/>
+        <button class="btn btn-v" onclick="ouvrirModalProduit()">+ Ajouter un produit</button>
+      </div>
+    </div>
+    <div id="produitsTable"><div class="loading"><div class="spinner"></div> Chargement...</div></div>
+  </div>
+</div>
+
+<!-- BOUTIQUES -->
+<div id="page-boutiques" class="page">
+  <div class="table-card">
+    <div class="table-hdr">
+      <div class="table-title">🏪 Boutiques <span id="boutCount" style="font-size:12px;color:var(--g400);font-weight:400"></span></div>
+      <div class="table-actions">
+        <input class="search-inp" type="text" placeholder="Rechercher..." oninput="rechercherBoutiques(this.value)"/>
+        <button class="btn btn-v" onclick="ouvrirModalBoutique()">+ Ajouter une boutique</button>
+      </div>
+    </div>
+    <div id="boutiquesTable"><div class="loading"><div class="spinner"></div> Chargement...</div></div>
+  </div>
+</div>
+
+<!-- RESTAURANTS -->
+<div id="page-restaurants" class="page">
+  <div class="table-card">
+    <div class="table-hdr">
+      <div class="table-title">🍽️ Restaurants</div>
+      <div class="table-actions">
+        <button class="btn btn-v" onclick="ouvrirModalRestaurant()">+ Ajouter un restaurant</button>
+      </div>
+    </div>
+    <div id="restaurantsTable"><div class="loading"><div class="spinner"></div> Chargement...</div></div>
+  </div>
+</div>
+
+<!-- LIVREURS -->
+<div id="page-livreurs" class="page">
+  <div class="table-card">
+    <div class="table-hdr">
+      <div class="table-title">🛵 Livreurs <span id="livCount" style="font-size:12px;color:var(--g400);font-weight:400"></span></div>
+      <div class="table-actions">
+        <input class="search-inp" type="text" placeholder="Rechercher..." oninput="rechercherLivreurs(this.value)"/>
+        <button class="btn btn-v" onclick="ouvrirModalLivreur()">+ Ajouter un livreur</button>
+      </div>
+    </div>
+    <div id="livreursTable"><div class="loading"><div class="spinner"></div> Chargement...</div></div>
+  </div>
+</div>
+
+<!-- COMMANDES -->
+<div id="page-commandes" class="page">
+  <div class="table-card">
+    <div class="table-hdr">
+      <div class="table-title">🧾 Commandes</div>
+    </div>
+    <div id="commandesTable"><div class="loading"><div class="spinner"></div> Chargement...</div></div>
+  </div>
+</div>
+
+<!-- CATEGORIES -->
+<div id="page-categories" class="page">
+  <div class="table-card">
+    <div class="table-hdr">
+      <div class="table-title">🏷️ Catégories</div>
+      <button class="btn btn-v" onclick="ouvrirModalCategorie()">+ Ajouter</button>
+    </div>
+    <div id="categoriesTable"><div class="loading"><div class="spinner"></div> Chargement...</div></div>
+  </div>
+</div>
+
+<!-- ZONES -->
+<div id="page-zones" class="page">
+  <div class="table-card">
+    <div class="table-hdr"><div class="table-title">📍 Zones géographiques</div></div>
+    <div id="zonesTable"><div class="loading"><div class="spinner"></div> Chargement...</div></div>
+  </div>
+</div>
+
+</div><!-- /content -->
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- MODAL PRODUIT -->
+<div class="modal-ov" id="modalProduit">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modalProduitTitle">Ajouter un produit</div>
+      <button class="modal-close" onclick="fermerModal('modalProduit')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="prodId"/>
+      <div class="fg">
+        <label class="fl">Photo du produit</label>
+        <div class="upload-zone" id="uploadZoneProd" onclick="triggerUpload('photoProdInput','uploadZoneProd','previewProd')">
+          <img id="previewProd" class="upload-preview"/>
+          <div id="uploadProdText">📷 Cliquez pour ajouter une photo</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:4px">JPG, PNG · Max 5 MB</div>
+        </div>
+        <input type="file" id="photoProdInput" accept="image/*" style="display:none" onchange="previewAndUpload(this,'previewProd','uploadZoneProd','uploadProdText','photoProdUrl')"/>
+        <input type="hidden" id="photoProdUrl"/>
+      </div>
+      <div class="fg"><label class="fl">Nom du produit *</label><input class="fi" id="prodNom" type="text" placeholder="Ex: Gari de Savalou"/></div>
+      <div class="fg"><label class="fl">Description</label><textarea class="fi" id="prodDesc" placeholder="Décrivez votre produit..."></textarea></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Prix (FCFA) *</label><input class="fi" id="prodPrix" type="number" placeholder="600"/></div>
+        <div class="fg"><label class="fl">Unité *</label>
+          <select class="fi" id="prodUnite"><option>kg</option><option>litre</option><option>pièce</option><option>sachet</option><option>250g</option><option>500g</option><option>unité</option><option>régime</option></select>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Stock</label><input class="fi" id="prodStock" type="number" placeholder="50"/></div>
+        <div class="fg"><label class="fl">Stock (affiché)</label><input class="fi" id="prodStockUnite" type="text" placeholder="50 kg"/></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Badge</label>
+          <select class="fi" id="prodBadge"><option value="">Aucun</option><option value="nat">Naturel</option><option value="local">Local</option><option value="promo">Promo</option><option value="flash">Flash</option></select>
+        </div>
+        <div class="fg"><label class="fl">Prix promo (FCFA)</label><input class="fi" id="prodPrixPromo" type="number" placeholder="Optionnel"/></div>
+      </div>
+      <div class="fg"><label class="fl">Boutique *</label><select class="fi" id="prodBoutique"></select></div>
+      <div class="fg"><label class="fl">Catégorie *</label><select class="fi" id="prodCat"></select></div>
+      <div class="fg" style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="prodDispo" checked style="width:16px;height:16px;accent-color:var(--v)"/>
+        <label class="fl" style="margin:0;cursor:pointer" for="prodDispo">Produit disponible à la vente</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-g" onclick="fermerModal('modalProduit')">Annuler</button>
+      <button class="btn btn-v" onclick="sauvegarderProduit()">💾 Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BOUTIQUE -->
+<div class="modal-ov" id="modalBoutique">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modalBoutiqueTitle">Ajouter une boutique</div>
+      <button class="modal-close" onclick="fermerModal('modalBoutique')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="boutId"/>
+      <div class="fg">
+        <label class="fl">Logo de la boutique</label>
+        <div class="upload-zone" id="uploadZoneBout" onclick="triggerUpload('photoBoutInput','uploadZoneBout','previewBout')">
+          <img id="previewBout" class="upload-preview"/>
+          <div id="uploadBoutText">🏪 Cliquez pour ajouter un logo</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:4px">JPG, PNG · Max 5 MB</div>
+        </div>
+        <input type="file" id="photoBoutInput" accept="image/*" style="display:none" onchange="previewAndUpload(this,'previewBout','uploadZoneBout','uploadBoutText','photoBoutUrl')"/>
+        <input type="hidden" id="photoBoutUrl"/>
+      </div>
+      <div class="fg"><label class="fl">Nom de la boutique *</label><input class="fi" id="boutNom" type="text" placeholder="Ex: Ferme Agbossou"/></div>
+      <div class="fg"><label class="fl">Description</label><textarea class="fi" id="boutDesc" placeholder="Description de la boutique..."></textarea></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Catégorie *</label>
+          <select class="fi" id="boutCat">
+            <option>Épicerie</option><option>Viandes et Volailles</option><option>Poissons et Crustacés</option>
+            <option>Oeufs</option><option>Légumes</option><option>Fruits</option><option>Huiles naturelles</option>
+            <option>Brasserie naturelle</option><option>Épices et Condiments</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Ville *</label><input class="fi" id="boutVille" type="text" placeholder="Ex: Cotonou"/></div>
+      </div>
+      <div class="fg"><label class="fl">Téléphone</label><input class="fi" id="boutTel" type="tel" placeholder="+229 ..."/></div>
+      <div class="fg"><label class="fl">MTN Mobile Money</label><input class="fi" id="boutMtn" type="tel" placeholder="+229 ..."/></div>
+      <div class="fg"><label class="fl">Zones de livraison</label>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;background:var(--g50);border-radius:8px;border:1px solid var(--g200)">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-check" value="cot" checked style="accent-color:var(--v)"/> Cotonou</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-check" value="abc" style="accent-color:var(--v)"/> Abomey-Calavi</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-check" value="pnv" style="accent-color:var(--v)"/> Porto-Novo</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-check" value="abo" style="accent-color:var(--v)"/> Abomey</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-check" value="par" style="accent-color:var(--v)"/> Parakou</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-check" value="nat" style="accent-color:var(--v)"/> Natitingou</label>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Statut</label>
+        <select class="fi" id="boutStatut"><option value="active">Active</option><option value="en_attente">En attente</option><option value="suspendue">Suspendue</option></select>
+      </div>
+      <div class="fg" style="display:flex;align-items:center;gap:10px">
+        <input type="checkbox" id="boutVerif" style="width:16px;height:16px;accent-color:var(--v)"/>
+        <label class="fl" style="margin:0;cursor:pointer" for="boutVerif">Boutique vérifiée ✓</label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-g" onclick="fermerModal('modalBoutique')">Annuler</button>
+      <button class="btn btn-v" onclick="sauvegarderBoutique()">💾 Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LIVREUR -->
+<div class="modal-ov" id="modalLivreur">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title" id="modalLivreurTitle">Ajouter un livreur</div>
+      <button class="modal-close" onclick="fermerModal('modalLivreur')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="livId"/>
+      <div class="fg">
+        <label class="fl">Photo de profil</label>
+        <div class="upload-zone" id="uploadZoneLiv" onclick="triggerUpload('photoLivInput','uploadZoneLiv','previewLiv')">
+          <img id="previewLiv" class="upload-preview"/>
+          <div id="uploadLivText">📷 Ajouter une photo</div>
+        </div>
+        <input type="file" id="photoLivInput" accept="image/*" style="display:none" onchange="previewAndUpload(this,'previewLiv','uploadZoneLiv','uploadLivText','photoLivUrl')"/>
+        <input type="hidden" id="photoLivUrl"/>
+      </div>
+      <div class="fg"><label class="fl">Nom complet *</label><input class="fi" id="livNom" type="text" placeholder="Ex: Kofi Dossou"/></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Téléphone *</label><input class="fi" id="livTel" type="tel" placeholder="+229 ..."/></div>
+        <div class="fg"><label class="fl">WhatsApp</label><input class="fi" id="livWa" type="tel" placeholder="+229 ..."/></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Type de véhicule</label>
+          <select class="fi" id="livVehicule"><option>moto</option><option>tricycle</option><option>voiture</option><option>vélo motorisé</option></select>
+        </div>
+        <div class="fg"><label class="fl">Immatriculation</label><input class="fi" id="livImmat" type="text" placeholder="BJ 1234 AB"/></div>
+      </div>
+      <div class="fg"><label class="fl">MTN Mobile Money</label><input class="fi" id="livMtn" type="tel" placeholder="+229 ..."/></div>
+      <div class="fg"><label class="fl">Zones de couverture</label>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px;background:var(--g50);border-radius:8px;border:1px solid var(--g200)">
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-liv-check" value="cot" checked style="accent-color:var(--v)"/> Cotonou</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-liv-check" value="abc" style="accent-color:var(--v)"/> Abomey-Calavi</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-liv-check" value="pnv" style="accent-color:var(--v)"/> Porto-Novo</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-liv-check" value="abo" style="accent-color:var(--v)"/> Abomey</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-liv-check" value="par" style="accent-color:var(--v)"/> Parakou</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:12px;cursor:pointer"><input type="checkbox" class="zone-liv-check" value="nat" style="accent-color:var(--v)"/> Natitingou</label>
+        </div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Statut</label>
+          <select class="fi" id="livStatut"><option value="actif">Actif</option><option value="en_attente">En attente</option><option value="suspendu">Suspendu</option></select>
+        </div>
+        <div class="fg" style="display:flex;flex-direction:column;justify-content:flex-end">
+          <div style="display:flex;align-items:center;gap:10px;padding-bottom:2px">
+            <input type="checkbox" id="livEnLigne" style="width:16px;height:16px;accent-color:var(--v)"/>
+            <label class="fl" style="margin:0;cursor:pointer" for="livEnLigne">En ligne maintenant</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-g" onclick="fermerModal('modalLivreur')">Annuler</button>
+      <button class="btn btn-v" onclick="sauvegarderLivreur()">💾 Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RESTAURANT -->
+<div class="modal-ov" id="modalRestaurant">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div class="modal-title">Ajouter un restaurant</div>
+      <button class="modal-close" onclick="fermerModal('modalRestaurant')">✕</button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="restoId"/>
+      <div class="fg"><label class="fl">Nom du restaurant *</label><input class="fi" id="restoNom" type="text" placeholder="Ex: Maquis Chez Mama Rosine"/></div>
+      <div class="fg"><label class="fl">Type de cuisine</label>
+        <select class="fi" id="restoCuisine">
+          <option>Cuisine béninoise traditionnelle</option><option>Grillades et Brochettes</option>
+          <option>Poissons et Fruits de mer</option><option>Plats africains variés</option>
+          <option>Fast food local</option><option>Cuisine internationale</option>
+        </select>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Ville *</label><input class="fi" id="restoVille" type="text" placeholder="Cotonou"/></div>
+        <div class="fg"><label class="fl">Quartier</label><input class="fi" id="restoQuart" type="text" placeholder="Akpakpa"/></div>
+      </div>
+      <div class="fg"><label class="fl">Téléphone</label><input class="fi" id="restoTel" type="tel" placeholder="+229 ..."/></div>
+      <div class="fg"><label class="fl">Horaires</label><input class="fi" id="restoHoraires" type="text" placeholder="Lun-Sam 7h-22h"/></div>
+      <div class="fg"><label class="fl">Description</label><textarea class="fi" id="restoDesc" placeholder="Décrivez votre restaurant..."></textarea></div>
+      <div class="fg"><label class="fl">Statut</label>
+        <select class="fi" id="restoStatut"><option value="actif">Actif</option><option value="en_attente">En attente</option></select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-g" onclick="fermerModal('modalRestaurant')">Annuler</button>
+      <button class="btn btn-v" onclick="sauvegarderRestaurant()">💾 Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CATEGORIE -->
+<div class="modal-ov" id="modalCategorie">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-hdr">
+      <div class="modal-title">Ajouter une catégorie</div>
+      <button class="modal-close" onclick="fermerModal('modalCategorie')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Nom *</label><input class="fi" id="catNom" type="text" placeholder="Ex: Céréales"/></div>
+      <div class="fg"><label class="fl">Emoji</label><input class="fi" id="catEmoji" type="text" placeholder="Ex: 🌾"/></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-g" onclick="fermerModal('modalCategorie')">Annuler</button>
+      <button class="btn btn-v" onclick="sauvegarderCategorie()">💾 Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// SUPABASE CONFIG
+// ============================================================
+var SUPA_URL = 'https://gqjneyqllslyxdsjqfez.supabase.co';
+var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdxam5leXFsbHNseXhkc2pxZmV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTE0MjEsImV4cCI6MjA5NjM4NzQyMX0.zUfqoEm4BFn5kVeKGcPYwaJQtYlMZjI9A1jOKNbO3Ak';
+var sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// État global
+var allProduits = [], allBoutiques = [], allLivreurs = [], allRestaurants = [], allCats = [];
+var uploadedPhotoUrl = {};
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('DOMContentLoaded', function() {
+  testerConnexion();
+  chargerDashboard();
+});
+
+async function testerConnexion() {
+  try {
+    var res = await sb.from('boutiques').select('id').limit(1);
+    if (res.error) throw res.error;
+    document.getElementById('connStatus').innerHTML = '🟢 Connecté à Supabase';
+    document.getElementById('connStatus').style.color = 'var(--v)';
+  } catch(e) {
+    document.getElementById('connStatus').innerHTML = '🔴 Erreur connexion';
+    document.getElementById('connStatus').style.color = 'var(--r)';
+  }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(function(p){ p.className = 'page'; });
+  document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('active'); });
+  var pg = document.getElementById('page-' + name);
+  if (pg) pg.classList.add('active');
+  var items = document.querySelectorAll('.sb-item');
+  items.forEach(function(item) {
+    if (item.getAttribute('onclick') && item.getAttribute('onclick').indexOf(name) !== -1) {
+      item.classList.add('active');
+    }
+  });
+  var titles = {dashboard:'Tableau de bord',produits:'Produits',boutiques:'Boutiques',restaurants:'Restaurants',livreurs:'Livreurs',commandes:'Commandes',categories:'Catégories',zones:'Zones'};
+  document.getElementById('pageTitle').textContent = titles[name] || name;
+  // Charger les données de la page
+  if (name === 'produits') chargerProduits();
+  else if (name === 'boutiques') chargerBoutiques();
+  else if (name === 'livreurs') chargerLivreurs();
+  else if (name === 'restaurants') chargerRestaurants();
+  else if (name === 'commandes') chargerCommandes();
+  else if (name === 'categories') chargerCategories();
+  else if (name === 'zones') chargerZones();
+  else if (name === 'dashboard') chargerDashboard();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+var toastTimer;
+function showToast(msg, ic) {
+  var t = document.getElementById('toast');
+  t.innerHTML = '<span>' + (ic||'✅') + '</span><span>' + msg + '</span>';
+  t.classList.add('show');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 3000);
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+async function chargerDashboard() {
+  try {
+    var [rb, rp, rl, rc] = await Promise.all([
+      sb.from('boutiques').select('id', {count:'exact'}).eq('statut','active'),
+      sb.from('produits').select('id', {count:'exact'}).eq('disponible',true),
+      sb.from('livreurs').select('id', {count:'exact'}).eq('statut','actif'),
+      sb.from('commandes').select('id', {count:'exact'})
+    ]);
+    document.getElementById('stat-boutiques').textContent = rb.count || 0;
+    document.getElementById('stat-produits').textContent = rp.count || 0;
+    document.getElementById('stat-livreurs').textContent = rl.count || 0;
+    document.getElementById('stat-commandes').textContent = rc.count || 0;
+    // Boutiques en attente
+    var rpa = await sb.from('boutiques').select('*').eq('statut','en_attente');
+    renderPendingBoutiques(rpa.data || []);
+  } catch(e) { console.error('Dashboard:', e); }
+}
+
+function renderPendingBoutiques(data) {
+  var el = document.getElementById('pendingBoutiques');
+  if (!data.length) { el.innerHTML = '<div class="empty"><span class="empty-ic">✅</span>Aucune boutique en attente</div>'; return; }
+  var h = '<table><thead><tr><th>Nom</th><th>Catégorie</th><th>Ville</th><th>Téléphone</th><th>Actions</th></tr></thead><tbody>';
+  data.forEach(function(b) {
+    h += '<tr><td><b>' + b.nom + '</b></td><td>' + (b.categorie||'-') + '</td><td>' + (b.ville||'-') + '</td><td>' + (b.telephone||'-') + '</td>'
+      + '<td><div class="row-actions">'
+      + '<button class="action-btn" onclick="validerBoutique(\'' + b.id + '\')">✅ Valider</button>'
+      + '<button class="action-btn del" onclick="supprimerBoutique(\'' + b.id + '\')">🗑️ Rejeter</button>'
+      + '</div></td></tr>';
+  });
+  h += '</tbody></table>';
+  el.innerHTML = h;
+}
+
+async function validerBoutique(id) {
+  var res = await sb.from('boutiques').update({statut:'active', verifie:true, zones_livraison:['cot','abc','pnv','abo','par','nat']}).eq('id',id);
+  if (!res.error) { showToast('Boutique validée !','✅'); chargerDashboard(); }
+}
+
+// ============================================================
+// PRODUITS
+// ============================================================
+async function chargerProduits() {
+  var res = await sb.from('produits').select('*, boutiques(nom), categories(nom)').order('cree_le', {ascending:false});
+  allProduits = res.data || [];
+  document.getElementById('prodCount').textContent = '(' + allProduits.length + ')';
+  renderProduits(allProduits);
+  // Charger boutiques et cats pour les selects
+  var rb = await sb.from('boutiques').select('id,nom').eq('statut','active');
+  allBoutiques = rb.data || [];
+  var rc = await sb.from('categories').select('*').order('ordre');
+  allCats = rc.data || [];
+}
+
+function renderProduits(data) {
+  var el = document.getElementById('produitsTable');
+  if (!data.length) { el.innerHTML = '<div class="empty"><span class="empty-ic">📦</span>Aucun produit</div>'; return; }
+  var h = '<table><thead><tr><th>Photo</th><th>Nom</th><th>Boutique</th><th>Prix</th><th>Unité</th><th>Stock</th><th>Statut</th><th>Actions</th></tr></thead><tbody>';
+  data.forEach(function(p) {
+    var photo = (p.photos && p.photos.length) ? '<img class="avatar" src="' + p.photos[0] + '" onerror="this.style.display=\'none\'"/>' : '<div class="avatar-placeholder">📦</div>';
+    var badge = p.disponible ? '<span class="badge badge-g">Disponible</span>' : '<span class="badge badge-r">Indispo</span>';
+    h += '<tr>'
+      + '<td>' + photo + '</td>'
+      + '<td><b>' + p.nom + '</b>' + (p.badge ? '<br><span class="badge badge-b" style="font-size:9px">' + p.badge + '</span>' : '') + '</td>'
+      + '<td style="color:var(--bl)">' + (p.boutiques ? p.boutiques.nom : '-') + '</td>'
+      + '<td><b>' + (p.prix||0).toLocaleString('fr-FR') + ' FCFA</b></td>'
+      + '<td>' + (p.unite||'-') + '</td>'
+      + '<td>' + (p.stock_unite || (p.stock ? p.stock + ' ' + (p.unite||'') : '-')) + '</td>'
+      + '<td>' + badge + '</td>'
+      + '<td><div class="row-actions">'
+      + '<button class="action-btn" onclick="editerProduit(\'' + p.id + '\')">✏️ Modifier</button>'
+      + '<button class="action-btn" onclick="toggleDispo(\'' + p.id + '\',' + !p.disponible + ')">' + (p.disponible ? '🚫 Masquer' : '✅ Activer') + '</button>'
+      + '<button class="action-btn del" onclick="supprimerProduit(\'' + p.id + '\')">🗑️</button>'
+      + '</div></td></tr>';
+  });
+  h += '</tbody></table>';
+  el.innerHTML = h;
+}
+
+function rechercherProduits(v) {
+  var f = v ? allProduits.filter(function(p){ return p.nom.toLowerCase().indexOf(v.toLowerCase()) !== -1; }) : allProduits;
+  renderProduits(f);
+}
+
+function ouvrirModalProduit(id) {
+  document.getElementById('prodId').value = '';
+  document.getElementById('prodNom').value = '';
+  document.getElementById('prodDesc').value = '';
+  document.getElementById('prodPrix').value = '';
+  document.getElementById('prodPrixPromo').value = '';
+  document.getElementById('prodUnite').value = 'kg';
+  document.getElementById('prodStock').value = '';
+  document.getElementById('prodStockUnite').value = '';
+  document.getElementById('prodBadge').value = '';
+  document.getElementById('prodDispo').checked = true;
+  document.getElementById('photoProdUrl').value = '';
+  document.getElementById('previewProd').style.display = 'none';
+  document.getElementById('uploadProdText').textContent = '📷 Cliquez pour ajouter une photo';
+  document.getElementById('uploadZoneProd').classList.remove('done');
+  document.getElementById('modalProduitTitle').textContent = 'Ajouter un produit';
+  // Remplir boutiques
+  var sel = document.getElementById('prodBoutique');
+  sel.innerHTML = '<option value="">-- Choisir une boutique --</option>';
+  allBoutiques.forEach(function(b){ sel.innerHTML += '<option value="' + b.id + '">' + b.nom + '</option>'; });
+  // Remplir catégories
+  var selc = document.getElementById('prodCat');
+  selc.innerHTML = '<option value="">-- Choisir une catégorie --</option>';
+  allCats.forEach(function(c){ selc.innerHTML += '<option value="' + c.id + '">' + c.emoji + ' ' + c.nom + '</option>'; });
+  document.getElementById('modalProduit').classList.add('open');
+}
+
+function editerProduit(id) {
+  var p = allProduits.find(function(x){ return x.id === id; });
+  if (!p) return;
+  ouvrirModalProduit();
+  document.getElementById('modalProduitTitle').textContent = 'Modifier le produit';
+  document.getElementById('prodId').value = p.id;
+  document.getElementById('prodNom').value = p.nom || '';
+  document.getElementById('prodDesc').value = p.description || '';
+  document.getElementById('prodPrix').value = p.prix || '';
+  document.getElementById('prodPrixPromo').value = p.prix_promo || '';
+  document.getElementById('prodUnite').value = p.unite || 'kg';
+  document.getElementById('prodStock').value = p.stock || '';
+  document.getElementById('prodStockUnite').value = p.stock_unite || '';
+  document.getElementById('prodBadge').value = p.badge || '';
+  document.getElementById('prodDispo').checked = p.disponible;
+  document.getElementById('prodBoutique').value = p.boutique_id || '';
+  document.getElementById('prodCat').value = p.categorie_id || '';
+  if (p.photos && p.photos[0]) {
+    document.getElementById('photoProdUrl').value = p.photos[0];
+    document.getElementById('previewProd').src = p.photos[0];
+    document.getElementById('previewProd').style.display = 'block';
+    document.getElementById('uploadProdText').textContent = '✅ Photo actuelle';
+  }
+}
+
+async function sauvegarderProduit() {
+  var id = document.getElementById('prodId').value;
+  var photoUrl = document.getElementById('photoProdUrl').value;
+  var data = {
+    nom: document.getElementById('prodNom').value.trim(),
+    description: document.getElementById('prodDesc').value.trim(),
+    prix: parseFloat(document.getElementById('prodPrix').value) || 0,
+    prix_promo: document.getElementById('prodPrixPromo').value ? parseFloat(document.getElementById('prodPrixPromo').value) : null,
+    unite: document.getElementById('prodUnite').value,
+    stock: parseInt(document.getElementById('prodStock').value) || 0,
+    stock_unite: document.getElementById('prodStockUnite').value.trim(),
+    badge: document.getElementById('prodBadge').value || null,
+    disponible: document.getElementById('prodDispo').checked,
+    boutique_id: document.getElementById('prodBoutique').value || null,
+    categorie_id: document.getElementById('prodCat').value ? parseInt(document.getElementById('prodCat').value) : null,
+    photos: photoUrl ? [photoUrl] : null
+  };
+  if (!data.nom) { showToast('Le nom est obligatoire','⚠️'); return; }
+  try {
+    var res;
+    if (id) {
+      res = await sb.from('produits').update(data).eq('id', id);
+    } else {
+      res = await sb.from('produits').insert(data);
+    }
+    if (res.error) throw res.error;
+    showToast(id ? 'Produit modifié !' : 'Produit ajouté !', '✅');
+    fermerModal('modalProduit');
+    chargerProduits();
+  } catch(e) { showToast('Erreur: ' + e.message, '❌'); }
+}
+
+async function toggleDispo(id, val) {
+  var res = await sb.from('produits').update({disponible: val}).eq('id', id);
+  if (!res.error) { showToast(val ? 'Produit activé !' : 'Produit masqué !', val ? '✅' : '🚫'); chargerProduits(); }
+}
+
+async function supprimerProduit(id) {
+  if (!confirm('Supprimer ce produit définitivement ?')) return;
+  var res = await sb.from('produits').delete().eq('id', id);
+  if (!res.error) { showToast('Produit supprimé','🗑️'); chargerProduits(); }
+  else showToast('Erreur: ' + res.error.message,'❌');
+}
+
+// ============================================================
+// BOUTIQUES
+// ============================================================
+async function chargerBoutiques() {
+  var res = await sb.from('boutiques').select('*').order('cree_le', {ascending:false});
+  allBoutiques = res.data || [];
+  document.getElementById('boutCount').textContent = '(' + allBoutiques.length + ')';
+  renderBoutiques(allBoutiques);
+}
+
+function renderBoutiques(data) {
+  var el = document.getElementById('boutiquesTable');
+  if (!data.length) { el.innerHTML = '<div class="empty"><span class="empty-ic">🏪</span>Aucune boutique</div>'; return; }
+  var h = '<table><thead><tr><th>Nom</th><th>Catégorie</th><th>Ville</th><th>Zones</th><th>Statut</th><th>Vérifié</th><th>Actions</th></tr></thead><tbody>';
+  data.forEach(function(b) {
+    var statBadge = b.statut === 'active' ? '<span class="badge badge-g">Active</span>' : b.statut === 'en_attente' ? '<span class="badge badge-y">En attente</span>' : '<span class="badge badge-r">Suspendue</span>';
+    h += '<tr>'
+      + '<td><b>' + b.nom + '</b></td>'
+      + '<td>' + (b.categorie||'-') + '</td>'
+      + '<td>' + (b.ville||'-') + '</td>'
+      + '<td style="font-size:11px">' + (b.zones_livraison ? b.zones_livraison.join(', ') : '-') + '</td>'
+      + '<td>' + statBadge + '</td>'
+      + '<td>' + (b.verifie ? '✅' : '❌') + '</td>'
+      + '<td><div class="row-actions">'
+      + '<button class="action-btn" onclick="editerBoutique(\'' + b.id + '\')">✏️</button>'
+      + '<button class="action-btn del" onclick="supprimerBoutique(\'' + b.id + '\')">🗑️</button>'
+      + '</div></td></tr>';
+  });
+  h += '</tbody></table>';
+  el.innerHTML = h;
+}
+
+function rechercherBoutiques(v) {
+  var f = v ? allBoutiques.filter(function(b){ return b.nom.toLowerCase().indexOf(v.toLowerCase()) !== -1; }) : allBoutiques;
+  renderBoutiques(f);
+}
+
+function ouvrirModalBoutique() {
+  document.getElementById('boutId').value = '';
+  document.getElementById('boutNom').value = '';
+  document.getElementById('boutDesc').value = '';
+  document.getElementById('boutVille').value = '';
+  document.getElementById('boutTel').value = '';
+  document.getElementById('boutMtn').value = '';
+  document.getElementById('boutStatut').value = 'active';
+  document.getElementById('boutVerif').checked = false;
+  document.getElementById('photoBoutUrl').value = '';
+  document.getElementById('previewBout').style.display = 'none';
+  document.getElementById('uploadBoutText').textContent = '🏪 Cliquez pour ajouter un logo';
+  document.getElementById('uploadZoneBout').classList.remove('done');
+  document.querySelectorAll('.zone-check').forEach(function(c){ c.checked = c.value === 'cot'; });
+  document.getElementById('modalBoutiqueTitle').textContent = 'Ajouter une boutique';
+  document.getElementById('modalBoutique').classList.add('open');
+}
+
+function editerBoutique(id) {
+  var b = allBoutiques.find(function(x){ return x.id === id; });
+  if (!b) return;
+  ouvrirModalBoutique();
+  document.getElementById('modalBoutiqueTitle').textContent = 'Modifier la boutique';
+  document.getElementById('boutId').value = b.id;
+  document.getElementById('boutNom').value = b.nom || '';
+  document.getElementById('boutDesc').value = b.description || '';
+  document.getElementById('boutCat').value = b.categorie || '';
+  document.getElementById('boutVille').value = b.ville || '';
+  document.getElementById('boutTel').value = b.telephone || '';
+  document.getElementById('boutMtn').value = b.mtn_money || '';
+  document.getElementById('boutStatut').value = b.statut || 'en_attente';
+  document.getElementById('boutVerif').checked = b.verifie || false;
+  if (b.zones_livraison) {
+    document.querySelectorAll('.zone-check').forEach(function(c){ c.checked = b.zones_livraison.indexOf(c.value) !== -1; });
+  }
+  if (b.logo_url) {
+    document.getElementById('photoBoutUrl').value = b.logo_url;
+    document.getElementById('previewBout').src = b.logo_url;
+    document.getElementById('previewBout').style.display = 'block';
+  }
+}
+
+async function sauvegarderBoutique() {
+  var id = document.getElementById('boutId').value;
+  var zones = [];
+  document.querySelectorAll('.zone-check:checked').forEach(function(c){ zones.push(c.value); });
+  var photoUrl = document.getElementById('photoBoutUrl').value;
+  var data = {
+    nom: document.getElementById('boutNom').value.trim(),
+    description: document.getElementById('boutDesc').value.trim(),
+    categorie: document.getElementById('boutCat').value,
+    ville: document.getElementById('boutVille').value.trim(),
+    telephone: document.getElementById('boutTel').value.trim(),
+    mtn_money: document.getElementById('boutMtn').value.trim(),
+    statut: document.getElementById('boutStatut').value,
+    verifie: document.getElementById('boutVerif').checked,
+    zones_livraison: zones,
+    logo_url: photoUrl || null
+  };
+  if (!data.nom) { showToast('Le nom est obligatoire','⚠️'); return; }
+  try {
+    var res = id ? await sb.from('boutiques').update(data).eq('id',id) : await sb.from('boutiques').insert(data);
+    if (res.error) throw res.error;
+    showToast(id ? 'Boutique modifiée !' : 'Boutique ajoutée !','✅');
+    fermerModal('modalBoutique');
+    chargerBoutiques();
+    chargerDashboard();
+  } catch(e) { showToast('Erreur: ' + e.message,'❌'); }
+}
+
+async function supprimerBoutique(id) {
+  if (!confirm('Supprimer cette boutique ? Tous ses produits seront aussi supprimés.')) return;
+  var res = await sb.from('boutiques').delete().eq('id',id);
+  if (!res.error) { showToast('Boutique supprimée','🗑️'); chargerBoutiques(); chargerDashboard(); }
+  else showToast('Erreur: ' + res.error.message,'❌');
+}
+
+// ============================================================
+// LIVREURS
+// ============================================================
+async function chargerLivreurs() {
+  var res = await sb.from('livreurs').select('*').order('cree_le', {ascending:false});
+  allLivreurs = res.data || [];
+  document.getElementById('livCount').textContent = '(' + allLivreurs.length + ')';
+  renderLivreurs(allLivreurs);
+}
+
+function renderLivreurs(data) {
+  var el = document.getElementById('livreursTable');
+  if (!data.length) { el.innerHTML = '<div class="empty"><span class="empty-ic">🛵</span>Aucun livreur</div>'; return; }
+  var h = '<table><thead><tr><th>Photo</th><th>Nom</th><th>Téléphone</th><th>Véhicule</th><th>Zones</th><th>Statut</th><th>En ligne</th><th>Actions</th></tr></thead><tbody>';
+  data.forEach(function(l) {
+    var photo = l.photo_url ? '<img class="avatar" src="' + l.photo_url + '" onerror="this.style.display=\'none\'"/>' : '<div class="avatar-placeholder">🛵</div>';
+    var statBadge = l.statut === 'actif' ? '<span class="badge badge-g">Actif</span>' : l.statut === 'en_attente' ? '<span class="badge badge-y">En attente</span>' : '<span class="badge badge-r">Suspendu</span>';
+    h += '<tr>'
+      + '<td>' + photo + '</td>'
+      + '<td><b>' + l.nom + '</b></td>'
+      + '<td>' + (l.telephone||'-') + '</td>'
+      + '<td>' + (l.type_vehicule||'moto') + '</td>'
+      + '<td style="font-size:11px">' + (l.zones_couverture ? l.zones_couverture.join(', ') : '-') + '</td>'
+      + '<td>' + statBadge + '</td>'
+      + '<td>' + (l.en_ligne ? '🟢 Oui' : '⚫ Non') + '</td>'
+      + '<td><div class="row-actions">'
+      + '<button class="action-btn" onclick="editerLivreur(\'' + l.id + '\')">✏️</button>'
+      + '<button class="action-btn" onclick="toggleLivreurStatut(\'' + l.id + '\',\'' + l.statut + '\')">' + (l.statut === 'actif' ? '🚫' : '✅') + '</button>'
+      + '<button class="action-btn del" onclick="supprimerLivreur(\'' + l.id + '\')">🗑️</button>'
+      + '</div></td></tr>';
+  });
+  h += '</tbody></table>';
+  el.innerHTML = h;
+}
+
+function rechercherLivreurs(v) {
+  var f = v ? allLivreurs.filter(function(l){ return l.nom.toLowerCase().indexOf(v.toLowerCase()) !== -1; }) : allLivreurs;
+  renderLivreurs(f);
+}
+
+function ouvrirModalLivreur() {
+  document.getElementById('livId').value = '';
+  document.getElementById('livNom').value = '';
+  document.getElementById('livTel').value = '';
+  document.getElementById('livWa').value = '';
+  document.getElementById('livVehicule').value = 'moto';
+  document.getElementById('livImmat').value = '';
+  document.getElementById('livMtn').value = '';
+  document.getElementById('livStatut').value = 'actif';
+  document.getElementById('livEnLigne').checked = false;
+  document.getElementById('photoLivUrl').value = '';
+  document.getElementById('previewLiv').style.display = 'none';
+  document.getElementById('uploadLivText').textContent = '📷 Ajouter une photo';
+  document.getElementById('uploadZoneLiv').classList.remove('done');
+  document.querySelectorAll('.zone-liv-check').forEach(function(c){ c.checked = c.value === 'cot'; });
+  document.getElementById('modalLivreurTitle').textContent = 'Ajouter un livreur';
+  document.getElementById('modalLivreur').classList.add('open');
+}
+
+function editerLivreur(id) {
+  var l = allLivreurs.find(function(x){ return x.id === id; });
+  if (!l) return;
+  ouvrirModalLivreur();
+  document.getElementById('modalLivreurTitle').textContent = 'Modifier le livreur';
+  document.getElementById('livId').value = l.id;
+  document.getElementById('livNom').value = l.nom || '';
+  document.getElementById('livTel').value = l.telephone || '';
+  document.getElementById('livWa').value = l.whatsapp || '';
+  document.getElementById('livVehicule').value = l.type_vehicule || 'moto';
+  document.getElementById('livImmat').value = l.immatriculation || '';
+  document.getElementById('livMtn').value = l.mtn_money || '';
+  document.getElementById('livStatut').value = l.statut || 'actif';
+  document.getElementById('livEnLigne').checked = l.en_ligne || false;
+  if (l.zones_couverture) {
+    document.querySelectorAll('.zone-liv-check').forEach(function(c){ c.checked = l.zones_couverture.indexOf(c.value) !== -1; });
+  }
+  if (l.photo_url) {
+    document.getElementById('photoLivUrl').value = l.photo_url;
+    document.getElementById('previewLiv').src = l.photo_url;
+    document.getElementById('previewLiv').style.display = 'block';
+    document.getElementById('uploadLivText').textContent = '✅ Photo actuelle';
+  }
+}
+
+async function sauvegarderLivreur() {
+  var id = document.getElementById('livId').value;
+  var zones = [];
+  document.querySelectorAll('.zone-liv-check:checked').forEach(function(c){ zones.push(c.value); });
+  var data = {
+    nom: document.getElementById('livNom').value.trim(),
+    telephone: document.getElementById('livTel').value.trim(),
+    whatsapp: document.getElementById('livWa').value.trim(),
+    type_vehicule: document.getElementById('livVehicule').value,
+    immatriculation: document.getElementById('livImmat').value.trim(),
+    mtn_money: document.getElementById('livMtn').value.trim(),
+    statut: document.getElementById('livStatut').value,
+    en_ligne: document.getElementById('livEnLigne').checked,
+    zones_couverture: zones,
+    photo_url: document.getElementById('photoLivUrl').value || null
+  };
+  if (!data.nom) { showToast('Le nom est obligatoire','⚠️'); return; }
+  try {
+    var res = id ? await sb.from('livreurs').update(data).eq('id',id) : await sb.from('livreurs').insert(data);
+    if (res.error) throw res.error;
+    showToast(id ? 'Livreur modifié !' : 'Livreur ajouté !','✅');
+    fermerModal('modalLivreur');
+    chargerLivreurs();
+  } catch(e) { showToast('Erreur: ' + e.message,'❌'); }
+}
+
+async function toggleLivreurStatut(id, statut) {
+  var newStatut = statut === 'actif' ? 'suspendu' : 'actif';
+  var res = await sb.from('livreurs').update({statut: newStatut}).eq('id',id);
+  if (!res.error) { showToast('Statut mis à jour !','✅'); chargerLivreurs(); }
+}
+
+async function supprimerLivreur(id) {
+  if (!confirm('Supprimer ce livreur définitivement ?')) return;
+  var res = await sb.from('livreurs').delete().eq('id',id);
+  if (!res.error) { showToast('Livreur supprimé','🗑️'); chargerLivreurs(); }
+}
+
+// ============================================================
+// RESTAURANTS
+// ============================================================
+async function chargerRestaurants() {
+  var res = await sb.from('restaurants').select('*').order('cree_le', {ascending:false});
+  allRestaurants = res.data || [];
+  renderRestaurants(allRestaurants);
+}
+
+function renderRestaurants(data) {
+  var el = document.getElementById('restaurantsTable');
+  if (!data.length) { el.innerHTML = '<div class="empty"><span class="empty-ic">🍽️</span>Aucun restaurant</div>'; return; }
+  var h = '<table><thead><tr><th>Nom</th><th>Cuisine</th><th>Ville</th><th>Téléphone</th><th>Statut</th><th>Actions</th></tr></thead><tbody>';
+  data.forEach(function(r) {
+    var statBadge = r.statut === 'actif' ? '<span class="badge badge-g">Actif</span>' : '<span class="badge badge-y">En attente</span>';
+    h += '<tr><td><b>' + r.nom + '</b></td><td>' + (r.type_cuisine||'-') + '</td><td>' + (r.ville||'-') + '</td><td>' + (r.telephone||'-') + '</td><td>' + statBadge + '</td>'
+      + '<td><div class="row-actions"><button class="action-btn" onclick="editerRestaurant(\'' + r.id + '\')">✏️</button><button class="action-btn del" onclick="supprimerRestaurant(\'' + r.id + '\')">🗑️</button></div></td></tr>';
+  });
+  h += '</tbody></table>';
+  el.innerHTML = h;
+}
+
+function ouvrirModalRestaurant() {
+  document.getElementById('restoId').value = '';
+  document.getElementById('restoNom').value = '';
+  document.getElementById('restoVille').value = '';
+  document.getElementById('restoQuart').value = '';
+  document.getElementById('restoTel').value = '';
+  document.getElementById('restoHoraires').value = '';
+  document.getElementById('restoDesc').value = '';
+  document.getElementById('restoStatut').value = 'actif';
+  document.getElementById('modalRestaurant').classList.add('open');
+}
+
+function editerRestaurant(id) {
+  var r = allRestaurants.find(function(x){ return x.id === id; });
+  if (!r) return;
+  ouvrirModalRestaurant();
+  document.getElementById('restoId').value = r.id;
+  document.getElementById('restoNom').value = r.nom || '';
+  document.getElementById('restoCuisine').value = r.type_cuisine || '';
+  document.getElementById('restoVille').value = r.ville || '';
+  document.getElementById('restoQuart').value = r.quartier || '';
+  document.getElementById('restoTel').value = r.telephone || '';
+  document.getElementById('restoHoraires').value = r.horaires || '';
+  document.getElementById('restoDesc').value = r.description || '';
+  document.getElementById('restoStatut').value = r.statut || 'actif';
+}
+
+async function sauvegarderRestaurant() {
+  var id = document.getElementById('restoId').value;
+  var data = {
+    nom: document.getElementById('restoNom').value.trim(),
+    type_cuisine: document.getElementById('restoCuisine').value,
+    ville: document.getElementById('restoVille').value.trim(),
+    quartier: document.getElementById('restoQuart').value.trim(),
+    telephone: document.getElementById('restoTel').value.trim(),
+    horaires: document.getElementById('restoHoraires').value.trim(),
+    description: document.getElementById('restoDesc').value.trim(),
+    statut: document.getElementById('restoStatut').value
+  };
+  if (!data.nom) { showToast('Le nom est obligatoire','⚠️'); return; }
+  try {
+    var res = id ? await sb.from('restaurants').update(data).eq('id',id) : await sb.from('restaurants').insert(data);
+    if (res.error) throw res.error;
+    showToast(id ? 'Restaurant modifié !' : 'Restaurant ajouté !','✅');
+    fermerModal('modalRestaurant');
+    chargerRestaurants();
+  } catch(e) { showToast('Erreur: ' + e.message,'❌'); }
+}
+
+async function supprimerRestaurant(id) {
+  if (!confirm('Supprimer ce restaurant ?')) return;
+  var res = await sb.from('restaurants').delete().eq('id',id);
+  if (!res.error) { showToast('Restaurant supprimé','🗑️'); chargerRestaurants(); }
+}
+
+// ============================================================
+// COMMANDES
+// ============================================================
+async function chargerCommandes() {
+  var res = await sb.from('commandes').select('*').order('cree_le',{ascending:false}).limit(50);
+  var data = res.data || [];
+  var el = document.getElementById('commandesTable');
+  if (!data.length) { el.innerHTML = '<div class="empty"><span class="empty-ic">🧾</span>Aucune commande</div>'; return; }
+  var h = '<table><thead><tr><th>Numéro</th><th>Zone</th><th>Total</th><th>Paiement</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
+  data.forEach(function(c) {
+    var statBadge = c.statut === 'livree' ? '<span class="badge badge-g">Livrée</span>'
+      : c.statut === 'en_livraison' ? '<span class="badge badge-b">En livraison</span>'
+      : c.statut === 'nouvelle' ? '<span class="badge badge-y">Nouvelle</span>'
+      : '<span class="badge badge-r">' + c.statut + '</span>';
+    var date = c.cree_le ? new Date(c.cree_le).toLocaleDateString('fr-FR') : '-';
+    h += '<tr><td><b>' + (c.numero||c.id.substring(0,8)) + '</b></td><td>' + (c.zone_livraison||'-') + '</td>'
+      + '<td><b>' + (c.total||0).toLocaleString('fr-FR') + ' FCFA</b></td>'
+      + '<td>' + (c.mode_paiement||'-') + '</td><td>' + statBadge + '</td><td>' + date + '</td>'
+      + '<td><select onchange="changerStatutCommande(\'' + c.id + '\',this.value)" style="border:1px solid var(--g200);border-radius:6px;padding:4px 8px;font-size:11px;font-family:inherit;background:var(--g50)">'
+      + '<option value="nouvelle"' + (c.statut==='nouvelle'?' selected':'') + '>Nouvelle</option>'
+      + '<option value="confirmee"' + (c.statut==='confirmee'?' selected':'') + '>Confirmée</option>'
+      + '<option value="en_livraison"' + (c.statut==='en_livraison'?' selected':'') + '>En livraison</option>'
+      + '<option value="livree"' + (c.statut==='livree'?' selected':'') + '>Livrée</option>'
+      + '<option value="annulee"' + (c.statut==='annulee'?' selected':'') + '>Annulée</option>'
+      + '</select></td></tr>';
+  });
+  h += '</tbody></table>';
+  el.innerHTML = h;
+}
+
+async function changerStatutCommande(id, statut) {
+  var res = await sb.from('commandes').update({statut: statut}).eq('id',id);
+  if (!res.error) showToast('Statut mis à jour !','✅');
+  else showToast('Erreur: ' + res.error.message,'❌');
+}
+
+// ============================================================
+// CATEGORIES
+// ============================================================
+async function chargerCategories() {
+  var res = await sb.from('categories').select('*').order('ordre');
+  var data = res.data || [];
+  var el = document.getElementById('categoriesTable');
+  var h = '<table><thead><tr><th>Emoji</th><th>Nom</th><th>Ordre</th><th>Actions</th></tr></thead><tbody>';
+  data.forEach(function(c) {
+    h += '<tr><td style="font-size:20px">' + (c.emoji||'📦') + '</td><td><b>' + c.nom + '</b></td><td>' + c.ordre + '</td>'
+      + '<td><button class="action-btn del" onclick="supprimerCategorie(' + c.id + ')">🗑️</button></td></tr>';
+  });
+  h += '</tbody></table>';
+  el.innerHTML = h;
+}
+
+function ouvrirModalCategorie() { document.getElementById('modalCategorie').classList.add('open'); }
+
+async function sauvegarderCategorie() {
+  var nom = document.getElementById('catNom').value.trim();
+  var emoji = document.getElementById('catEmoji').value.trim();
+  if (!nom) { showToast('Le nom est obligatoire','⚠️'); return; }
+  var res = await sb.from('categories').insert({nom:nom, emoji:emoji});
+  if (!res.error) { showToast('Catégorie ajoutée !','✅'); fermerModal('modalCategorie'); chargerCategories(); }
+  else showToast('Erreur: ' + res.error.message,'❌');
+}
+
+async function supprimerCategorie(id) {
+  if (!confirm('Supprimer cette catégorie ?')) return;
+  var res = await sb.from('categories').delete().eq('id',id);
+  if (!res.error) { showToast('Catégorie supprimée','🗑️'); chargerCategories(); }
+}
+
+// ============================================================
+// ZONES
+// ============================================================
+async function chargerZones() {
+  var res = await sb.from('zones').select('*');
+  var data = res.data || [];
+  var el = document.getElementById('zonesTable');
+  var h = '<table><thead><tr><th>Emoji</th><th>Nom</th><th>Région</th><th>Actif</th></tr></thead><tbody>';
+  data.forEach(function(z) {
+    h += '<tr><td style="font-size:20px">' + (z.emoji||'📍') + '</td><td><b>' + z.nom + '</b></td><td>' + (z.region||'-') + '</td><td>' + (z.actif ? '✅' : '❌') + '</td></tr>';
+  });
+  h += '</tbody></table>';
+  el.innerHTML = h;
+}
+
+// ============================================================
+// UPLOAD PHOTOS
+// ============================================================
+function triggerUpload(inputId, zoneId, previewId) {
+  document.getElementById(inputId).click();
+}
+
+async function previewAndUpload(input, previewId, zoneId, textId, urlFieldId) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('Fichier trop lourd ! Max 5 MB','⚠️'); return; }
+  // Preview immédiat
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = document.getElementById(previewId);
+    img.src = e.target.result;
+    img.style.display = 'block';
+    document.getElementById(textId).textContent = '⏳ Upload en cours...';
+    document.getElementById(zoneId).classList.add('done');
+  };
+  reader.readAsDataURL(file);
+  // Upload vers Supabase
+  try {
+    var ext = file.name.split('.').pop().toLowerCase();
+    var chemin = 'admin/' + Date.now() + '_' + Math.random().toString(36).substr(2,6) + '.' + ext;
+    var res = await sb.storage.from('yeye-market').upload(chemin, file, {cacheControl:'3600', upsert:true});
+    if (res.error) throw res.error;
+    var url = sb.storage.from('yeye-market').getPublicUrl(chemin).data.publicUrl;
+    document.getElementById(urlFieldId).value = url;
+    document.getElementById(textId).textContent = '✅ Photo téléversée';
+    showToast('Photo uploadée !','📸');
+  } catch(e) {
+    document.getElementById(textId).textContent = '✅ Photo sélectionnée (locale)';
+    showToast('Photo sélectionnée','📸');
+  }
+  input.value = '';
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function fermerModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+// Fermer modal en cliquant dehors
+document.querySelectorAll('.modal-ov').forEach(function(ov) {
+  ov.addEventListener('click', function(e) {
+    if (e.target === ov) ov.classList.remove('open');
+  });
+});
+</script>
+</body>
+</html>
