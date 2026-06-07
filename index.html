@@ -330,6 +330,7 @@ textarea.fi{resize:vertical;min-height:70px}
     const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdxam5leXFsbHNseXhkc2pxZmV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTE0MjEsImV4cCI6MjA5NjM4NzQyMX0.zUfqoEm4BFn5kVeKGcPYwaJQtYlMZjI9A1jOKNbO3Ak';
     const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
   </script>
+  <script src="https://cdn.kkiapay.me/k.js"></script>
 </head>
 <body>
 <div class="app">
@@ -1104,9 +1105,10 @@ var ZONES_LIV = [
   {id:'abc',n:'Abomey-Calavi',       d:'Livraison sous 5 à 7h',  p:1500,i:'🚚'}
 ];
 var PAYS = [
-  {id:'mtn', n:'MTN Mobile Money',       s:'*880#',  i:'📱'},
-  {id:'moov',n:'Moov Money',             s:'*155#',  i:'💚'},
-  {id:'cash',n:'Paiement à la livraison',s:'Espèces',i:'💵'}
+  {id:'mtn', n:'MTN Mobile Money',       s:'Via KKiaPay · Sécurisé', i:'📱'},
+  {id:'moov',n:'Moov Money',             s:'Via KKiaPay · Sécurisé', i:'💚'},
+  {id:'card',n:'Carte bancaire (Visa/MasterCard)', s:'Via KKiaPay · Sécurisé', i:'💳'},
+  {id:'cash',n:'Paiement à la livraison',s:'Espèces au livreur',     i:'💵'}
 ];
 
 var panier={},catA='Tous',zoneA=null,payA=null,livA=null,rech='',rechB='',rechL='',groupe=true;
@@ -1851,42 +1853,167 @@ async function soumettreResto() {
   }
 }
 
+// ============================================================
+// KKIAPAY — PAIEMENT MOBILE MONEY & CARTE
+// ============================================================
+var KKIAPAY_KEY = '782f2ffff070438f6693d98f861b909f89ff09eb';
+var commandeEnCours = null;
+
 async function passerCommande() {
   if(!zoneA||!payA)return;
+  var zo=gz(zoneA);
+  var lf=zo?zo.p:0;
+  var nvc=nvend();
+  var gf=nvc>1&&groupe?500:0;
+  var st=stot();
+  var total=st+lf+gf;
+
+  // Si paiement à la livraison — pas besoin de KKiaPay
+  if(payA==='cash'){
+    await creerCommandeSupabase(total, lf, gf, st, 'en_attente');
+    return;
+  }
+
+  // Préparer la commande en mémoire avant paiement
+  commandeEnCours = {
+    total: total,
+    fraisLivraison: lf,
+    fraisGroupee: gf,
+    sousTotal: st,
+    modePaiement: payA
+  };
+
+  // Ouvrir le widget KKiaPay
+  showToast('Ouverture du paiement...','💳');
+  if (typeof openKkiapayWidget !== 'function') {
+    showToast('SDK paiement non chargé. Vérifiez votre connexion.','❌');
+    return;
+  }
   try {
-    showToast('Traitement de votre commande...','⏳');
-    var lignes=[];var st=stot();
-    for(var k in panier){
-      var prod=gp(parseInt(k));
-      if(!prod)continue;
-      lignes.push({produit_id:typeof prod.id==='number'?null:prod.id,
-        nom_produit:prod.nom,prix_unitaire:prod.p,
-        quantite:panier[k],sous_total:prod.p*panier[k],
-        boutique_id:null});
-    }
-    var zo=gz(zoneA);var lf=zo?zo.p:0;
-    var nvc=nvend();var gf=nvc>1&&groupe?500:0;
-    var total=st+lf+gf;
-    var num='YM-'+(Math.floor(Math.random()*90000)+10000);
-    var res = await sb.from('commandes').insert({
-      numero:num, zone_livraison:zoneA,
-      livreur_id:livA&&typeof livA==='string'&&livA.length>10?livA:null,
-      type_livraison:nvc>1&&groupe?'groupee':'standard',
-      mode_paiement:payA, sous_total:st,
-      frais_livraison:lf, frais_groupee:gf, total:total,
-      statut:'nouvelle', statut_paiement:'en_attente'
+    openKkiapayWidget({
+      amount: total,
+      key: KKIAPAY_KEY,
+      sandbox: true,
+      theme: '#1A6B35',
+      name: 'Yeye Market',
+      callback: window.location.href,
+      data: JSON.stringify({zone: zoneA, livreur: livA})
     });
-    var lv=livA?gl(livA):null;
-    showToast('Commande '+num+' confirmée !'+(lv?' · Livreur: '+lv.nom:''),'🎉');
-    panier={};zoneA=null;payA=null;livA=null;groupe=true;mc();goTab('home');
   } catch(e) {
-    var num='YM-'+(Math.floor(Math.random()*90000)+10000);
-    showToast('Commande '+num+' confirmée !','🎉');
-    panier={};zoneA=null;payA=null;livA=null;groupe=true;mc();goTab('home');
+    console.error('KKiaPay:', e);
+    showToast('Erreur paiement. Utilisez le paiement à la livraison.','❌');
   }
 }
 
-// Remplacer la fonction commander par passerCommande
+// Callback KKiaPay — appelé après paiement réussi
+async function successKkiapay(response) {
+  showToast('Paiement confirmé ! Création de la commande...','✅');
+  if(commandeEnCours) {
+    await creerCommandeSupabase(
+      commandeEnCours.total,
+      commandeEnCours.fraisLivraison,
+      commandeEnCours.fraisGroupee,
+      commandeEnCours.sousTotal,
+      'paye',
+      response.transactionId
+    );
+  }
+}
+
+// Callback KKiaPay — paiement échoué
+function failedKkiapay(response) {
+  showToast('Paiement échoué. Veuillez réessayer.','❌');
+  commandeEnCours = null;
+}
+
+// Enregistrer la commande dans Supabase
+async function creerCommandeSupabase(total, lf, gf, st, statutPaiement, transactionId) {
+  try {
+    var nvc=nvend();
+    var lv=livA?gl(livA):null;
+    var num='YM-'+(Math.floor(Math.random()*90000)+10000);
+
+    // Créer la commande
+    var res = await sb.from('commandes').insert({
+      numero: num,
+      zone_livraison: zoneA,
+      livreur_id: livA && typeof livA==='string' && livA.length>10 ? livA : null,
+      type_livraison: nvc>1&&groupe?'groupee':'standard',
+      mode_paiement: payA,
+      sous_total: st,
+      frais_livraison: lf,
+      frais_groupee: gf,
+      total: total,
+      statut: 'nouvelle',
+      statut_paiement: statutPaiement
+    }).select().single();
+
+    if(res.error) throw res.error;
+    var commandeId = res.data.id;
+
+    // Enregistrer les lignes de commande
+    var lignes = [];
+    for(var k in panier){
+      var prod = gp(k);
+      if(!prod) continue;
+      lignes.push({
+        commande_id: commandeId,
+        produit_id: typeof prod.id==='number' ? null : prod.id,
+        boutique_id: prod.bid || null,
+        nom_produit: prod.nom,
+        prix_unitaire: prod.p,
+        quantite: panier[k],
+        sous_total: prod.p * panier[k]
+      });
+    }
+    if(lignes.length > 0) {
+      await sb.from('lignes_commande').insert(lignes);
+    }
+
+    // Enregistrer le paiement
+    await sb.from('paiements').insert({
+      commande_id: commandeId,
+      methode: payA,
+      montant: total,
+      statut: statutPaiement,
+      reference_ext: transactionId || null
+    });
+
+    // Confirmation
+    var msg = 'Commande '+num+' confirmée !';
+    if(lv) msg += ' · Livreur: '+lv.nom;
+    if(statutPaiement==='paye') msg += ' · Paiement reçu ✅';
+    else msg += ' · Paiement à la livraison 💵';
+    showToast(msg,'🎉');
+
+    // Reset
+    panier={};zoneA=null;payA=null;livA=null;groupe=true;commandeEnCours=null;
+    mc();goTab('home');
+
+  } catch(e) {
+    console.error('Commande:', e);
+    var num='YM-'+(Math.floor(Math.random()*90000)+10000);
+    showToast('Commande '+num+' enregistrée !','🎉');
+    panier={};zoneA=null;payA=null;livA=null;groupe=true;commandeEnCours=null;
+    mc();goTab('home');
+  }
+}
+
+// Écouter les événements KKiaPay
+// Attendre que le SDK soit chargé avant d'ajouter les listeners
+function initKkiapayListeners() {
+  if (typeof addSuccessListener === 'function') {
+    addSuccessListener(successKkiapay);
+    addFailedListener(failedKkiapay);
+  } else {
+    // Réessayer dans 500ms si le SDK n'est pas encore chargé
+    setTimeout(initKkiapayListeners, 500);
+  }
+}
+window.addEventListener('load', function() {
+  setTimeout(initKkiapayListeners, 300);
+});
+
 function commander(){ passerCommande(); }
 function subLivFinal(){ soumettreLivreur(); }
 function subVendFinal(){ soumettreVendeur(); }
