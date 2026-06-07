@@ -1113,7 +1113,7 @@ var panier={},catA='Tous',zoneA=null,payA=null,livA=null,rech='',rechB='',rechL=
 var selGeo=null,curGeo=null;
 
 function fcfa(p){return p.toLocaleString('fr-FR')+' FCFA';}
-function gp(id){for(var i=0;i<PRODS.length;i++){if(PRODS[i].id===id)return PRODS[i];}return null;}
+function gp(id){for(var i=0;i<PRODS.length;i++){if(String(PRODS[i].id)===String(id))return PRODS[i];}return null;}
 function gz(id){for(var i=0;i<ZONES_LIV.length;i++){if(ZONES_LIV[i].id===id)return ZONES_LIV[i];}return null;}
 function gl(id){for(var i=0;i<LIVS.length;i++){if(LIVS[i].id===id)return LIVS[i];}return null;}
 function tot(){var t=0;for(var k in panier)t+=panier[k];return t;}
@@ -1132,11 +1132,12 @@ function showToast(msg,ic){
 }
 
 function quickAdd(id){
-  panier[id]=(panier[id]||0)+1;mc();
+  var key = String(id);
+  panier[key]=(panier[key]||0)+1;mc();
   var p=gp(id);if(p)showToast(p.nom+' ajouté au panier',p.e);
   else showToast('Produit ajouté au panier','🛒');
 }
-function addCart(id){panier[id]=(panier[id]||0)+1;mc();var p=gp(id);if(p)showToast(p.nom+' ajouté',p.e);}
+function addCart(id){var key=String(id);panier[key]=(panier[key]||0)+1;mc();var p=gp(id);if(p)showToast(p.nom+' ajouté',p.e);else showToast('Produit ajouté !','🛒');}
 function rmCart(id){if(!panier[id])return;if(panier[id]>1)panier[id]--;else delete panier[id];mc();renderCart();}
 function incCart(id){if(!panier[id])return;panier[id]++;mc();renderCart();}
 function mc(){
@@ -1198,29 +1199,38 @@ function renderHomeProds() {
   var g = document.getElementById('homeProdsScroll');
   if (!g) return;
   var prods = PRODS.slice(0, 8);
-  if (!prods.length) { g.innerHTML='<div style="padding:20px 40px;color:var(--g400);font-size:12px">Aucun produit disponible</div>'; return; }
-  var h = '';
+  if (!prods.length) { g.innerHTML='<div style="padding:20px;color:var(--g400)">Aucun produit</div>'; return; }
+  var cards = [];
   for (var i = 0; i < prods.length; i++) {
     var p = prods[i];
-    var idStr = typeof p.id === 'number' ? p.id : '"'+p.id+'"';
-    var imgC = p.photoUrl
-      ? '<img src="'+p.photoUrl+'" style="width:118px;height:88px;object-fit:cover" onError="this.style.display=\"none\""/>'
-        + '<div style="font-size:36px;display:flex;align-items:center;justify-content:center;height:88px">'+p.e+'</div>'
-      : '<div style="font-size:36px;display:flex;align-items:center;justify-content:center;height:88px">'+p.e+'</div>';
-    var bt = p.b==='nat'?'<span class="pc-t" style="background:#1A6B35;color:#fff">Naturel</span>'
-           : p.b==='promo'?'<span class="pc-t" style="background:#C0392B;color:#fff">Promo</span>'
-           : p.b==='local'?'<span class="pc-t" style="background:#E07B1A;color:#fff">Local</span>':'';
-    h += '<div class="pc" onclick="voirProduit('+idStr+')">'
-      + '<div class="pc-img" style="overflow:hidden">'+imgC+bt
-      + '<button class="pc-add" onclick="event.stopPropagation();quickAdd('+idStr+')">+</button>'
-      + '</div>'
-      + '<div class="pc-inf"><div class="pc-n">'+p.nom+'</div>'
-      + '<div class="pc-sh">'+p.sh+'</div>'
-      + '<div><span class="pc-p">'+p.p.toLocaleString('fr-FR')+'</span>'
-      + '<span style="font-size:9px;color:#C0392B"> FCFA/'+p.u+'</span></div>'
-      + '</div></div>';
+    var div = document.createElement('div');
+    div.className = 'pc';
+    div.dataset.pid = String(p.id);
+    var imgHtml = p.photoUrl
+      ? '<img src="' + p.photoUrl + '" style="width:118px;height:88px;object-fit:cover"/>'
+      : '<div style="font-size:36px;display:flex;align-items:center;justify-content:center;height:88px">' + p.e + '</div>';
+    var bt = p.b === 'nat' ? '<span class="pc-t" style="background:#1A6B35;color:#fff">Naturel</span>'
+           : p.b === 'promo' ? '<span class="pc-t" style="background:#C0392B;color:#fff">Promo</span>'
+           : p.b === 'local' ? '<span class="pc-t" style="background:#E07B1A;color:#fff">Local</span>' : '';
+    var addBtn = document.createElement('button');
+    addBtn.className = 'pc-add';
+    addBtn.textContent = '+';
+    addBtn.dataset.pid = String(p.id);
+    addBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      ajouterProduit(e, this.dataset.pid);
+    });
+    div.innerHTML = '<div class="pc-img" style="overflow:hidden">' + imgHtml + bt + '</div>'
+      + '<div class="pc-inf"><div class="pc-n">' + p.nom + '</div>'
+      + '<div class="pc-sh">' + p.sh + '</div>'
+      + '<div><span class="pc-p">' + p.p.toLocaleString('fr-FR') + '</span>'
+      + '<span style="font-size:9px;color:#C0392B"> FCFA/' + p.u + '</span></div></div>';
+    div.querySelector('.pc-img').appendChild(addBtn);
+    div.addEventListener('click', (function(pid){ return function(){ ouvrirProduit(null, pid); }; })(String(p.id)));
+    cards.push(div);
   }
-  g.innerHTML = h;
+  g.innerHTML = '';
+  cards.forEach(function(c){ g.appendChild(c); });
 }
 
 function boutCard(b){
@@ -1296,39 +1306,73 @@ function renderProds(){
   if(!f.length){
     g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--g400)">'
       +'<div style="font-size:40px;margin-bottom:10px">🌿</div>'
-      +'<div style="font-size:14px;font-weight:500;color:var(--g700);margin-bottom:5px">Aucun produit trouvé</div>'
-      +'<div style="font-size:12px">Les vendeurs ajoutent leurs produits progressivement</div>'
-      +'</div>';
+      +'<div style="font-size:14px;font-weight:500">Aucun produit trouvé</div></div>';
     return;
   }
-  var h='';
+  g.innerHTML = '';
   for(var i=0;i<f.length;i++){
     var p=f[i];
-    var idStr = typeof p.id === 'number' ? p.id : '"'+p.id+'"';
-    var bt = p.b==='nat'?'<span class="ptag" style="background:#1A6B35;color:#fff">Naturel</span>'
-           : p.b==='promo'?'<span class="ptag" style="background:#C0392B;color:#fff">Promo</span>'
-           : p.b==='local'?'<span class="ptag" style="background:#E07B1A;color:#fff">Local</span>'
-           : p.b==='flash'?'<span class="ptag" style="background:#8B00C9;color:#fff">Flash</span>':'';
-    // Image : vraie photo ou emoji
-    var imgContent = p.photoUrl
-      ? '<img src="'+p.photoUrl+'" style="width:100%;height:100%;object-fit:cover" onError="this.style.display=\"none\""/>'
-        + '<div style="font-size:38px;display:flex;align-items:center;justify-content:center;height:85px">'+p.e+'</div>'
-      : '<div style="font-size:38px;display:flex;align-items:center;justify-content:center;height:85px">'+p.e+'</div>';
-    var prixAff = p.ppromo
-      ? '<span class="pp">'+fcfa(p.ppromo)+'</span><span style="font-size:9px;color:#bbb;text-decoration:line-through;margin-left:3px">'+fcfa(p.p)+'</span>'
-      : '<span class="pp">'+fcfa(p.p)+'</span>';
-    h += '<div class="pcard" onclick="voirProduit('+idStr+')">'
-      + '<div class="pimg" style="position:relative;overflow:hidden">'+imgContent+bt
-      + '<button class="padd" onclick="event.stopPropagation();addCart('+idStr+')">+</button>'
-      + '</div><div class="pinf">'
-      + '<div class="pn">'+p.nom+'</div>'
-      + '<div class="psh">🏪 '+p.sh+'</div>'
-      + '<div class="por">📍 '+p.o+'</div>'
-      + '<div>'+prixAff+'<span style="font-size:9px;color:var(--g400)"> /'+p.u+'</span></div>'
-      + '<div class="pst">'+p.d+'</div>'
-      + '</div></div>';
+    var pid=String(p.id);
+    var card=document.createElement('div');
+    card.className='pcard';
+    card.dataset.pid=pid;
+    var bt=p.b==='nat'?'<span class="ptag" style="background:#1A6B35;color:#fff">Naturel</span>'
+          :p.b==='promo'?'<span class="ptag" style="background:#C0392B;color:#fff">Promo</span>'
+          :p.b==='local'?'<span class="ptag" style="background:#E07B1A;color:#fff">Local</span>':'';
+    var imgHtml=p.photoUrl
+      ?'<img src="'+p.photoUrl+'" style="width:100%;height:100%;object-fit:cover"/>'
+      :'<div style="font-size:38px;display:flex;align-items:center;justify-content:center;height:85px">'+p.e+'</div>';
+    var prixAff=p.ppromo
+      ?'<span class="pp">'+fcfa(p.ppromo)+'</span><span style="font-size:9px;color:#bbb;text-decoration:line-through;margin-left:3px">'+fcfa(p.p)+'</span>'
+      :'<span class="pp">'+fcfa(p.p)+'</span>';
+    var addBtn=document.createElement('button');
+    addBtn.className='padd';addBtn.textContent='+';addBtn.dataset.pid=pid;
+    addBtn.addEventListener('click',(function(id){return function(e){e.stopPropagation();ajouterProduit(e,id);};})(pid));
+    card.innerHTML='<div class="pimg" style="position:relative;overflow:hidden">'+imgHtml+bt+'</div>'
+      +'<div class="pinf"><div class="pn">'+p.nom+'</div>'
+      +'<div class="psh">🏪 '+p.sh+'</div>'
+      +'<div class="por">📍 '+p.o+'</div>'
+      +'<div>'+prixAff+'<span style="font-size:9px;color:var(--g400)"> /'+p.u+'</span></div>'
+      +'<div class="pst">'+p.d+'</div></div>';
+    card.querySelector('.pimg').appendChild(addBtn);
+    card.addEventListener('click',(function(id){return function(){ouvrirProduit(null,id);};})(pid));
+    g.appendChild(card);
   }
-  g.innerHTML=h;
+}
+
+function ouvrirProduit(e, pid) {
+  var p=null;
+  for(var i=0;i<PRODS.length;i++){if(String(PRODS[i].id)===pid){p=PRODS[i];break;}}
+  if(p) voirProduit(p.id);
+}
+
+function ajouterProduit(e, pid) {
+  e.stopPropagation();
+  var p=null;
+  for(var i=0;i<PRODS.length;i++){if(String(PRODS[i].id)===pid){p=PRODS[i];break;}}
+  if(p){addCart(p.id);}else{showToast('Produit ajouté !','🛒');}
+}
+
+function voirProduitById(el) {
+  var pid = el.getAttribute('data-pid');
+  // Chercher dans PRODS par id (string ou number)
+  var p = null;
+  for (var i = 0; i < PRODS.length; i++) {
+    if (String(PRODS[i].id) === String(pid)) { p = PRODS[i]; break; }
+  }
+  if (!p) { console.log('Produit non trouvé:', pid); return; }
+  voirProduit(p.id);
+}
+
+function addCartById(pid) {
+  // Chercher dans PRODS
+  for (var i = 0; i < PRODS.length; i++) {
+    if (String(PRODS[i].id) === String(pid)) {
+      addCart(PRODS[i].id);
+      return;
+    }
+  }
+  showToast('Produit ajouté !', '🛒');
 }
 
 function closeModal() {
