@@ -1410,64 +1410,67 @@ function togD(){
   if(btn.classList.contains('on')){btn.classList.remove('on');btn.innerHTML='⚫ Hors ligne';showToast('Vous êtes hors ligne','⚫');}
   else{btn.classList.add('on');btn.innerHTML='🟢 Disponible';showToast('Vous êtes disponible','🟢');}
 }
-// Upload réel vers Supabase Storage
+// Upload photos vers Supabase Storage
 var uploadedFiles = {};
 
+// Input fichier global réutilisable
+var _fileInput = null;
+var _currentBoxId = null;
+
 function simUp(boxId) {
-  var input = document.createElement('input');
-  input.type = 'file';
-  input.accept = 'image/*';
-  input.onchange = function(e) {
-    var file = e.target.files[0];
-    if (!file) return;
-    // Vérifier taille max 5MB
-    if (file.size > 5 * 1024 * 1024) {
-      showToast('Fichier trop lourd ! Max 5 MB','⚠️');
-      return;
-    }
-    uploaderVersSupabase(file, boxId);
-  };
-  input.click();
+  _currentBoxId = boxId;
+  if (!_fileInput) {
+    _fileInput = document.createElement('input');
+    _fileInput.type = 'file';
+    _fileInput.accept = 'image/jpeg,image/png,image/webp';
+    _fileInput.style.display = 'none';
+    document.body.appendChild(_fileInput);
+    _fileInput.addEventListener('change', function() {
+      var file = this.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) {
+        showToast('Fichier trop lourd ! Max 5 MB','⚠️');
+        this.value = '';
+        return;
+      }
+      uploaderVersSupabase(file, _currentBoxId);
+      this.value = '';
+    });
+  }
+  _fileInput.click();
 }
 
 async function uploaderVersSupabase(file, boxId) {
   var box = document.getElementById(boxId);
   if (!box) return;
-  // Afficher chargement
   box.innerHTML = '<span class="upic">⏳</span><div class="upt">Envoi en cours...</div><div class="ups">' + file.name + '</div>';
   try {
-    var ext = file.name.split('.').pop();
-    var nomFichier = boxId + '_' + Date.now() + '.' + ext;
-    var dossier = boxId.startsWith('up-p') ? 'produits' :
-                  boxId.startsWith('up-r') ? 'livreurs' :
-                  boxId.startsWith('up-v') ? 'livreurs' :
-                  boxId.startsWith('up-ph') ? 'livreurs' :
-                  boxId.startsWith('up-resto') ? 'restaurants' :
-                  boxId.startsWith('up-plats') ? 'restaurants' : 'divers';
-    var chemin = dossier + '/' + nomFichier;
-    var res = await sb.storage.from('yeye-market').upload(chemin, file, {
-      cacheControl: '3600',
-      upsert: true
-    });
+    var ext = file.name.split('.').pop().toLowerCase();
+    var dossier = (boxId.indexOf('ph') !== -1 || boxId.indexOf('-r') !== -1 || boxId.indexOf('-v') !== -1) ? 'livreurs'
+                : (boxId.indexOf('resto') !== -1 || boxId.indexOf('plats') !== -1) ? 'restaurants'
+                : 'produits';
+    var chemin = dossier + '/' + boxId + '_' + Date.now() + '.' + ext;
+    var res = await sb.storage.from('yeye-market').upload(chemin, file, {cacheControl:'3600', upsert:true});
     if (res.error) throw res.error;
-    // Obtenir l'URL publique
-    var urlRes = sb.storage.from('yeye-market').getPublicUrl(chemin);
-    var publicUrl = urlRes.data.publicUrl;
-    // Sauvegarder l'URL
+    var publicUrl = sb.storage.from('yeye-market').getPublicUrl(chemin).data.publicUrl;
     uploadedFiles[boxId] = publicUrl;
-    // Afficher preview
     box.classList.add('done');
     box.innerHTML = '<img src="' + publicUrl + '" style="width:100%;height:80px;object-fit:cover;border-radius:8px;margin-bottom:5px"/>'
       + '<div class="upt">✅ Photo téléversée</div>'
-      + '<div class="ups">Cliquez pour changer</div>';
-    box.onclick = function(){ simUp(boxId); };
-    showToast('Photo ajoutée avec succès !','📸');
+      + '<div class="ups">Appuyez pour changer</div>';
+    showToast('Photo ajoutée !','📸');
   } catch(err) {
-    console.error('Upload erreur:', err);
-    // Fallback : simuler si erreur réseau
-    box.classList.add('done');
-    box.innerHTML = '<span class="upic">✅</span><div class="upt">Photo enregistrée</div><div class="ups">Cliquez pour changer</div>';
-    showToast('Photo enregistrée !','📸');
+    console.error('Upload:', err);
+    // Preview locale en fallback
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      box.classList.add('done');
+      box.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:80px;object-fit:cover;border-radius:8px;margin-bottom:5px"/>'
+        + '<div class="upt">✅ Photo sélectionnée</div>'
+        + '<div class="ups">Appuyez pour changer</div>';
+    };
+    reader.readAsDataURL(file);
+    showToast('Photo sélectionnée !','📸');
   }
 }
 function swL(tab){
