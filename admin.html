@@ -99,10 +99,45 @@ textarea.fi{resize:vertical;min-height:80px}
 .empty-ic{font-size:40px;display:block;margin-bottom:10px}
 /* PAGE */
 .page{display:none}.page.active{display:block}
-/* RESPONSIVE */
-@media(max-width:900px){
-  .sidebar{width:60px}.sidebar .sb-logo-t,.sidebar .sb-logo-s,.sidebar .sb-item span,.sidebar .sb-section,.sidebar .sb-footer{display:none}
-  .main{margin-left:60px}.stats-grid{grid-template-columns:1fr 1fr}
+/* BOTTOM NAV MOBILE */
+.bot-nav-mob{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--g100);padding:8px 0 16px;z-index:200;grid-template-columns:repeat(5,1fr)}
+.bni{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:4px 0}
+.bni-ic{font-size:20px}
+.bni-lbl{font-size:9px;color:var(--g400);font-weight:500}
+.bni.on .bni-lbl{color:var(--v);font-weight:600}
+
+/* MOBILE HEADER */
+.mob-hdr{display:none;background:var(--vd);padding:12px 16px;position:sticky;top:0;z-index:100;align-items:center;justify-content:space-between}
+.mob-hdr-t{font-size:15px;font-weight:600;color:#fff}
+.mob-hdr-r{display:flex;align-items:center;gap:8px}
+
+@media(max-width:768px){
+  .sidebar{display:none}
+  .main{margin-left:0}
+  .topbar{display:none}
+  .mob-hdr{display:flex}
+  .bot-nav-mob{display:grid}
+  .content{padding:14px;padding-bottom:80px}
+  .stats-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .stat-card{padding:14px}
+  .stat-n{font-size:20px}
+  .table-hdr{flex-direction:column;gap:10px;align-items:flex-start;padding:12px 14px}
+  .table-actions{width:100%;flex-direction:column;gap:8px}
+  .search-inp{width:100%}
+  .btn{justify-content:center}
+  table{font-size:12px}
+  th,td{padding:8px 10px}
+  .modal{margin:0 8px;max-width:100%}
+  .modal-ov{align-items:flex-end}
+  .modal{border-radius:16px 16px 0 0;max-height:95vh}
+  .frow{grid-template-columns:1fr}
+  .table-card{border-radius:10px}
+}
+@media(max-width:400px){
+  .stats-grid{grid-template-columns:1fr 1fr;gap:8px}
+  .stat-card{padding:12px}
+  .stat-ic{width:34px;height:34px;font-size:17px}
+  .stat-n{font-size:18px}
 }
 </style>
 </head>
@@ -132,6 +167,21 @@ textarea.fi{resize:vertical;min-height:80px}
 
 <!-- MAIN -->
 <div class="main">
+
+<!-- MOBILE HEADER -->
+<div class="mob-hdr">
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:30px;height:30px;background:var(--j);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px">🌿</div>
+    <div>
+      <div class="mob-hdr-t" id="mobPageTitle">Tableau de bord</div>
+      <div style="font-size:9px;color:rgba(255,255,255,.6)" id="connStatusMob">⏳ Connexion...</div>
+    </div>
+  </div>
+  <div class="mob-hdr-r">
+    <a href="/" style="text-decoration:none"><button class="btn btn-g" style="padding:6px 10px;font-size:11px">🌍 Site</button></a>
+  </div>
+</div>
+
 <div class="topbar">
   <div class="topbar-title" id="pageTitle">Tableau de bord</div>
   <div class="topbar-right">
@@ -241,6 +291,40 @@ textarea.fi{resize:vertical;min-height:80px}
 </div>
 
 </div><!-- /content -->
+
+<!-- BOTTOM NAV MOBILE -->
+<div class="bot-nav-mob">
+  <div class="bni on" id="bni-dashboard" onclick="showPage('dashboard')">
+    <div class="bni-ic">📊</div>
+    <div class="bni-lbl">Dashboard</div>
+  </div>
+  <div class="bni" id="bni-produits" onclick="showPage('produits')">
+    <div class="bni-ic">📦</div>
+    <div class="bni-lbl">Produits</div>
+  </div>
+  <div class="bni" id="bni-boutiques" onclick="showPage('boutiques')">
+    <div class="bni-ic">🏪</div>
+    <div class="bni-lbl">Boutiques</div>
+  </div>
+  <div class="bni" id="bni-livreurs" onclick="showPage('livreurs')">
+    <div class="bni-ic">🛵</div>
+    <div class="bni-lbl">Livreurs</div>
+  </div>
+  <div class="bni" id="bni-more" onclick="toggleMoreMenu()">
+    <div class="bni-ic">⋯</div>
+    <div class="bni-lbl">Plus</div>
+  </div>
+</div>
+
+<!-- MORE MENU MOBILE -->
+<div id="moreMenu" style="display:none;position:fixed;bottom:70px;right:10px;background:#fff;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.15);padding:8px;z-index:300;min-width:160px">
+  <div onclick="showPage('restaurants');toggleMoreMenu()" style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;border-radius:8px" onmouseover="this.style.background='var(--g50)'" onmouseout="this.style.background='none'">🍽️ Restaurants</div>
+  <div onclick="showPage('commandes');toggleMoreMenu()" style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;border-radius:8px" onmouseover="this.style.background='var(--g50)'" onmouseout="this.style.background='none'">🧾 Commandes</div>
+  <div onclick="showPage('categories');toggleMoreMenu()" style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;border-radius:8px" onmouseover="this.style.background='var(--g50)'" onmouseout="this.style.background='none'">🏷️ Catégories</div>
+  <div onclick="showPage('zones');toggleMoreMenu()" style="padding:10px 14px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:8px;border-radius:8px" onmouseover="this.style.background='var(--g50)'" onmouseout="this.style.background='none'">📍 Zones</div>
+</div>
+<div id="moreOv" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:299" onclick="toggleMoreMenu()"></div>
+
 </div><!-- /main -->
 </div><!-- /layout -->
 
@@ -449,14 +533,51 @@ textarea.fi{resize:vertical;min-height:80px}
 
 <!-- MODAL CATEGORIE -->
 <div class="modal-ov" id="modalCategorie">
-  <div class="modal" style="max-width:360px">
+  <div class="modal" style="max-width:400px">
     <div class="modal-hdr">
-      <div class="modal-title">Ajouter une catégorie</div>
+      <div class="modal-title" id="modalCatTitle">Ajouter une catégorie</div>
       <button class="modal-close" onclick="fermerModal('modalCategorie')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="fg"><label class="fl">Nom *</label><input class="fi" id="catNom" type="text" placeholder="Ex: Céréales"/></div>
-      <div class="fg"><label class="fl">Emoji</label><input class="fi" id="catEmoji" type="text" placeholder="Ex: 🌾"/></div>
+      <input type="hidden" id="catId"/>
+      <div class="fg">
+        <label class="fl">Emoji de la catégorie</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input class="fi" id="catEmoji" type="text" placeholder="Ex: 🌾" style="width:80px;font-size:24px;text-align:center"/>
+          <div style="font-size:11px;color:var(--g400);line-height:1.5">Tapez ou copiez un emoji<br/>depuis votre clavier</div>
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">Nom de la catégorie *</label>
+        <input class="fi" id="catNom" type="text" placeholder="Ex: Céréales et Farines"/>
+      </div>
+      <div class="fg">
+        <label class="fl">Ordre d'affichage</label>
+        <input class="fi" id="catOrdre" type="number" placeholder="Ex: 5 (plus petit = affiché en premier)"/>
+        <div style="font-size:11px;color:var(--g400);margin-top:4px">Les catégories sont affichées du plus petit au plus grand</div>
+      </div>
+      <!-- Emojis suggérés -->
+      <div class="fg">
+        <label class="fl">Emojis suggérés — cliquez pour choisir</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;background:var(--g50);border-radius:8px;padding:10px;border:1px solid var(--g200)">
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px;transition:background .1s" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🌾</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🥩</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🐟</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🥚</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🥦</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🍍</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🫙</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🍶</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🌶</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🍽️</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🧴</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🌿</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🫘</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🥜</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🍌</span>
+          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🥭</span>
+        </div>
+      </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-g" onclick="fermerModal('modalCategorie')">Annuler</button>
@@ -485,23 +606,48 @@ var uploadedPhotoUrl = {};
 window.addEventListener('DOMContentLoaded', function() {
   testerConnexion();
   chargerDashboard();
+  // Précharger boutiques et catégories dès le démarrage
+  prechargerSelects();
 });
+
+async function prechargerSelects() {
+  try {
+    var rb = await sb.from('boutiques').select('id,nom').eq('statut','active');
+    allBoutiques = rb.data || [];
+    var rc = await sb.from('categories').select('*').order('ordre');
+    allCats = rc.data || [];
+    console.log('✅ ' + allBoutiques.length + ' boutiques, ' + allCats.length + ' catégories chargées');
+  } catch(e) { console.error('Préchargement:', e); }
+}
 
 async function testerConnexion() {
   try {
     var res = await sb.from('boutiques').select('id').limit(1);
     if (res.error) throw res.error;
-    document.getElementById('connStatus').innerHTML = '🟢 Connecté à Supabase';
-    document.getElementById('connStatus').style.color = 'var(--v)';
+    var el = document.getElementById('connStatus');
+    var elm = document.getElementById('connStatusMob');
+    if (el) { el.innerHTML = '🟢 Connecté à Supabase'; el.style.color = 'var(--v)'; }
+    if (elm) elm.textContent = '🟢 Connecté';
   } catch(e) {
-    document.getElementById('connStatus').innerHTML = '🔴 Erreur connexion';
-    document.getElementById('connStatus').style.color = 'var(--r)';
+    var el = document.getElementById('connStatus');
+    var elm = document.getElementById('connStatusMob');
+    if (el) { el.innerHTML = '🔴 Erreur connexion'; el.style.color = 'var(--r)'; }
+    if (elm) elm.textContent = '🔴 Erreur';
   }
 }
 
 // ============================================================
 // NAVIGATION
 // ============================================================
+function toggleMoreMenu() {
+  var m = document.getElementById('moreMenu');
+  var o = document.getElementById('moreOv');
+  if (!m || !o) return;
+  var v = m.style.display !== 'none';
+  m.style.display = v ? 'none' : 'block';
+  o.style.display = v ? 'none' : 'block';
+}
+
 function showPage(name) {
   document.querySelectorAll('.page').forEach(function(p){ p.className = 'page'; });
   document.querySelectorAll('.sb-item').forEach(function(i){ i.classList.remove('active'); });
@@ -514,7 +660,21 @@ function showPage(name) {
     }
   });
   var titles = {dashboard:'Tableau de bord',produits:'Produits',boutiques:'Boutiques',restaurants:'Restaurants',livreurs:'Livreurs',commandes:'Commandes',categories:'Catégories',zones:'Zones'};
-  document.getElementById('pageTitle').textContent = titles[name] || name;
+  var title = titles[name] || name;
+  var pt = document.getElementById('pageTitle');
+  if (pt) pt.textContent = title;
+  var mpt = document.getElementById('mobPageTitle');
+  if (mpt) mpt.textContent = title;
+  // Update mobile bottom nav
+  var mobTabs = ['dashboard','produits','boutiques','livreurs'];
+  mobTabs.forEach(function(t){
+    var el = document.getElementById('bni-' + t);
+    if (el) el.className = 'bni' + (t === name ? ' on' : '');
+  });
+  var moreEl = document.getElementById('bni-more');
+  if (moreEl) moreEl.className = 'bni' + (['restaurants','commandes','categories','zones'].indexOf(name) !== -1 ? ' on' : '');
+  // Scroll to top
+  window.scrollTo(0,0);
   // Charger les données de la page
   if (name === 'produits') chargerProduits();
   else if (name === 'boutiques') chargerBoutiques();
@@ -624,7 +784,7 @@ function rechercherProduits(v) {
   renderProduits(f);
 }
 
-function ouvrirModalProduit(id) {
+async function ouvrirModalProduit(id) {
   document.getElementById('prodId').value = '';
   document.getElementById('prodNom').value = '';
   document.getElementById('prodDesc').value = '';
@@ -640,21 +800,37 @@ function ouvrirModalProduit(id) {
   document.getElementById('uploadProdText').textContent = '📷 Cliquez pour ajouter une photo';
   document.getElementById('uploadZoneProd').classList.remove('done');
   document.getElementById('modalProduitTitle').textContent = 'Ajouter un produit';
+
+  // Toujours recharger boutiques et catégories
+  try {
+    var rb = await sb.from('boutiques').select('id,nom').eq('statut','active');
+    allBoutiques = rb.data || [];
+    var rc = await sb.from('categories').select('*').order('ordre');
+    allCats = rc.data || [];
+  } catch(e) { console.error('Chargement selects:', e); }
+
   // Remplir boutiques
   var sel = document.getElementById('prodBoutique');
   sel.innerHTML = '<option value="">-- Choisir une boutique --</option>';
   allBoutiques.forEach(function(b){ sel.innerHTML += '<option value="' + b.id + '">' + b.nom + '</option>'; });
+
   // Remplir catégories
   var selc = document.getElementById('prodCat');
   selc.innerHTML = '<option value="">-- Choisir une catégorie --</option>';
-  allCats.forEach(function(c){ selc.innerHTML += '<option value="' + c.id + '">' + c.emoji + ' ' + c.nom + '</option>'; });
+  if (allCats.length === 0) {
+    // Catégories par défaut si Supabase vide
+    var defCats = [{id:1,emoji:'🌾',nom:'Épicerie'},{id:2,emoji:'🥩',nom:'Viandes et Volailles'},{id:3,emoji:'🐟',nom:'Poissons et Crustacés'},{id:4,emoji:'🥚',nom:'Oeufs'},{id:5,emoji:'🥦',nom:'Légumes'},{id:6,emoji:'🍍',nom:'Fruits'},{id:7,emoji:'🫙',nom:'Huiles naturelles'},{id:8,emoji:'🍶',nom:'Brasserie naturelle'},{id:9,emoji:'🌶',nom:'Épices et Condiments'},{id:10,emoji:'🍽️',nom:'Plats préparés'}];
+    allCats = defCats;
+  }
+  allCats.forEach(function(c){ selc.innerHTML += '<option value="' + c.id + '">' + (c.emoji||'') + ' ' + c.nom + '</option>'; });
+
   document.getElementById('modalProduit').classList.add('open');
 }
 
-function editerProduit(id) {
+async function editerProduit(id) {
   var p = allProduits.find(function(x){ return x.id === id; });
   if (!p) return;
-  ouvrirModalProduit();
+  await ouvrirModalProduit();
   document.getElementById('modalProduitTitle').textContent = 'Modifier le produit';
   document.getElementById('prodId').value = p.id;
   document.getElementById('prodNom').value = p.nom || '';
@@ -1072,34 +1248,89 @@ async function changerStatutCommande(id, statut) {
 // ============================================================
 // CATEGORIES
 // ============================================================
+var allCatsData = [];
+
 async function chargerCategories() {
   var res = await sb.from('categories').select('*').order('ordre');
-  var data = res.data || [];
+  allCatsData = res.data || [];
+  renderCategories(allCatsData);
+}
+
+function renderCategories(data) {
   var el = document.getElementById('categoriesTable');
-  var h = '<table><thead><tr><th>Emoji</th><th>Nom</th><th>Ordre</th><th>Actions</th></tr></thead><tbody>';
+  if (!data.length) { el.innerHTML = '<div class="empty"><span class="empty-ic">🏷️</span>Aucune catégorie</div>'; return; }
+  var h = '<table><thead><tr><th>Emoji</th><th>Nom</th><th>Ordre</th><th>Actif</th><th>Actions</th></tr></thead><tbody>';
   data.forEach(function(c) {
-    h += '<tr><td style="font-size:20px">' + (c.emoji||'📦') + '</td><td><b>' + c.nom + '</b></td><td>' + c.ordre + '</td>'
-      + '<td><button class="action-btn del" onclick="supprimerCategorie(' + c.id + ')">🗑️</button></td></tr>';
+    h += '<tr>'
+      + '<td style="font-size:22px;text-align:center">' + (c.emoji||'📦') + '</td>'
+      + '<td><b>' + c.nom + '</b></td>'
+      + '<td><input type="number" value="' + (c.ordre||0) + '" style="width:60px;border:1px solid var(--g200);border-radius:6px;padding:4px 8px;font-size:12px;font-family:inherit;text-align:center" onchange="majOrdreCategorie(' + c.id + ',this.value)"/></td>'
+      + '<td>' + (c.actif !== false ? '<span class="badge badge-g">Actif</span>' : '<span class="badge badge-r">Inactif</span>') + '</td>'
+      + '<td><div class="row-actions">'
+      + '<button class="action-btn" onclick="editerCategorie(' + c.id + ')">✏️ Modifier</button>'
+      + '<button class="action-btn" onclick="toggleCategorie(' + c.id + ',' + (c.actif !== false) + ')">' + (c.actif !== false ? '🚫 Désactiver' : '✅ Activer') + '</button>'
+      + '<button class="action-btn del" onclick="supprimerCategorie(' + c.id + ')">🗑️</button>'
+      + '</div></td></tr>';
   });
   h += '</tbody></table>';
   el.innerHTML = h;
 }
 
-function ouvrirModalCategorie() { document.getElementById('modalCategorie').classList.add('open'); }
+function ouvrirModalCategorie() {
+  document.getElementById('catId').value = '';
+  document.getElementById('catNom').value = '';
+  document.getElementById('catEmoji').value = '';
+  document.getElementById('catOrdre').value = '';
+  document.getElementById('modalCatTitle').textContent = 'Ajouter une catégorie';
+  document.getElementById('modalCategorie').classList.add('open');
+}
+
+function editerCategorie(id) {
+  var c = allCatsData.find(function(x){ return x.id === id; });
+  if (!c) return;
+  document.getElementById('catId').value = c.id;
+  document.getElementById('catNom').value = c.nom || '';
+  document.getElementById('catEmoji').value = c.emoji || '';
+  document.getElementById('catOrdre').value = c.ordre || 0;
+  document.getElementById('modalCatTitle').textContent = 'Modifier la catégorie';
+  document.getElementById('modalCategorie').classList.add('open');
+}
 
 async function sauvegarderCategorie() {
+  var id = document.getElementById('catId').value;
   var nom = document.getElementById('catNom').value.trim();
   var emoji = document.getElementById('catEmoji').value.trim();
+  var ordre = parseInt(document.getElementById('catOrdre').value) || 0;
   if (!nom) { showToast('Le nom est obligatoire','⚠️'); return; }
-  var res = await sb.from('categories').insert({nom:nom, emoji:emoji});
-  if (!res.error) { showToast('Catégorie ajoutée !','✅'); fermerModal('modalCategorie'); chargerCategories(); }
-  else showToast('Erreur: ' + res.error.message,'❌');
+  try {
+    var res;
+    if (id) {
+      res = await sb.from('categories').update({nom:nom, emoji:emoji, ordre:ordre}).eq('id', id);
+    } else {
+      res = await sb.from('categories').insert({nom:nom, emoji:emoji, ordre:ordre, actif:true});
+    }
+    if (res.error) throw res.error;
+    showToast(id ? 'Catégorie modifiée !' : 'Catégorie ajoutée !','✅');
+    fermerModal('modalCategorie');
+    chargerCategories();
+  } catch(e) { showToast('Erreur: ' + e.message,'❌'); }
+}
+
+async function majOrdreCategorie(id, val) {
+  var res = await sb.from('categories').update({ordre: parseInt(val)||0}).eq('id', id);
+  if (!res.error) showToast('Ordre mis à jour !','✅');
+}
+
+async function toggleCategorie(id, actuel) {
+  var res = await sb.from('categories').update({actif: !actuel}).eq('id', id);
+  if (!res.error) { showToast(!actuel ? 'Catégorie activée !' : 'Catégorie désactivée !','✅'); chargerCategories(); }
 }
 
 async function supprimerCategorie(id) {
-  if (!confirm('Supprimer cette catégorie ?')) return;
-  var res = await sb.from('categories').delete().eq('id',id);
+  if (!confirm('Supprimer cette catégorie ? Les produits liés ne seront pas supprimés.')) return;
+  var res = await sb.from('categories').delete().eq('id', id);
   if (!res.error) { showToast('Catégorie supprimée','🗑️'); chargerCategories(); }
+  else showToast('Erreur: ' + res.error.message,'❌');
 }
 
 // ============================================================
