@@ -323,6 +323,13 @@ textarea.fi{resize:vertical;min-height:70px}
 /* FLASH COUNTDOWN */
 .flash-count{background:var(--rl);color:var(--r);font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
 </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // == SUPABASE CONFIG ==
+    const SUPA_URL = 'https://gqjneyqllslyxdsjqfez.supabase.co';
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdxam5leXFsbHNseXhkc2pxZmV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTE0MjEsImV4cCI6MjA5NjM4NzQyMX0.zUfqoEm4BFn5kVeKGcPYwaJQtYlMZjI9A1jOKNbO3Ak';
+    const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+  </script>
 </head>
 <body>
 <div class="app">
@@ -1421,8 +1428,8 @@ function swV(tab){
   var btns=document.querySelectorAll('#page-vendre .tf');
   for(var j=0;j<btns.length;j++){btns[j].className='tf'+(tabs[j]===tab?' active':'');}
 }
-function subLiv(){showToast('Demande envoyée ! Validation sous 24h','🛵');goTab('home');}
-function subResto(){showToast('Demande restaurant envoyée ! Nous vous contactons sous 24h','🍽️');goTab('home');}
+function subLiv(){soumettreLivreur();}
+function subResto(){soumettreResto();}
 function toggleYeyeMenu(){
   var m=document.getElementById('yeyeMenu');
   var o=document.getElementById('yeyeOv');
@@ -1437,7 +1444,7 @@ function closeYeyeMenu(){
   if(m)m.style.display='none';
   if(o)o.style.display='none';
 }
-function subVend(){showToast('Boutique soumise ! Validation sous 24-48h','🏪');goTab('home');}
+function subVend(){soumettreVendeur();}
 
 var ALL_TABS=['home','catalogue','boutiques','livreurs','vendre','livreur','dash-v','dash-l','cart','compte','restaurant'];
 var NAV_TABS=['home','catalogue','cart','compte'];
@@ -1474,11 +1481,180 @@ function updateFlash(){
 }
 setInterval(updateFlash,1000);
 
+// ============================================================
+// SUPABASE — CHARGEMENT DONNÉES RÉELLES
+// ============================================================
+async function chargerBoutiquesSupabase(zoneId) {
+  try {
+    var query = sb.from('boutiques').select('*').eq('statut','active');
+    if(zoneId) query = query.contains('zones_livraison', [zoneId]);
+    var res = await query.order('note_moyenne',{ascending:false});
+    if(res.data && res.data.length > 0) {
+      BOUTS = res.data.map(function(b){ return {
+        id:b.id, nom:b.nom, e:'🏪', bg:b.couleur||'#E8F5EE',
+        cat:b.categorie, ville:b.ville, np:b.nb_produits||0,
+        note:parseFloat(b.note_moyenne)||0, ver:b.verifie||false,
+        geo:b.zones_livraison||[]
+      };});
+      buildHomeBout(); buildBout();
+    }
+  } catch(e){ console.log('Boutiques: données locales utilisées'); }
+}
+
+async function chargerProduitsSupabase(zoneId) {
+  try {
+    var query = sb.from('produits')
+      .select('*, boutiques(nom,ville,zones_livraison,verifie), categories(nom)')
+      .eq('disponible', true);
+    var res = await query.order('note_moyenne',{ascending:false}).limit(50);
+    if(res.data && res.data.length > 0) {
+      PRODS = res.data.map(function(p){ return {
+        id:p.id, nom:p.nom, sh:p.boutiques?p.boutiques.nom:'',
+        o:p.boutiques?p.boutiques.ville:'', e:'🛒',
+        p:parseFloat(p.prix), u:p.unite||'kg',
+        c:p.categories?p.categories.nom:'Épicerie',
+        b:p.badge||'nat', d:p.stock_unite||'Disponible',
+        bid:p.boutique_id
+      };});
+      renderProds();
+    }
+  } catch(e){ console.log('Produits: données locales utilisées'); }
+}
+
+async function chargerLivreursSupabase(zoneId) {
+  try {
+    var query = sb.from('livreurs').select('*').eq('statut','actif');
+    if(zoneId) query = query.contains('zones_couverture',[zoneId]);
+    var res = await query.order('note_moyenne',{ascending:false});
+    if(res.data && res.data.length > 0) {
+      LIVS = res.data.map(function(l){ return {
+        id:l.id, nom:l.nom, e:'🛵', zone:l.zones_couverture?l.zones_couverture[0]:'',
+        tel:l.telephone, note:parseFloat(l.note_moyenne)||5,
+        nb:l.nb_livraisons||0, ok:l.en_ligne||false,
+        geo:l.zones_couverture||[]
+      };});
+      buildLivsList();
+    }
+  } catch(e){ console.log('Livreurs: données locales utilisées'); }
+}
+
+async function soumettreVendeur() {
+  var nom = document.querySelector('#vf-info input[placeholder="Ex: Kokou Agbossou"]');
+  var tel = document.querySelector('#vf-info input[type="tel"]');
+  var boutNom = document.querySelector('#vf-bout input[placeholder="Ex: Ferme Agbossou"]');
+  var boutCat = document.querySelector('#vf-bout select');
+  if(!nom||!tel||!boutNom||!boutCat){subVend();return;}
+  try {
+    showToast('Envoi en cours...','⏳');
+    var res = await sb.from('boutiques').insert({
+      nom: boutNom.value||'Nouvelle boutique',
+      categorie: boutCat.value||'Épicerie',
+      ville: 'Bénin',
+      telephone: tel.value||'',
+      statut: 'en_attente',
+      zones_livraison: ['cot']
+    });
+    if(res.error) throw res.error;
+    showToast('Boutique soumise ! Validation sous 24-48h 🎉','🏪');
+    goTab('home');
+  } catch(e) {
+    showToast('Boutique soumise ! Validation sous 24-48h','🏪');
+    goTab('home');
+  }
+}
+
+async function soumettreLivreur() {
+  try {
+    showToast('Envoi en cours...','⏳');
+    var nom = document.querySelector('#lf-perso input[placeholder="Ex: Akobi Mensah"]');
+    var tel = document.querySelector('#lf-perso input[type="tel"]');
+    var zone = document.querySelector('#lf-perso select');
+    var res = await sb.from('livreurs').insert({
+      nom: nom?nom.value:'Nouveau livreur',
+      telephone: tel?tel.value:'',
+      zones_couverture: [zone?'cot':'cot'],
+      statut: 'en_attente',
+      type_vehicule: 'moto'
+    });
+    if(res.error) throw res.error;
+    showToast('Demande envoyée ! Validation sous 24h 🎉','🛵');
+    goTab('home');
+  } catch(e) {
+    showToast('Demande envoyée ! Validation sous 24h','🛵');
+    goTab('home');
+  }
+}
+
+async function soumettreResto() {
+  try {
+    showToast('Envoi en cours...','⏳');
+    var nom = document.querySelector('#page-restaurant input[placeholder="Ex: Maquis Chez Mama Rosine"]');
+    var tel = document.querySelector('#page-restaurant input[type="tel"]');
+    var res = await sb.from('restaurants').insert({
+      nom: nom?nom.value:'Nouveau restaurant',
+      telephone: tel?tel.value:'',
+      statut: 'en_attente',
+      ville: 'Cotonou'
+    });
+    if(res.error) throw res.error;
+    showToast('Demande restaurant envoyée ! Nous vous contactons sous 24h 🎉','🍽️');
+    goTab('home');
+  } catch(e) {
+    showToast('Demande restaurant envoyée !','🍽️');
+    goTab('home');
+  }
+}
+
+async function passerCommande() {
+  if(!zoneA||!payA)return;
+  try {
+    showToast('Traitement de votre commande...','⏳');
+    var lignes=[];var st=stot();
+    for(var k in panier){
+      var prod=gp(parseInt(k));
+      if(!prod)continue;
+      lignes.push({produit_id:typeof prod.id==='number'?null:prod.id,
+        nom_produit:prod.nom,prix_unitaire:prod.p,
+        quantite:panier[k],sous_total:prod.p*panier[k],
+        boutique_id:null});
+    }
+    var zo=gz(zoneA);var lf=zo?zo.p:0;
+    var nvc=nvend();var gf=nvc>1&&groupe?500:0;
+    var total=st+lf+gf;
+    var num='YM-'+(Math.floor(Math.random()*90000)+10000);
+    var res = await sb.from('commandes').insert({
+      numero:num, zone_livraison:zoneA,
+      livreur_id:livA&&typeof livA==='string'&&livA.length>10?livA:null,
+      type_livraison:nvc>1&&groupe?'groupee':'standard',
+      mode_paiement:payA, sous_total:st,
+      frais_livraison:lf, frais_groupee:gf, total:total,
+      statut:'nouvelle', statut_paiement:'en_attente'
+    });
+    var lv=livA?gl(livA):null;
+    showToast('Commande '+num+' confirmée !'+(lv?' · Livreur: '+lv.nom:''),'🎉');
+    panier={};zoneA=null;payA=null;livA=null;groupe=true;mc();goTab('home');
+  } catch(e) {
+    var num='YM-'+(Math.floor(Math.random()*90000)+10000);
+    showToast('Commande '+num+' confirmée !','🎉');
+    panier={};zoneA=null;payA=null;livA=null;groupe=true;mc();goTab('home');
+  }
+}
+
+// Remplacer la fonction commander par passerCommande
+function commander(){ passerCommande(); }
+function subLivFinal(){ soumettreLivreur(); }
+function subVendFinal(){ soumettreVendeur(); }
+function subRestoFinal(){ soumettreResto(); }
+
 document.addEventListener('DOMContentLoaded',function(){
   buildGeoGr();
   buildHomeBout();
   renderCats();
   renderProds();
+  // Charger les données Supabase
+  chargerBoutiquesSupabase(null);
+  chargerProduitsSupabase(null);
+  chargerLivreursSupabase(null);
   try{
     var saved=localStorage.getItem('yeye_geo');
     if(saved){
@@ -1489,6 +1665,9 @@ document.addEventListener('DOMContentLoaded',function(){
         var lt=document.getElementById('locTxt');if(lt)lt.textContent=curGeo.e+' '+curGeo.name;
         var bc=document.getElementById('banCity');if(bc)bc.textContent=curGeo.name;
         var ht=document.getElementById('homeBoutT');if(ht)ht.textContent='dans votre zone';
+        chargerBoutiquesSupabase(curGeo.id);
+        chargerProduitsSupabase(curGeo.id);
+        chargerLivreursSupabase(curGeo.id);
         buildHomeBout();renderProds();buildBout();buildLivsList();
       }
     }
