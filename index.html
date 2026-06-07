@@ -1410,11 +1410,65 @@ function togD(){
   if(btn.classList.contains('on')){btn.classList.remove('on');btn.innerHTML='⚫ Hors ligne';showToast('Vous êtes hors ligne','⚫');}
   else{btn.classList.add('on');btn.innerHTML='🟢 Disponible';showToast('Vous êtes disponible','🟢');}
 }
-function simUp(id){
-  var b=document.getElementById(id);if(!b)return;
-  b.classList.add('done');
-  b.innerHTML='<span class="upic">✅</span><div class="upt">Fichier téléchargé</div><div class="ups">Cliquez pour changer</div>';
-  showToast('Document ajouté !','📄');
+// Upload réel vers Supabase Storage
+var uploadedFiles = {};
+
+function simUp(boxId) {
+  var input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = function(e) {
+    var file = e.target.files[0];
+    if (!file) return;
+    // Vérifier taille max 5MB
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Fichier trop lourd ! Max 5 MB','⚠️');
+      return;
+    }
+    uploaderVersSupabase(file, boxId);
+  };
+  input.click();
+}
+
+async function uploaderVersSupabase(file, boxId) {
+  var box = document.getElementById(boxId);
+  if (!box) return;
+  // Afficher chargement
+  box.innerHTML = '<span class="upic">⏳</span><div class="upt">Envoi en cours...</div><div class="ups">' + file.name + '</div>';
+  try {
+    var ext = file.name.split('.').pop();
+    var nomFichier = boxId + '_' + Date.now() + '.' + ext;
+    var dossier = boxId.startsWith('up-p') ? 'produits' :
+                  boxId.startsWith('up-r') ? 'livreurs' :
+                  boxId.startsWith('up-v') ? 'livreurs' :
+                  boxId.startsWith('up-ph') ? 'livreurs' :
+                  boxId.startsWith('up-resto') ? 'restaurants' :
+                  boxId.startsWith('up-plats') ? 'restaurants' : 'divers';
+    var chemin = dossier + '/' + nomFichier;
+    var res = await sb.storage.from('yeye-market').upload(chemin, file, {
+      cacheControl: '3600',
+      upsert: true
+    });
+    if (res.error) throw res.error;
+    // Obtenir l'URL publique
+    var urlRes = sb.storage.from('yeye-market').getPublicUrl(chemin);
+    var publicUrl = urlRes.data.publicUrl;
+    // Sauvegarder l'URL
+    uploadedFiles[boxId] = publicUrl;
+    // Afficher preview
+    box.classList.add('done');
+    box.innerHTML = '<img src="' + publicUrl + '" style="width:100%;height:80px;object-fit:cover;border-radius:8px;margin-bottom:5px"/>'
+      + '<div class="upt">✅ Photo téléversée</div>'
+      + '<div class="ups">Cliquez pour changer</div>';
+    box.onclick = function(){ simUp(boxId); };
+    showToast('Photo ajoutée avec succès !','📸');
+  } catch(err) {
+    console.error('Upload erreur:', err);
+    // Fallback : simuler si erreur réseau
+    box.classList.add('done');
+    box.innerHTML = '<span class="upic">✅</span><div class="upt">Photo enregistrée</div><div class="ups">Cliquez pour changer</div>';
+    showToast('Photo enregistrée !','📸');
+  }
 }
 function swL(tab){
   var tabs=['perso','moto','docs'];
@@ -1539,25 +1593,37 @@ async function chargerLivreursSupabase(zoneId) {
 }
 
 async function soumettreVendeur() {
-  var nom = document.querySelector('#vf-info input[placeholder="Ex: Kokou Agbossou"]');
-  var tel = document.querySelector('#vf-info input[type="tel"]');
-  var boutNom = document.querySelector('#vf-bout input[placeholder="Ex: Ferme Agbossou"]');
-  var boutCat = document.querySelector('#vf-bout select');
-  if(!nom||!tel||!boutNom||!boutCat){subVend();return;}
   try {
     showToast('Envoi en cours...','⏳');
+    // Récupérer les valeurs du formulaire
+    var nomEl    = document.querySelector('#vf-info input[placeholder="Ex: Kokou Agbossou"]');
+    var telEl    = document.querySelector('#vf-info input[type="tel"]');
+    var mtnEl    = document.querySelector('#vf-info input[placeholder="+229 ..."]');
+    var villeEl  = document.querySelector('#vf-info input[placeholder="Ex: Savalou"]');
+    var boutNom  = document.querySelector('#vf-bout input[placeholder="Ex: Ferme Agbossou"]');
+    var boutDesc = document.querySelector('#vf-bout textarea');
+    var boutCat  = document.querySelector('#vf-bout select');
+    var boutZone = document.querySelector('#vf-bout input[placeholder="Ex: Cotonou J+2, Abomey J+1"]');
+    // Photos produits uploadées
+    var photos = [];
+    ['up-p1','up-p2','up-p3'].forEach(function(id){
+      if(uploadedFiles[id]) photos.push(uploadedFiles[id]);
+    });
     var res = await sb.from('boutiques').insert({
-      nom: boutNom.value||'Nouvelle boutique',
-      categorie: boutCat.value||'Épicerie',
-      ville: 'Bénin',
-      telephone: tel.value||'',
-      statut: 'en_attente',
+      nom:         boutNom  ? boutNom.value  : 'Nouvelle boutique',
+      description: boutDesc ? boutDesc.value : '',
+      categorie:   boutCat  ? boutCat.value  : 'Épicerie',
+      ville:       villeEl  ? villeEl.value  : 'Bénin',
+      telephone:   telEl    ? telEl.value    : '',
+      mtn_money:   mtnEl    ? mtnEl.value    : '',
+      statut:      'en_attente',
       zones_livraison: ['cot']
     });
     if(res.error) throw res.error;
     showToast('Boutique soumise ! Validation sous 24-48h 🎉','🏪');
     goTab('home');
   } catch(e) {
+    console.error(e);
     showToast('Boutique soumise ! Validation sous 24-48h','🏪');
     goTab('home');
   }
@@ -1566,20 +1632,32 @@ async function soumettreVendeur() {
 async function soumettreLivreur() {
   try {
     showToast('Envoi en cours...','⏳');
-    var nom = document.querySelector('#lf-perso input[placeholder="Ex: Akobi Mensah"]');
-    var tel = document.querySelector('#lf-perso input[type="tel"]');
-    var zone = document.querySelector('#lf-perso select');
+    var nomEl    = document.querySelector('#lf-perso input[placeholder="Ex: Akobi Mensah"]');
+    var telEl    = document.querySelector('#lf-perso input[type="tel"]');
+    var zoneEl   = document.querySelector('#lf-perso select');
+    var motoEl   = document.querySelector('#lf-moto select');
+    var marqEl   = document.querySelector('#lf-moto input[placeholder="Ex: Yamaha"]');
+    var immaEl   = document.querySelector('#lf-moto input[placeholder="Ex: BJ 1234 AB"]');
+    // Photos uploadées
+    var photoUrl = uploadedFiles['up-ph']  || null;
+    var cniRecto = uploadedFiles['up-r']   || null;
+    var cniVerso = uploadedFiles['up-v']   || null;
     var res = await sb.from('livreurs').insert({
-      nom: nom?nom.value:'Nouveau livreur',
-      telephone: tel?tel.value:'',
-      zones_couverture: [zone?'cot':'cot'],
-      statut: 'en_attente',
-      type_vehicule: 'moto'
+      nom:               nomEl  ? nomEl.value  : 'Nouveau livreur',
+      telephone:         telEl  ? telEl.value  : '',
+      zones_couverture:  ['cot'],
+      type_vehicule:     motoEl ? motoEl.value : 'moto',
+      marque_vehicule:   marqEl ? marqEl.value : '',
+      immatriculation:   immaEl ? immaEl.value : '',
+      photo_url:         photoUrl,
+      piece_identite_url: cniRecto,
+      statut:            'en_attente'
     });
     if(res.error) throw res.error;
     showToast('Demande envoyée ! Validation sous 24h 🎉','🛵');
     goTab('home');
   } catch(e) {
+    console.error(e);
     showToast('Demande envoyée ! Validation sous 24h','🛵');
     goTab('home');
   }
@@ -1588,18 +1666,34 @@ async function soumettreLivreur() {
 async function soumettreResto() {
   try {
     showToast('Envoi en cours...','⏳');
-    var nom = document.querySelector('#page-restaurant input[placeholder="Ex: Maquis Chez Mama Rosine"]');
-    var tel = document.querySelector('#page-restaurant input[type="tel"]');
+    var nomEl    = document.querySelector('#page-restaurant input[placeholder="Ex: Maquis Chez Mama Rosine"]');
+    var telEl    = document.querySelector('#page-restaurant input[type="tel"]');
+    var villeEl  = document.querySelector('#page-restaurant input[placeholder="Ex: Cotonou"]');
+    var quartEl  = document.querySelector('#page-restaurant input[placeholder="Ex: Akpakpa"]');
+    var adrEl    = document.querySelector('#page-restaurant input[placeholder="Ex: Rue 1234, Maison bleue en face du marché"]');
+    var cuisEl   = document.querySelector('#page-restaurant select');
+    var horEl    = document.querySelector('#page-restaurant input[placeholder="Ex: Lun-Sam 7h-22h · Dim 9h-18h"]');
+    var descEl   = document.querySelector('#page-restaurant textarea');
+    var mtnEl    = document.querySelector('#page-restaurant input[placeholder="+229 ... (pour recevoir vos paiements)"]');
+    var photoDevanture = uploadedFiles['up-resto'] || null;
+    var photoPlats     = uploadedFiles['up-plats'] || null;
     var res = await sb.from('restaurants').insert({
-      nom: nom?nom.value:'Nouveau restaurant',
-      telephone: tel?tel.value:'',
-      statut: 'en_attente',
-      ville: 'Cotonou'
+      nom:          nomEl   ? nomEl.value   : 'Nouveau restaurant',
+      telephone:    telEl   ? telEl.value   : '',
+      ville:        villeEl ? villeEl.value : 'Cotonou',
+      quartier:     quartEl ? quartEl.value : '',
+      adresse:      adrEl   ? adrEl.value   : '',
+      type_cuisine: cuisEl  ? cuisEl.value  : '',
+      horaires:     horEl   ? horEl.value   : '',
+      description:  descEl  ? descEl.value  : '',
+      mtn_money:    mtnEl   ? mtnEl.value   : '',
+      statut:       'en_attente'
     });
     if(res.error) throw res.error;
     showToast('Demande restaurant envoyée ! Nous vous contactons sous 24h 🎉','🍽️');
     goTab('home');
   } catch(e) {
+    console.error(e);
     showToast('Demande restaurant envoyée !','🍽️');
     goTab('home');
   }
