@@ -455,30 +455,9 @@ textarea.fi{resize:vertical;min-height:70px}
     <div class="sec-t">🔥 Populaires près de vous</div>
     <div class="sec-more" onclick="goTab('catalogue')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
   </div>
-  <div class="prods-scroll">
-    <div class="pc">
-      <div class="pc-img">🌾<span class="pc-t" style="background:#1A6B35;color:#fff">Naturel</span><button class="pc-add" onclick="quickAdd(1)">+</button></div>
-      <div class="pc-inf"><div class="pc-n">Gari de Savalou</div><div class="pc-sh">Ferme Agbossou</div><div><span class="pc-p">600</span><span style="font-size:9px;color:#C0392B"> FCFA/kg</span></div></div>
-    </div>
-    <div class="pc">
-      <div class="pc-img">🐟<span class="pc-t" style="background:#1A6B35;color:#fff">Frais</span><button class="pc-add" onclick="quickAdd(5)">+</button></div>
-      <div class="pc-inf"><div class="pc-n">Tilapia frais</div><div class="pc-sh">Pêcherie Littoral</div><div><span class="pc-p">2 500</span><span style="font-size:9px;color:#C0392B"> FCFA/kg</span></div></div>
-    </div>
-    <div class="pc">
-      <div class="pc-img">🥭<span class="pc-t" style="background:#C0392B;color:#fff">Promo</span><button class="pc-add" onclick="quickAdd(2)">+</button></div>
-      <div class="pc-inf"><div class="pc-n">Mangue Tanguiéta</div><div class="pc-sh">Verger Tanguiéta</div><div><span class="pc-p">800</span><span class="pc-old">1200</span></div></div>
-    </div>
-    <div class="pc">
-      <div class="pc-img">🥩<span class="pc-t" style="background:#C0392B;color:#fff">Local</span><button class="pc-add" onclick="quickAdd(7)">+</button></div>
-      <div class="pc-inf"><div class="pc-n">Viande de boeuf</div><div class="pc-sh">Ferme Agbossou</div><div><span class="pc-p">3 500</span><span style="font-size:9px;color:#C0392B"> FCFA/kg</span></div></div>
-    </div>
-    <div class="pc">
-      <div class="pc-img">🫙<span class="pc-t" style="background:#1A6B35;color:#fff">Naturel</span><button class="pc-add" onclick="quickAdd(4)">+</button></div>
-      <div class="pc-inf"><div class="pc-n">Huile de Palme</div><div class="pc-sh">Huilerie Lokossa</div><div><span class="pc-p">1 200</span><span style="font-size:9px;color:#C0392B"> FCFA/L</span></div></div>
-    </div>
-    <div class="pc">
-      <div class="pc-img">🦐<span class="pc-t" style="background:#1A6B35;color:#fff">Frais</span><button class="pc-add" onclick="quickAdd(6)">+</button></div>
-      <div class="pc-inf"><div class="pc-n">Crevettes fumées</div><div class="pc-sh">Pêcherie Littoral</div><div><span class="pc-p">3 500</span><span style="font-size:9px;color:#C0392B"> FCFA/kg</span></div></div>
+  <div class="prods-scroll" id="homeProdsScroll">
+    <div style="display:flex;align-items:center;justify-content:center;padding:20px 40px;color:var(--g400);font-size:12px">
+      <span>⏳ Chargement...</span>
     </div>
   </div>
 
@@ -1155,6 +1134,7 @@ function showToast(msg,ic){
 function quickAdd(id){
   panier[id]=(panier[id]||0)+1;mc();
   var p=gp(id);if(p)showToast(p.nom+' ajouté au panier',p.e);
+  else showToast('Produit ajouté au panier','🛒');
 }
 function addCart(id){panier[id]=(panier[id]||0)+1;mc();var p=gp(id);if(p)showToast(p.nom+' ajouté',p.e);}
 function rmCart(id){if(!panier[id])return;if(panier[id]>1)panier[id]--;else delete panier[id];mc();renderCart();}
@@ -1213,6 +1193,35 @@ function confirmGeo(){
   showToast(z.name+' · '+z.nb+' boutiques disponibles','📍');
 }
 function openGeo(){var ov=document.getElementById('geoOv');if(ov)ov.style.display='flex';}
+
+function renderHomeProds() {
+  var g = document.getElementById('homeProdsScroll');
+  if (!g) return;
+  var prods = PRODS.slice(0, 8);
+  if (!prods.length) { g.innerHTML='<div style="padding:20px 40px;color:var(--g400);font-size:12px">Aucun produit disponible</div>'; return; }
+  var h = '';
+  for (var i = 0; i < prods.length; i++) {
+    var p = prods[i];
+    var idStr = typeof p.id === 'number' ? p.id : '"'+p.id+'"';
+    var imgC = p.photoUrl
+      ? '<img src="'+p.photoUrl+'" style="width:118px;height:88px;object-fit:cover" onError="this.style.display=\"none\""/>'
+        + '<div style="font-size:36px;display:flex;align-items:center;justify-content:center;height:88px">'+p.e+'</div>'
+      : '<div style="font-size:36px;display:flex;align-items:center;justify-content:center;height:88px">'+p.e+'</div>';
+    var bt = p.b==='nat'?'<span class="pc-t" style="background:#1A6B35;color:#fff">Naturel</span>'
+           : p.b==='promo'?'<span class="pc-t" style="background:#C0392B;color:#fff">Promo</span>'
+           : p.b==='local'?'<span class="pc-t" style="background:#E07B1A;color:#fff">Local</span>':'';
+    h += '<div class="pc" onclick="voirProduit('+idStr+')">'
+      + '<div class="pc-img" style="overflow:hidden">'+imgC+bt
+      + '<button class="pc-add" onclick="event.stopPropagation();quickAdd('+idStr+')">+</button>'
+      + '</div>'
+      + '<div class="pc-inf"><div class="pc-n">'+p.nom+'</div>'
+      + '<div class="pc-sh">'+p.sh+'</div>'
+      + '<div><span class="pc-p">'+p.p.toLocaleString('fr-FR')+'</span>'
+      + '<span style="font-size:9px;color:#C0392B"> FCFA/'+p.u+'</span></div>'
+      + '</div></div>';
+  }
+  g.innerHTML = h;
+}
 
 function boutCard(b){
   return '<div class="bcrd" onclick="goTab(\'catalogue\')">'
@@ -1284,20 +1293,79 @@ function getFil(){
 function renderProds(){
   var g=document.getElementById('prodGrid');if(!g)return;
   var f=getFil();
-  if(!f.length){g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--g400)">Aucun produit trouvé dans cette zone</div>';return;}
+  if(!f.length){
+    g.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--g400)">'
+      +'<div style="font-size:40px;margin-bottom:10px">🌿</div>'
+      +'<div style="font-size:14px;font-weight:500;color:var(--g700);margin-bottom:5px">Aucun produit trouvé</div>'
+      +'<div style="font-size:12px">Les vendeurs ajoutent leurs produits progressivement</div>'
+      +'</div>';
+    return;
+  }
   var h='';
   for(var i=0;i<f.length;i++){
     var p=f[i];
-    var bt=p.b==='nat'?'<span class="ptag" style="background:#1A6B35;color:#fff">Naturel</span>':p.b==='promo'?'<span class="ptag" style="background:#C0392B;color:#fff">Promo</span>':p.b==='local'?'<span class="ptag" style="background:#E07B1A;color:#fff">Local</span>':'';
-    h+='<div class="pcard"><div class="pimg">'+p.e+bt+'<button class="padd" onclick="addCart('+p.id+')">+</button></div><div class="pinf">'
-      +'<div class="pn">'+p.nom+'</div>'
-      +'<div class="psh">🏪 '+p.sh+'</div>'
-      +'<div class="por">📍 '+p.o+'</div>'
-      +'<div><span class="pp">'+fcfa(p.p)+'</span><span style="font-size:9px;color:var(--g400)"> /'+p.u+'</span></div>'
-      +'<div class="pst">'+p.d+'</div>'
-      +'</div></div>';
+    var idStr = typeof p.id === 'number' ? p.id : '"'+p.id+'"';
+    var bt = p.b==='nat'?'<span class="ptag" style="background:#1A6B35;color:#fff">Naturel</span>'
+           : p.b==='promo'?'<span class="ptag" style="background:#C0392B;color:#fff">Promo</span>'
+           : p.b==='local'?'<span class="ptag" style="background:#E07B1A;color:#fff">Local</span>'
+           : p.b==='flash'?'<span class="ptag" style="background:#8B00C9;color:#fff">Flash</span>':'';
+    // Image : vraie photo ou emoji
+    var imgContent = p.photoUrl
+      ? '<img src="'+p.photoUrl+'" style="width:100%;height:100%;object-fit:cover" onError="this.style.display=\"none\""/>'
+        + '<div style="font-size:38px;display:flex;align-items:center;justify-content:center;height:85px">'+p.e+'</div>'
+      : '<div style="font-size:38px;display:flex;align-items:center;justify-content:center;height:85px">'+p.e+'</div>';
+    var prixAff = p.ppromo
+      ? '<span class="pp">'+fcfa(p.ppromo)+'</span><span style="font-size:9px;color:#bbb;text-decoration:line-through;margin-left:3px">'+fcfa(p.p)+'</span>'
+      : '<span class="pp">'+fcfa(p.p)+'</span>';
+    h += '<div class="pcard" onclick="voirProduit('+idStr+')">'
+      + '<div class="pimg" style="position:relative;overflow:hidden">'+imgContent+bt
+      + '<button class="padd" onclick="event.stopPropagation();addCart('+idStr+')">+</button>'
+      + '</div><div class="pinf">'
+      + '<div class="pn">'+p.nom+'</div>'
+      + '<div class="psh">🏪 '+p.sh+'</div>'
+      + '<div class="por">📍 '+p.o+'</div>'
+      + '<div>'+prixAff+'<span style="font-size:9px;color:var(--g400)"> /'+p.u+'</span></div>'
+      + '<div class="pst">'+p.d+'</div>'
+      + '</div></div>';
   }
   g.innerHTML=h;
+}
+
+function closeModal() {
+  document.querySelectorAll('[data-yeye-modal]').forEach(function(m){m.remove();});
+}
+
+function voirProduit(id) {
+  var p = null;
+  for(var i=0;i<PRODS.length;i++){if(PRODS[i].id==id){p=PRODS[i];break;}}
+  if(!p)return;
+  var idStr = typeof p.id === 'number' ? p.id : JSON.stringify(p.id);
+  var imgHtml = p.photoUrl
+    ? '<img src="'+p.photoUrl+'" style="width:100%;height:220px;object-fit:cover"/>'
+    : '<div style="font-size:80px;text-align:center;padding:30px 0">'+p.e+'</div>';
+  var prixHtml = p.ppromo
+    ? '<span style="font-size:20px;font-weight:700;color:var(--r)">'+fcfa(p.ppromo)+'</span> <span style="font-size:13px;color:#bbb;text-decoration:line-through">'+fcfa(p.p)+'</span>'
+    : '<span style="font-size:20px;font-weight:700;color:var(--r)">'+fcfa(p.p)+'</span>';
+  var modal = document.createElement('div');
+  modal.setAttribute('data-yeye-modal','1');
+  modal.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:800;display:flex;align-items:flex-end;justify-content:center';
+  var closeBtn = '<button id="modalClose" style="position:absolute;top:12px;right:12px;width:32px;height:32px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;border:none;font-size:18px;cursor:pointer">✕</button>';
+  var addBtn = '<button id="modalAdd" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer">+ Ajouter au panier</button>';
+  modal.innerHTML='<div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;max-height:88vh;overflow-y:auto">'
+    +'<div style="position:relative">'+imgHtml+closeBtn+'</div>'
+    +'<div style="padding:16px">'
+    +'<div style="font-size:17px;font-weight:600;color:var(--g900);margin-bottom:4px">'+p.nom+'</div>'
+    +'<div style="font-size:12px;color:var(--bl);margin-bottom:4px">🏪 '+p.sh+' · 📍 '+p.o+'</div>'
+    +(p.desc?'<div style="font-size:12px;color:var(--g400);margin-bottom:12px;line-height:1.6">'+p.desc+'</div>':'')
+    +'<div style="margin-bottom:14px">'+prixHtml+'<div style="font-size:10px;color:var(--g400)">/'+p.u+' · '+p.d+'</div></div>'
+    +addBtn+'</div></div>';
+  modal.querySelector('#modalClose').addEventListener('click', closeModal);
+  modal.querySelector('#modalAdd').addEventListener('click', function(){
+    addCart(p.id);
+    closeModal();
+  });
+  modal.addEventListener('click', function(e){if(e.target===modal)closeModal();});
+  document.body.appendChild(modal);
 }
 
 function getLivD(zid){
@@ -1558,24 +1626,61 @@ async function chargerBoutiquesSupabase(zoneId) {
   } catch(e){ console.log('Boutiques: données locales utilisées'); }
 }
 
+// Emojis par catégorie
+var CAT_EMOJI = {
+  'Épicerie':'🌾','Viandes et Volailles':'🥩','Poissons et Crustacés':'🐟',
+  'Oeufs':'🥚','Légumes':'🥦','Fruits':'🍍','Huiles naturelles':'🫙',
+  'Brasserie naturelle':'🍶','Épices et Condiments':'🌶','Plats préparés':'🍽️'
+};
+
 async function chargerProduitsSupabase(zoneId) {
   try {
-    var query = sb.from('produits')
-      .select('*, boutiques(nom,ville,zones_livraison,verifie), categories(nom)')
-      .eq('disponible', true);
-    var res = await query.order('note_moyenne',{ascending:false}).limit(50);
-    if(res.data && res.data.length > 0) {
-      PRODS = res.data.map(function(p){ return {
-        id:p.id, nom:p.nom, sh:p.boutiques?p.boutiques.nom:'',
-        o:p.boutiques?p.boutiques.ville:'', e:'🛒',
-        p:parseFloat(p.prix), u:p.unite||'kg',
-        c:p.categories?p.categories.nom:'Épicerie',
-        b:p.badge||'nat', d:p.stock_unite||'Disponible',
-        bid:p.boutique_id
-      };});
-      renderProds();
+    var res = await sb.from('produits')
+      .select('*, boutiques(id,nom,ville,zones_livraison,verifie,statut), categories(nom)')
+      .eq('disponible', true)
+      .order('cree_le', {ascending:false})
+      .limit(100);
+    if (res.error) throw res.error;
+    if (res.data && res.data.length > 0) {
+      var filtered = res.data;
+      // Filtrer par zone si sélectionnée
+      if (zoneId) {
+        filtered = res.data.filter(function(p){
+          if (!p.boutiques || !p.boutiques.zones_livraison) return true;
+          return p.boutiques.zones_livraison.indexOf(zoneId) !== -1;
+        });
+      }
+      if (filtered.length > 0) {
+        PRODS = filtered.map(function(p){
+          var catNom = p.categories ? p.categories.nom : 'Épicerie';
+          var emoji = CAT_EMOJI[catNom] || '🛒';
+          // Si le produit a des photos, utiliser la première
+          var photoUrl = (p.photos && p.photos.length > 0) ? p.photos[0] : null;
+          return {
+            id: p.id,
+            nom: p.nom,
+            sh: p.boutiques ? p.boutiques.nom : 'Boutique',
+            o: p.boutiques ? p.boutiques.ville : '',
+            e: emoji,
+            photoUrl: photoUrl,
+            p: parseFloat(p.prix) || 0,
+            ppromo: p.prix_promo ? parseFloat(p.prix_promo) : null,
+            u: p.unite || 'kg',
+            c: catNom,
+            b: p.badge || 'nat',
+            d: p.stock_unite || (p.stock ? p.stock + ' ' + (p.unite||'kg') : 'Disponible'),
+            bid: p.boutique_id,
+            desc: p.description || ''
+          };
+        });
+        renderProds();
+        renderCats();
+        console.log('✅ ' + PRODS.length + ' produits chargés depuis Supabase');
+      }
     }
-  } catch(e){ console.log('Produits: données locales utilisées'); }
+  } catch(e) {
+    console.log('Produits Supabase erreur:', e.message, '- données locales utilisées');
+  }
 }
 
 async function chargerLivreursSupabase(zoneId) {
@@ -1750,7 +1855,7 @@ document.addEventListener('DOMContentLoaded',function(){
   renderProds();
   // Charger les données Supabase
   chargerBoutiquesSupabase(null);
-  chargerProduitsSupabase(null);
+  chargerProduitsSupabase(null).then(function(){renderHomeProds();});
   chargerLivreursSupabase(null);
   try{
     var saved=localStorage.getItem('yeye_geo');
@@ -1763,7 +1868,7 @@ document.addEventListener('DOMContentLoaded',function(){
         var bc=document.getElementById('banCity');if(bc)bc.textContent=curGeo.name;
         var ht=document.getElementById('homeBoutT');if(ht)ht.textContent='dans votre zone';
         chargerBoutiquesSupabase(curGeo.id);
-        chargerProduitsSupabase(curGeo.id);
+        chargerProduitsSupabase(curGeo.id).then(function(){renderHomeProds();});
         chargerLivreursSupabase(curGeo.id);
         buildHomeBout();renderProds();buildBout();buildLivsList();
       }
