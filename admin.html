@@ -88,6 +88,9 @@ textarea.fi{resize:vertical;min-height:80px}
 .upload-zone.done{border-color:var(--v);background:var(--vl)}
 .upload-preview{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-bottom:8px;display:none}
 /* TOAST */
+.cat-emoji-opt{font-size:22px;cursor:pointer;padding:5px;border-radius:8px;text-align:center;border:2px solid transparent;transition:all .1s;display:flex;align-items:center;justify-content:center}
+.cat-emoji-opt:hover{background:var(--vl);border-color:var(--v)}
+.cat-emoji-opt.sel{background:var(--vl);border-color:var(--v)}
 .toast{position:fixed;bottom:24px;right:24px;background:var(--g900);color:#fff;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;transform:translateY(60px);opacity:0;transition:all .3s;display:flex;align-items:center;gap:8px;box-shadow:0 4px 16px rgba(0,0,0,.2)}
 .toast.show{transform:translateY(0);opacity:1}
 /* LOADING */
@@ -533,50 +536,69 @@ textarea.fi{resize:vertical;min-height:80px}
 
 <!-- MODAL CATEGORIE -->
 <div class="modal-ov" id="modalCategorie">
-  <div class="modal" style="max-width:400px">
+  <div class="modal" style="max-width:420px">
     <div class="modal-hdr">
       <div class="modal-title" id="modalCatTitle">Ajouter une catégorie</div>
       <button class="modal-close" onclick="fermerModal('modalCategorie')">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="catId"/>
+      <input type="hidden" id="catImageUrl"/>
+
+      <!-- IMAGE UPLOAD -->
       <div class="fg">
-        <label class="fl">Emoji de la catégorie</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input class="fi" id="catEmoji" type="text" placeholder="Ex: 🌾" style="width:80px;font-size:24px;text-align:center"/>
-          <div style="font-size:11px;color:var(--g400);line-height:1.5">Tapez ou copiez un emoji<br/>depuis votre clavier</div>
+        <label class="fl">Image de la catégorie</label>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <!-- Preview -->
+          <div id="catImgPreview" style="width:80px;height:80px;border-radius:12px;background:var(--g50);border:2px dashed var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;cursor:pointer" onclick="document.getElementById('catImgInput').click()">
+            <span style="font-size:32px" id="catImgPlaceholder">📷</span>
+          </div>
+          <div style="flex:1">
+            <button type="button" onclick="document.getElementById('catImgInput').click()" class="btn btn-b" style="width:100%;margin-bottom:8px">
+              📁 Choisir une image
+            </button>
+            <div style="font-size:11px;color:var(--g400);line-height:1.6">
+              JPG, PNG · Max 2 MB<br/>
+              Taille recommandée : 200×200 px<br/>
+              Fond transparent ou blanc
+            </div>
+          </div>
         </div>
+        <input type="file" id="catImgInput" accept="image/*" style="display:none" onchange="uploadImageCategorie(this)"/>
       </div>
+
+      <!-- OU EMOJI -->
+      <div class="fg">
+        <label class="fl">Ou choisir un emoji (si pas d'image)</label>
+        <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;background:var(--g50);border-radius:10px;padding:10px;border:1px solid var(--g200)">
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🌾')">🌾</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🥩')">🥩</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🐟')">🐟</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🥚')">🥚</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🥦')">🥦</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🍍')">🍍</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🫙')">🫙</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🍶')">🍶</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🌶')">🌶</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🍽️')">🍽️</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🥭')">🥭</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🥜')">🥜</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🫘')">🫘</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🌿')">🌿</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🧴')">🧴</span>
+          <span class="cat-emoji-opt" onclick="selEmoji(this,'🥬')">🥬</span>
+        </div>
+        <input class="fi" id="catEmoji" type="text" placeholder="Ou tapez un emoji..." style="margin-top:8px"/>
+      </div>
+
       <div class="fg">
         <label class="fl">Nom de la catégorie *</label>
         <input class="fi" id="catNom" type="text" placeholder="Ex: Céréales et Farines"/>
       </div>
       <div class="fg">
         <label class="fl">Ordre d'affichage</label>
-        <input class="fi" id="catOrdre" type="number" placeholder="Ex: 5 (plus petit = affiché en premier)"/>
-        <div style="font-size:11px;color:var(--g400);margin-top:4px">Les catégories sont affichées du plus petit au plus grand</div>
-      </div>
-      <!-- Emojis suggérés -->
-      <div class="fg">
-        <label class="fl">Emojis suggérés — cliquez pour choisir</label>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;background:var(--g50);border-radius:8px;padding:10px;border:1px solid var(--g200)">
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px;transition:background .1s" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🌾</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🥩</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🐟</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🥚</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🥦</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🍍</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🫙</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🍶</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🌶</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🍽️</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🧴</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🌿</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🫘</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🥜</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🍌</span>
-          <span onclick="document.getElementById('catEmoji').value=this.textContent" style="font-size:22px;cursor:pointer;padding:4px;border-radius:6px" onmouseover="this.style.background='var(--vl)'" onmouseout="this.style.background='none'">🥭</span>
-        </div>
+        <input class="fi" id="catOrdre" type="number" placeholder="Ex: 5"/>
+        <div style="font-size:11px;color:var(--g400);margin-top:3px">Plus petit = affiché en premier</div>
       </div>
     </div>
     <div class="modal-footer">
@@ -1259,10 +1281,13 @@ async function chargerCategories() {
 function renderCategories(data) {
   var el = document.getElementById('categoriesTable');
   if (!data.length) { el.innerHTML = '<div class="empty"><span class="empty-ic">🏷️</span>Aucune catégorie</div>'; return; }
-  var h = '<table><thead><tr><th>Emoji</th><th>Nom</th><th>Ordre</th><th>Actif</th><th>Actions</th></tr></thead><tbody>';
+  var h = '<table><thead><tr><th>Image / Icône</th><th>Nom</th><th>Ordre</th><th>Actif</th><th>Actions</th></tr></thead><tbody>';
   data.forEach(function(c) {
+    var icon = c.image_url
+      ? '<img src="' + c.image_url + '" style="width:40px;height:40px;object-fit:cover;border-radius:8px;border:1px solid var(--g100)"/>'
+      : '<span style="font-size:28px">' + (c.emoji||'📦') + '</span>';
     h += '<tr>'
-      + '<td style="font-size:22px;text-align:center">' + (c.emoji||'📦') + '</td>'
+      + '<td style="text-align:center">' + icon + '</td>'
       + '<td><b>' + c.nom + '</b></td>'
       + '<td><input type="number" value="' + (c.ordre||0) + '" style="width:60px;border:1px solid var(--g200);border-radius:6px;padding:4px 8px;font-size:12px;font-family:inherit;text-align:center" onchange="majOrdreCategorie(' + c.id + ',this.value)"/></td>'
       + '<td>' + (c.actif !== false ? '<span class="badge badge-g">Actif</span>' : '<span class="badge badge-r">Inactif</span>') + '</td>'
@@ -1281,19 +1306,77 @@ function ouvrirModalCategorie() {
   document.getElementById('catNom').value = '';
   document.getElementById('catEmoji').value = '';
   document.getElementById('catOrdre').value = '';
+  document.getElementById('catImageUrl').value = '';
   document.getElementById('modalCatTitle').textContent = 'Ajouter une catégorie';
+  // Reset preview
+  var prev = document.getElementById('catImgPreview');
+  if (prev) { prev.innerHTML = '<span style="font-size:32px">📷</span>'; }
+  // Reset emoji selection
+  document.querySelectorAll('.cat-emoji-opt').forEach(function(e){ e.classList.remove('sel'); });
   document.getElementById('modalCategorie').classList.add('open');
+}
+
+function selEmoji(el, emoji) {
+  document.querySelectorAll('.cat-emoji-opt').forEach(function(e){ e.classList.remove('sel'); });
+  el.classList.add('sel');
+  document.getElementById('catEmoji').value = emoji;
+  // Clear image if emoji selected
+  document.getElementById('catImageUrl').value = '';
+  var prev = document.getElementById('catImgPreview');
+  if (prev) prev.innerHTML = '<span style="font-size:32px">' + emoji + '</span>';
+}
+
+async function uploadImageCategorie(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { showToast('Image trop lourde ! Max 2 MB','⚠️'); return; }
+  // Preview immédiat
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var prev = document.getElementById('catImgPreview');
+    if (prev) prev.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>';
+  };
+  reader.readAsDataURL(file);
+  showToast('Upload en cours...','⏳');
+  try {
+    var ext = file.name.split('.').pop().toLowerCase();
+    var chemin = 'categories/' + Date.now() + '_' + Math.random().toString(36).substr(2,5) + '.' + ext;
+    var res = await sb.storage.from('yeye-market').upload(chemin, file, {cacheControl:'3600', upsert:true});
+    if (res.error) throw res.error;
+    var url = sb.storage.from('yeye-market').getPublicUrl(chemin).data.publicUrl;
+    document.getElementById('catImageUrl').value = url;
+    document.getElementById('catEmoji').value = '';
+    document.querySelectorAll('.cat-emoji-opt').forEach(function(e){ e.classList.remove('sel'); });
+    showToast('Image uploadée !','🖼️');
+  } catch(e) {
+    showToast('Image enregistrée localement','📷');
+  }
+  input.value = '';
 }
 
 function editerCategorie(id) {
   var c = allCatsData.find(function(x){ return x.id === id; });
   if (!c) return;
+  ouvrirModalCategorie();
   document.getElementById('catId').value = c.id;
   document.getElementById('catNom').value = c.nom || '';
   document.getElementById('catEmoji').value = c.emoji || '';
   document.getElementById('catOrdre').value = c.ordre || 0;
+  document.getElementById('catImageUrl').value = c.image_url || '';
   document.getElementById('modalCatTitle').textContent = 'Modifier la catégorie';
-  document.getElementById('modalCategorie').classList.add('open');
+  // Afficher image existante
+  var prev = document.getElementById('catImgPreview');
+  if (prev) {
+    if (c.image_url) {
+      prev.innerHTML = '<img src="' + c.image_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>';
+    } else if (c.emoji) {
+      prev.innerHTML = '<span style="font-size:32px">' + c.emoji + '</span>';
+      // Sélectionner l'emoji dans la grille
+      document.querySelectorAll('.cat-emoji-opt').forEach(function(e){
+        e.classList.toggle('sel', e.textContent === c.emoji);
+      });
+    }
+  }
 }
 
 async function sauvegarderCategorie() {
@@ -1301,14 +1384,14 @@ async function sauvegarderCategorie() {
   var nom = document.getElementById('catNom').value.trim();
   var emoji = document.getElementById('catEmoji').value.trim();
   var ordre = parseInt(document.getElementById('catOrdre').value) || 0;
+  var imageUrl = document.getElementById('catImageUrl').value.trim();
   if (!nom) { showToast('Le nom est obligatoire','⚠️'); return; }
+  var data = {nom:nom, emoji:emoji, ordre:ordre};
+  if (imageUrl) data.image_url = imageUrl;
   try {
-    var res;
-    if (id) {
-      res = await sb.from('categories').update({nom:nom, emoji:emoji, ordre:ordre}).eq('id', id);
-    } else {
-      res = await sb.from('categories').insert({nom:nom, emoji:emoji, ordre:ordre, actif:true});
-    }
+    var res = id
+      ? await sb.from('categories').update(data).eq('id', id)
+      : await sb.from('categories').insert(Object.assign({actif:true}, data));
     if (res.error) throw res.error;
     showToast(id ? 'Catégorie modifiée !' : 'Catégorie ajoutée !','✅');
     fermerModal('modalCategorie');
