@@ -644,11 +644,59 @@ textarea.fi{resize:vertical;min-height:70px}
         <div class="frow"><button class="sbtn" style="background:var(--g200);color:var(--g700)" onclick="swV('info')">Retour</button><button class="sbtn" onclick="swV('prod')">Suivant</button></div>
       </div>
       <div id="vf-prod" style="display:none">
-        <div class="fg"><label class="fl">Produit 1 *</label><input class="fi" type="text" placeholder="Ex: Gari de Savalou"/></div>
-        <div class="frow"><div class="fg"><label class="fl">Prix (FCFA) *</label><input class="fi" type="number" placeholder="600"/></div><div class="fg"><label class="fl">Unité *</label><select class="fi"><option>kg</option><option>litre</option><option>pièce</option><option>sachet</option><option>unité</option></select></div></div>
-        <div class="fg"><label class="fl">Produit 2</label><input class="fi" type="text" placeholder="Optionnel"/></div>
-        <div class="fg"><label class="fl">Produit 3</label><input class="fi" type="text" placeholder="Optionnel"/></div>
-        <div class="frow"><button class="sbtn" style="background:var(--g200);color:var(--g700)" onclick="swV('bout')">Retour</button><button class="sbtn" onclick="subVend()">Soumettre</button></div>
+        <div style="background:var(--vl);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--vd);margin-bottom:14px;display:flex;gap:8px">
+          <i class="ti ti-info-circle" style="font-size:15px;flex-shrink:0;color:var(--v);margin-top:1px" aria-hidden="true"></i>
+          Ajoutez jusqu'a 3 produits. Vous pourrez en ajouter d'autres depuis votre dashboard apres validation.
+        </div>
+        <div style="background:var(--g50);border-radius:10px;padding:12px;margin-bottom:12px;border:0.5px solid var(--g100)">
+          <div style="font-size:12px;font-weight:600;color:var(--v);margin-bottom:10px">Produit 1 *</div>
+          <div class="fg"><label class="fl">Photo du produit *</label>
+            <div class="upb" id="up-p1" onclick="simUp('up-p1')"><span class="upic">🖼️</span><div class="upt">Ajouter une photo</div><div class="ups">JPG ou PNG - Max 5 MB</div></div>
+          </div>
+          <div class="fg"><label class="fl">Nom du produit *</label><input class="fi" type="text" placeholder="Ex: Gari de Savalou"/></div>
+          <div class="fg"><label class="fl">Description *</label><textarea class="fi" rows="2" placeholder="Ex: Gari artisanal de qualite superieure produit a Savalou."></textarea></div>
+          <div class="frow">
+            <div class="fg"><label class="fl">Prix (FCFA) *</label><input class="fi" type="number" placeholder="600"/></div>
+            <div class="fg"><label class="fl">Unite *</label><select class="fi"><option>kg</option><option>litre</option><option>piece</option><option>sachet</option><option>250g</option><option>500g</option><option>unite</option><option>regime</option></select></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="fl">Stock disponible *</label><input class="fi" type="text" placeholder="Ex: 50 kg"/></div>
+            <div class="fg"><label class="fl">Delai livraison</label><input class="fi" type="text" placeholder="Ex: J+1, J+2"/></div>
+          </div>
+          <div class="fg"><label class="fl">Categorie *</label>
+            <select class="fi"><option>Epicerie</option><option>Viandes et Volailles</option><option>Poissons et Crustaces</option><option>Oeufs</option><option>Legumes</option><option>Fruits</option><option>Huiles naturelles</option><option>Brasserie naturelle</option><option>Epices</option></select>
+          </div>
+        </div>
+        <div style="background:var(--g50);border-radius:10px;padding:12px;margin-bottom:12px;border:0.5px solid var(--g100)">
+          <div style="font-size:12px;font-weight:600;color:var(--g400);margin-bottom:10px">Produit 2 (optionnel)</div>
+          <div class="fg"><label class="fl">Photo du produit</label>
+            <div class="upb" id="up-p2" onclick="simUp('up-p2')"><span class="upic">🖼️</span><div class="upt">Ajouter une photo</div><div class="ups">JPG ou PNG - Max 5 MB</div></div>
+          </div>
+          <div class="fg"><label class="fl">Nom du produit</label><input class="fi" type="text" placeholder="Ex: Huile de palme"/></div>
+          <div class="fg"><label class="fl">Description</label><textarea class="fi" rows="2" placeholder="Decrivez votre produit..."></textarea></div>
+          <div class="frow">
+            <div class="fg"><label class="fl">Prix (FCFA)</label><input class="fi" type="number" placeholder="1200"/></div>
+            <div class="fg"><label class="fl">Unite</label><select class="fi"><option>kg</option><option>litre</option><option>piece</option><option>sachet</option><option>250g</option><option>500g</option><option>unite</option></select></div>
+          </div>
+          <div class="fg"><label class="fl">Stock disponible</label><input class="fi" type="text" placeholder="Ex: 80 litres"/></div>
+        </div>
+        <div style="background:var(--g50);border-radius:10px;padding:12px;margin-bottom:14px;border:0.5px solid var(--g100)">
+          <div style="font-size:12px;font-weight:600;color:var(--g400);margin-bottom:10px">Produit 3 (optionnel)</div>
+          <div class="fg"><label class="fl">Photo du produit</label>
+            <div class="upb" id="up-p3" onclick="simUp('up-p3')"><span class="upic">🖼️</span><div class="upt">Ajouter une photo</div><div class="ups">JPG ou PNG - Max 5 MB</div></div>
+          </div>
+          <div class="fg"><label class="fl">Nom du produit</label><input class="fi" type="text" placeholder="Ex: Piment seche"/></div>
+          <div class="fg"><label class="fl">Description</label><textarea class="fi" rows="2" placeholder="Decrivez votre produit..."></textarea></div>
+          <div class="frow">
+            <div class="fg"><label class="fl">Prix (FCFA)</label><input class="fi" type="number" placeholder="500"/></div>
+            <div class="fg"><label class="fl">Unite</label><select class="fi"><option>kg</option><option>litre</option><option>piece</option><option>sachet</option><option>250g</option><option>500g</option><option>unite</option></select></div>
+          </div>
+          <div class="fg"><label class="fl">Stock disponible</label><input class="fi" type="text" placeholder="Ex: 40 sachets"/></div>
+        </div>
+        <div class="frow">
+          <button class="sbtn" style="background:var(--g200);color:var(--g700)" onclick="swV('bout')">Retour</button>
+          <button class="sbtn" onclick="subVend()">Soumettre</button>
+        </div>
       </div>
     </div>
   </div>
@@ -741,19 +789,211 @@ textarea.fi{resize:vertical;min-height:70px}
 
 <!-- MON COMPTE -->
 <div id="page-compte" class="page">
+  <div style="background:var(--g50);padding-bottom:70px">
+
+    <!-- PROFIL HEADER -->
+    <div style="background:linear-gradient(135deg,#1A6B35,#2E8B50);padding:20px 16px 24px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid rgba(255,255,255,.4);flex-shrink:0">👤</div>
+        <div style="flex:1">
+          <div style="font-size:16px;font-weight:600;color:#fff">Se connecter</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:3px">Connectez-vous pour accéder à votre compte</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><i class="ti ti-headset" style="font-size:16px;color:#fff" aria-hidden="true"></i></div>
+            <span style="font-size:9px;color:rgba(255,255,255,.75)">Aide</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><i class="ti ti-settings" style="font-size:16px;color:#fff" aria-hidden="true"></i></div>
+            <span style="font-size:9px;color:rgba(255,255,255,.75)">Paramètres</span>
+          </div>
+        </div>
+      </div>
+      <!-- MEMBRE -->
+      <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">🌿</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:#F5C518">Membre Yéyé</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:1px">Points : 0 / 1000</div>
+          </div>
+        </div>
+        <button style="background:var(--j);color:var(--jd);border:none;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">S'inscrire</button>
+      </div>
+    </div>
+
+    <!-- AVANTAGES MEMBRE -->
+    <div style="background:#fff;padding:12px 14px;margin-bottom:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div style="background:var(--jl);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer">
+        <div style="font-size:20px;margin-bottom:4px">🎁</div>
+        <div style="font-size:11px;font-weight:600;color:var(--jd)">Coupons</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:2px">0 disponibles</div>
+      </div>
+      <div style="background:var(--vl);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer">
+        <div style="font-size:20px;margin-bottom:4px">💰</div>
+        <div style="font-size:11px;font-weight:600;color:var(--vd)">Portefeuille</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:2px">0 FCFA</div>
+      </div>
+      <div style="background:var(--bll);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer">
+        <div style="font-size:20px;margin-bottom:4px">⭐</div>
+        <div style="font-size:11px;font-weight:600;color:var(--bld)">Points</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:2px">0 pts</div>
+      </div>
+    </div>
+
+    <!-- RACCOURCIS -->
+    <div style="background:#fff;padding:14px;margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:20px">❤️</div>
+          <span style="font-size:10px;color:var(--g700)">Favoris</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--jl);display:flex;align-items:center;justify-content:center;font-size:20px">🕐</div>
+          <span style="font-size:10px;color:var(--g700)">Historique</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--bll);display:flex;align-items:center;justify-content:center;font-size:20px">📍</div>
+          <span style="font-size:10px;color:var(--g700)">Adresses</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--rl);display:flex;align-items:center;justify-content:center;font-size:20px">🎟️</div>
+          <span style="font-size:10px;color:var(--g700)">Promotions</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- MES COMMANDES -->
+    <div style="background:#fff;padding:14px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <span style="font-size:14px;font-weight:600;color:var(--g900)">Mes commandes</span>
+        <span style="font-size:11px;color:var(--g400);display:flex;align-items:center;gap:3px;cursor:pointer">Voir tout <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0;position:relative">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">
+            🧾
+            <span style="position:absolute;top:-3px;right:-3px;background:var(--r);color:#fff;font-size:8px;font-weight:700;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center">1</span>
+          </div>
+          <span style="font-size:10px;color:var(--g700)">Toutes</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px">⏳</div>
+          <span style="font-size:10px;color:var(--g700)">En attente</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px">🛵</div>
+          <span style="font-size:10px;color:var(--g700)">En livraison</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px">⭐</div>
+          <span style="font-size:10px;color:var(--g700)">À évaluer</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- REJOINDRE YEYE -->
+    <div style="background:#fff;padding:14px;margin-bottom:8px">
+      <div style="font-size:14px;font-weight:600;color:var(--g900);margin-bottom:12px;display:flex;align-items:center;gap:6px">
+        <span style="font-size:18px">🌿</span> Rejoindre Yéyé Market
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="background:var(--vl);border-radius:12px;padding:14px;cursor:pointer;border:0.5px solid rgba(26,107,53,.15)" onclick="goTab('vendre')">
+          <div style="font-size:24px;margin-bottom:7px">💼</div>
+          <div style="font-size:13px;font-weight:600;color:var(--vd)">Ouvrir ma boutique</div>
+          <div style="font-size:10px;color:var(--v);margin-top:3px;line-height:1.4">Vendre vos produits · 5% commission · Gratuit</div>
+          <div style="margin-top:8px;background:var(--v);color:#fff;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:500;text-align:center">Commencer →</div>
+        </div>
+        <div style="background:var(--bll);border-radius:12px;padding:14px;cursor:pointer;border:0.5px solid rgba(26,95,165,.15)" onclick="goTab('livreur')">
+          <div style="font-size:24px;margin-bottom:7px">🛵</div>
+          <div style="font-size:13px;font-weight:600;color:var(--bld)">Devenir livreur</div>
+          <div style="font-size:10px;color:var(--bl);margin-top:3px;line-height:1.4">Livrer des commandes · Gains hebdomadaires</div>
+          <div style="margin-top:8px;background:var(--bl);color:#fff;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:500;text-align:center">S'inscrire →</div>
+        </div>
+      </div>
+      <!-- RESTAURANT -->
+      <div style="background:#FFF3E0;border-radius:12px;padding:14px;cursor:pointer;border:0.5px solid rgba(224,123,26,.2)" onclick="goTab('restaurant')">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:32px">🍽️</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:#7B3A00">Référencer mon restaurant</div>
+            <div style="font-size:10px;color:var(--or,#E07B1A);margin-top:3px;line-height:1.4">Vendez vos plats préparés sur Yéyé Market · Menu en ligne · Commandes directes</div>
+          </div>
+          <div style="background:#E07B1A;color:#fff;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:500;white-space:nowrap">Rejoindre →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARDS RAPIDES -->
+    <div style="background:#fff;padding:14px;margin-bottom:8px">
+      <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">Accès rapide (démo)</div>
+      <div class="trow" style="cursor:pointer;padding:10px 0;border-bottom:0.5px solid var(--g100)" onclick="goTab('dash-v')"><span style="font-size:13px;color:var(--g900);display:flex;align-items:center;gap:8px"><span style="font-size:18px">📊</span> Dashboard Vendeur</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
+      <div class="trow" style="cursor:pointer;padding:10px 0;border-bottom:none" onclick="goTab('dash-l')"><span style="font-size:13px;color:var(--g900);display:flex;align-items:center;gap:8px"><span style="font-size:18px">🛵</span> Dashboard Livreur</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- RESTAURANT PAGE -->
+<div id="page-restaurant" class="page">
   <div class="lbody">
-    <div style="background:linear-gradient(135deg,#1A6B35,#2E8B50);border-radius:12px;padding:20px;text-align:center;color:#fff">
-      <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 10px;border:2px solid rgba(255,255,255,.4)">👤</div>
-      <div style="font-size:15px;font-weight:600">Connectez-vous</div>
-      <div style="font-size:11px;opacity:.8;margin:5px 0 14px">pour accéder à vos commandes et votre profil</div>
-      <button style="background:var(--j);color:var(--jd);border:none;border-radius:10px;padding:10px 28px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Se connecter</button>
+    <div style="background:linear-gradient(135deg,#E07B1A,#F5A623);border-radius:12px;padding:18px;color:#fff">
+      <h2 style="font-size:16px;font-weight:600;margin-bottom:5px">🍽️ Référencer mon restaurant</h2>
+      <p style="font-size:11px;opacity:.85;margin-bottom:12px;line-height:1.5">Vendez vos plats préparés directement sur Yéyé Market. Commandes en ligne, livraison via nos livreurs partenaires.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div style="background:rgba(255,255,255,.2);border-radius:8px;padding:7px 12px;font-size:11px;font-weight:500">✅ Inscription gratuite</div>
+        <div style="background:rgba(255,255,255,.2);border-radius:8px;padding:7px 12px;font-size:11px;font-weight:500">📱 Commandes en ligne</div>
+        <div style="background:rgba(255,255,255,.2);border-radius:8px;padding:7px 12px;font-size:11px;font-weight:500">🛵 Livraison intégrée</div>
+      </div>
     </div>
     <div class="tcrd">
-      <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">Rejoindre Yéyé Market</div>
-      <div class="trow" style="cursor:pointer" onclick="goTab('vendre')"><span style="color:var(--g900)">💼 Ouvrir ma boutique</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
-      <div class="trow" style="cursor:pointer" onclick="goTab('livreur')"><span style="color:var(--g900)">🛵 Devenir livreur</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
-      <div class="trow" style="cursor:pointer" onclick="goTab('dash-v')"><span style="color:var(--g900)">📊 Dashboard Vendeur (démo)</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
-      <div class="trow" style="cursor:pointer;border:none" onclick="goTab('dash-l')"><span style="color:var(--g900)">🛵 Dashboard Livreur (démo)</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
+      <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-percentage" style="color:#E07B1A;font-size:16px" aria-hidden="true"></i>Tarifs restaurant</div>
+      <div class="trow"><span>Inscription</span><span style="font-weight:600;color:#E07B1A">Gratuit</span></div>
+      <div class="trow"><span>Commission par commande</span><span style="font-weight:600;color:#E07B1A">8%</span></div>
+      <div class="trow"><span>Menu en ligne</span><span style="font-weight:600;color:#E07B1A">Illimité</span></div>
+      <div class="trow"><span>Paiement des gains</span><span style="font-weight:600;color:#E07B1A">Chaque semaine</span></div>
+      <div class="trow"><span>Via MTN / Moov Money</span><span style="font-weight:600;color:#E07B1A">✅</span></div>
+    </div>
+    <div class="rcrd">
+      <div class="rt"><i class="ti ti-tools-kitchen-2" style="color:#E07B1A;font-size:18px" aria-hidden="true"></i>Inscrire mon restaurant</div>
+      <div class="rs">Remplissez ce formulaire. Notre équipe vous contacte sous 24h pour finaliser votre inscription.</div>
+      <div class="fg"><label class="fl">Nom du restaurant *</label><input class="fi" type="text" placeholder="Ex: Maquis Chez Mama Rosine"/></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Téléphone *</label><input class="fi" type="tel" placeholder="+229 ..."/></div>
+        <div class="fg"><label class="fl">WhatsApp *</label><input class="fi" type="tel" placeholder="+229 ..."/></div>
+      </div>
+      <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="resto@email.com"/></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Ville *</label><input class="fi" type="text" placeholder="Ex: Cotonou"/></div>
+        <div class="fg"><label class="fl">Quartier *</label><input class="fi" type="text" placeholder="Ex: Akpakpa"/></div>
+      </div>
+      <div class="fg"><label class="fl">Adresse complète *</label><input class="fi" type="text" placeholder="Ex: Rue 1234, Maison bleue en face du marché"/></div>
+      <div class="fg"><label class="fl">Type de cuisine *</label>
+        <select class="fi">
+          <option>Cuisine béninoise traditionnelle</option>
+          <option>Grillades et Brochettes</option>
+          <option>Poissons et Fruits de mer</option>
+          <option>Plats africains variés</option>
+          <option>Fast food local</option>
+          <option>Cuisine internationale</option>
+          <option>Pâtisserie et Boulangerie</option>
+          <option>Autre</option>
+        </select>
+      </div>
+      <div class="fg"><label class="fl">Horaires d'ouverture *</label><input class="fi" type="text" placeholder="Ex: Lun-Sam 7h-22h · Dim 9h-18h"/></div>
+      <div class="fg"><label class="fl">Capacité de commandes / jour</label><input class="fi" type="text" placeholder="Ex: 30 commandes par jour"/></div>
+      <div class="fg"><label class="fl">Description du restaurant *</label><textarea class="fi" rows="3" placeholder="Présentez votre restaurant, vos spécialités, votre ambiance..."></textarea></div>
+      <div class="fg"><label class="fl">📸 Photo de la devanture *</label>
+        <div class="upb" id="up-resto" onclick="simUp('up-resto')"><span class="upic">🏪</span><div class="upt">Photo de votre restaurant</div><div class="ups">JPG ou PNG · Max 5 MB</div></div>
+      </div>
+      <div class="fg"><label class="fl">🍽️ Photo de vos plats phares</label>
+        <div class="upb" id="up-plats" onclick="simUp('up-plats')"><span class="upic">🍛</span><div class="upt">Photos de vos meilleurs plats</div><div class="ups">JPG ou PNG · Max 5 MB chacune</div></div>
+      </div>
+      <div class="fg"><label class="fl">Numéro MTN Mobile Money *</label><input class="fi" type="tel" placeholder="+229 ... (pour recevoir vos paiements)"/></div>
+      <button class="sbtn" style="background:#E07B1A" onclick="subResto()">
+        <i class="ti ti-send" aria-hidden="true"></i> Soumettre ma demande
+      </button>
     </div>
   </div>
 </div>
@@ -768,10 +1008,47 @@ textarea.fi{resize:vertical;min-height:70px}
     <div class="nav-ic" id="bic-catalogue"><i class="ti ti-basket" style="font-size:18px;color:var(--g400)" aria-hidden="true"></i></div>
     <span class="nav-lbl" id="blbl-catalogue">Catalogue</span>
   </div>
-  <div class="nav-center-wrap" onclick="goTab('home')">
-    <div class="nav-center-btn"><span style="font-size:24px">🌿</span></div>
+  <div class="nav-center-wrap" onclick="toggleYeyeMenu()" style="position:relative">
+    <div class="nav-center-btn" id="yeyeBtn"><span style="font-size:24px">🌿</span></div>
     <span class="nav-lbl" style="color:var(--v);font-weight:600;font-size:10px">Yéyé</span>
   </div>
+  <!-- YEYE MINI MENU -->
+  <div id="yeyeMenu" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#fff;border-radius:16px;padding:16px;box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:500;width:280px;max-width:90vw">
+    <div style="text-align:center;margin-bottom:14px">
+      <div style="font-size:22px;margin-bottom:4px">🌿</div>
+      <div style="font-size:14px;font-weight:600;color:var(--g900)">Rejoindre Yéyé Market</div>
+      <div style="font-size:11px;color:var(--g400);margin-top:2px">Choisissez votre rôle</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="background:var(--vl);border-radius:12px;padding:13px;cursor:pointer;display:flex;align-items:center;gap:12px;border:0.5px solid rgba(26,107,53,.15)" onclick="closeYeyeMenu();goTab('vendre')">
+        <span style="font-size:26px">💼</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:var(--vd)">Devenir vendeur</div>
+          <div style="font-size:10px;color:var(--v);margin-top:2px">Ouvrez votre boutique · 5% commission</div>
+        </div>
+        <i class="ti ti-chevron-right" style="color:var(--v);font-size:16px" aria-hidden="true"></i>
+      </div>
+      <div style="background:var(--bll);border-radius:12px;padding:13px;cursor:pointer;display:flex;align-items:center;gap:12px;border:0.5px solid rgba(26,95,165,.15)" onclick="closeYeyeMenu();goTab('livreur')">
+        <span style="font-size:26px">🛵</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:var(--bld)">Devenir livreur</div>
+          <div style="font-size:10px;color:var(--bl);margin-top:2px">Gains hebdomadaires · MTN & Moov</div>
+        </div>
+        <i class="ti ti-chevron-right" style="color:var(--bl);font-size:16px" aria-hidden="true"></i>
+      </div>
+      <div style="background:#FFF3E0;border-radius:12px;padding:13px;cursor:pointer;display:flex;align-items:center;gap:12px;border:0.5px solid rgba(224,123,26,.2)" onclick="closeYeyeMenu();goTab('restaurant')">
+        <span style="font-size:26px">🍽️</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;color:#7B3A00">Mon restaurant</div>
+          <div style="font-size:10px;color:#E07B1A;margin-top:2px">Vendez vos plats préparés</div>
+        </div>
+        <i class="ti ti-chevron-right" style="color:#E07B1A;font-size:16px" aria-hidden="true"></i>
+      </div>
+    </div>
+    <button style="width:100%;margin-top:12px;background:var(--g100);color:var(--g400);border:none;border-radius:10px;padding:10px;font-size:12px;font-family:inherit;cursor:pointer" onclick="closeYeyeMenu()">Fermer</button>
+  </div>
+  <!-- OVERLAY -->
+  <div id="yeyeOv" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;z-index:499" onclick="closeYeyeMenu()"></div>
   <div class="nav-it" onclick="goTab('cart')">
     <div class="nav-ic" id="bic-cart" style="position:relative">
       <i class="ti ti-shopping-cart" style="font-size:18px;color:var(--g400)" aria-hidden="true"></i>
@@ -1145,9 +1422,24 @@ function swV(tab){
   for(var j=0;j<btns.length;j++){btns[j].className='tf'+(tabs[j]===tab?' active':'');}
 }
 function subLiv(){showToast('Demande envoyée ! Validation sous 24h','🛵');goTab('home');}
+function subResto(){showToast('Demande restaurant envoyée ! Nous vous contactons sous 24h','🍽️');goTab('home');}
+function toggleYeyeMenu(){
+  var m=document.getElementById('yeyeMenu');
+  var o=document.getElementById('yeyeOv');
+  if(!m||!o)return;
+  var visible=m.style.display!=='none';
+  m.style.display=visible?'none':'block';
+  o.style.display=visible?'none':'block';
+}
+function closeYeyeMenu(){
+  var m=document.getElementById('yeyeMenu');
+  var o=document.getElementById('yeyeOv');
+  if(m)m.style.display='none';
+  if(o)o.style.display='none';
+}
 function subVend(){showToast('Boutique soumise ! Validation sous 24-48h','🏪');goTab('home');}
 
-var ALL_TABS=['home','catalogue','boutiques','livreurs','vendre','livreur','dash-v','dash-l','cart','compte'];
+var ALL_TABS=['home','catalogue','boutiques','livreurs','vendre','livreur','dash-v','dash-l','cart','compte','restaurant'];
 var NAV_TABS=['home','catalogue','cart','compte'];
 function goTab(name){
   for(var i=0;i<ALL_TABS.length;i++){
