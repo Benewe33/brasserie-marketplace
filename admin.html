@@ -197,14 +197,100 @@ textarea.fi{resize:vertical;min-height:80px}
 
 <!-- DASHBOARD -->
 <div id="page-dashboard" class="page active">
-  <div class="stats-grid" id="statsGrid">
-    <div class="stat-card"><div class="stat-ic" style="background:var(--vl)">🏪</div><div class="stat-n" id="stat-boutiques">-</div><div class="stat-l">Boutiques actives</div></div>
-    <div class="stat-card"><div class="stat-ic" style="background:#FEF3D7">📦</div><div class="stat-n" id="stat-produits">-</div><div class="stat-l">Produits disponibles</div></div>
-    <div class="stat-card"><div class="stat-ic" style="background:var(--bll)">🛵</div><div class="stat-n" id="stat-livreurs">-</div><div class="stat-l">Livreurs actifs</div></div>
-    <div class="stat-card"><div class="stat-ic" style="background:var(--rl)">🧾</div><div class="stat-n" id="stat-commandes">-</div><div class="stat-l">Commandes total</div></div>
+
+  <!-- STATS PRINCIPALES -->
+  <div class="stats-grid" style="margin-bottom:14px">
+    <div class="stat-card" style="cursor:pointer" onclick="showPage('boutiques')">
+      <div class="stat-ic" style="background:var(--vl)">🏪</div>
+      <div class="stat-n" id="stat-boutiques">-</div>
+      <div class="stat-l">Boutiques actives</div>
+      <div class="stat-delta" style="color:var(--v)" id="stat-boutiques-att"></div>
+    </div>
+    <div class="stat-card" style="cursor:pointer" onclick="showPage('produits')">
+      <div class="stat-ic" style="background:#FEF3D7">📦</div>
+      <div class="stat-n" id="stat-produits">-</div>
+      <div class="stat-l">Produits disponibles</div>
+    </div>
+    <div class="stat-card" style="cursor:pointer" onclick="showPage('livreurs')">
+      <div class="stat-ic" style="background:var(--bll)">🛵</div>
+      <div class="stat-n" id="stat-livreurs">-</div>
+      <div class="stat-l">Livreurs actifs</div>
+      <div class="stat-delta" style="color:var(--bl)" id="stat-livreurs-att"></div>
+    </div>
+    <div class="stat-card" style="cursor:pointer" onclick="showPage('commandes')">
+      <div class="stat-ic" style="background:var(--rl)">🧾</div>
+      <div class="stat-n" id="stat-commandes">-</div>
+      <div class="stat-l">Commandes total</div>
+      <div class="stat-delta" style="color:var(--r)" id="stat-cmds-today"></div>
+    </div>
   </div>
+
+  <!-- 2ÈME LIGNE STATS -->
+  <div class="stats-grid" style="margin-bottom:16px">
+    <div class="stat-card" style="cursor:pointer" onclick="showPage('restaurants')">
+      <div class="stat-ic" style="background:#FFF3E0">🍽️</div>
+      <div class="stat-n" id="stat-restaurants">-</div>
+      <div class="stat-l">Restaurants</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ic" style="background:var(--vl)">💰</div>
+      <div class="stat-n" id="stat-revenus">-</div>
+      <div class="stat-l">FCFA revenus</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ic" style="background:#F0E8FB">👥</div>
+      <div class="stat-n" id="stat-clients">-</div>
+      <div class="stat-l">Clients inscrits</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ic" style="background:var(--jl)">⭐</div>
+      <div class="stat-n" id="stat-note">-</div>
+      <div class="stat-l">Note moyenne</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+    <!-- ACTIVITÉ EN TEMPS RÉEL -->
+    <div class="table-card" style="grid-column:1/-1">
+      <div class="table-hdr">
+        <div class="table-title">⚡ Activité en temps réel</div>
+        <button class="btn btn-g" onclick="chargerActiviteTempsReel()" style="font-size:11px;padding:5px 10px">🔄 Actualiser</button>
+      </div>
+      <div id="activite-realtime" style="padding:0 16px 12px">
+        <div class="loading"><div class="spinner"></div> Chargement...</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+    <!-- COMMANDES RÉCENTES -->
+    <div class="table-card">
+      <div class="table-hdr" style="padding:12px 14px">
+        <div class="table-title" style="font-size:13px">🧾 Commandes récentes</div>
+        <span onclick="showPage('commandes')" style="font-size:11px;color:var(--g400);cursor:pointer">Voir tout</span>
+      </div>
+      <div id="dash-cmds-recentes" style="padding:0 12px 10px">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- BOUTIQUES EN ATTENTE -->
+    <div class="table-card">
+      <div class="table-hdr" style="padding:12px 14px">
+        <div class="table-title" style="font-size:13px">⏳ En attente validation</div>
+      </div>
+      <div id="pendingBoutiques" style="padding:0 12px 10px">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+  </div>
+
   <!-- BANNIÈRE OFFRE DU JOUR -->
-  <div class="table-card" style="margin-bottom:16px">
+  <div class="table-card" style="margin-bottom:14px">
     <div class="table-hdr">
       <div class="table-title">📢 Bannière "Offre du jour"</div>
       <button class="btn btn-v" onclick="ouvrirModalBanner()">✏️ Modifier</button>
@@ -225,10 +311,28 @@ textarea.fi{resize:vertical;min-height:80px}
     </div>
   </div>
 
-  <div class="table-card">
-    <div class="table-hdr"><div class="table-title">⏳ Boutiques en attente de validation</div></div>
-    <div id="pendingBoutiques"><div class="loading"><div class="spinner"></div> Chargement...</div></div>
+  <!-- TOP VENDEURS -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+    <div class="table-card">
+      <div class="table-hdr" style="padding:12px 14px">
+        <div class="table-title" style="font-size:13px">🏆 Top vendeurs</div>
+      </div>
+      <div id="dash-top-vendeurs" style="padding:0 12px 10px">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- TOP LIVREURS -->
+    <div class="table-card">
+      <div class="table-hdr" style="padding:12px 14px">
+        <div class="table-title" style="font-size:13px">🛵 Top livreurs</div>
+      </div>
+      <div id="dash-top-livreurs" style="padding:0 12px 10px">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </div>
   </div>
+
 </div>
 
 <!-- PRODUITS -->
@@ -890,20 +994,216 @@ function showToast(msg, ic) {
 // ============================================================
 async function chargerDashboard() {
   try {
-    var [rb, rp, rl, rc] = await Promise.all([
+    // Stats principales en parallèle
+    var [rb, rp, rl, rc, rr, rbAtt, rlAtt] = await Promise.all([
       sb.from('boutiques').select('id', {count:'exact'}).eq('statut','active'),
       sb.from('produits').select('id', {count:'exact'}).eq('disponible',true),
       sb.from('livreurs').select('id', {count:'exact'}).eq('statut','actif'),
-      sb.from('commandes').select('id', {count:'exact'})
+      sb.from('commandes').select('id,total', {count:'exact'}),
+      sb.from('restaurants').select('id', {count:'exact'}).eq('statut','actif'),
+      sb.from('boutiques').select('id', {count:'exact'}).eq('statut','en_attente'),
+      sb.from('livreurs').select('id', {count:'exact'}).eq('statut','en_attente')
     ]);
+
     document.getElementById('stat-boutiques').textContent = rb.count || 0;
     document.getElementById('stat-produits').textContent = rp.count || 0;
     document.getElementById('stat-livreurs').textContent = rl.count || 0;
     document.getElementById('stat-commandes').textContent = rc.count || 0;
+    document.getElementById('stat-restaurants').textContent = rr.count || 0;
+
+    // En attente
+    var attBout = rbAtt.count || 0;
+    var attLiv = rlAtt.count || 0;
+    var elBA = document.getElementById('stat-boutiques-att');
+    var elLA = document.getElementById('stat-livreurs-att');
+    if (elBA) elBA.textContent = attBout > 0 ? attBout + ' en attente' : '';
+    if (elLA) elLA.textContent = attLiv > 0 ? attLiv + ' en attente' : '';
+
+    // Revenus total
+    var revenus = (rc.data || []).reduce(function(s, c) { return s + (c.total || 0); }, 0);
+    var elRev = document.getElementById('stat-revenus');
+    if (elRev) elRev.textContent = revenus > 1000000 ? (revenus/1000000).toFixed(1) + 'M' : revenus > 1000 ? (revenus/1000).toFixed(0) + 'K' : revenus;
+
+    // Commandes aujourd'hui
+    var today = new Date().toISOString().split('T')[0];
+    var rcToday = await sb.from('commandes').select('id', {count:'exact'}).gte('cree_le', today);
+    var elCT = document.getElementById('stat-cmds-today');
+    if (elCT) elCT.textContent = (rcToday.count || 0) + ' aujourd'hui';
+
     // Boutiques en attente
     var rpa = await sb.from('boutiques').select('*').eq('statut','en_attente');
-    renderPendingBoutiques(rpa.data || []);
+    var rlaAtt = await sb.from('livreurs').select('*').eq('statut','en_attente');
+    var rraAtt = await sb.from('restaurants').select('*').eq('statut','en_attente');
+    renderPendingAll(rpa.data || [], rlaAtt.data || [], rraAtt.data || []);
+
+    // Commandes récentes
+    chargerCommandesRecentes();
+    chargerActiviteTempsReel();
+    chargerTopVendeurs();
+    chargerTopLivreurs();
+
   } catch(e) { console.error('Dashboard:', e); }
+}
+
+function renderPendingAll(boutiques, livreurs, restaurants) {
+  var el = document.getElementById('pendingBoutiques');
+  var all = [];
+  boutiques.forEach(function(b) { all.push({type:'boutique', data:b}); });
+  livreurs.forEach(function(l) { all.push({type:'livreur', data:l}); });
+  restaurants.forEach(function(r) { all.push({type:'restaurant', data:r}); });
+
+  if (!all.length) {
+    el.innerHTML = '<div class="empty"><span class="empty-ic">✅</span>Aucune demande en attente</div>';
+    return;
+  }
+  var h = '';
+  all.forEach(function(item) {
+    var ic = item.type === 'boutique' ? '🏪' : item.type === 'livreur' ? '🛵' : '🍽️';
+    var nom = item.data.nom || '-';
+    var info = item.type === 'boutique' ? (item.data.categorie||'') + ' · ' + (item.data.ville||'')
+             : item.type === 'livreur' ? (item.data.telephone||'')
+             : (item.data.type_cuisine||'') + ' · ' + (item.data.ville||'');
+    h += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--g100)">'
+      + '<span style="font-size:18px">' + ic + '</span>'
+      + '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + nom + '</div>'
+      + '<div style="font-size:10px;color:var(--g400)">' + info + '</div></div>'
+      + '<div style="display:flex;gap:4px">'
+      + '<button class="action-btn" style="padding:4px 8px;font-size:10px" onclick="validerDemande('' + item.data.id + '','' + item.type + '')">✅</button>'
+      + '<button class="action-btn del" style="padding:4px 8px;font-size:10px" onclick="rejeterDemande('' + item.data.id + '','' + item.type + '')">❌</button>'
+      + '</div></div>';
+  });
+  el.innerHTML = h;
+}
+
+async function validerDemande(id, type) {
+  try {
+    var table = type === 'boutique' ? 'boutiques' : type === 'livreur' ? 'livreurs' : 'restaurants';
+    var data = type === 'boutique'
+      ? {statut:'active', verifie:true, zones_livraison:['cot','abc','pnv','abo','par','nat']}
+      : type === 'livreur' ? {statut:'actif', verifie:true}
+      : {statut:'actif', verifie:true};
+    var res = await sb.from(table).update(data).eq('id', id);
+    if (res.error) throw res.error;
+    showToast('Demande validée !', '✅');
+    chargerDashboard();
+  } catch(e) { showToast('Erreur: ' + e.message, '❌'); }
+}
+
+async function rejeterDemande(id, type) {
+  if (!confirm('Rejeter cette demande ?')) return;
+  try {
+    var table = type === 'boutique' ? 'boutiques' : type === 'livreur' ? 'livreurs' : 'restaurants';
+    var statut = type === 'boutique' ? 'rejetee' : type === 'livreur' ? 'rejete' : 'rejete';
+    var res = await sb.from(table).update({statut: statut}).eq('id', id);
+    if (res.error) throw res.error;
+    showToast('Demande rejetée', '🚫');
+    chargerDashboard();
+  } catch(e) { showToast('Erreur: ' + e.message, '❌'); }
+}
+
+async function chargerActiviteTempsReel() {
+  var el = document.getElementById('activite-realtime');
+  if (!el) return;
+  try {
+    // Dernières commandes + inscriptions
+    var [rcmds, rbouts, rlivs] = await Promise.all([
+      sb.from('commandes').select('numero,statut,total,cree_le,zone_livraison').order('cree_le',{ascending:false}).limit(5),
+      sb.from('boutiques').select('nom,statut,cree_le').order('cree_le',{ascending:false}).limit(3),
+      sb.from('livreurs').select('nom,statut,cree_le,en_ligne').order('cree_le',{ascending:false}).limit(3)
+    ]);
+    var events = [];
+    (rcmds.data||[]).forEach(function(c) { events.push({t:new Date(c.cree_le),ic:'🧾',txt:'Commande '+c.numero,sub:(c.total||0).toLocaleString('fr-FR')+' FCFA · '+c.zone_livraison,color:'var(--v)'}); });
+    (rbouts.data||[]).forEach(function(b) { events.push({t:new Date(b.cree_le),ic:'🏪',txt:'Boutique: '+b.nom,sub:'Statut: '+b.statut,color:'var(--bl)'}); });
+    (rlivs.data||[]).forEach(function(l) { events.push({t:new Date(l.cree_le),ic:'🛵',txt:'Livreur: '+l.nom,sub:l.en_ligne?'En ligne ✅':'Hors ligne',color:'var(--or)'}); });
+    events.sort(function(a,b){ return b.t-a.t; });
+    if (!events.length) { el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--g400);font-size:12px">Aucune activité récente</div>'; return; }
+    var h = '';
+    events.slice(0,8).forEach(function(ev) {
+      var mins = Math.floor((Date.now()-ev.t)/60000);
+      var timeStr = mins < 60 ? mins+'min' : Math.floor(mins/60)+'h';
+      h += '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--g100)">'
+        + '<span style="font-size:20px">' + ev.ic + '</span>'
+        + '<div style="flex:1"><div style="font-size:12px;font-weight:600;color:var(--g900)">' + ev.txt + '</div>'
+        + '<div style="font-size:10px;color:var(--g400)">' + ev.sub + '</div></div>'
+        + '<span style="font-size:10px;color:var(--g400);white-space:nowrap">' + timeStr + '</span>'
+        + '</div>';
+    });
+    el.innerHTML = h;
+  } catch(e) { el.innerHTML = '<div style="padding:16px;color:var(--g400);font-size:12px;text-align:center">Erreur de chargement</div>'; }
+}
+
+async function chargerCommandesRecentes() {
+  var el = document.getElementById('dash-cmds-recentes');
+  if (!el) return;
+  try {
+    var res = await sb.from('commandes').select('numero,statut,total,cree_le,zone_livraison').order('cree_le',{ascending:false}).limit(6);
+    var data = res.data || [];
+    if (!data.length) { el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--g400);font-size:12px">Aucune commande</div>'; return; }
+    var h = '';
+    data.forEach(function(c) {
+      var sc = c.statut==='livree'?'badge-g':c.statut==='en_livraison'?'badge-b':c.statut==='annulee'?'badge-r':'badge-y';
+      h += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--g100)">'
+        + '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;color:var(--g900)">' + (c.numero||'#') + '</div>'
+        + '<div style="font-size:10px;color:var(--g400)">' + (c.zone_livraison||'-') + '</div></div>'
+        + '<div style="text-align:right"><div style="font-size:12px;font-weight:700;color:var(--r)">' + (c.total||0).toLocaleString('fr-FR') + ' F</div>'
+        + '<span class="badge ' + sc + '" style="font-size:9px">' + c.statut + '</span></div>'
+        + '<select onchange="majStatutCmd('' + c.id + '',this.value)" style="border:1px solid var(--g200);border-radius:6px;padding:3px 5px;font-size:10px;font-family:inherit;background:var(--g50);margin-left:4px">'
+        + '<option value="nouvelle"' + (c.statut==='nouvelle'?' selected':'') + '>Nouvelle</option>'
+        + '<option value="confirmee"' + (c.statut==='confirmee'?' selected':'') + '>Confirmée</option>'
+        + '<option value="en_livraison"' + (c.statut==='en_livraison'?' selected':'') + '>Livraison</option>'
+        + '<option value="livree"' + (c.statut==='livree'?' selected':'') + '>Livrée</option>'
+        + '<option value="annulee"' + (c.statut==='annulee'?' selected':'') + '>Annulée</option>'
+        + '</select></div>';
+    });
+    el.innerHTML = h;
+  } catch(e) {}
+}
+
+async function majStatutCmd(id, statut) {
+  var res = await sb.from('commandes').update({statut:statut}).eq('id',id);
+  if (!res.error) showToast('Statut mis à jour !','✅');
+}
+
+async function chargerTopVendeurs() {
+  var el = document.getElementById('dash-top-vendeurs');
+  if (!el) return;
+  try {
+    var res = await sb.from('boutiques').select('nom,nb_ventes,note_moyenne,ville').eq('statut','active').order('nb_ventes',{ascending:false}).limit(5);
+    var data = res.data || [];
+    if (!data.length) { el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--g400);font-size:12px">Aucune boutique</div>'; return; }
+    var h = '';
+    data.forEach(function(b, i) {
+      h += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--g100)">'
+        + '<span style="font-size:16px;width:20px;text-align:center;color:var(--g400);font-weight:700">' + (i+1) + '</span>'
+        + '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + b.nom + '</div>'
+        + '<div style="font-size:10px;color:var(--g400)">' + (b.ville||'-') + '</div></div>'
+        + '<div style="text-align:right"><div style="font-size:11px;color:var(--v);font-weight:600">' + (b.nb_ventes||0) + ' ventes</div>'
+        + '<div style="font-size:10px;color:var(--j)">⭐' + (b.note_moyenne||'-') + '</div></div>'
+        + '</div>';
+    });
+    el.innerHTML = h;
+  } catch(e) {}
+}
+
+async function chargerTopLivreurs() {
+  var el = document.getElementById('dash-top-livreurs');
+  if (!el) return;
+  try {
+    var res = await sb.from('livreurs').select('nom,nb_livraisons,note_moyenne,en_ligne').eq('statut','actif').order('nb_livraisons',{ascending:false}).limit(5);
+    var data = res.data || [];
+    if (!data.length) { el.innerHTML = '<div style="padding:16px;text-align:center;color:var(--g400);font-size:12px">Aucun livreur</div>'; return; }
+    var h = '';
+    data.forEach(function(l, i) {
+      h += '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--g100)">'
+        + '<span style="font-size:16px;width:20px;text-align:center;color:var(--g400);font-weight:700">' + (i+1) + '</span>'
+        + '<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + l.nom + '</div>'
+        + '<div style="font-size:10px;color:'+(l.en_ligne?'var(--v)':'var(--g400)')+'">' + (l.en_ligne?'🟢 En ligne':'⚫ Hors ligne') + '</div></div>'
+        + '<div style="text-align:right"><div style="font-size:11px;color:var(--bl);font-weight:600">' + (l.nb_livraisons||0) + ' livr.</div>'
+        + '<div style="font-size:10px;color:var(--j)">⭐' + (l.note_moyenne||'-') + '</div></div>'
+        + '</div>';
+    });
+    el.innerHTML = h;
+  } catch(e) {}
 }
 
 function renderPendingBoutiques(data) {
