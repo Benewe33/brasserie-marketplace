@@ -203,6 +203,28 @@ textarea.fi{resize:vertical;min-height:80px}
     <div class="stat-card"><div class="stat-ic" style="background:var(--bll)">🛵</div><div class="stat-n" id="stat-livreurs">-</div><div class="stat-l">Livreurs actifs</div></div>
     <div class="stat-card"><div class="stat-ic" style="background:var(--rl)">🧾</div><div class="stat-n" id="stat-commandes">-</div><div class="stat-l">Commandes total</div></div>
   </div>
+  <!-- BANNIÈRE OFFRE DU JOUR -->
+  <div class="table-card" style="margin-bottom:16px">
+    <div class="table-hdr">
+      <div class="table-title">📢 Bannière "Offre du jour"</div>
+      <button class="btn btn-v" onclick="ouvrirModalBanner()">✏️ Modifier</button>
+    </div>
+    <div style="padding:14px">
+      <div style="background:var(--vl);border-radius:10px;padding:14px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:36px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;background:#fff;border-radius:10px;flex-shrink:0" id="adm-ban-img">🌿</div>
+        <div style="flex:1">
+          <div style="font-size:10px;font-weight:700;background:var(--v);color:#fff;display:inline-block;padding:2px 8px;border-radius:8px;margin-bottom:4px" id="adm-ban-tag">OFFRE DU JOUR</div>
+          <div style="font-size:13px;font-weight:600;color:var(--g900)" id="adm-ban-title">Produits frais livrés en 2h</div>
+          <div style="font-size:11px;color:var(--g400);margin-top:2px" id="adm-ban-sub">Ferme Agbossou · Savalou</div>
+          <div style="font-size:14px;font-weight:700;color:var(--r);margin-top:4px">
+            <span id="adm-ban-price">600 FCFA</span>
+            <span style="font-size:10px;color:var(--v);font-weight:600" id="adm-ban-unit">/kg · 0 frais</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="table-card">
     <div class="table-hdr"><div class="table-title">⏳ Boutiques en attente de validation</div></div>
     <div id="pendingBoutiques"><div class="loading"><div class="spinner"></div> Chargement...</div></div>
