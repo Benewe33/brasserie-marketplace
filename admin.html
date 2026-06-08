@@ -534,6 +534,55 @@ textarea.fi{resize:vertical;min-height:80px}
   </div>
 </div>
 
+<!-- MODAL BANNIÈRE -->
+<div class="modal-ov" id="modalBanner">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-hdr">
+      <div class="modal-title">✏️ Modifier la bannière</div>
+      <button class="modal-close" onclick="fermerModal('modalBanner')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="fg">
+        <label class="fl">Image / Emoji *</label>
+        <div style="display:flex;gap:10px;align-items:center">
+          <div id="bannerImgPreview" style="width:60px;height:60px;border-radius:10px;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer;overflow:hidden" onclick="document.getElementById('bannerImgInput').click()">🌿</div>
+          <div style="flex:1">
+            <button onclick="document.getElementById('bannerImgInput').click()" class="btn btn-b" style="width:100%;margin-bottom:6px">📁 Choisir une image</button>
+            <input type="file" id="bannerImgInput" accept="image/*" style="display:none" onchange="uploadBannerImg(this)"/>
+            <input type="hidden" id="bannerImgUrl"/>
+            <div style="font-size:11px;color:var(--g400)">Ou tapez un emoji :</div>
+            <input class="fi" id="bannerEmoji" type="text" placeholder="Ex: 🌿 🥩 🐟" style="margin-top:4px"/>
+          </div>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Badge (ex: OFFRE DU JOUR, PROMO, NOUVEAU)</label>
+        <input class="fi" id="bannerTag" type="text" placeholder="OFFRE DU JOUR" value="OFFRE DU JOUR"/>
+      </div>
+      <div class="fg"><label class="fl">Titre principal *</label>
+        <input class="fi" id="bannerTitle" type="text" placeholder="Ex: Produits frais livrés en 2h"/>
+      </div>
+      <div class="fg"><label class="fl">Sous-titre (boutique · ville)</label>
+        <input class="fi" id="bannerSub" type="text" placeholder="Ex: Ferme Agbossou · Savalou"/>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">Prix</label>
+          <input class="fi" id="bannerPrice" type="text" placeholder="Ex: 600 FCFA"/>
+        </div>
+        <div class="fg"><label class="fl">Unité / info</label>
+          <input class="fi" id="bannerUnit" type="text" placeholder="Ex: /kg · 0 frais"/>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">Lien (optionnel)</label>
+        <input class="fi" id="bannerLink" type="text" placeholder="Ex: catalogue, boutiques..."/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-g" onclick="fermerModal('modalBanner')">Annuler</button>
+      <button class="btn btn-v" onclick="sauvegarderBanner()">💾 Appliquer</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL CATEGORIE -->
 <div class="modal-ov" id="modalCategorie">
   <div class="modal" style="max-width:420px">
@@ -628,6 +677,7 @@ var uploadedPhotoUrl = {};
 window.addEventListener('DOMContentLoaded', function() {
   testerConnexion();
   chargerDashboard();
+  chargerBanner();
   // Précharger boutiques et catégories dès le démarrage
   prechargerSelects();
 });
@@ -661,6 +711,99 @@ async function testerConnexion() {
 // ============================================================
 // NAVIGATION
 // ============================================================
+// ============================================================
+// BANNIÈRE OFFRE DU JOUR
+// ============================================================
+var bannerData = {
+  emoji: '🌿', imgUrl: '', tag: 'OFFRE DU JOUR',
+  title: 'Produits frais livrés en 2h', sub: 'Ferme Agbossou · Savalou',
+  price: '600 FCFA', unit: '/kg · 0 frais', link: ''
+};
+
+async function chargerBanner() {
+  try {
+    // Stocker la bannière dans une table settings ou localStorage
+    var saved = localStorage.getItem('yeye_banner');
+    if (saved) {
+      bannerData = JSON.parse(saved);
+      majAffichageBanner();
+    }
+    // Essayer depuis Supabase (table settings si elle existe)
+    var res = await sb.from('boutiques').select('id').limit(1); // juste pour tester la connexion
+  } catch(e) {}
+}
+
+function ouvrirModalBanner() {
+  document.getElementById('bannerTag').value = bannerData.tag || '';
+  document.getElementById('bannerTitle').value = bannerData.title || '';
+  document.getElementById('bannerSub').value = bannerData.sub || '';
+  document.getElementById('bannerPrice').value = bannerData.price || '';
+  document.getElementById('bannerUnit').value = bannerData.unit || '';
+  document.getElementById('bannerLink').value = bannerData.link || '';
+  document.getElementById('bannerEmoji').value = bannerData.emoji || '';
+  document.getElementById('bannerImgUrl').value = bannerData.imgUrl || '';
+  var prev = document.getElementById('bannerImgPreview');
+  if (prev) {
+    if (bannerData.imgUrl) {
+      prev.innerHTML = '<img src="'+bannerData.imgUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>';
+    } else {
+      prev.textContent = bannerData.emoji || '🌿';
+    }
+  }
+  document.getElementById('modalBanner').classList.add('open');
+}
+
+async function uploadBannerImg(input) {
+  var file = input.files[0]; if (!file) return;
+  showToast('Upload...','⏳');
+  try {
+    var ext = file.name.split('.').pop();
+    var chemin = 'admin/banner_' + Date.now() + '.' + ext;
+    var res = await sb.storage.from('yeye-market').upload(chemin, file, {cacheControl:'3600',upsert:true});
+    if (res.error) throw res.error;
+    var url = sb.storage.from('yeye-market').getPublicUrl(chemin).data.publicUrl;
+    document.getElementById('bannerImgUrl').value = url;
+    var prev = document.getElementById('bannerImgPreview');
+    if (prev) prev.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>';
+    showToast('Image uploadée !','🖼️');
+  } catch(e) { showToast('Erreur upload','❌'); }
+  input.value = '';
+}
+
+function sauvegarderBanner() {
+  bannerData = {
+    emoji: document.getElementById('bannerEmoji').value || '🌿',
+    imgUrl: document.getElementById('bannerImgUrl').value || '',
+    tag: document.getElementById('bannerTag').value || 'OFFRE DU JOUR',
+    title: document.getElementById('bannerTitle').value || '',
+    sub: document.getElementById('bannerSub').value || '',
+    price: document.getElementById('bannerPrice').value || '',
+    unit: document.getElementById('bannerUnit').value || '',
+    link: document.getElementById('bannerLink').value || ''
+  };
+  // Sauvegarder dans localStorage
+  try { localStorage.setItem('yeye_banner', JSON.stringify(bannerData)); } catch(e) {}
+  majAffichageBanner();
+  fermerModal('modalBanner');
+  showToast('Bannière mise à jour !','✅');
+}
+
+function majAffichageBanner() {
+  var img = document.getElementById('adm-ban-img');
+  var tag = document.getElementById('adm-ban-tag');
+  var title = document.getElementById('adm-ban-title');
+  var sub = document.getElementById('adm-ban-sub');
+  var price = document.getElementById('adm-ban-price');
+  var unit = document.getElementById('adm-ban-unit');
+  if (img) img.textContent = bannerData.imgUrl ? '' : (bannerData.emoji || '🌿');
+  if (img && bannerData.imgUrl) img.innerHTML = '<img src="'+bannerData.imgUrl+'" style="width:56px;height:56px;object-fit:cover;border-radius:10px"/>';
+  if (tag) tag.textContent = bannerData.tag;
+  if (title) title.textContent = bannerData.title;
+  if (sub) sub.textContent = bannerData.sub;
+  if (price) price.textContent = bannerData.price;
+  if (unit) unit.textContent = bannerData.unit;
+}
+
 function toggleMoreMenu() {
   var m = document.getElementById('moreMenu');
   var o = document.getElementById('moreOv');

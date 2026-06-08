@@ -435,15 +435,15 @@ textarea.fi{resize:vertical;min-height:70px}
 
   <!-- BANNER -->
   <div style="padding:0 10px 10px;background:#fff">
-    <div class="banner">
-      <div class="ban-img">🌿</div>
+    <div class="banner" id="mainBanner" onclick="ouvrirBannerModal()" style="cursor:pointer">
+      <div class="ban-img" id="banImg">🌿</div>
       <div class="ban-txt">
-        <span class="ban-tag">OFFRE DU JOUR</span>
-        <div class="ban-title">Produits frais livrés en 2h à <span id="banCity">Cotonou</span></div>
-        <div class="ban-sub">Ferme Agbossou · Savalou</div>
+        <span class="ban-tag" id="banTag">OFFRE DU JOUR</span>
+        <div class="ban-title" id="banTitle">Produits frais livrés en 2h à <span id="banCity">Cotonou</span></div>
+        <div class="ban-sub" id="banSub">Ferme Agbossou · Savalou</div>
         <div style="display:flex;align-items:baseline;gap:4px;margin-top:5px">
-          <span class="ban-price">600 FCFA</span>
-          <span style="font-size:10px;color:#1A6B35;font-weight:600">/kg · 0 frais</span>
+          <span class="ban-price" id="banPrice">600 FCFA</span>
+          <span style="font-size:10px;color:#1A6B35;font-weight:600" id="banUnit">/kg · 0 frais</span>
         </div>
       </div>
     </div>
@@ -2897,6 +2897,36 @@ function buildHomeLivs(){
 
 document.addEventListener('DOMContentLoaded',function(){
   checkAuth();
+  // Charger la bannière depuis localStorage (modifiée via admin)
+  try {
+    var savedBanner = localStorage.getItem('yeye_banner');
+    if (savedBanner) {
+      var bd = JSON.parse(savedBanner);
+      var banImg = document.getElementById('banImg');
+      var banTag = document.getElementById('banTag');
+      var banTitle = document.getElementById('banTitle');
+      var banSub = document.getElementById('banSub');
+      var banPrice = document.getElementById('banPrice');
+      var banUnit = document.getElementById('banUnit');
+      if (banImg) {
+        if (bd.imgUrl) {
+          banImg.innerHTML = '<img src="'+bd.imgUrl+'" style="width:100%;height:100%;object-fit:cover"/>';
+        } else if (bd.emoji) {
+          banImg.textContent = bd.emoji;
+        }
+      }
+      if (banTag && bd.tag) banTag.textContent = bd.tag;
+      if (banTitle && bd.title) {
+        // Garder le span banCity
+        var city = banTitle ? banTitle.querySelector('#banCity') : null;
+        var cityText = city ? city.textContent : 'Cotonou';
+        banTitle.innerHTML = bd.title + ' <span id="banCity">' + cityText + '</span>';
+      }
+      if (banSub && bd.sub) banSub.textContent = bd.sub;
+      if (banPrice && bd.price) banPrice.textContent = bd.price;
+      if (banUnit && bd.unit) banUnit.textContent = bd.unit;
+    }
+  } catch(e) {}
   buildGeoGr();
   buildHomeBout();
   renderCats();
