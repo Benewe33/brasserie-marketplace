@@ -691,83 +691,290 @@ textarea.fi{resize:vertical;min-height:70px}
 
 <!-- DASHBOARD VENDEUR -->
 <div id="page-dash-v" class="page">
-  <div class="dbody">
-    <div class="dhv">
-      <div class="dav">🧑🏾</div>
-      <div class="dnm">Kokou Agbossou</div>
-      <div class="dsh">🏪 Ferme Agbossou · Savalou</div>
-      <div class="dsts">Boutique active et vérifiée</div>
-      <div class="dsgr">
-        <div class="ds"><div class="dsn">24</div><div class="dsl">Commandes</div></div>
-        <div class="ds"><div class="dsn">186k</div><div class="dsl">FCFA gains</div></div>
-        <div class="ds"><div class="dsn">8</div><div class="dsl">Produits</div></div>
+  <div style="background:var(--g50);padding-bottom:80px">
+
+    <!-- HEADER VENDEUR -->
+    <div style="background:linear-gradient(135deg,#1A6B35,#2E8B50);padding:18px 16px 20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div id="dv-avatar" style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);flex-shrink:0">🏪</div>
+        <div style="flex:1">
+          <div id="dv-nom" style="font-size:15px;font-weight:600;color:#fff">Ma Boutique</div>
+          <div id="dv-statut" style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px">⏳ En attente de validation</div>
+        </div>
+        <button onclick="goTab('compte')" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:inherit">← Compte</button>
+      </div>
+      <!-- STATS VENDEUR -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
+          <div id="dv-nb-prods" style="font-size:18px;font-weight:700;color:#fff">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7)">Produits</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
+          <div id="dv-nb-cmds" style="font-size:18px;font-weight:700;color:#fff">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7)">Commandes</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
+          <div id="dv-gains" style="font-size:16px;font-weight:700;color:var(--j)">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7)">FCFA gains</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
+          <div id="dv-note" style="font-size:18px;font-weight:700;color:#fff">-</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7)">Note</div>
+        </div>
       </div>
     </div>
-    <div class="dcrd">
-      <div class="dctt"><div class="dctl"><i class="ti ti-shopping-bag" aria-hidden="true"></i>Commandes récentes</div><button class="dact">Voir tout</button></div>
-      <div class="oit"><div class="oe">🌾</div><div class="oi"><div class="on">Gari de Savalou x 5 kg</div><div class="od">Afi K. · Cotonou · Livreur Kofi en route</div></div><span class="os os-s">En livraison</span></div>
-      <div class="oit"><div class="oe">🥩</div><div class="oi"><div class="on">Viande de boeuf x 2 kg</div><div class="od">Mede R. · Abomey-Calavi · 7 000 FCFA</div></div><span class="os os-n">Nouveau</span></div>
-      <div class="oit"><div class="oe">🧅</div><div class="oi"><div class="on">Oignon local x 10 kg</div><div class="od">Seto A. · Cotonou · 7 000 FCFA</div></div><span class="os os-d">Livré</span></div>
+
+    <!-- ONGLETS VENDEUR -->
+    <div style="background:#fff;display:flex;border-bottom:2px solid var(--g100);overflow-x:auto;scrollbar-width:none">
+      <button id="dv-tab-prods" onclick="dvTab('prods')" style="flex:1;min-width:80px;padding:12px 8px;font-size:12px;font-weight:600;border:none;background:none;color:var(--v);border-bottom:2px solid var(--v);cursor:pointer;font-family:inherit">📦 Produits</button>
+      <button id="dv-tab-cmds" onclick="dvTab('cmds')" style="flex:1;min-width:80px;padding:12px 8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--g400);cursor:pointer;font-family:inherit">🧾 Commandes</button>
+      <button id="dv-tab-gains" onclick="dvTab('gains')" style="flex:1;min-width:80px;padding:12px 8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--g400);cursor:pointer;font-family:inherit">💰 Gains</button>
+      <button id="dv-tab-profil" onclick="dvTab('profil')" style="flex:1;min-width:80px;padding:12px 8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--g400);cursor:pointer;font-family:inherit">⚙️ Boutique</button>
     </div>
-    <div class="dcrd">
-      <div class="dctt"><div class="dctl"><i class="ti ti-package" aria-hidden="true"></i>Mes produits</div><button class="dact">+ Ajouter</button></div>
-      <div class="pit"><div class="pie">🌾</div><div class="pii"><div class="pin">Gari de Savalou</div><div class="pid">600 FCFA/kg · 50 kg dispo</div></div><div class="pia"><button class="pab">✏️</button><button class="pab">👁️</button></div></div>
-      <div class="pit"><div class="pie">🥩</div><div class="pii"><div class="pin">Viande de boeuf</div><div class="pid">3 500 FCFA/kg · 35 kg dispo</div></div><div class="pia"><button class="pab">✏️</button><button class="pab">👁️</button></div></div>
-      <div class="pit"><div class="pie">🧅</div><div class="pii"><div class="pin">Oignon local</div><div class="pid">700 FCFA/kg · 90 kg dispo</div></div><div class="pia"><button class="pab">✏️</button><button class="pab">👁️</button></div></div>
-      <button class="apb">+ Ajouter un produit</button>
-    </div>
-    <div class="dcrd">
-      <div class="dctt"><div class="dctl"><i class="ti ti-chart-bar" aria-hidden="true"></i>Revenus ce mois</div></div>
-      <div style="background:var(--vl);border-radius:10px;padding:13px;text-align:center">
-        <div style="font-size:24px;font-weight:600;color:var(--v)">186 500 FCFA</div>
-        <div style="font-size:11px;color:var(--vd);margin-top:4px">+22% vs mois dernier</div>
-        <div style="font-size:10px;color:var(--g400);margin-top:7px">Prochain paiement : Vendredi via MTN Money</div>
+
+    <!-- SECTION PRODUITS -->
+    <div id="dv-prods" style="padding:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="font-size:14px;font-weight:600;color:var(--g900)">Mes produits</span>
+        <button onclick="ouvrirFormProduitVendeur()" style="background:var(--v);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">+ Ajouter</button>
+      </div>
+      <div id="dv-prods-liste">
+        <div style="text-align:center;padding:30px;color:var(--g400);font-size:12px"><div style="font-size:30px;margin-bottom:8px">📦</div>Aucun produit</div>
+      </div>
+      <!-- FORMULAIRE AJOUT PRODUIT -->
+      <div id="form-prod-vendeur" style="display:none;background:#fff;border-radius:12px;padding:14px;margin-top:10px;border:1px solid var(--g100)">
+        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px" id="form-prod-titre">Ajouter un produit</div>
+        <input type="hidden" id="vprod-id"/>
+        <div style="margin-bottom:10px">
+          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">📸 Photo</label>
+          <div style="border:2px dashed var(--g200);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:var(--g50)" id="vprod-photo-zone" onclick="simUp('vprod-photo')">
+            <span style="font-size:24px" id="vprod-photo-ic">📷</span>
+            <div style="font-size:12px;color:var(--g400);margin-top:4px">Cliquer pour ajouter</div>
+          </div>
+          <input type="file" id="vprod-photo" accept="image/*" style="display:none" onchange="uploaderPhotoVProd(this)"/>
+          <input type="hidden" id="vprod-photo-url"/>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Nom *</label>
+          <input id="vprod-nom" type="text" placeholder="Ex: Gari de Savalou" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Description</label>
+          <textarea id="vprod-desc" rows="2" placeholder="Décrivez votre produit..." style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;resize:none;box-sizing:border-box"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div>
+            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Prix (FCFA) *</label>
+            <input id="vprod-prix" type="number" placeholder="600" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Unité</label>
+            <select id="vprod-unite" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none">
+              <option>kg</option><option>litre</option><option>pièce</option><option>sachet</option><option>250g</option><option>500g</option><option>unité</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div>
+            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Stock</label>
+            <input id="vprod-stock" type="text" placeholder="Ex: 50 kg" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Badge</label>
+            <select id="vprod-badge" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none">
+              <option value="">Aucun</option><option value="nat">Naturel</option><option value="local">Local</option><option value="promo">Promo</option><option value="flash">Flash</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="fermerFormProduitVendeur()" style="flex:1;background:var(--g100);color:var(--g700);border:none;border-radius:10px;padding:11px;font-size:13px;cursor:pointer;font-family:inherit">Annuler</button>
+          <button onclick="sauvegarderProduitVendeur()" style="flex:2;background:var(--v);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💾 Sauvegarder</button>
+        </div>
       </div>
     </div>
+
+    <!-- SECTION COMMANDES VENDEUR -->
+    <div id="dv-cmds" style="padding:12px;display:none">
+      <div style="font-size:14px;font-weight:600;color:var(--g900);margin-bottom:12px">Commandes reçues</div>
+      <div id="dv-cmds-liste">
+        <div style="text-align:center;padding:30px;color:var(--g400);font-size:12px"><div style="font-size:30px;margin-bottom:8px">🧾</div>Aucune commande</div>
+      </div>
+    </div>
+
+    <!-- SECTION GAINS VENDEUR -->
+    <div id="dv-gains-sec" style="padding:12px;display:none">
+      <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">💰 Mes gains</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <div style="background:var(--vl);border-radius:10px;padding:12px;text-align:center">
+            <div id="dv-gains-total" style="font-size:16px;font-weight:700;color:var(--v)">0 FCFA</div>
+            <div style="font-size:11px;color:var(--g400);margin-top:2px">Total gagné</div>
+          </div>
+          <div style="background:var(--jl);border-radius:10px;padding:12px;text-align:center">
+            <div id="dv-gains-attente" style="font-size:16px;font-weight:700;color:var(--jd)">0 FCFA</div>
+            <div style="font-size:11px;color:var(--g400);margin-top:2px">En attente</div>
+          </div>
+        </div>
+        <div style="background:var(--g50);border-radius:10px;padding:12px;font-size:12px;color:var(--g700);line-height:1.6">
+          📅 Les paiements sont effectués chaque <b>lundi</b> via MTN ou Moov Money<br/>
+          📊 Commission Yéyé Market : <b>5%</b> par vente
+        </div>
+      </div>
+      <div id="dv-gains-liste">
+        <div style="text-align:center;padding:20px;color:var(--g400);font-size:12px">Aucun gain enregistré</div>
+      </div>
+    </div>
+
+    <!-- SECTION PROFIL BOUTIQUE -->
+    <div id="dv-profil" style="padding:12px;display:none">
+      <div style="background:#fff;border-radius:12px;padding:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">⚙️ Ma boutique</div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Nom de la boutique</label>
+          <input id="dv-bout-nom" type="text" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+        </div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Description</label>
+          <textarea id="dv-bout-desc" rows="2" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;resize:none;box-sizing:border-box"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div>
+            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Téléphone</label>
+            <input id="dv-bout-tel" type="tel" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">MTN Money</label>
+            <input id="dv-bout-mtn" type="tel" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+          </div>
+        </div>
+        <button onclick="sauvegarderProfilBoutique()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💾 Sauvegarder</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <!-- DASHBOARD LIVREUR -->
 <div id="page-dash-l" class="page">
-  <div class="dbody">
-    <div class="dhl">
-      <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
-        <div class="dav" style="margin-bottom:0">🧑🏾<div class="davo"></div></div>
+  <div style="background:var(--g50);padding-bottom:80px">
+
+    <!-- HEADER LIVREUR -->
+    <div style="background:linear-gradient(135deg,#1A5FA5,#1A6B35);padding:18px 16px 20px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div id="dl-avatar" style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);flex-shrink:0">🛵</div>
         <div style="flex:1">
-          <div class="dnm">Kofi Dossou</div>
-          <div class="dsh">📍 Cotonou centre et nord</div>
-          <div style="font-size:12px;color:var(--j);font-weight:500;margin-top:3px">📱 +229 97 00 11 22</div>
+          <div id="dl-nom" style="font-size:15px;font-weight:600;color:#fff">Mon espace livreur</div>
+          <div id="dl-statut" style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px">⏳ En attente de validation</div>
         </div>
-        <button class="togb on" id="dispoBtn" onclick="togD()">🟢 Disponible</button>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+          <div id="dl-toggle-btn" onclick="toggleDispoLivreur()" style="width:44px;height:24px;border-radius:12px;background:var(--g400);cursor:pointer;position:relative;transition:background .2s">
+            <div id="dl-toggle-dot" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
+          </div>
+          <span id="dl-dispo-label" style="font-size:9px;color:rgba(255,255,255,.75)">Hors ligne</span>
+        </div>
       </div>
-      <div class="dsgr">
-        <div class="ds"><div class="dsn">32</div><div class="dsl">Livraisons</div></div>
-        <div class="ds"><div class="dsn">48k</div><div class="dsl">FCFA gains</div></div>
-        <div class="ds"><div class="dsn">4.9</div><div class="dsl">Note</div></div>
-      </div>
-    </div>
-    <div class="ncrd">
-      <div class="nct">🔔 Nouvelle commande assignée !</div>
-      <div style="background:#fff;border-radius:10px;padding:11px;border:1px solid rgba(245,197,24,.3)">
-        <div style="font-size:12px;font-weight:600;color:var(--g900);margin-bottom:3px">🌾 Gari x 5 kg + 🥩 Boeuf x 2 kg</div>
-        <div style="font-size:11px;color:var(--g400);margin-bottom:6px">📍 Ferme Agbossou, Savalou → Cotonou nord</div>
-        <div style="font-size:12px;font-weight:600;color:var(--v)">Gain estimé : 1 000 FCFA</div>
-        <div class="nac"><button class="na-a" onclick="showToast('Commande acceptée !','✅')">✅ Accepter</button><button class="na-r" onclick="showToast('Commande refusée','❌')">❌ Refuser</button></div>
-      </div>
-    </div>
-    <div class="dcrd">
-      <div class="dctt"><div class="dctl"><i class="ti ti-clock" aria-hidden="true"></i>Livraisons récentes</div><button class="dact">Voir tout</button></div>
-      <div class="lo"><div class="loe">🛵</div><div class="loi"><div class="lon">Tilapia x 3 kg → Cotonou sud</div><div class="lod">Pêcherie du Littoral · Aujourd'hui 10h30</div></div><div><div class="log">+500 FCFA</div><span class="os os-d" style="font-size:9px">Livré</span></div></div>
-      <div class="lo"><div class="loe">🛵</div><div class="loi"><div class="lon">Huile x 2L → Cotonou nord</div><div class="lod">Huilerie Lokossa · Hier 15h20</div></div><div><div class="log">+1 000 FCFA</div><span class="os os-d" style="font-size:9px">Livré</span></div></div>
-    </div>
-    <div class="dcrd">
-      <div class="dctt"><div class="dctl"><i class="ti ti-chart-bar" aria-hidden="true"></i>Gains ce mois</div></div>
-      <div style="background:var(--bll);border-radius:10px;padding:13px;text-align:center">
-        <div style="font-size:24px;font-weight:600;color:var(--bl)">48 000 FCFA</div>
-        <div style="font-size:11px;color:var(--bld);margin-top:4px">32 livraisons effectuées</div>
-        <div style="font-size:10px;color:var(--g400);margin-top:7px">Prochain paiement : Vendredi via MTN Money</div>
+      <!-- STATS LIVREUR -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
+          <div id="dl-nb-livr" style="font-size:18px;font-weight:700;color:#fff">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7)">Livraisons</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
+          <div id="dl-note" style="font-size:18px;font-weight:700;color:var(--j)">-</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7)">Note</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
+          <div id="dl-gains" style="font-size:16px;font-weight:700;color:#fff">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7)">FCFA gains</div>
+        </div>
+        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
+          <div id="dl-today" style="font-size:18px;font-weight:700;color:#fff">0</div>
+          <div style="font-size:9px;color:rgba(255,255,255,.7)">Aujourd'hui</div>
+        </div>
       </div>
     </div>
+
+    <!-- ONGLETS LIVREUR -->
+    <div style="background:#fff;display:flex;border-bottom:2px solid var(--g100)">
+      <button id="dl-tab-cmds" onclick="dlTab('cmds')" style="flex:1;padding:12px 8px;font-size:12px;font-weight:600;border:none;background:none;color:var(--bl);border-bottom:2px solid var(--bl);cursor:pointer;font-family:inherit">📦 Livraisons</button>
+      <button id="dl-tab-gains" onclick="dlTab('gains')" style="flex:1;padding:12px 8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--g400);cursor:pointer;font-family:inherit">💰 Gains</button>
+      <button id="dl-tab-profil" onclick="dlTab('profil')" style="flex:1;padding:12px 8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--g400);cursor:pointer;font-family:inherit">⚙️ Profil</button>
+    </div>
+
+    <!-- SECTION LIVRAISONS -->
+    <div id="dl-cmds" style="padding:12px">
+      <!-- Commandes disponibles -->
+      <div style="background:var(--bll);border-radius:12px;padding:12px;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--bld);margin-bottom:8px">🔔 Commandes disponibles</div>
+        <div id="dl-cmds-dispo">
+          <div style="text-align:center;padding:16px;color:var(--g400);font-size:12px">Aucune commande disponible pour l'instant</div>
+        </div>
+      </div>
+      <!-- Mes livraisons en cours -->
+      <div style="background:#fff;border-radius:12px;padding:12px;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:8px">🛵 En cours</div>
+        <div id="dl-cmds-encours">
+          <div style="text-align:center;padding:16px;color:var(--g400);font-size:12px">Aucune livraison en cours</div>
+        </div>
+      </div>
+      <!-- Historique -->
+      <div style="background:#fff;border-radius:12px;padding:12px">
+        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:8px">📋 Historique</div>
+        <div id="dl-cmds-histo">
+          <div style="text-align:center;padding:16px;color:var(--g400);font-size:12px">Aucune livraison effectuée</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION GAINS LIVREUR -->
+    <div id="dl-gains-sec" style="padding:12px;display:none">
+      <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">💰 Mes gains</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <div style="background:var(--bll);border-radius:10px;padding:12px;text-align:center">
+            <div id="dl-gains-total" style="font-size:16px;font-weight:700;color:var(--bl)">0 FCFA</div>
+            <div style="font-size:11px;color:var(--g400);margin-top:2px">Total gagné</div>
+          </div>
+          <div style="background:var(--jl);border-radius:10px;padding:12px;text-align:center">
+            <div id="dl-gains-semaine" style="font-size:16px;font-weight:700;color:var(--jd)">0 FCFA</div>
+            <div style="font-size:11px;color:var(--g400);margin-top:2px">Cette semaine</div>
+          </div>
+        </div>
+        <div style="background:var(--g50);border-radius:10px;padding:12px;font-size:12px;color:var(--g700);line-height:1.6">
+          📅 Paiement chaque <b>lundi</b> via MTN ou Moov Money<br/>
+          🛵 Tarif par livraison selon la zone
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION PROFIL LIVREUR -->
+    <div id="dl-profil" style="padding:12px;display:none">
+      <div style="background:#fff;border-radius:12px;padding:14px">
+        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">⚙️ Mon profil livreur</div>
+        <div style="margin-bottom:10px">
+          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Nom complet</label>
+          <input id="dl-profil-nom" type="text" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <div>
+            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Téléphone</label>
+            <input id="dl-profil-tel" type="tel" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+          </div>
+          <div>
+            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">MTN Money</label>
+            <input id="dl-profil-mtn" type="tel" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
+          </div>
+        </div>
+        <div style="margin-bottom:14px">
+          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Véhicule</label>
+          <select id="dl-profil-vehicule" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none">
+            <option>moto</option><option>tricycle</option><option>voiture</option>
+          </select>
+        </div>
+        <button onclick="sauvegarderProfilLivreur()" style="width:100%;background:var(--bl);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💾 Sauvegarder</button>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -1064,17 +1271,33 @@ textarea.fi{resize:vertical;min-height:70px}
         </div>
       </div>
 
-      <!-- REJOINDRE YÉYÉ (connecté) -->
+      <!-- ACCÈS DASHBOARDS / REJOINDRE -->
       <div style="background:#fff;padding:14px 16px">
-        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">🌿 Rejoindre Yéyé Market</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-          <div onclick="goTab('vendre')" style="background:var(--vl);border-radius:10px;padding:12px;cursor:pointer;text-align:center">
-            <div style="font-size:22px;margin-bottom:4px">💼</div>
-            <div style="font-size:11px;font-weight:600;color:var(--vd)">Ma boutique</div>
+        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">🌿 Mes espaces</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div onclick="accederDashVendeur()" style="background:var(--vl);border-radius:10px;padding:12px;cursor:pointer;display:flex;align-items:center;gap:10px;border:0.5px solid rgba(26,107,53,.15)">
+            <span style="font-size:22px">💼</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600;color:var(--vd)">Espace Vendeur</div>
+              <div style="font-size:10px;color:var(--v);margin-top:1px">Gérer ma boutique et mes produits</div>
+            </div>
+            <i class="ti ti-chevron-right" style="color:var(--v);font-size:14px" aria-hidden="true"></i>
           </div>
-          <div onclick="goTab('livreur')" style="background:var(--bll);border-radius:10px;padding:12px;cursor:pointer;text-align:center">
-            <div style="font-size:22px;margin-bottom:4px">🛵</div>
-            <div style="font-size:11px;font-weight:600;color:var(--bld)">Livreur</div>
+          <div onclick="accederDashLivreur()" style="background:var(--bll);border-radius:10px;padding:12px;cursor:pointer;display:flex;align-items:center;gap:10px;border:0.5px solid rgba(26,95,165,.15)">
+            <span style="font-size:22px">🛵</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600;color:var(--bld)">Espace Livreur</div>
+              <div style="font-size:10px;color:var(--bl);margin-top:1px">Voir mes livraisons et mes gains</div>
+            </div>
+            <i class="ti ti-chevron-right" style="color:var(--bl);font-size:14px" aria-hidden="true"></i>
+          </div>
+          <div onclick="goTab('restaurant')" style="background:#FFF3E0;border-radius:10px;padding:12px;cursor:pointer;display:flex;align-items:center;gap:10px">
+            <span style="font-size:22px">🍽️</span>
+            <div style="flex:1">
+              <div style="font-size:12px;font-weight:600;color:#7B3A00">Mon restaurant</div>
+              <div style="font-size:10px;color:#E07B1A;margin-top:1px">Référencer mon restaurant</div>
+            </div>
+            <i class="ti ti-chevron-right" style="color:#E07B1A;font-size:14px" aria-hidden="true"></i>
           </div>
         </div>
       </div>
@@ -2415,6 +2638,395 @@ function geolocRealtime() {
 
 
 // ============================================================
+// DASHBOARD VENDEUR
+// ============================================================
+var vendeurBoutiqueId = null;
+var vendeurEnLigne = false;
+var livreurId = null;
+var livreurEnLigne = false;
+
+// Onglets dashboard vendeur
+function dvTab(tab) {
+  ['prods','cmds','gains-sec','profil'].forEach(function(t) {
+    var el = document.getElementById('dv-' + t);
+    if (el) el.style.display = 'none';
+  });
+  var el = document.getElementById('dv-' + tab);
+  if (el) el.style.display = 'block';
+  // Update tab styles
+  ['prods','cmds','gains','profil'].forEach(function(t) {
+    var btn = document.getElementById('dv-tab-' + t);
+    if (!btn) return;
+    var active = t === tab || (t === 'gains' && tab === 'gains-sec');
+    btn.style.color = active ? 'var(--v)' : 'var(--g400)';
+    btn.style.borderBottom = active ? '2px solid var(--v)' : 'none';
+    btn.style.fontWeight = active ? '600' : '500';
+  });
+  if (tab === 'cmds') chargerCommandesVendeur();
+  if (tab === 'gains-sec') chargerGainsVendeur();
+  if (tab === 'profil') chargerProfilBoutique();
+}
+
+// Charger dashboard vendeur
+async function chargerDashVendeur() {
+  if (!currentUser) return;
+  try {
+    // Chercher la boutique de ce vendeur
+    var res = await sb.from('boutiques').select('*').eq('vendeur_id', currentUser.id).single();
+    if (res.error || !res.data) {
+      // Pas encore de boutique validée
+      document.getElementById('dv-nom').textContent = 'Boutique en attente';
+      document.getElementById('dv-statut').textContent = '⏳ Votre boutique est en cours de validation';
+      return;
+    }
+    var bout = res.data;
+    vendeurBoutiqueId = bout.id;
+    document.getElementById('dv-nom').textContent = bout.nom;
+    document.getElementById('dv-statut').textContent = bout.statut === 'active' ? '✅ Boutique active et vérifiée' : '⏳ En attente de validation';
+    // Remplir formulaire profil
+    var pn = document.getElementById('dv-bout-nom'); if(pn) pn.value = bout.nom || '';
+    var pd = document.getElementById('dv-bout-desc'); if(pd) pd.value = bout.description || '';
+    var pt = document.getElementById('dv-bout-tel'); if(pt) pt.value = bout.telephone || '';
+    var pm = document.getElementById('dv-bout-mtn'); if(pm) pm.value = bout.mtn_money || '';
+    // Stats
+    var resProd = await sb.from('produits').select('id', {count:'exact'}).eq('boutique_id', bout.id);
+    var resCmd = await sb.from('lignes_commande').select('id', {count:'exact'}).eq('boutique_id', bout.id);
+    document.getElementById('dv-nb-prods').textContent = resProd.count || 0;
+    document.getElementById('dv-nb-cmds').textContent = resCmd.count || 0;
+    if (bout.note_moyenne) document.getElementById('dv-note').textContent = bout.note_moyenne;
+    // Charger produits par défaut
+    chargerProduitsVendeur();
+  } catch(e) { console.log('DashVendeur:', e.message); }
+}
+
+async function chargerProduitsVendeur() {
+  if (!vendeurBoutiqueId) return;
+  var el = document.getElementById('dv-prods-liste'); if(!el) return;
+  try {
+    var res = await sb.from('produits').select('*').eq('boutique_id', vendeurBoutiqueId).order('cree_le', {ascending:false});
+    var data = res.data || [];
+    if (!data.length) {
+      el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--g400);font-size:12px"><div style="font-size:30px;margin-bottom:8px">📦</div>Aucun produit. Ajoutez votre premier produit !</div>';
+      return;
+    }
+    el.innerHTML = '';
+    data.forEach(function(p) {
+      var div = document.createElement('div');
+      div.style.cssText = 'background:#fff;border-radius:10px;padding:10px;margin-bottom:8px;display:flex;align-items:center;gap:10px;border:1px solid var(--g100)';
+      var imgHtml = p.photos && p.photos[0]
+        ? '<img src="'+p.photos[0]+'" style="width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0"/>'
+        : '<div style="width:44px;height:44px;border-radius:8px;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">📦</div>';
+      div.innerHTML = imgHtml
+        + '<div style="flex:1;min-width:0">'
+        + '<div style="font-size:13px;font-weight:600;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+p.nom+'</div>'
+        + '<div style="font-size:12px;color:var(--r);font-weight:600">'+(p.prix||0).toLocaleString('fr-FR')+' FCFA/'+p.unite+'</div>'
+        + '<div style="font-size:10px;color:var(--g400)">'+(p.stock_unite||'')+'</div>'
+        + '</div>'
+        + '<div style="display:flex;flex-direction:column;gap:4px">'
+        + '<span style="font-size:10px;font-weight:600;padding:2px 7px;border-radius:8px;background:'+(p.disponible?'var(--vl)':'var(--rl)')+';color:'+(p.disponible?'var(--v)':'var(--r)')+'">'+( p.disponible?'Actif':'Inactif')+'</span>'
+        + '</div>';
+      var btnEdit = document.createElement('button');
+      btnEdit.textContent = '✏️';
+      btnEdit.style.cssText = 'background:var(--g100);border:none;border-radius:6px;padding:5px 8px;font-size:12px;cursor:pointer;margin-left:4px';
+      btnEdit.addEventListener('click', (function(prod){ return function(){ editerProduitVendeur(prod); }; })(p));
+      div.querySelector('div:last-child').appendChild(btnEdit);
+      el.appendChild(div);
+    });
+    document.getElementById('dv-nb-prods').textContent = data.length;
+  } catch(e) { console.log('ProduitsVendeur:', e.message); }
+}
+
+function ouvrirFormProduitVendeur() {
+  document.getElementById('vprod-id').value = '';
+  document.getElementById('vprod-nom').value = '';
+  document.getElementById('vprod-desc').value = '';
+  document.getElementById('vprod-prix').value = '';
+  document.getElementById('vprod-stock').value = '';
+  document.getElementById('vprod-badge').value = '';
+  document.getElementById('vprod-photo-url').value = '';
+  document.getElementById('vprod-photo-ic').textContent = '📷';
+  document.getElementById('form-prod-titre').textContent = 'Ajouter un produit';
+  document.getElementById('form-prod-vendeur').style.display = 'block';
+  document.getElementById('form-prod-vendeur').scrollIntoView({behavior:'smooth'});
+}
+
+function editerProduitVendeur(p) {
+  document.getElementById('vprod-id').value = p.id;
+  document.getElementById('vprod-nom').value = p.nom || '';
+  document.getElementById('vprod-desc').value = p.description || '';
+  document.getElementById('vprod-prix').value = p.prix || '';
+  document.getElementById('vprod-unite').value = p.unite || 'kg';
+  document.getElementById('vprod-stock').value = p.stock_unite || '';
+  document.getElementById('vprod-badge').value = p.badge || '';
+  document.getElementById('vprod-photo-url').value = p.photos && p.photos[0] ? p.photos[0] : '';
+  if (p.photos && p.photos[0]) {
+    document.getElementById('vprod-photo-ic').innerHTML = '<img src="'+p.photos[0]+'" style="width:60px;height:60px;object-fit:cover;border-radius:8px"/>';
+  }
+  document.getElementById('form-prod-titre').textContent = 'Modifier le produit';
+  document.getElementById('form-prod-vendeur').style.display = 'block';
+  document.getElementById('form-prod-vendeur').scrollIntoView({behavior:'smooth'});
+}
+
+function fermerFormProduitVendeur() {
+  document.getElementById('form-prod-vendeur').style.display = 'none';
+}
+
+function uploaderPhotoVProd(input) {
+  var file = input.files[0]; if(!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('vprod-photo-ic').innerHTML = '<img src="'+e.target.result+'" style="width:60px;height:60px;object-fit:cover;border-radius:8px"/>';
+  };
+  reader.readAsDataURL(file);
+  uploaderVersSupabase(file, 'vprod-photo-zone').then(function(url) {
+    if (url) document.getElementById('vprod-photo-url').value = url;
+  }).catch(function() {});
+}
+
+async function sauvegarderProduitVendeur() {
+  if (!vendeurBoutiqueId) { showToast('Boutique non trouvée', '⚠️'); return; }
+  var nom = document.getElementById('vprod-nom').value.trim();
+  if (!nom) { showToast('Le nom est obligatoire', '⚠️'); return; }
+  var prix = parseFloat(document.getElementById('vprod-prix').value);
+  if (!prix) { showToast('Le prix est obligatoire', '⚠️'); return; }
+  var id = document.getElementById('vprod-id').value;
+  var photoUrl = document.getElementById('vprod-photo-url').value;
+  var data = {
+    nom: nom,
+    description: document.getElementById('vprod-desc').value.trim(),
+    prix: prix,
+    unite: document.getElementById('vprod-unite').value,
+    stock_unite: document.getElementById('vprod-stock').value.trim(),
+    badge: document.getElementById('vprod-badge').value || null,
+    boutique_id: vendeurBoutiqueId,
+    disponible: true,
+    photos: photoUrl ? [photoUrl] : null
+  };
+  showToast('Sauvegarde...', '⏳');
+  try {
+    var res = id ? await sb.from('produits').update(data).eq('id', id) : await sb.from('produits').insert(data);
+    if (res.error) throw res.error;
+    showToast(id ? 'Produit modifié !' : 'Produit ajouté !', '✅');
+    fermerFormProduitVendeur();
+    chargerProduitsVendeur();
+  } catch(e) { showToast('Erreur: ' + e.message, '❌'); }
+}
+
+async function chargerCommandesVendeur() {
+  if (!vendeurBoutiqueId) return;
+  var el = document.getElementById('dv-cmds-liste'); if(!el) return;
+  try {
+    var res = await sb.from('lignes_commande').select('*, commandes(numero,statut,total,cree_le,zone_livraison)').eq('boutique_id', vendeurBoutiqueId).order('commandes(cree_le)', {ascending:false}).limit(20);
+    var data = res.data || [];
+    if (!data.length) { el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--g400);font-size:12px"><div style="font-size:30px;margin-bottom:8px">🧾</div>Aucune commande reçue</div>'; return; }
+    var h = '';
+    data.forEach(function(l) {
+      var cmd = l.commandes || {};
+      var statColor = cmd.statut === 'livree' ? 'var(--v)' : cmd.statut === 'en_livraison' ? 'var(--bl)' : 'var(--or)';
+      h += '<div style="border:1px solid var(--g100);border-radius:10px;padding:12px;margin-bottom:8px;background:#fff">'
+        + '<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
+        + '<span style="font-size:13px;font-weight:600">' + (cmd.numero||'Commande') + '</span>'
+        + '<span style="font-size:11px;font-weight:600;color:'+statColor+'">' + (cmd.statut||'') + '</span>'
+        + '</div>'
+        + '<div style="font-size:12px;color:var(--g700)">📦 ' + l.nom_produit + ' × ' + l.quantite + '</div>'
+        + '<div style="font-size:12px;font-weight:600;color:var(--r);margin-top:2px">' + (l.sous_total||0).toLocaleString('fr-FR') + ' FCFA</div>'
+        + '</div>';
+    });
+    el.innerHTML = h;
+  } catch(e) { el.innerHTML = '<div style="padding:16px;color:var(--g400);font-size:12px;text-align:center">Erreur de chargement</div>'; }
+}
+
+async function chargerGainsVendeur() {
+  if (!vendeurBoutiqueId) return;
+  try {
+    var res = await sb.from('gains').select('*').eq('beneficiaire_id', vendeurBoutiqueId).order('cree_le', {ascending:false});
+    var data = res.data || [];
+    var total = data.reduce(function(s, g) { return s + (g.montant_net||0); }, 0);
+    var attente = data.filter(function(g){ return g.statut === 'en_attente'; }).reduce(function(s, g){ return s + (g.montant_net||0); }, 0);
+    var el1 = document.getElementById('dv-gains-total'); if(el1) el1.textContent = total.toLocaleString('fr-FR') + ' FCFA';
+    var el2 = document.getElementById('dv-gains-attente'); if(el2) el2.textContent = attente.toLocaleString('fr-FR') + ' FCFA';
+    document.getElementById('dv-gains').textContent = total.toLocaleString('fr-FR');
+  } catch(e) {}
+}
+
+async function chargerProfilBoutique() {
+  // Already loaded in chargerDashVendeur
+}
+
+async function sauvegarderProfilBoutique() {
+  if (!vendeurBoutiqueId) return;
+  var data = {
+    nom: document.getElementById('dv-bout-nom').value.trim(),
+    description: document.getElementById('dv-bout-desc').value.trim(),
+    telephone: document.getElementById('dv-bout-tel').value.trim(),
+    mtn_money: document.getElementById('dv-bout-mtn').value.trim()
+  };
+  showToast('Sauvegarde...', '⏳');
+  try {
+    var res = await sb.from('boutiques').update(data).eq('id', vendeurBoutiqueId);
+    if (res.error) throw res.error;
+    document.getElementById('dv-nom').textContent = data.nom;
+    showToast('Boutique mise à jour !', '✅');
+  } catch(e) { showToast('Erreur: ' + e.message, '❌'); }
+}
+
+// ============================================================
+// DASHBOARD LIVREUR
+// ============================================================
+function dlTab(tab) {
+  ['cmds','gains-sec','profil'].forEach(function(t) {
+    var el = document.getElementById('dl-' + t);
+    if (el) el.style.display = 'none';
+  });
+  var el = document.getElementById('dl-' + tab);
+  if (el) el.style.display = 'block';
+  ['cmds','gains','profil'].forEach(function(t) {
+    var btn = document.getElementById('dl-tab-' + t);
+    if (!btn) return;
+    var active = t === tab || (t === 'gains' && tab === 'gains-sec');
+    btn.style.color = active ? 'var(--bl)' : 'var(--g400)';
+    btn.style.borderBottom = active ? '2px solid var(--bl)' : 'none';
+    btn.style.fontWeight = active ? '600' : '500';
+  });
+  if (tab === 'gains-sec') chargerGainsLivreur();
+}
+
+async function chargerDashLivreur() {
+  if (!currentUser) return;
+  try {
+    var res = await sb.from('livreurs').select('*').eq('utilisateur_id', currentUser.id).single();
+    if (res.error || !res.data) {
+      document.getElementById('dl-nom').textContent = 'En attente de validation';
+      document.getElementById('dl-statut').textContent = "⏳ Votre dossier est en cours d'examen";
+      return;
+    }
+    var liv = res.data;
+    livreurId = liv.id;
+    livreurEnLigne = liv.en_ligne || false;
+    document.getElementById('dl-nom').textContent = liv.nom;
+    document.getElementById('dl-statut').textContent = liv.statut === 'actif' ? '✅ Livreur actif et vérifié' : '⏳ En attente de validation';
+    document.getElementById('dl-nb-livr').textContent = liv.nb_livraisons || 0;
+    if (liv.note_moyenne) document.getElementById('dl-note').textContent = liv.note_moyenne;
+    // Profil
+    var pn = document.getElementById('dl-profil-nom'); if(pn) pn.value = liv.nom || '';
+    var pt = document.getElementById('dl-profil-tel'); if(pt) pt.value = liv.telephone || '';
+    var pm = document.getElementById('dl-profil-mtn'); if(pm) pm.value = liv.mtn_money || '';
+    var pv = document.getElementById('dl-profil-vehicule'); if(pv) pv.value = liv.type_vehicule || 'moto';
+    // Toggle en ligne
+    majToggleLivreur(livreurEnLigne);
+    // Charger commandes
+    chargerCommandesLivreur();
+  } catch(e) { console.log('DashLivreur:', e.message); }
+}
+
+function majToggleLivreur(enLigne) {
+  var toggle = document.getElementById('dl-toggle-btn');
+  var dot = document.getElementById('dl-toggle-dot');
+  var label = document.getElementById('dl-dispo-label');
+  if (toggle) toggle.style.background = enLigne ? 'var(--v)' : 'var(--g400)';
+  if (dot) dot.style.left = enLigne ? '22px' : '2px';
+  if (label) label.textContent = enLigne ? 'En ligne ✅' : 'Hors ligne';
+}
+
+async function toggleDispoLivreur() {
+  if (!livreurId) return;
+  livreurEnLigne = !livreurEnLigne;
+  majToggleLivreur(livreurEnLigne);
+  try {
+    await sb.from('livreurs').update({en_ligne: livreurEnLigne}).eq('id', livreurId);
+    showToast(livreurEnLigne ? 'Vous êtes en ligne !' : 'Vous êtes hors ligne', livreurEnLigne ? '✅' : '⚫');
+  } catch(e) {}
+}
+
+async function chargerCommandesLivreur() {
+  if (!livreurId) return;
+  var elDispo = document.getElementById('dl-cmds-dispo');
+  var elEnCours = document.getElementById('dl-cmds-encours');
+  var elHisto = document.getElementById('dl-cmds-histo');
+  try {
+    // Commandes assignées à ce livreur
+    var res = await sb.from('commandes').select('*').eq('livreur_id', livreurId).order('cree_le', {ascending:false}).limit(20);
+    var data = res.data || [];
+    var enCours = data.filter(function(c){ return c.statut === 'en_livraison' || c.statut === 'confirmee'; });
+    var histo = data.filter(function(c){ return c.statut === 'livree' || c.statut === 'annulee'; });
+    document.getElementById('dl-today').textContent = enCours.length;
+    var renderCmd = function(cmds, el, emptyMsg) {
+      if (!cmds.length) { el.innerHTML = '<div style="text-align:center;padding:12px;color:var(--g400);font-size:12px">' + emptyMsg + '</div>'; return; }
+      var h = '';
+      cmds.forEach(function(cmd) {
+        var date = new Date(cmd.cree_le).toLocaleDateString('fr-FR');
+        h += '<div style="border:1px solid var(--g100);border-radius:10px;padding:11px;margin-bottom:8px;background:#fff">'
+          + '<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
+          + '<span style="font-size:13px;font-weight:600">' + (cmd.numero||'Commande') + '</span>'
+          + '<span style="font-size:12px;font-weight:700;color:var(--r)">' + (cmd.total||0).toLocaleString('fr-FR') + ' FCFA</span>'
+          + '</div>'
+          + '<div style="font-size:11px;color:var(--g400)">📍 ' + (cmd.zone_livraison||'') + ' · ' + date + '</div>'
+          + (cmd.statut === 'en_livraison' ? '<button class="btn-confirm-liv" data-cmdid="'+cmd.id+'" style="width:100%;margin-top:8px;background:var(--v);color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">✅ Confirmer la livraison</button>' : '')
+          + '</div>';
+      });
+      el.innerHTML = h;
+      // Attach click handlers
+      el.querySelectorAll('.btn-confirm-liv').forEach(function(btn) {
+        btn.addEventListener('click', function() { confirmerLivraison(this.dataset.cmdid); });
+      });
+    };
+    renderCmd(enCours, elEnCours, "Aucune livraison en cours");
+    renderCmd(histo, elHisto, "Aucune livraison effectuee");
+  } catch(e) { console.log('CmdsLivreur:', e.message); }
+}
+
+async function confirmerLivraison(cmdId) {
+  showToast('Confirmation...', '⏳');
+  try {
+    var res = await sb.from('commandes').update({statut:'livree', livre_le: new Date().toISOString()}).eq('id', cmdId);
+    if (res.error) throw res.error;
+    showToast('Livraison confirmée !', '✅');
+    chargerCommandesLivreur();
+    if (livreurId) {
+      var liv = await sb.from('livreurs').select('nb_livraisons').eq('id', livreurId).single();
+      var nb = (liv.data ? liv.data.nb_livraisons || 0 : 0) + 1;
+      await sb.from('livreurs').update({nb_livraisons: nb}).eq('id', livreurId);
+      document.getElementById('dl-nb-livr').textContent = nb;
+    }
+  } catch(e) { showToast('Erreur: ' + e.message, '❌'); }
+}
+
+async function chargerGainsLivreur() {
+  if (!livreurId) return;
+  try {
+    var res = await sb.from('gains').select('*').eq('beneficiaire_id', livreurId).order('cree_le', {ascending:false});
+    var data = res.data || [];
+    var total = data.reduce(function(s, g) { return s + (g.montant_net||0); }, 0);
+    var semaine = data.filter(function(g) {
+      var d = new Date(g.cree_le);
+      var now = new Date();
+      var diff = (now - d) / (1000 * 60 * 60 * 24);
+      return diff <= 7;
+    }).reduce(function(s, g){ return s + (g.montant_net||0); }, 0);
+    var el1 = document.getElementById('dl-gains-total'); if(el1) el1.textContent = total.toLocaleString('fr-FR') + ' FCFA';
+    var el2 = document.getElementById('dl-gains-semaine'); if(el2) el2.textContent = semaine.toLocaleString('fr-FR') + ' FCFA';
+    document.getElementById('dl-gains').textContent = total.toLocaleString('fr-FR');
+  } catch(e) {}
+}
+
+async function sauvegarderProfilLivreur() {
+  if (!livreurId) return;
+  var data = {
+    nom: document.getElementById('dl-profil-nom').value.trim(),
+    telephone: document.getElementById('dl-profil-tel').value.trim(),
+    mtn_money: document.getElementById('dl-profil-mtn').value.trim(),
+    type_vehicule: document.getElementById('dl-profil-vehicule').value
+  };
+  showToast('Sauvegarde...', '⏳');
+  try {
+    var res = await sb.from('livreurs').update(data).eq('id', livreurId);
+    if (res.error) throw res.error;
+    document.getElementById('dl-nom').textContent = data.nom;
+    showToast('Profil mis à jour !', '✅');
+  } catch(e) { showToast('Erreur: ' + e.message, '❌'); }
+}
+
+// ============================================================
 // AUTH — SYSTÈME DE COMPTE COMPLET
 // ============================================================
 var currentUser = null;
@@ -2605,6 +3217,8 @@ async function afficherVueConnecte() {
   // Charger commandes et adresses
   chargerMesCommandes('toutes');
   chargerMesAdresses();
+  // Vérifier si vendeur ou livreur
+  verifierRoleUtilisateur();
 }
 
 // Charger mes commandes
@@ -2694,6 +3308,34 @@ async function sauvegarderAdresse() {
     fermerModalAdresse();
     afficherAdresseLocale({nom: nom, adresse: detail, quartier: quartier, ville: ville, par_defaut: defaut});
   }
+}
+
+async function verifierRoleUtilisateur() {
+  if (!currentUser) return;
+  // Check if user has a boutique
+  try {
+    var resBout = await sb.from('boutiques').select('id,statut').eq('vendeur_id', currentUser.id).limit(1);
+    if (resBout.data && resBout.data.length > 0) {
+      vendeurBoutiqueId = resBout.data[0].id;
+      // Show vendor dashboard link more prominently
+    }
+  } catch(e) {}
+  // Check if user is a livreur
+  try {
+    var resLiv = await sb.from('livreurs').select('id,statut').eq('utilisateur_id', currentUser.id).limit(1);
+    if (resLiv.data && resLiv.data.length > 0) {
+      livreurId = resLiv.data[0].id;
+    }
+  } catch(e) {}
+}
+
+function accederDashVendeur() {
+  goTab('dash-v');
+  chargerDashVendeur();
+}
+function accederDashLivreur() {
+  goTab('dash-l');
+  chargerDashLivreur();
 }
 
 async function chargerMesAdresses() {
