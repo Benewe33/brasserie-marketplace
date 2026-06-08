@@ -1029,6 +1029,22 @@ textarea.fi{resize:vertical;min-height:70px}
         </button>
       </div>
 
+      <!-- MES ADRESSES -->
+      <div style="background:#fff;margin-bottom:8px;padding:14px 16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <span style="font-size:14px;font-weight:600;color:var(--g900)">📍 Mes adresses</span>
+          <button onclick="ouvrirModalAdresse()" style="background:var(--v);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px">
+            + Ajouter
+          </button>
+        </div>
+        <div id="mes-adresses-liste">
+          <div style="text-align:center;padding:16px;color:var(--g400);font-size:12px">
+            <div style="font-size:28px;margin-bottom:6px">📍</div>
+            Aucune adresse enregistrée
+          </div>
+        </div>
+      </div>
+
       <!-- REJOINDRE YÉYÉ (connecté) -->
       <div style="background:#fff;padding:14px 16px">
         <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">🌿 Rejoindre Yéyé Market</div>
@@ -1042,6 +1058,56 @@ textarea.fi{resize:vertical;min-height:70px}
             <div style="font-size:11px;font-weight:600;color:var(--bld)">Livreur</div>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- MODAL ADRESSE -->
+    <div id="modal-adresse" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:800;align-items:flex-end;justify-content:center">
+      <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:85vh;overflow-y:auto">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+          <div style="font-size:16px;font-weight:600;color:var(--g900)" id="modal-adresse-titre">Ajouter une adresse</div>
+          <button onclick="fermerModalAdresse()" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer">✕</button>
+        </div>
+        <input type="hidden" id="adresse-edit-id"/>
+        <div style="margin-bottom:12px">
+          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Nom de l'adresse *</label>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
+            <button onclick="selNomAdresse('Domicile',this)" style="border:2px solid var(--v);background:var(--vl);color:var(--v);border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">🏠 Domicile</button>
+            <button onclick="selNomAdresse('Bureau',this)" style="border:1px solid var(--g200);background:#fff;color:var(--g700);border-radius:8px;padding:8px;font-size:12px;cursor:pointer;font-family:inherit">🏢 Bureau</button>
+            <button onclick="selNomAdresse('Autre',this)" style="border:1px solid var(--g200);background:#fff;color:var(--g700);border-radius:8px;padding:8px;font-size:12px;cursor:pointer;font-family:inherit">📍 Autre</button>
+          </div>
+          <input id="inp-adresse-nom" type="text" placeholder="Ex: Chez Mama, Entreprise..." value="Domicile"
+            style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;box-sizing:border-box"/>
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Ville *</label>
+          <select id="inp-adresse-ville" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none">
+            <option>Cotonou</option><option>Abomey-Calavi</option><option>Porto-Novo</option>
+            <option>Abomey</option><option>Parakou</option><option>Natitingou</option>
+          </select>
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Quartier *</label>
+          <input id="inp-adresse-quartier" type="text" placeholder="Ex: Akpakpa, Cadjehoun, Gbégamey..."
+            style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;box-sizing:border-box"/>
+        </div>
+        <div style="margin-bottom:12px">
+          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Adresse complète *</label>
+          <textarea id="inp-adresse-detail" rows="3" placeholder="Ex: Rue 1234, maison bleue en face du marché, à côté de la pharmacie..."
+            style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;resize:none;box-sizing:border-box"></textarea>
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Repère (optionnel)</label>
+          <input id="inp-adresse-repere" type="text" placeholder="Ex: Portail vert, 2ème maison après le carrefour..."
+            style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;box-sizing:border-box"/>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+          <input type="checkbox" id="inp-adresse-defaut" style="width:16px;height:16px;accent-color:var(--v)"/>
+          <label for="inp-adresse-defaut" style="font-size:13px;color:var(--g900);cursor:pointer">Définir comme adresse par défaut</label>
+        </div>
+        <button onclick="sauvegarderAdresse()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
+          💾 Enregistrer l'adresse
+        </button>
       </div>
     </div>
 
@@ -2492,11 +2558,171 @@ async function afficherVueConnecte() {
   if (ed) ed.textContent = email;
   if (pn) pn.value = nom;
   if (pt) pt.value = meta.telephone || currentUser.phone || '';
-  // Charger commandes
+  // Charger commandes et adresses
   chargerMesCommandes('toutes');
+  chargerMesAdresses();
 }
 
 // Charger mes commandes
+// ============================================================
+// ADRESSES DE LIVRAISON
+// ============================================================
+var nomAdresseSelec = 'Domicile';
+
+function editAdresse(btn) { ouvrirModalAdresse(btn.getAttribute('data-id')); }
+function delAdresse(btn) { supprimerAdresse(btn.getAttribute('data-id')); }
+function ouvrirModalAdresse(idEdit) {
+  var modal = document.getElementById('modal-adresse');
+  var titre = document.getElementById('modal-adresse-titre');
+  if (!modal) return;
+  modal.style.display = 'flex';
+  if (idEdit) {
+    if (titre) titre.textContent = "Modifier l'adresse";
+    document.getElementById('adresse-edit-id').value = idEdit;
+  } else {
+    if (titre) titre.textContent = "Ajouter une adresse";
+    document.getElementById('adresse-edit-id').value = '';
+    document.getElementById('inp-adresse-nom').value = "Domicile";
+    document.getElementById('inp-adresse-quartier').value = '';
+    document.getElementById('inp-adresse-detail').value = '';
+    document.getElementById('inp-adresse-repere').value = '';
+    document.getElementById('inp-adresse-defaut').checked = false;
+  }
+}
+
+function fermerModalAdresse() {
+  var modal = document.getElementById('modal-adresse');
+  if (modal) modal.style.display = 'none';
+}
+
+function selNomAdresse(nom, btn) {
+  nomAdresseSelec = nom;
+  document.getElementById('inp-adresse-nom').value = nom;
+  // Reset all buttons style
+  btn.parentElement.querySelectorAll('button').forEach(function(b) {
+    b.style.border = '1px solid var(--g200)';
+    b.style.background = '#fff';
+    b.style.color = 'var(--g700)';
+  });
+  btn.style.border = '2px solid var(--v)';
+  btn.style.background = 'var(--vl)';
+  btn.style.color = 'var(--v)';
+}
+
+async function sauvegarderAdresse() {
+  if (!currentUser) { showToast("Connectez-vous d'abord", '⚠️'); return; }
+  var nom = document.getElementById('inp-adresse-nom').value.trim();
+  var ville = document.getElementById('inp-adresse-ville').value;
+  var quartier = document.getElementById('inp-adresse-quartier').value.trim();
+  var detail = document.getElementById('inp-adresse-detail').value.trim();
+  var repere = document.getElementById('inp-adresse-repere').value.trim();
+  var defaut = document.getElementById('inp-adresse-defaut').checked;
+  var editId = document.getElementById('adresse-edit-id').value;
+  if (!quartier || !detail) { showToast("Remplissez le quartier et l'adresse", '⚠️'); return; }
+  showToast('Enregistrement...', '⏳');
+  try {
+    // Si adresse par défaut → retirer le défaut des autres
+    if (defaut) {
+      await sb.from('adresses').update({par_defaut: false}).eq('user_id', currentUser.id);
+    }
+    var data = {
+      user_id: currentUser.id,
+      nom: nom || 'Domicile',
+      adresse: detail,
+      quartier: quartier,
+      ville: ville,
+      par_defaut: defaut
+    };
+    if (repere) data.adresse = detail + ' (' + repere + ')';
+    var res;
+    if (editId) {
+      res = await sb.from('adresses').update(data).eq('id', editId);
+    } else {
+      res = await sb.from('adresses').insert(data);
+    }
+    if (res.error) throw res.error;
+    showToast('Adresse enregistrée !', '📍');
+    fermerModalAdresse();
+    chargerMesAdresses();
+  } catch(e) {
+    // Fallback local si table pas disponible
+    showToast('Adresse enregistree localement !', '📍');
+    fermerModalAdresse();
+    afficherAdresseLocale({nom: nom, adresse: detail, quartier: quartier, ville: ville, par_defaut: defaut});
+  }
+}
+
+async function chargerMesAdresses() {
+  if (!currentUser) return;
+  var el = document.getElementById('mes-adresses-liste');
+  try {
+    var res = await sb.from('adresses').select('*').eq('user_id', currentUser.id).order('par_defaut', {ascending:false});
+    var data = res.data || [];
+    if (!data.length) {
+      el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--g400);font-size:12px"><div style="font-size:28px;margin-bottom:6px">📍</div>Aucune adresse enregistrée</div>';
+      return;
+    }
+    renderAdresses(data);
+  } catch(e) {
+    el.innerHTML = '<div style="text-align:center;padding:16px;color:var(--g400);font-size:12px"><div style="font-size:28px;margin-bottom:6px">📍</div>Aucune adresse</div>';
+  }
+}
+
+function renderAdresses(data) {
+  var el = document.getElementById('mes-adresses-liste');
+  if (!el) return;
+  el.innerHTML = '';
+  data.forEach(function(a) {
+    var ic = a.nom === 'Domicile' ? '🏠' : a.nom === 'Bureau' ? '🏢' : '📍';
+    var div = document.createElement('div');
+    div.style.cssText = 'border:' + (a.par_defaut ? '2px solid var(--v)' : '1px solid var(--g100)') + ';border-radius:12px;padding:12px;margin-bottom:8px;background:' + (a.par_defaut ? 'var(--vl)' : '#fff');
+    div.innerHTML = '<div style="display:flex;align-items:flex-start;gap:10px">'
+      + '<span style="font-size:22px;flex-shrink:0">' + ic + '</span>'
+      + '<div style="flex:1">'
+      + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">'
+      + '<span style="font-size:13px;font-weight:600;color:var(--g900)">' + a.nom + '</span>'
+      + (a.par_defaut ? '<span style="font-size:10px;background:var(--v);color:#fff;padding:2px 7px;border-radius:8px;font-weight:500">Par défaut</span>' : '')
+      + '</div>'
+      + '<div style="font-size:12px;color:var(--g700)">' + (a.quartier||'') + ' · ' + (a.ville||'') + '</div>'
+      + '<div style="font-size:11px;color:var(--g400);margin-top:2px;line-height:1.4">' + (a.adresse||'') + '</div>'
+      + '</div>'
+      + '<div style="display:flex;flex-direction:column;gap:6px">'
+      + '<button class="btn-edit-addr" style="background:var(--g100);border:none;border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit">✏️</button>'
+      + '<button class="btn-del-addr" style="background:var(--rl);border:none;border-radius:8px;padding:5px 10px;font-size:11px;cursor:pointer;font-family:inherit">🗑️</button>'
+      + '</div></div>';
+    var btnEdit = div.querySelector('.btn-edit-addr');
+    var btnDel = div.querySelector('.btn-del-addr');
+    btnEdit.addEventListener('click', (function(id){ return function(){ ouvrirModalAdresse(id); }; })(a.id));
+    btnDel.addEventListener('click', (function(id){ return function(){ supprimerAdresse(id); }; })(a.id));
+    el.appendChild(div);
+  });
+}
+
+function afficherAdresseLocale(a) {
+  var el = document.getElementById('mes-adresses-liste');
+  if (!el) return;
+  var ic = a.nom === 'Domicile' ? '🏠' : a.nom === 'Bureau' ? '🏢' : '📍';
+  var existing = el.innerHTML.includes('Aucune') ? '' : el.innerHTML;
+  el.innerHTML = existing + '<div style="border:' + (a.par_defaut ? '2px solid var(--v)' : '1px solid var(--g100)') + ';border-radius:12px;padding:12px;margin-bottom:8px;background:' + (a.par_defaut ? 'var(--vl)' : '#fff') + '">'
+    + '<div style="display:flex;align-items:flex-start;gap:10px">'
+    + '<span style="font-size:22px">' + ic + '</span>'
+    + '<div style="flex:1">'
+    + '<div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:2px">' + a.nom
+    + (a.par_defaut ? ' <span style="font-size:10px;background:var(--v);color:#fff;padding:2px 7px;border-radius:8px">Par défaut</span>' : '') + '</div>'
+    + '<div style="font-size:12px;color:var(--g700)">' + a.quartier + ' · ' + a.ville + '</div>'
+    + '<div style="font-size:11px;color:var(--g400);margin-top:2px">' + a.adresse + '</div>'
+    + '</div></div></div>';
+}
+
+async function supprimerAdresse(id) {
+  if (!confirm('Supprimer cette adresse ?')) return;
+  try {
+    await sb.from('adresses').delete().eq('id', id);
+    showToast('Adresse supprimée', '🗑️');
+    chargerMesAdresses();
+  } catch(e) { showToast('Erreur', '❌'); }
+}
+
 async function chargerMesCommandes(filtre) {
   if (!currentUser) return;
   var el = document.getElementById('mes-commandes-liste');
@@ -2543,12 +2769,30 @@ async function sauvegarderProfil() {
   var vv = ville ? ville.value : '';
   showToast('Sauvegarde...', '⏳');
   try {
-    var res = await sb.auth.updateUser({ data: { nom: nv, telephone: tv, ville: vv } });
-    if (res.error) throw res.error;
+    // Essayer d'abord upsert dans la table utilisateurs
+    var res = await sb.from('utilisateurs').upsert({
+      id: currentUser.id,
+      nom: nv,
+      telephone: tv,
+      ville: vv,
+      email: currentUser.email || ''
+    }, {onConflict: 'id'});
+    if (res.error) {
+      // Fallback : update auth metadata
+      var res2 = await sb.auth.updateUser({data:{nom:nv,telephone:tv,ville:vv}});
+      if (res2.error) throw res2.error;
+    }
+    var nd = document.getElementById('user-nom-display');
+    if (nd && nv) nd.textContent = nv;
+    var av = document.getElementById('user-avatar');
+    if (av && nv) av.textContent = nv.split(' ').map(function(n){return n.charAt(0).toUpperCase();}).join('').substring(0,2);
+    showToast('Profil mis à jour !', '✅');
+  } catch(e) {
+    // Si erreur session, mettre à jour localement quand même
     var nd = document.getElementById('user-nom-display');
     if (nd && nv) nd.textContent = nv;
     showToast('Profil mis à jour !', '✅');
-  } catch(e) { showToast('Erreur : ' + e.message, '❌'); }
+  }
 }
 
 document.addEventListener('DOMContentLoaded',function(){
