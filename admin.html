@@ -146,6 +146,35 @@ textarea.fi{resize:vertical;min-height:80px}
 </head>
 <body>
 
+<!-- PAGE LOGIN ADMIN -->
+<div id="adminLoginPage" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#1A6B35,#0D3B6E);padding:20px">
+  <div style="background:#fff;border-radius:20px;padding:32px 24px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:48px;margin-bottom:10px">🌿</div>
+      <h1 style="font-size:20px;font-weight:700;color:#1A1A1A;font-family:inherit">Yéyé Market</h1>
+      <p style="font-size:13px;color:#777;margin-top:4px;font-family:inherit">Espace Administrateur</p>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;color:#777;display:block;margin-bottom:5px;font-weight:500;font-family:inherit">Email</label>
+      <input id="adminEmailInput" type="email" placeholder="admin@yeyemarket.bj"
+        style="width:100%;border:1px solid #ddd;border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;background:#f9f9f9;box-sizing:border-box"/>
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="font-size:12px;color:#777;display:block;margin-bottom:5px;font-weight:500;font-family:inherit">Mot de passe</label>
+      <input id="adminPassInput" type="password" placeholder="••••••••"
+        style="width:100%;border:1px solid #ddd;border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;outline:none;background:#f9f9f9;box-sizing:border-box"
+        onkeydown="if(event.key==='Enter')connexionAdmin()"/>
+    </div>
+    <button onclick="connexionAdmin()" id="adminLoginBtn"
+      style="width:100%;background:linear-gradient(135deg,#1A6B35,#2E8B50);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
+      🔐 Se connecter
+    </button>
+    <div id="adminLoginError" style="display:none;margin-top:12px;background:#FDECEA;color:#C0392B;border-radius:8px;padding:10px 14px;font-size:12px;text-align:center;font-family:inherit"></div>
+  </div>
+</div>
+
+<!-- APP ADMIN (caché par défaut) -->
+<div id="adminApp" style="display:none">
 <div class="layout">
 <!-- SIDEBAR -->
 <div class="sidebar">
@@ -1964,5 +1993,6 @@ document.querySelectorAll('.modal-ov').forEach(function(ov) {
 });
 </script>
 </div>
+</div></div>
 </body>
 </html>
