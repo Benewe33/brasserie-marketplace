@@ -2315,6 +2315,175 @@ async function verifierRoleUtilisateur(email){
   });
 }
 
+function fermerModal(id){var m=document.getElementById(id);if(m)m.style.display='none';}
+
+function ouvrirHistorique(){
+  if(!currentUser){showToast('Connectez-vous','⚠️');return;}
+  var m=document.getElementById('modal-historique');
+  if(m){m.style.display='flex';chargerHistorique();}
+}
+async function chargerHistorique(){
+  var el=document.getElementById('historique-content');if(!el)return;
+  el.innerHTML='<div style="text-align:center;padding:20px;color:var(--g400)">Chargement...</div>';
+  try{
+    var res=await sb.from('commandes').select('*').order('cree_le',{ascending:false}).limit(20);
+    var data=res.data||[];
+    if(!data.length){el.innerHTML='<div style="text-align:center;padding:30px;color:var(--g400);font-size:12px"><div style="font-size:30px">🧾</div>Aucune commande</div>';return;}
+    var h='';
+    data.forEach(function(cmd){
+      var sc=cmd.statut==='livree'?'var(--v)':cmd.statut==='en_livraison'?'var(--bl)':'var(--or)';
+      var date=new Date(cmd.cree_le).toLocaleDateString('fr-FR');
+      h+='<div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:0.5px solid var(--g100)">'
+        +'<div style="font-size:22px">🧾</div>'
+        +'<div style="flex:1"><div style="font-size:13px;font-weight:600">'+(cmd.numero||'#'+cmd.id.substr(0,8))+'</div>'
+        +'<div style="font-size:11px;color:var(--g400)">'+date+'</div>'
+        +'<span style="font-size:10px;font-weight:600;color:'+sc+'">'+cmd.statut+'</span></div>'
+        +'<div style="font-size:14px;font-weight:700;color:var(--r)">'+(cmd.total||0).toLocaleString('fr-FR')+' F</div></div>';
+    });
+    el.innerHTML=h;
+  }catch(e){el.innerHTML='<div style="padding:16px;color:var(--g400);font-size:12px">Erreur de chargement</div>';}
+}
+
+function ouvrirAdresses(){
+  var m=document.getElementById('modal-adresses');
+  if(m){m.style.display='flex';chargerAdresses();}
+}
+function chargerAdresses(){
+  var el=document.getElementById('adresses-content');if(!el)return;
+  var saved=[];try{saved=JSON.parse(localStorage.getItem('yeye_adresses')||'[]');}catch(e){}
+  if(!saved.length){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--g400);font-size:12px">Aucune adresse</div>';return;}
+  var h='';
+  saved.forEach(function(a,i){
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--g50);margin-bottom:8px">'
+      +'<span style="font-size:22px">📍</span>'
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:600">'+a.nom+'</div>'
+      +'<div style="font-size:11px;color:var(--g400)">'+a.rue+' · '+a.ville+'</div></div>'
+      +'<button data-i="'+i+'" onclick="supprimerAdresse(parseInt(this.dataset.i))" style="background:var(--rl);color:var(--r);border:none;border-radius:8px;padding:5px 8px;font-size:12px;cursor:pointer">🗑️</button></div>';
+  });
+  el.innerHTML=h;
+}
+function sauvegarderAdresse(){
+  var nom=(document.getElementById('adr-nom')||{}).value||'';
+  var rue=(document.getElementById('adr-rue')||{}).value||'';
+  var ville=(document.getElementById('adr-ville')||{}).value||'Cotonou';
+  if(!nom||!rue){showToast('Nom et rue obligatoires','⚠️');return;}
+  var saved=[];try{saved=JSON.parse(localStorage.getItem('yeye_adresses')||'[]');}catch(e){}
+  saved.push({nom:nom,rue:rue,ville:ville});
+  localStorage.setItem('yeye_adresses',JSON.stringify(saved));
+  ['adr-nom','adr-rue','adr-ville','adr-tel'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  chargerAdresses();showToast('Adresse sauvegardée !','✅');
+}
+function supprimerAdresse(i){
+  var saved=[];try{saved=JSON.parse(localStorage.getItem('yeye_adresses')||'[]');}catch(e){}
+  saved.splice(i,1);localStorage.setItem('yeye_adresses',JSON.stringify(saved));chargerAdresses();
+}
+
+function ouvrirFavoris(){
+  var m=document.getElementById('modal-favoris');if(!m)return;
+  m.style.display='flex';
+  var el=document.getElementById('favoris-content');if(!el)return;
+  var favs=[];try{favs=JSON.parse(localStorage.getItem('yeye_favoris')||'[]');}catch(e){}
+  if(!favs.length){el.innerHTML='<div style="text-align:center;padding:30px;color:var(--g400);font-size:12px"><div style="font-size:30px">❤️</div>Aucun favori</div>';return;}
+  var h='';
+  favs.forEach(function(p){
+    h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--g100)">'
+      +(p.photoUrl?'<img src="'+p.photoUrl+'" style="width:48px;height:48px;border-radius:10px;object-fit:cover"/>'
+      :'<div style="width:48px;height:48px;border-radius:10px;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:22px">'+p.e+'</div>')
+      +'<div style="flex:1"><div style="font-size:13px;font-weight:600">'+p.nom+'</div>'
+      +'<div style="font-size:12px;font-weight:700;color:var(--r)">'+fcfa(p.p)+' FCFA</div></div></div>';
+  });
+  el.innerHTML=h;
+}
+
+function ouvrirPromotions(){showToast('Aucune promotion disponible','🎟️');}
+function ouvrirCommandes(){ouvrirHistorique();}
+
+function ouvrirCoupons(){
+  var m=document.getElementById('modal-coupons');if(m)m.style.display='flex';
+}
+function appliquerCoupon(){
+  var code=((document.getElementById('coupon-code')||{}).value||'').toUpperCase().trim();
+  if(!code)return;
+  if(code==='YEYE10'||code==='BIENVENUE15'){showToast('Coupon '+code+' appliqué !','🎁');}
+  else showToast('Code invalide ou expiré','❌');
+}
+
+function ouvrirPortefeuille(){
+  var m=document.getElementById('modal-portefeuille');if(!m)return;
+  m.style.display='flex';
+  var solde=0;try{solde=parseFloat(localStorage.getItem('yeye_solde')||'0');}catch(e){}
+  var el=document.getElementById('solde-affichage');if(el)el.textContent=solde.toLocaleString('fr-FR')+' FCFA';
+}
+function rechargerMomo(op){
+  var montant=parseFloat((document.getElementById('recharge-montant')||{}).value||'0');
+  if(!montant||montant<500){showToast('Montant minimum 500 FCFA','⚠️');return;}
+  showToast('Simulation en cours...','📱');
+  setTimeout(function(){
+    var s=0;try{s=parseFloat(localStorage.getItem('yeye_solde')||'0');}catch(e){}
+    s+=montant;localStorage.setItem('yeye_solde',String(s));
+    var el=document.getElementById('solde-affichage');if(el)el.textContent=s.toLocaleString('fr-FR')+' FCFA';
+    showToast('+'+montant.toLocaleString('fr-FR')+' FCFA rechargé !','✅');
+  },1500);
+}
+
+function ouvrirPoints(){
+  var m=document.getElementById('modal-points');if(!m)return;
+  m.style.display='flex';
+  var pts=0;try{pts=parseInt(localStorage.getItem('yeye_points')||'0');}catch(e){}
+  var el=document.getElementById('points-affichage');if(el)el.textContent=pts;
+  var el2=document.getElementById('points-barre');if(el2)el2.style.width=Math.min(pts/10,100)+'%';
+}
+
+function ouvrirAide(){
+  var m=document.getElementById('modal-aide');if(!m)return;
+  m.style.display='flex';
+  var faqs=[
+    {q:'Comment passer une commande ?',r:'Choisissez vos produits, ajoutez au panier, sélectionnez votre zone et validez.'},
+    {q:'Comment payer ?',r:'MTN MoMo, Moov Money, carte bancaire ou paiement à la livraison.'},
+    {q:'Délai de livraison ?',r:'30 min à 2h selon votre zone.'},
+    {q:'Comment devenir vendeur ?',r:'Onglet Yéyé → Ouvrir ma boutique.'},
+    {q:'Un problème avec ma commande ?',r:'Contactez-nous via WhatsApp ou par téléphone.'}
+  ];
+  var h='';
+  faqs.forEach(function(f){
+    h+='<div style="border-bottom:0.5px solid var(--g100);padding:12px 0">'
+      +'<div style="font-size:13px;font-weight:600;margin-bottom:4px">❓ '+f.q+'</div>'
+      +'<div style="font-size:12px;color:var(--g400)">'+f.r+'</div></div>';
+  });
+  var el=document.getElementById('faq-list');if(el)el.innerHTML=h;
+}
+
+function ouvrirParametres(){
+  var m=document.getElementById('modal-parametres');if(!m)return;
+  m.style.display='flex';
+  if(currentUser){
+    var meta=currentUser.user_metadata||{};
+    var el=document.getElementById('param-nom');if(el)el.value=meta.nom||'';
+    var el2=document.getElementById('param-email');if(el2)el2.value=currentUser.email||'';
+  }
+}
+async function sauvegarderProfil(){
+  var nom=(document.getElementById('param-nom')||{}).value||'';
+  if(!nom){showToast('Entrez votre nom','⚠️');return;}
+  try{
+    if(currentUser)await sb.auth.updateUser({data:{nom:nom}});
+    var el=document.getElementById('cpt-nom');if(el)el.textContent=nom;
+    showToast('Profil mis à jour !','✅');
+  }catch(e){showToast('Erreur','❌');}
+}
+async function changerMotDePasse(){
+  var p=(document.getElementById('param-newpass')||{}).value||'';
+  if(!p||p.length<6){showToast('Minimum 6 caractères','⚠️');return;}
+  try{
+    var res=await sb.auth.updateUser({password:p});
+    if(res.error)throw res.error;
+    var el=document.getElementById('param-newpass');if(el)el.value='';
+    showToast('Mot de passe modifié !','✅');
+  }catch(e){showToast('Erreur: '+e.message,'❌');}
+}
+
+
+
 </script>
 
 </body>
