@@ -587,7 +587,27 @@ textarea.fi{resize:vertical;min-height:70px}
         <div class="fg"><label class="fl">🪪 Pièce d'identité recto *</label><div class="upb" id="up-r" onclick="simUp('up-r')"><span class="upic">🪪</span><div class="upt">CNI, Passeport ou Permis (recto)</div><div class="ups">JPG, PNG ou PDF · Max 5 MB</div></div></div>
         <div class="fg"><label class="fl">🪪 Pièce d'identité verso *</label><div class="upb" id="up-v" onclick="simUp('up-v')"><span class="upic">🪪</span><div class="upt">CNI, Passeport ou Permis (verso)</div><div class="ups">JPG, PNG ou PDF · Max 5 MB</div></div></div>
         <div style="background:var(--bll);border-radius:10px;padding:10px 12px;font-size:11px;color:var(--bld);margin-bottom:12px">🔒 Vos documents sont chiffrés et sécurisés. Utilisés uniquement pour vérification.</div>
-        <div class="frow"><button class="sbtn" style="background:var(--g200);color:var(--g700)" onclick="swL('moto')">Retour</button><button class="sbtn sbtn-b" onclick="subLiv()">Soumettre</button></div>
+        <!-- CONSENTEMENT LIVREUR -->
+        <div style="background:var(--bll);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(26,95,165,.2)">
+          <div style="font-size:13px;font-weight:600;color:var(--bld);margin-bottom:12px">📋 Contrat d'engagement Yéyé Market</div>
+          <div style="font-size:11px;color:var(--g400);margin-bottom:12px;line-height:1.6">En tant que livreur, vous vous engagez à livrer les colis intacts, à ne pas ouvrir ou endommager les commandes, et à respecter les clients.</div>
+          <a href="https://raw.githubusercontent.com/Benewe33/brasserie-marketplace/main/Contrat_Yeye_Market.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--bl);color:#fff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;text-decoration:none;margin-bottom:14px">
+            📄 Lire le contrat complet
+          </a>
+          <div class="fg"><label class="fl">Nom et Prénom complets *</label>
+            <input class="fi" id="lf-consent-nom" type="text" placeholder="Ex: MENSAH Akobi"/>
+          </div>
+          <div class="fg"><label class="fl">Numéro de téléphone *</label>
+            <input class="fi" id="lf-consent-tel" type="tel" placeholder="+229 97 00 00 00"/>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-top:8px">
+            <input type="checkbox" id="lf-consent-check" style="width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0"/>
+            <label for="lf-consent-check" style="font-size:12px;color:var(--g700);cursor:pointer;line-height:1.6">
+              Je, soussigné(e), certifie avoir lu et accepté le contrat d'engagement Yéyé Market. Je m'engage à livrer toutes les commandes intactes et conformes.
+            </label>
+          </div>
+        </div>
+        <div class="frow"><button class="sbtn" style="background:var(--g200);color:var(--g700)" onclick="swL('moto')">Retour</button><button class="sbtn sbtn-b" onclick="verifierConsentementEtSoumettre('livreur')">✅ Créer mon compte</button></div>
       </div>
     </div>
   </div>
@@ -680,9 +700,29 @@ textarea.fi{resize:vertical;min-height:70px}
           </div>
           <div class="fg"><label class="fl">Stock disponible</label><input class="fi" type="text" placeholder="Ex: 40 sachets"/></div>
         </div>
+        <!-- CONSENTEMENT VENDEUR -->
+        <div style="background:var(--vl);border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(26,107,53,.2)">
+          <div style="font-size:13px;font-weight:600;color:var(--vd);margin-bottom:12px">📋 Contrat d'engagement Yéyé Market</div>
+          <div style="font-size:11px;color:var(--g400);margin-bottom:12px;line-height:1.6">En créant votre compte, vous acceptez de respecter les choix de vos clients, de livrer des produits conformes et d'assumer votre responsabilité légale en cas de manquement.</div>
+          <a href="https://raw.githubusercontent.com/Benewe33/brasserie-marketplace/main/Contrat_Yeye_Market.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:var(--v);color:#fff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;text-decoration:none;margin-bottom:14px">
+            📄 Lire le contrat complet
+          </a>
+          <div class="fg"><label class="fl">Nom et Prénom complets *</label>
+            <input class="fi" id="vf-consent-nom" type="text" placeholder="Ex: AGOSSOU Viviane"/>
+          </div>
+          <div class="fg"><label class="fl">Numéro de téléphone *</label>
+            <input class="fi" id="vf-consent-tel" type="tel" placeholder="+229 97 00 00 00"/>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:10px;margin-top:8px">
+            <input type="checkbox" id="vf-consent-check" style="width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0"/>
+            <label for="vf-consent-check" style="font-size:12px;color:var(--g700);cursor:pointer;line-height:1.6">
+              Je, soussigné(e) <strong id="vf-consent-nom-display">___</strong>, certifie avoir lu et accepté le contrat d'engagement Yéyé Market. Je m'engage à respecter les droits des clients et reconnais ma responsabilité légale en cas de manquement.
+            </label>
+          </div>
+        </div>
         <div class="frow">
           <button class="sbtn" style="background:var(--g200);color:var(--g700)" onclick="swV('bout')">Retour</button>
-          <button class="sbtn" onclick="subVend()">Soumettre</button>
+          <button class="sbtn" onclick="verifierConsentementEtSoumettre('vendeur')">✅ Créer mon compte</button>
         </div>
       </div>
     </div>
@@ -1004,8 +1044,28 @@ textarea.fi{resize:vertical;min-height:70px}
         <div class="upb" id="up-plats" onclick="simUp('up-plats')"><span class="upic">🍛</span><div class="upt">Photos de vos meilleurs plats</div><div class="ups">JPG ou PNG · Max 5 MB chacune</div></div>
       </div>
       <div class="fg"><label class="fl">Numéro MTN Mobile Money *</label><input class="fi" type="tel" placeholder="+229 ... (pour recevoir vos paiements)"/></div>
-      <button class="sbtn" style="background:#E07B1A" onclick="subResto()">
-        <i class="ti ti-send" aria-hidden="true"></i> Soumettre ma demande
+      <!-- CONSENTEMENT RESTAURANT -->
+      <div style="background:#FFF3E0;border-radius:12px;padding:16px;margin-bottom:16px;border:1px solid rgba(224,123,26,.3)">
+        <div style="font-size:13px;font-weight:600;color:#7B3A00;margin-bottom:12px">📋 Contrat d'engagement Yéyé Market</div>
+        <div style="font-size:11px;color:var(--g400);margin-bottom:12px;line-height:1.6">En rejoignant Yéyé Market, vous vous engagez à servir des plats conformes aux commandes, respecter les normes d'hygiène et assumer votre responsabilité légale.</div>
+        <a href="https://raw.githubusercontent.com/Benewe33/brasserie-marketplace/main/Contrat_Yeye_Market.pdf" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#E07B1A;color:#fff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;text-decoration:none;margin-bottom:14px">
+          📄 Lire le contrat complet
+        </a>
+        <div class="fg"><label class="fl">Nom et Prénom du responsable *</label>
+          <input class="fi" id="rf-consent-nom" type="text" placeholder="Ex: TOSSOU Marie-Claire"/>
+        </div>
+        <div class="fg"><label class="fl">Numéro de téléphone *</label>
+          <input class="fi" id="rf-consent-tel" type="tel" placeholder="+229 97 00 00 00"/>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-top:8px">
+          <input type="checkbox" id="rf-consent-check" style="width:18px;height:18px;margin-top:2px;cursor:pointer;flex-shrink:0"/>
+          <label for="rf-consent-check" style="font-size:12px;color:var(--g700);cursor:pointer;line-height:1.6">
+            Je, soussigné(e), responsable de cet établissement, certifie avoir lu et accepté le contrat d'engagement Yéyé Market. Je m'engage à respecter les commandes des clients et les normes sanitaires.
+          </label>
+        </div>
+      </div>
+      <button class="sbtn" style="background:#E07B1A" onclick="verifierConsentementEtSoumettre('restaurant')">
+        <i class="ti ti-send" aria-hidden="true"></i> ✅ Créer mon compte
       </button>
     </div>
   </div>
@@ -2052,6 +2112,34 @@ function subLivFinal(){ soumettreLivreur(); }
 function subVendFinal(){ soumettreVendeur(); }
 function subRestoFinal(){ soumettreResto(); }
 
+function verifierConsentementEtSoumettre(type) {
+  var prefixes = {vendeur:'vf', livreur:'lf', restaurant:'rf'};
+  var pre = prefixes[type] || 'vf';
+
+  // Champs consentement selon le type
+  var nomEl   = document.getElementById(pre+'-consent-nom');
+  var telEl   = document.getElementById(pre+'-consent-tel');
+  var checkEl = document.getElementById(pre+'-consent-check');
+
+  var nomComplet = nomEl   ? nomEl.value.trim()   : '';
+  var tel        = telEl   ? telEl.value.trim()   : '';
+  var checked    = checkEl ? checkEl.checked      : false;
+
+  if (!nomComplet){ showToast('Entrez votre nom et prénom complets','⚠️'); if(nomEl)nomEl.focus(); return; }
+  if (nomComplet.split(' ').length < 2){ showToast('Entrez votre NOM et PRÉNOM (2 mots minimum)','⚠️'); if(nomEl)nomEl.focus(); return; }
+  if (!tel){ showToast('Entrez votre numéro de téléphone','⚠️'); if(telEl)telEl.focus(); return; }
+  if (!checked){ showToast('Vous devez lire et accepter le contrat pour continuer','⚠️'); return; }
+
+  // Mettre à jour l'affichage du nom signataire
+  var display = document.getElementById(pre+'-consent-nom-display');
+  if (display) display.textContent = nomComplet;
+
+  // Lancer la soumission selon le type
+  if (type === 'vendeur')     soumettreVendeur();
+  else if (type === 'livreur') soumettreLivreur();
+  else if (type === 'restaurant') soumettreResto();
+}
+
 document.addEventListener('DOMContentLoaded',function(){
   buildGeoGr();
   buildHomeBout();
@@ -2120,144 +2208,84 @@ function onCompteTabOpen(){sb.auth.getSession().then(function(res){if(res.data&&
 async function cptConnexion(){var email=(document.getElementById('cpt-email-inp')||{}).value||'';var pass=(document.getElementById('cpt-pass-inp')||{}).value||'';if(!email||!pass){showToast('Email et mot de passe requis','⚠️');return;}showToast('Connexion...','⏳');try{var res=await sb.auth.signInWithPassword({email,password:pass});if(res.error)throw res.error;currentUser=res.data.user;await afficherVueConnecte();showToast('Bienvenue !','✅');}catch(e){showToast(e.message.indexOf('Invalid')!==-1?'Email ou mot de passe incorrect':'Erreur: '+e.message,'❌');}}
 async function cptDeconnexion(){await sb.auth.signOut();currentUser=null;['cpt-login-form'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='block';});['cpt-logout-form','cpt-espaces'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});var el=document.getElementById('cpt-auth-btn');if(el)el.textContent='Se connecter';showToast('Déconnecté','👋');}
 async function afficherVueConnecte(){if(!currentUser)return;var email=currentUser.email||'';var nom=(currentUser.user_metadata&&currentUser.user_metadata.nom)||email.split('@')[0];var el;el=document.getElementById('cpt-nom');if(el)el.textContent=nom;el=document.getElementById('cpt-email');if(el)el.textContent=email;el=document.getElementById('cpt-avatar');if(el)el.textContent=nom.charAt(0).toUpperCase();el=document.getElementById('cpt-auth-btn');if(el)el.textContent='Connecté ✅';el=document.getElementById('cpt-login-form');if(el)el.style.display='none';el=document.getElementById('cpt-logout-form');if(el)el.style.display='block';await verifierRoleUtilisateur(email);}
-async function verifierRoleUtilisateur(email){var espaces=[];try{var r1=await sb.from('boutiques').select('id,nom,statut').eq('email',email).limit(1);if(!r1.error&&r1.data&&r1.data.length)espaces.push({type:'vendeur',nom:r1.data[0].nom,statut:r1.data[0].statut,ic:'💼',color:'var(--v)',bg:'var(--vl)',url:'vendeur.html'});}catch(e1){}try{var r2=await sb.from('livreurs').select('id,nom,statut').eq('email',email).limit(1);if(!r2.error&&r2.data&&r2.data.length)espaces.push({type:'livreur',nom:r2.data[0].nom,statut:r2.data[0].statut,ic:'🛵',color:'var(--bl)',bg:'var(--bll)',url:'livreur.html'});}catch(e2){}try{var r3=await sb.from('restaurants').select('id,nom,statut').eq('email',email).limit(1);if(!r3.error&&r3.data&&r3.data.length)espaces.push({type:'restaurant',nom:r3.data[0].nom,statut:r3.data[0].statut,ic:'🍽️',color:'var(--or)',bg:'#FFF3E0',url:'restaurant.html'});}catch(e3){}
-if(!espaces.length&&currentUser){var meta=currentUser.user_metadata||{};if(meta.role)espaces.push({type:meta.role,nom:meta.nom||'Mon Espace',statut:'en_attente',ic:meta.role==='vendeur'?'💼':meta.role==='livreur'?'🛵':'🍽️',color:meta.role==='vendeur'?'var(--v)':meta.role==='livreur'?'var(--bl)':'var(--or)',bg:meta.role==='vendeur'?'var(--vl)':meta.role==='livreur'?'var(--bll)':'#FFF3E0',url:meta.role+'.html'});}
-var el=document.getElementById('cpt-espaces');var list=document.getElementById('cpt-espaces-list');if(!espaces.length){if(el)el.style.display='none';return;}if(el)el.style.display='block';if(list)list.innerHTML='';espaces.forEach(function(esp){var actif=esp.statut==='active'||esp.statut==='actif';var div=document.createElement('div');div.style.cssText='display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;margin-bottom:8px;border:1.5px solid rgba(0,0,0,.08);background:'+esp.bg+';cursor:'+(actif?'pointer':'default');div.innerHTML='<span style="font-size:28px">'+esp.ic+'</span><div style="flex:1"><div style="font-size:13px;font-weight:600;color:var(--g900)">'+esp.nom+'</div><div style="font-size:11px;margin-top:3px;color:'+(actif?esp.color:'var(--or)')+'">'+( actif?"✅ Actif — Ouvrir le dashboard":"⏳ En attente de validation")+'</div></div>'+(actif?'<i class="ti ti-chevron-right" style="color:'+esp.color+';font-size:18px"></i>':'');if(actif)div.addEventListener('click',(function(u){return function(){window.location.href=u;};})(esp.url));if(list)list.appendChild(div);});}
-function fermerModal(id){var m=document.getElementById(id);if(m)m.style.display='none';}
-function ouvrirHistorique(){if(!currentUser){showToast('Connectez-vous','⚠️');return;}var m=document.getElementById('modal-historique');if(m){m.style.display='flex';chargerHistorique();}}
-async function chargerHistorique(){var el=document.getElementById('historique-content');if(!el)return;el.innerHTML='<div style="text-align:center;padding:20px;color:var(--g400)">Chargement...</div>';try{var res=await sb.from('commandes').select('*').order('cree_le',{ascending:false}).limit(20);var data=res.data||[];if(!data.length){el.innerHTML='<div style="text-align:center;padding:30px;color:var(--g400);font-size:12px">Aucune commande</div>';return;}var h='';data.forEach(function(cmd){var date=new Date(cmd.cree_le).toLocaleDateString('fr-FR');h+='<div style="display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:0.5px solid var(--g100)"><div style="font-size:22px">🧾</div><div style="flex:1"><div style="font-size:13px;font-weight:600">'+(cmd.numero||'#'+cmd.id.substr(0,8))+'</div><div style="font-size:11px;color:var(--g400)">'+date+'</div><span style="font-size:10px;font-weight:600;color:var(--v)">'+cmd.statut+'</span></div><div style="font-size:14px;font-weight:700;color:var(--r)">'+(cmd.total||0).toLocaleString('fr-FR')+' F</div></div>';});el.innerHTML=h;}catch(e){el.innerHTML='<div style="padding:16px;color:var(--g400);font-size:12px">Erreur</div>';}}
-function ouvrirAdresses(){var m=document.getElementById('modal-adresses');if(m){m.style.display='flex';chargerAdresses();}}
-function chargerAdresses(){var el=document.getElementById('adresses-content');if(!el)return;var saved=[];try{saved=JSON.parse(localStorage.getItem('yeye_adresses')||'[]');}catch(e){}if(!saved.length){el.innerHTML='<div style="text-align:center;padding:16px;color:var(--g400);font-size:12px">Aucune adresse</div>';return;}var h='';saved.forEach(function(a,i){h+='<div style="display:flex;gap:10px;padding:10px;border-radius:10px;background:var(--g50);margin-bottom:8px"><span style="font-size:22px">📍</span><div style="flex:1"><div style="font-size:13px;font-weight:600">'+a.nom+'</div><div style="font-size:11px;color:var(--g400)">'+a.rue+' · '+a.ville+'</div></div><button data-i="'+i+'" onclick="supprimerAdresse(parseInt(this.dataset.i))" style="background:var(--rl);color:var(--r);border:none;border-radius:8px;padding:5px 8px;font-size:12px;cursor:pointer">🗑️</button></div>';});el.innerHTML=h;}
-function sauvegarderAdresse(){var nom=(document.getElementById('adr-nom')||{}).value||'';var rue=(document.getElementById('adr-rue')||{}).value||'';var ville=(document.getElementById('adr-ville')||{}).value||'Cotonou';if(!nom||!rue){showToast('Nom et rue obligatoires','⚠️');return;}var saved=[];try{saved=JSON.parse(localStorage.getItem('yeye_adresses')||'[]');}catch(e){}saved.push({nom,rue,ville});localStorage.setItem('yeye_adresses',JSON.stringify(saved));['adr-nom','adr-rue','adr-ville','adr-tel'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});chargerAdresses();showToast('Adresse sauvegardée !','✅');}
-function supprimerAdresse(i){var saved=[];try{saved=JSON.parse(localStorage.getItem('yeye_adresses')||'[]');}catch(e){}saved.splice(i,1);localStorage.setItem('yeye_adresses',JSON.stringify(saved));chargerAdresses();}
-function ouvrirFavoris(){var m=document.getElementById('modal-favoris');if(m)m.style.display='flex';}
-function ouvrirPromotions(){showToast('Aucune promotion disponible','🎟️');}
-function ouvrirCommandes(){ouvrirHistorique();}
-function ouvrirCoupons(){var m=document.getElementById('modal-coupons');if(m)m.style.display='flex';}
-function appliquerCoupon(){var code=((document.getElementById('coupon-code')||{}).value||'').toUpperCase();if(code==='YEYE10'||code==='BIENVENUE15'){showToast('Coupon appliqué !','🎁');}else showToast('Code invalide','❌');}
-function ouvrirPortefeuille(){var m=document.getElementById('modal-portefeuille');if(m){m.style.display='flex';var s=parseFloat(localStorage.getItem('yeye_solde')||'0');var el=document.getElementById('solde-affichage');if(el)el.textContent=s.toLocaleString('fr-FR')+' FCFA';}}
-function rechargerMomo(op){var montant=parseFloat((document.getElementById('recharge-montant')||{}).value||'0');if(!montant||montant<500){showToast('Montant minimum 500 FCFA','⚠️');return;}showToast('Simulation...','📱');setTimeout(function(){var s=parseFloat(localStorage.getItem('yeye_solde')||'0')+montant;localStorage.setItem('yeye_solde',String(s));var el=document.getElementById('solde-affichage');if(el)el.textContent=s.toLocaleString('fr-FR')+' FCFA';showToast('+'+montant.toLocaleString('fr-FR')+' FCFA rechargé !','✅');},1500);}
-function ouvrirPoints(){var m=document.getElementById('modal-points');if(m)m.style.display='flex';}
-function ouvrirAide(){var m=document.getElementById('modal-aide');if(m){m.style.display='flex';var el=document.getElementById('faq-list');if(el)el.innerHTML='<div style="padding:12px 0;border-bottom:0.5px solid var(--g100)"><div style="font-size:13px;font-weight:600;margin-bottom:4px">❓ Comment passer une commande ?</div><div style="font-size:12px;color:var(--g400)">Choisissez vos produits, ajoutez au panier, sélectionnez votre zone et validez.</div></div><div style="padding:12px 0;border-bottom:0.5px solid var(--g100)"><div style="font-size:13px;font-weight:600;margin-bottom:4px">❓ Comment payer ?</div><div style="font-size:12px;color:var(--g400)">MTN MoMo, Moov Money, carte bancaire ou paiement à la livraison.</div></div><div style="padding:12px 0"><div style="font-size:13px;font-weight:600;margin-bottom:4px">❓ Comment devenir vendeur ?</div><div style="font-size:12px;color:var(--g400)">Onglet Rejoindre Yéyé Market → Ouvrir ma boutique.</div></div>';}}
-function ouvrirParametres(){var m=document.getElementById('modal-parametres');if(m){m.style.display='flex';if(currentUser){var meta=currentUser.user_metadata||{};var el=document.getElementById('param-nom');if(el)el.value=meta.nom||'';var el2=document.getElementById('param-email');if(el2)el2.value=currentUser.email||'';}}}
-async function sauvegarderProfil(){var nom=(document.getElementById('param-nom')||{}).value||'';if(!nom){showToast('Entrez votre nom','⚠️');return;}try{if(currentUser)await sb.auth.updateUser({data:{nom}});showToast('Profil mis à jour !','✅');}catch(e){showToast('Erreur','❌');}}
-async function changerMotDePasse(){var p=(document.getElementById('param-newpass')||{}).value||'';if(!p||p.length<6){showToast('Minimum 6 caractères','⚠️');return;}try{var res=await sb.auth.updateUser({password:p});if(res.error)throw res.error;showToast('Mot de passe modifié !','✅');}catch(e){showToast('Erreur','❌');}}
+async function verifierRoleUtilisateur(email){
+  var espaces=[];
+  var uid = currentUser ? currentUser.id : null;
 
-</script>
-<!-- MODALS COMPTE -->
-<div id="modal-historique" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
-  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-size:15px;font-weight:600">🕐 Historique des commandes</div>
-      <button onclick="fermerModal('modal-historique')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <div id="historique-content"></div>
-  </div>
-</div>
-<div id="modal-adresses" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
-  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-size:15px;font-weight:600">📍 Mes adresses</div>
-      <button onclick="fermerModal('modal-adresses')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <div id="adresses-content"></div>
-    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--g100)">
-      <div style="font-size:13px;font-weight:600;margin-bottom:10px">+ Nouvelle adresse</div>
-      <input id="adr-nom" type="text" placeholder="Nom (Maison, Bureau...)" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px"/>
-      <input id="adr-rue" type="text" placeholder="Rue / Quartier" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px"/>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-        <input id="adr-ville" type="text" placeholder="Ville" style="border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none"/>
-        <input id="adr-tel" type="tel" placeholder="Téléphone" style="border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none"/>
-      </div>
-      <button onclick="sauvegarderAdresse()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💾 Sauvegarder</button>
-    </div>
-  </div>
-</div>
-<div id="modal-favoris" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
-  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-size:15px;font-weight:600">❤️ Mes favoris</div>
-      <button onclick="fermerModal('modal-favoris')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <div id="favoris-content"><div style="text-align:center;padding:30px;color:var(--g400);font-size:12px"><div style="font-size:30px;margin-bottom:8px">❤️</div>Aucun favori</div></div>
-  </div>
-</div>
-<div id="modal-coupons" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
-  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-size:15px;font-weight:600">🎁 Mes Coupons</div>
-      <button onclick="fermerModal('modal-coupons')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:14px">
-      <input id="coupon-code" type="text" placeholder="Code promo" style="flex:1;border:1px solid var(--g200);border-radius:10px;padding:11px;font-size:13px;font-family:inherit;outline:none;text-transform:uppercase"/>
-      <button onclick="appliquerCoupon()" style="background:var(--v);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Valider</button>
-    </div>
-    <div style="background:linear-gradient(135deg,var(--jl),#FFF8DC);border-radius:12px;padding:14px;border:1.5px dashed var(--j)">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><div style="font-size:16px;font-weight:700;color:var(--jd);letter-spacing:2px">YEYE10</div><div style="font-size:11px;color:var(--g400)">10% sur votre première commande</div></div>
-        <div style="background:var(--j);color:var(--jd);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700">-10%</div>
-      </div>
-    </div>
-  </div>
-</div>
-<div id="modal-portefeuille" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
-  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-size:15px;font-weight:600">💰 Mon Portefeuille</div>
-      <button onclick="fermerModal('modal-portefeuille')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <div style="background:linear-gradient(135deg,var(--v),#2E8B50);border-radius:16px;padding:20px;text-align:center;margin-bottom:16px">
-      <div style="font-size:11px;color:rgba(255,255,255,.8)">Solde disponible</div>
-      <div id="solde-affichage" style="font-size:28px;font-weight:700;color:#fff">0 FCFA</div>
-    </div>
-    <div style="margin-bottom:10px"><input id="recharge-montant" type="number" placeholder="Montant (FCFA)" min="500" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:11px;font-size:14px;font-family:inherit;outline:none"/></div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-      <button onclick="rechargerMomo('mtn')" style="background:#FFCB05;color:#1A1A1A;border:none;border-radius:12px;padding:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📱 MTN MoMo</button>
-      <button onclick="rechargerMomo('moov')" style="background:#0057A8;color:#fff;border:none;border-radius:12px;padding:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📱 Moov Money</button>
-    </div>
-    <div style="background:var(--g50);border-radius:10px;padding:12px;font-size:11px;color:var(--g400);line-height:1.8">📞 MTN MoMo : *126#<br>📞 Moov Money : *155#<br>💡 Montant minimum : 500 FCFA</div>
-  </div>
-</div>
-<div id="modal-points" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
-  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-size:15px;font-weight:600">⭐ Points Yéyé</div>
-      <button onclick="fermerModal('modal-points')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <div style="background:linear-gradient(135deg,#F5C518,#E07B1A);border-radius:16px;padding:20px;text-align:center;margin-bottom:16px">
-      <div style="font-size:11px;color:rgba(255,255,255,.9)">Vos points</div>
-      <div id="points-affichage" style="font-size:36px;font-weight:700;color:#fff">0</div>
-      <div style="background:rgba(255,255,255,.3);border-radius:20px;height:6px;margin-top:10px"><div id="points-barre" style="background:#fff;border-radius:20px;height:6px;width:0%"></div></div>
-    </div>
-    <div style="background:var(--g50);border-radius:10px;padding:12px;font-size:12px;color:var(--g700);line-height:1.8">🥉 Bronze : 0–499 pts<br>🥈 Argent : 500–999 pts · 5% réduction<br>🥇 Or : 1000+ pts · 10% + livraison offerte</div>
-  </div>
-</div>
-<div id="modal-aide" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
-  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-size:15px;font-weight:600">🎧 Centre d'aide</div>
-      <button onclick="fermerModal('modal-aide')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-      <a href="tel:+22900000000" style="text-decoration:none;background:var(--vl);border-radius:12px;padding:14px;text-align:center;display:block"><div style="font-size:24px;margin-bottom:6px">📞</div><div style="font-size:12px;font-weight:600;color:var(--vd)">Appeler</div><div style="font-size:10px;color:var(--v)">+229 00 00 00 00</div></a>
-      <a href="https://wa.me/22900000000" target="_blank" style="text-decoration:none;background:#E8F8F0;border-radius:12px;padding:14px;text-align:center;display:block"><div style="font-size:24px;margin-bottom:6px">💬</div><div style="font-size:12px;font-weight:600;color:#1A6B35">WhatsApp</div><div style="font-size:10px;color:var(--v)">8h–20h</div></a>
-    </div>
-    <div id="faq-list"></div>
-  </div>
-</div>
-<div id="modal-parametres" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
-  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div style="font-size:15px;font-weight:600">⚙️ Paramètres</div>
-      <button onclick="fermerModal('modal-parametres')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
-    </div>
-    <input id="param-nom" type="text" placeholder="Nom complet" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px"/>
-    <input id="param-email" type="email" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;background:var(--g100);outline:none;margin-bottom:10px" readonly/>
-    <button onclick="sauvegarderProfil()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px">💾 Sauvegarder</button>
-    <input id="param-newpass" type="password" placeholder="Nouveau mot de passe" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px"/>
-    <button onclick="changerMotDePasse()" style="width:100%;background:var(--bl);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:14px">🔑 Changer mot de passe</button>
-    <button onclick="cptDeconnexion();fermerModal('modal-parametres')" style="width:100%;background:var(--rl);color:var(--r);border:1px solid var(--r);border-radius:12px;padding:12px;font-size:13px;font-family:inherit;cursor:pointer">🚪 Se déconnecter</button>
-  </div>
-</div>
+  // Check vendeur — par email OU par vendeur_id
+  try {
+    var r1 = await sb.from('boutiques').select('id,nom,statut').eq('email',email).limit(1);
+    console.log('Boutique par email:', JSON.stringify(r1.data), 'err:', r1.error);
+    if(!r1.error && r1.data && r1.data.length) {
+      espaces.push({type:'vendeur',nom:r1.data[0].nom,statut:r1.data[0].statut,ic:'💼',color:'var(--v)',bg:'var(--vl)',url:'vendeur.html'});
+    } else if (uid) {
+      // Essai par vendeur_id
+      var r1b = await sb.from('boutiques').select('id,nom,statut').eq('vendeur_id',uid).limit(1);
+      console.log('Boutique par vendeur_id:', JSON.stringify(r1b.data));
+      if(!r1b.error && r1b.data && r1b.data.length) {
+        espaces.push({type:'vendeur',nom:r1b.data[0].nom,statut:r1b.data[0].statut,ic:'💼',color:'var(--v)',bg:'var(--vl)',url:'vendeur.html'});
+      }
+    }
+  } catch(e1){ console.log('Boutique erreur:',e1.message); }
+
+  // Check livreur — par email OU utilisateur_id
+  try {
+    var r2 = await sb.from('livreurs').select('id,nom,statut').eq('email',email).limit(1);
+    if(!r2.error && r2.data && r2.data.length) {
+      espaces.push({type:'livreur',nom:r2.data[0].nom,statut:r2.data[0].statut,ic:'🛵',color:'var(--bl)',bg:'var(--bll)',url:'livreur.html'});
+    } else if (uid) {
+      var r2b = await sb.from('livreurs').select('id,nom,statut').eq('utilisateur_id',uid).limit(1);
+      if(!r2b.error && r2b.data && r2b.data.length) {
+        espaces.push({type:'livreur',nom:r2b.data[0].nom,statut:r2b.data[0].statut,ic:'🛵',color:'var(--bl)',bg:'var(--bll)',url:'livreur.html'});
+      }
+    }
+  } catch(e2){ console.log('Livreur erreur:',e2.message); }
+
+  // Check restaurant — par email
+  try {
+    var r3 = await sb.from('restaurants').select('id,nom,statut').eq('email',email).limit(1);
+    if(!r3.error && r3.data && r3.data.length) {
+      espaces.push({type:'restaurant',nom:r3.data[0].nom,statut:r3.data[0].statut,ic:'🍽️',color:'var(--or)',bg:'#FFF3E0',url:'restaurant.html'});
+    }
+  } catch(e3){ console.log('Restaurant erreur:',e3.message); }
+
+  // Fallback via user_metadata
+  if(!espaces.length && currentUser) {
+    var meta = currentUser.user_metadata || {};
+    if(meta.role) espaces.push({
+      type:meta.role,
+      nom:meta.nom||'Mon Espace',
+      statut:'en_attente',
+      ic:meta.role==='vendeur'?'💼':meta.role==='livreur'?'🛵':'🍽️',
+      color:meta.role==='vendeur'?'var(--v)':meta.role==='livreur'?'var(--bl)':'var(--or)',
+      bg:meta.role==='vendeur'?'var(--vl)':meta.role==='livreur'?'var(--bll)':'#FFF3E0',
+      url:meta.role+'.html'
+    });
+  }
+
+  console.log('Espaces trouvés:', espaces.length, espaces.map(function(e){return e.type+':'+e.statut;}));
+
+  var el=document.getElementById('cpt-espaces');
+  var list=document.getElementById('cpt-espaces-list');
+  if(!espaces.length){if(el)el.style.display='none';return;}
+  if(el)el.style.display='block';
+  if(list)list.innerHTML='';
+  espaces.forEach(function(esp){
+    var actif=esp.statut==='active'||esp.statut==='actif';
+    var div=document.createElement('div');
+    div.style.cssText='display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;margin-bottom:8px;border:1.5px solid rgba(0,0,0,.08);background:'+esp.bg+';cursor:'+(actif?'pointer':'default');
+    div.innerHTML='<span style="font-size:28px">'+esp.ic+'</span>'
+      +'<div style="flex:1">'
+      +'<div style="font-size:13px;font-weight:600;color:var(--g900)">'+esp.nom+'</div>'
+      +'<div style="font-size:11px;margin-top:3px;color:'+(actif?esp.color:'var(--or)')+'">'+( actif?"✅ Actif — Ouvrir le dashboard":"⏳ En attente de validation admin")+'</div>'
+      +'</div>'
+      +(actif?'<i class="ti ti-chevron-right" style="color:'+esp.color+';font-size:18px"></i>':'');
+    if(actif)div.addEventListener('click',(function(u){return function(){window.location.href=u;};})(esp.url));
+    if(list)list.appendChild(div);
+  });
+}
+
+
+
 </body>
 </html>

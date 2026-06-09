@@ -481,16 +481,24 @@ async function chargerMissionEnCours(){
 }
 
 async function ajouterPhotoColisLivreur(input,livId){
+  if(photosColisLivreur.length >= 3){showToast('Maximum 3 photos','⚠️');input.value='';return;}
   var file=input.files[0];if(!file)return;
-  showToast('Upload...','📸');
+  showToast('Upload photo...','📸');
   var url=await uploadSupabase(file,'livraisons/colis_l_'+livId+'_'+Date.now());
   if(url){
     photosColisLivreur.push(url);
     var grid=document.getElementById('photosColisLivEl');
-    if(grid){var img=document.createElement('img');img.src=url;img.className='photo-thumb';grid.appendChild(img);}
+    if(grid){
+      var img=document.createElement('img');img.src=url;img.className='photo-thumb';
+      grid.appendChild(img);
+    }
+    if(photosColisLivreur.length >= 3){
+      var zone=document.getElementById('photosColisLivEl');
+      // Hide add button after 3
+    }
     var btn=document.getElementById('btnPriseEnCharge');
     if(btn){btn.disabled=false;btn.style.opacity='1';}
-    showToast('Photo ajoutée !','✅');
+    showToast('Photo '+photosColisLivreur.length+'/3 du colis ajoutée !','📸');
   }
   input.value='';
 }
@@ -505,16 +513,26 @@ async function priseEnCharge(livId){
 }
 
 async function ajouterPhotoLivraison(input,livId){
+  if(photosLivraison.length >= 3){showToast('Maximum 3 photos','⚠️');input.value='';return;}
   var file=input.files[0];if(!file)return;
-  showToast('Upload...','📸');
+  showToast('Upload photo...','📸');
   var url=await uploadSupabase(file,'livraisons/confirm_'+livId+'_'+Date.now());
   if(url){
     photosLivraison.push(url);
     var grid=document.getElementById('photosLivEl');
-    if(grid){var img=document.createElement('img');img.src=url;img.className='photo-thumb';grid.appendChild(img);}
+    if(grid){
+      var img=document.createElement('img');img.src=url;img.className='photo-thumb';
+      grid.appendChild(img);
+    }
+    // Masquer zone si 3 photos atteintes
+    if(photosLivraison.length >= 3){
+      var zone=document.getElementById('photoLivZone');
+      if(zone)zone.style.display='none';
+    }
+    // Activer bouton confirmer
     var btn=document.getElementById('btnColisLivre');
     if(btn){btn.disabled=false;btn.style.opacity='1';}
-    showToast('Photo ajoutée !','✅');
+    showToast('Photo '+photosLivraison.length+'/3 ajoutée !','📸');
   }
   input.value='';
 }
