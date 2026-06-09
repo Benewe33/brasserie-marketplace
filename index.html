@@ -36,7 +36,7 @@ html,body{width:100%;min-height:100vh;background:var(--g50);font-family:'DM Sans
 .geo-div{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .geo-div span{font-size:11px;color:var(--g400);white-space:nowrap}
 .geo-ln{flex:1;height:0.5px;background:var(--g200)}
-.geo-gr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.geo-gr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .geo-z{border:1px solid var(--g200);border-radius:12px;padding:11px 8px;text-align:center;cursor:pointer;background:var(--w);font-family:inherit}
 .geo-z:active{border-color:var(--v);background:var(--vl)}
 .geo-z.sel{border:1.5px solid var(--v);background:var(--vl)}
@@ -337,7 +337,7 @@ textarea.fi{resize:vertical;min-height:70px}
 
 <!-- GEO MODAL -->
 <div class="geo-ov" id="geoOv">
-  <div class="geo-sh">
+  <div class="geo-sh" style="max-height:90vh;overflow-y:auto">
     <div class="geo-hd"></div>
     <div class="geo-bd">
       <div class="geo-t"><i class="ti ti-map-pin" style="color:var(--v);font-size:20px" aria-hidden="true"></i>Où vous trouvez-vous ?</div>
@@ -623,7 +623,7 @@ html,body{width:100%;min-height:100vh;background:var(--g50);font-family:'DM Sans
 .geo-div{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .geo-div span{font-size:11px;color:var(--g400);white-space:nowrap}
 .geo-ln{flex:1;height:0.5px;background:var(--g200)}
-.geo-gr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.geo-gr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
 .geo-z{border:1px solid var(--g200);border-radius:12px;padding:11px 8px;text-align:center;cursor:pointer;background:var(--w);font-family:inherit}
 .geo-z:active{border-color:var(--v);background:var(--vl)}
 .geo-z.sel{border:1.5px solid var(--v);background:var(--vl)}
@@ -919,7 +919,7 @@ textarea.fi{resize:vertical;min-height:70px}
 
 <!-- GEO MODAL -->
 <div class="geo-ov" id="geoOv">
-  <div class="geo-sh">
+  <div class="geo-sh" style="max-height:90vh;overflow-y:auto">
     <div class="geo-hd"></div>
     <div class="geo-bd">
       <div class="geo-t"><i class="ti ti-map-pin" style="color:var(--v);font-size:20px" aria-hidden="true"></i>Où vous trouvez-vous ?</div>
@@ -3092,4 +3092,62 @@ async function verifierRoleUtilisateur() {
   } catch(e) {}
 }
 
->
+
+// ============================================================
+// INIT AU DÉMARRAGE
+// ============================================================
+(async function init() {
+  // 1. Construire la grille des villes
+  buildGeoGr();
+
+  // 2. Vérifier si ville déjà choisie
+  try {
+    var saved = localStorage.getItem('yeye_geo');
+    if (saved) {
+      var gz2 = JSON.parse(saved);
+      for (var i = 0; i < GZ.length; i++) {
+        if (GZ[i].id === gz2.id) { curGeo = GZ[i]; break; }
+      }
+      if (curGeo) {
+        var ov = document.getElementById('geoOv');
+        if (ov) ov.style.display = 'none';
+        var lt = document.getElementById('locTxt');
+        if (lt) lt.textContent = curGeo.e + ' ' + curGeo.name;
+        var bc = document.getElementById('banCity');
+        if (bc) bc.textContent = curGeo.name;
+        chargerCategoriesSupabase();
+        chargerBoutiquesSupabase(curGeo.id);
+        chargerProduitsSupabase(curGeo.id);
+        chargerLivreursSupabase(curGeo.id);
+      }
+    } else {
+      // Pas de ville sauvegardée — afficher le modal
+      var ov2 = document.getElementById('geoOv');
+      if (ov2) ov2.style.display = 'flex';
+      // Charger quand même les données globales
+      chargerCategoriesSupabase();
+      chargerBoutiquesSupabase(null);
+      chargerProduitsSupabase(null);
+      chargerLivreursSupabase(null);
+    }
+  } catch(e) {
+    buildGeoGr();
+    chargerBoutiquesSupabase(null);
+    chargerProduitsSupabase(null);
+  }
+
+  // 3. Vérifier session utilisateur
+  try {
+    var session = await sb.auth.getSession();
+    if (session.data && session.data.session) {
+      currentUser = session.data.session.user;
+      afficherVueConnecte();
+    }
+  } catch(e) { console.log('Auth:', e.message); }
+
+})();
+
+
+</script>
+</body>
+</html>

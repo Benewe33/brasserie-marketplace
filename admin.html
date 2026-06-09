@@ -647,7 +647,28 @@ textarea.fi{resize:vertical;min-height:80px}
       <button class="modal-close" onclick="fermerModal('modalBanner')">✕</button>
     </div>
     <div class="modal-body">
-      <div class="fg"><label class="fl">Emoji ou icône</label><input class="fi" id="bannerEmoji" type="text" placeholder="🌿"/></div>
+      <!-- IMAGE OU EMOJI -->
+      <div class="fg">
+        <label class="fl">Image ou Emoji *</label>
+        <div style="display:flex;gap:12px;align-items:flex-start">
+          <div id="bannerImgPreview" onclick="document.getElementById('bannerImgInput').click()"
+            style="width:72px;height:72px;border-radius:12px;background:var(--vl);border:2px dashed var(--g200);display:flex;align-items:center;justify-content:center;font-size:36px;cursor:pointer;overflow:hidden;flex-shrink:0">
+            🌿
+          </div>
+          <div style="flex:1">
+            <button onclick="document.getElementById('bannerImgInput').click()" class="btn btn-b" style="width:100%;margin-bottom:8px;justify-content:center;padding:9px">
+              📁 Choisir une photo
+            </button>
+            <input type="file" id="bannerImgInput" accept="image/*" style="display:none" onchange="uploadBannerImg(this)"/>
+            <input type="hidden" id="bannerImgUrl"/>
+            <label class="fl" style="margin-bottom:4px">Ou tapez un emoji</label>
+            <input class="fi" id="bannerEmoji" type="text" placeholder="🌿 🥩 🐟 🍍" style="font-size:20px;text-align:center"/>
+            <button onclick="effacerPhotoBanner()" style="width:100%;margin-top:6px;background:var(--rl);color:var(--r);border:none;border-radius:8px;padding:6px;font-size:11px;cursor:pointer;font-family:inherit">
+              🗑️ Retirer la photo
+            </button>
+          </div>
+        </div>
+      </div>
       <div class="fg"><label class="fl">Badge</label><input class="fi" id="bannerTag" type="text" placeholder="OFFRE DU JOUR"/></div>
       <div class="fg"><label class="fl">Titre *</label><input class="fi" id="bannerTitle" type="text" placeholder="Produits frais livrés en 2h"/></div>
       <div class="fg"><label class="fl">Sous-titre</label><input class="fi" id="bannerSub" type="text" placeholder="Boutique · Ville"/></div>
@@ -806,11 +827,57 @@ function ouvrirModalBanner() {
   document.getElementById('bannerPrice').value = bannerData.price||'';
   document.getElementById('bannerUnit').value = bannerData.unit||'';
   document.getElementById('bannerEmoji').value = bannerData.emoji||'';
+  document.getElementById('bannerImgUrl').value = bannerData.imgUrl||'';
+  // Afficher la preview
+  var prev = document.getElementById('bannerImgPreview');
+  if (prev) {
+    if (bannerData.imgUrl) {
+      prev.innerHTML = '<img src="'+bannerData.imgUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>';
+    } else {
+      prev.textContent = bannerData.emoji || '🌿';
+    }
+  }
   document.getElementById('modalBanner').classList.add('open');
+}
+
+async function uploadBannerImg(input) {
+  var file = input.files[0]; if (!file) return;
+  showToast('Upload photo...','⏳');
+  try {
+    var ext = file.name.split('.').pop().toLowerCase();
+    var path = 'admin/banner_' + Date.now() + '.' + ext;
+    var res = await sb.storage.from('yeye-market').upload(path, file, {cacheControl:'3600', upsert:true});
+    if (res.error) throw res.error;
+    var url = sb.storage.from('yeye-market').getPublicUrl(path).data.publicUrl;
+    document.getElementById('bannerImgUrl').value = url;
+    var prev = document.getElementById('bannerImgPreview');
+    if (prev) prev.innerHTML = '<img src="'+url+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>';
+    showToast('Photo uploadée !','🖼️');
+  } catch(e) {
+    // Fallback: use base64
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      document.getElementById('bannerImgUrl').value = ev.target.result;
+      var prev = document.getElementById('bannerImgPreview');
+      if (prev) prev.innerHTML = '<img src="'+ev.target.result+'" style="width:100%;height:100%;object-fit:cover;border-radius:10px"/>';
+      showToast('Photo sélectionnée !','🖼️');
+    };
+    reader.readAsDataURL(file);
+  }
+  input.value = '';
+}
+
+function effacerPhotoBanner() {
+  document.getElementById('bannerImgUrl').value = '';
+  var prev = document.getElementById('bannerImgPreview');
+  var emoji = document.getElementById('bannerEmoji').value || '🌿';
+  if (prev) prev.textContent = emoji;
+  showToast('Photo retirée','🗑️');
 }
 function sauvegarderBanner() {
   bannerData = {
     emoji: document.getElementById('bannerEmoji').value||'🌿',
+    imgUrl: document.getElementById('bannerImgUrl').value||'',
     tag: document.getElementById('bannerTag').value||'OFFRE DU JOUR',
     title: document.getElementById('bannerTitle').value||'',
     sub: document.getElementById('bannerSub').value||'',
@@ -823,7 +890,14 @@ function sauvegarderBanner() {
   showToast('Bannière mise à jour !','✅');
 }
 function majAffichageBanner() {
-  var img=document.getElementById('adm-ban-img'); if(img) img.textContent=bannerData.emoji||'🌿';
+  var img=document.getElementById('adm-ban-img');
+  if (img) {
+    if (bannerData.imgUrl) {
+      img.innerHTML = '<img src="'+bannerData.imgUrl+'" style="width:56px;height:56px;object-fit:cover;border-radius:10px"/>';
+    } else {
+      img.textContent = bannerData.emoji||'🌿';
+    }
+  }
   var tag=document.getElementById('adm-ban-tag'); if(tag) tag.textContent=bannerData.tag||'';
   var title=document.getElementById('adm-ban-title'); if(title) title.textContent=bannerData.title||'';
   var sub=document.getElementById('adm-ban-sub'); if(sub) sub.textContent=bannerData.sub||'';
