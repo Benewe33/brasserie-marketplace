@@ -787,11 +787,11 @@ textarea.fi{resize:vertical;min-height:70px}
           <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:3px">Connectez-vous pour accéder à votre compte</div>
         </div>
         <div style="display:flex;gap:10px">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer">
+          <div onclick="ouvrirAide()" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer">
             <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><i class="ti ti-headset" style="font-size:16px;color:#fff" aria-hidden="true"></i></div>
             <span style="font-size:9px;color:rgba(255,255,255,.75)">Aide</span>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer">
+          <div onclick="ouvrirParametres()" style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer">
             <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><i class="ti ti-settings" style="font-size:16px;color:#fff" aria-hidden="true"></i></div>
             <span style="font-size:9px;color:rgba(255,255,255,.75)">Paramètres</span>
           </div>
@@ -812,17 +812,17 @@ textarea.fi{resize:vertical;min-height:70px}
 
     <!-- AVANTAGES MEMBRE -->
     <div style="background:#fff;padding:12px 14px;margin-bottom:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-      <div style="background:var(--jl);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer">
+      <div style="background:var(--jl);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer" onclick="ouvrirCoupons()">
         <div style="font-size:20px;margin-bottom:4px">🎁</div>
         <div style="font-size:11px;font-weight:600;color:var(--jd)">Coupons</div>
         <div style="font-size:10px;color:var(--g400);margin-top:2px">0 disponibles</div>
       </div>
-      <div style="background:var(--vl);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer">
+      <div style="background:var(--vl);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer" onclick="ouvrirPortefeuille()">
         <div style="font-size:20px;margin-bottom:4px">💰</div>
         <div style="font-size:11px;font-weight:600;color:var(--vd)">Portefeuille</div>
         <div style="font-size:10px;color:var(--g400);margin-top:2px">0 FCFA</div>
       </div>
-      <div style="background:var(--bll);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer">
+      <div style="background:var(--bll);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer" onclick="ouvrirPoints()">
         <div style="font-size:20px;margin-bottom:4px">⭐</div>
         <div style="font-size:11px;font-weight:600;color:var(--bld)">Points</div>
         <div style="font-size:10px;color:var(--g400);margin-top:2px">0 pts</div>
@@ -832,19 +832,19 @@ textarea.fi{resize:vertical;min-height:70px}
     <!-- RACCOURCIS -->
     <div style="background:#fff;padding:14px;margin-bottom:8px">
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+        <div onclick="ouvrirFavoris()" style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
           <div style="width:40px;height:40px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:20px">❤️</div>
           <span style="font-size:10px;color:var(--g700)">Favoris</span>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+        <div onclick="ouvrirHistorique()" style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
           <div style="width:40px;height:40px;border-radius:50%;background:var(--jl);display:flex;align-items:center;justify-content:center;font-size:20px">🕐</div>
           <span style="font-size:10px;color:var(--g700)">Historique</span>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+        <div onclick="ouvrirAdresses()" style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
           <div style="width:40px;height:40px;border-radius:50%;background:var(--bll);display:flex;align-items:center;justify-content:center;font-size:20px">📍</div>
           <span style="font-size:10px;color:var(--g700)">Adresses</span>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+        <div onclick="ouvrirPromotions()" style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
           <div style="width:40px;height:40px;border-radius:50%;background:var(--rl);display:flex;align-items:center;justify-content:center;font-size:20px">🎟️</div>
           <span style="font-size:10px;color:var(--g700)">Promotions</span>
         </div>
@@ -865,7 +865,7 @@ textarea.fi{resize:vertical;min-height:70px}
           </div>
           <span style="font-size:10px;color:var(--g700)">Toutes</span>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0">
+        <div onclick="ouvrirCommandes()" style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0">
           <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px">⏳</div>
           <span style="font-size:10px;color:var(--g700)">En attente</span>
         </div>
@@ -873,7 +873,7 @@ textarea.fi{resize:vertical;min-height:70px}
           <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px">🛵</div>
           <span style="font-size:10px;color:var(--g700)">En livraison</span>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0">
+        <div onclick="ouvrirCommandes()" style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0">
           <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px">⭐</div>
           <span style="font-size:10px;color:var(--g700)">À évaluer</span>
         </div>
@@ -2085,5 +2085,120 @@ async function sauvegarderProfil(){var nom=(document.getElementById('param-nom')
 async function changerMotDePasse(){var p=(document.getElementById('param-newpass')||{}).value||'';if(!p||p.length<6){showToast('Minimum 6 caractères','⚠️');return;}try{var res=await sb.auth.updateUser({password:p});if(res.error)throw res.error;showToast('Mot de passe modifié !','✅');}catch(e){showToast('Erreur','❌');}}
 
 </script>
+<!-- MODALS COMPTE -->
+<div id="modal-historique" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600">🕐 Historique des commandes</div>
+      <button onclick="fermerModal('modal-historique')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div id="historique-content"></div>
+  </div>
+</div>
+<div id="modal-adresses" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600">📍 Mes adresses</div>
+      <button onclick="fermerModal('modal-adresses')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div id="adresses-content"></div>
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--g100)">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px">+ Nouvelle adresse</div>
+      <input id="adr-nom" type="text" placeholder="Nom (Maison, Bureau...)" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px"/>
+      <input id="adr-rue" type="text" placeholder="Rue / Quartier" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <input id="adr-ville" type="text" placeholder="Ville" style="border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none"/>
+        <input id="adr-tel" type="tel" placeholder="Téléphone" style="border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none"/>
+      </div>
+      <button onclick="sauvegarderAdresse()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💾 Sauvegarder</button>
+    </div>
+  </div>
+</div>
+<div id="modal-favoris" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600">❤️ Mes favoris</div>
+      <button onclick="fermerModal('modal-favoris')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div id="favoris-content"><div style="text-align:center;padding:30px;color:var(--g400);font-size:12px"><div style="font-size:30px;margin-bottom:8px">❤️</div>Aucun favori</div></div>
+  </div>
+</div>
+<div id="modal-coupons" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600">🎁 Mes Coupons</div>
+      <button onclick="fermerModal('modal-coupons')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <input id="coupon-code" type="text" placeholder="Code promo" style="flex:1;border:1px solid var(--g200);border-radius:10px;padding:11px;font-size:13px;font-family:inherit;outline:none;text-transform:uppercase"/>
+      <button onclick="appliquerCoupon()" style="background:var(--v);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Valider</button>
+    </div>
+    <div style="background:linear-gradient(135deg,var(--jl),#FFF8DC);border-radius:12px;padding:14px;border:1.5px dashed var(--j)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:16px;font-weight:700;color:var(--jd);letter-spacing:2px">YEYE10</div><div style="font-size:11px;color:var(--g400)">10% sur votre première commande</div></div>
+        <div style="background:var(--j);color:var(--jd);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700">-10%</div>
+      </div>
+    </div>
+  </div>
+</div>
+<div id="modal-portefeuille" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600">💰 Mon Portefeuille</div>
+      <button onclick="fermerModal('modal-portefeuille')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div style="background:linear-gradient(135deg,var(--v),#2E8B50);border-radius:16px;padding:20px;text-align:center;margin-bottom:16px">
+      <div style="font-size:11px;color:rgba(255,255,255,.8)">Solde disponible</div>
+      <div id="solde-affichage" style="font-size:28px;font-weight:700;color:#fff">0 FCFA</div>
+    </div>
+    <div style="margin-bottom:10px"><input id="recharge-montant" type="number" placeholder="Montant (FCFA)" min="500" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:11px;font-size:14px;font-family:inherit;outline:none"/></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <button onclick="rechargerMomo('mtn')" style="background:#FFCB05;color:#1A1A1A;border:none;border-radius:12px;padding:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📱 MTN MoMo</button>
+      <button onclick="rechargerMomo('moov')" style="background:#0057A8;color:#fff;border:none;border-radius:12px;padding:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📱 Moov Money</button>
+    </div>
+    <div style="background:var(--g50);border-radius:10px;padding:12px;font-size:11px;color:var(--g400);line-height:1.8">📞 MTN MoMo : *126#<br>📞 Moov Money : *155#<br>💡 Montant minimum : 500 FCFA</div>
+  </div>
+</div>
+<div id="modal-points" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600">⭐ Points Yéyé</div>
+      <button onclick="fermerModal('modal-points')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div style="background:linear-gradient(135deg,#F5C518,#E07B1A);border-radius:16px;padding:20px;text-align:center;margin-bottom:16px">
+      <div style="font-size:11px;color:rgba(255,255,255,.9)">Vos points</div>
+      <div id="points-affichage" style="font-size:36px;font-weight:700;color:#fff">0</div>
+      <div style="background:rgba(255,255,255,.3);border-radius:20px;height:6px;margin-top:10px"><div id="points-barre" style="background:#fff;border-radius:20px;height:6px;width:0%"></div></div>
+    </div>
+    <div style="background:var(--g50);border-radius:10px;padding:12px;font-size:12px;color:var(--g700);line-height:1.8">🥉 Bronze : 0–499 pts<br>🥈 Argent : 500–999 pts · 5% réduction<br>🥇 Or : 1000+ pts · 10% + livraison offerte</div>
+  </div>
+</div>
+<div id="modal-aide" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600">🎧 Centre d'aide</div>
+      <button onclick="fermerModal('modal-aide')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <a href="tel:+22900000000" style="text-decoration:none;background:var(--vl);border-radius:12px;padding:14px;text-align:center;display:block"><div style="font-size:24px;margin-bottom:6px">📞</div><div style="font-size:12px;font-weight:600;color:var(--vd)">Appeler</div><div style="font-size:10px;color:var(--v)">+229 00 00 00 00</div></a>
+      <a href="https://wa.me/22900000000" target="_blank" style="text-decoration:none;background:#E8F8F0;border-radius:12px;padding:14px;text-align:center;display:block"><div style="font-size:24px;margin-bottom:6px">💬</div><div style="font-size:12px;font-weight:600;color:#1A6B35">WhatsApp</div><div style="font-size:10px;color:var(--v)">8h–20h</div></a>
+    </div>
+    <div id="faq-list"></div>
+  </div>
+</div>
+<div id="modal-parametres" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:500;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600">⚙️ Paramètres</div>
+      <button onclick="fermerModal('modal-parametres')" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;font-size:16px">✕</button>
+    </div>
+    <input id="param-nom" type="text" placeholder="Nom complet" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px"/>
+    <input id="param-email" type="email" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;background:var(--g100);outline:none;margin-bottom:10px" readonly/>
+    <button onclick="sauvegarderProfil()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px">💾 Sauvegarder</button>
+    <input id="param-newpass" type="password" placeholder="Nouveau mot de passe" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px"/>
+    <button onclick="changerMotDePasse()" style="width:100%;background:var(--bl);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:14px">🔑 Changer mot de passe</button>
+    <button onclick="cptDeconnexion();fermerModal('modal-parametres')" style="width:100%;background:var(--rl);color:var(--r);border:1px solid var(--r);border-radius:12px;padding:12px;font-size:13px;font-family:inherit;cursor:pointer">🚪 Se déconnecter</button>
+  </div>
+</div>
 </body>
 </html>
