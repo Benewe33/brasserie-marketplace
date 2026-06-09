@@ -620,9 +620,8 @@ textarea.fi{resize:vertical;min-height:70px}
         <div class="frow"><div class="fg"><label class="fl">Téléphone *</label><input class="fi" id="vf-tel" type="tel" placeholder="+229 ..."/></div><div class="fg"><label class="fl">Ville *</label><input class="fi" id="vf-ville" type="text" placeholder="Ex: Cotonou"/></div></div>
         <div class="fg"><label class="fl">Email * <span style="font-size:10px;color:var(--g400)">(identifiant de connexion)</span></label><input class="fi" id="vf-email" type="email" placeholder="votre@email.com"/></div>
         <div class="fg"><label class="fl">Mot de passe * <span style="font-size:10px;color:var(--g400)">(min. 6 caractères)</span></label><input class="fi" id="vf-pass" type="password" placeholder="••••••••"/></div>
-        <div class="frow"><div class="fg"><label class="fl">Ville *</label><input class="fi" type="text" placeholder="Ex: Savalou"/></div><div class="fg"><label class="fl">Région *</label><select class="fi"><option>Alibori</option><option>Atacora</option><option>Atlantique</option><option>Borgou</option><option>Collines</option><option>Couffo</option><option>Donga</option><option>Littoral</option><option>Mono</option><option>Ouémé</option><option>Plateau</option><option>Zou</option></select></div></div>
-        <div class="fg"><label class="fl">Numéro MTN Mobile Money *</label><input class="fi" type="tel" placeholder="+229 ..."/></div>
-        <button class="sbtn" onclick="swV('bout')">Suivant : Ma boutique</button>
+        <div class="fg"><label class="fl">Numéro MTN Mobile Money *</label><input class="fi" id="vf-mtn" type="tel" placeholder="+229 ..."/></div>
+        <button class="sbtn" onclick="swV('bout')">Suivant : Ma boutique →</button>
       </div>
       <div id="vf-bout" style="display:none">
         <div class="fg"><label class="fl">Nom de votre boutique *</label><input class="fi" type="text" placeholder="Ex: Ferme Agbossou"/></div>
@@ -1315,8 +1314,8 @@ function gp(id){for(var i=0;i<PRODS.length;i++){if(String(PRODS[i].id)===String(
 function gz(id){for(var i=0;i<ZONES_LIV.length;i++){if(ZONES_LIV[i].id===id)return ZONES_LIV[i];}return null;}
 function gl(id){for(var i=0;i<LIVS.length;i++){if(LIVS[i].id===id)return LIVS[i];}return null;}
 function tot(){var t=0;for(var k in panier)t+=panier[k];return t;}
-function stot(){var t=0;for(var k in panier){var p=gp(parseInt(k));if(p)t+=p.p*panier[k];}return t;}
-function nvend(){var v={};for(var k in panier){var p=gp(parseInt(k));if(p)v[p.bid]=1;}return Object.keys(v).length;}
+function stot(){var t=0;for(var k in panier){var p=gp(k);if(p)t+=p.p*(panier[k]||0);}return t;}
+function nvend(){var v={};for(var k in panier){var p=gp(k);if(p)v[p.bid]=1;}return Object.keys(v).length;}
 
 var tT;
 function showToast(msg,ic){
@@ -1693,7 +1692,7 @@ function renderCart(){
     return;
   }
   var vg={};
-  for(var i=0;i<keys.length;i++){var p=gp(keys[i]);if(p){if(!vg[p.bid])vg[p.bid]=[];vg[p.bid].push(keys[i]);}}
+  for(var i=0;i<keys.length;i++){var p=gp(String(keys[i]));if(p){if(!vg[p.bid])vg[p.bid]=[];vg[p.bid].push(String(keys[i]));}}
   var nvc=Object.keys(vg).length;
   var iH='';
   for(var bid in vg){
@@ -2365,7 +2364,7 @@ async function verifierRoleUtilisateur(email) {
   list.innerHTML = '';
 
   espaces.forEach(function(esp) {
-    var actif = esp.statut==='active'||e.statut==='actif';
+    var actif = esp.statut==='active'||esp.statut==='actif';
     var div = document.createElement('div');
     div.style.cssText = 'display:flex;align-items:center;gap:12px;padding:12px;border-radius:12px;margin-bottom:8px;border:0.5px solid rgba(0,0,0,.08);background:'+e.bg+';cursor:'+(actif?'pointer':'default');
     div.innerHTML = '<span style="font-size:26px">'+esp.ic+'</span>'
@@ -2373,7 +2372,7 @@ async function verifierRoleUtilisateur(email) {
       +'<div style="font-size:13px;font-weight:600;color:var(--g900)">'+esp.nom+'</div>'
       +'<div style="font-size:11px;margin-top:2px;color:'+(actif?esp.color:"var(--or)")+'">'+( actif?"✅ Actif — Ouvrir le dashboard":"⏳ En attente validation")+'</div>'
       +'</div>'
-      +(actif?'<i class="ti ti-chevron-right" style="color:'+e.color+';font-size:18px"></i>':'');
+      +(actif?'<i class="ti ti-chevron-right" style="color:'+esp.color+';font-size:18px"></i>':'');
     if (actif) {
       div.addEventListener('click', (function(u){return function(){window.location.href=u;};})(esp.url));
     }
