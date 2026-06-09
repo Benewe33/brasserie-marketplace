@@ -2173,29 +2173,59 @@ async function chargerCategoriesSupabase() {
   try {
     var res = await sb.from('categories').select('id,nom,image_url').order('ordre',{ascending:true});
     if (res.error || !res.data || !res.data.length) return;
+
     res.data.forEach(function(cat) {
       if (!cat.image_url) return;
-      // Find the cat-item with this label
+      var nomLower = (cat.nom||'').toLowerCase().trim();
+
       var items = document.querySelectorAll('.cat-item');
       items.forEach(function(item) {
         var lbl = item.querySelector('.cat-lbl');
-        if (!lbl || lbl.textContent.trim() !== cat.nom) return;
+        if (!lbl) return;
+        var lblText = lbl.textContent.trim().toLowerCase();
+
+        // Match flexible: exact, ou contient, ou commence par
+        var match = lblText === nomLower
+          || nomLower === lblText
+          || lblText.indexOf(nomLower) !== -1
+          || nomLower.indexOf(lblText) !== -1;
+
+        if (!match) return;
+
         var ic = item.querySelector('.cat-ic');
         if (!ic) return;
-        // Keep badge if exists
+
+        // Garder le badge HOT/NEW
         var badge = ic.querySelector('.cat-bdg');
-        // Replace content with image
+
+        // Créer l'image
         var img = document.createElement('img');
         img.src = cat.image_url;
         img.alt = cat.nom;
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
-        img.onerror = function() { this.style.display='none'; };
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%;position:absolute;top:0;left:0';
+        img.onerror = function() { this.remove(); };
+
+        // Mettre en position relative pour superposer
+        ic.style.position = 'relative';
+        ic.style.overflow = 'hidden';
+
+        // Supprimer ancienne image si existe
+        var oldImg = ic.querySelector('img');
+        if (oldImg) oldImg.remove();
+
+        // Vider le texte emoji mais garder le badge
         ic.innerHTML = '';
         ic.appendChild(img);
-        if (badge) ic.appendChild(badge);
+        if (badge) {
+          badge.style.position = 'absolute';
+          badge.style.top = '-4px';
+          badge.style.right = '-4px';
+          badge.style.zIndex = '2';
+          ic.appendChild(badge);
+        }
       });
     });
-    console.log('Categories images chargées OK');
+    console.log('Categories images chargées:', res.data.length);
   } catch(e) {
     console.log('Categories erreur:', e.message);
   }
