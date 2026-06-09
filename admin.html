@@ -776,12 +776,75 @@ var uploadedPhotoUrl = {};
 // INIT
 // ============================================================
 window.addEventListener('DOMContentLoaded', function() {
+  // Vérifier si déjà connecté comme admin
+  sb.auth.getSession().then(function(res) {
+    if (res.data && res.data.session) {
+      var user = res.data.session.user;
+      var meta = user.user_metadata || {};
+      // Vérifier que c'est bien un admin
+      if (meta.role === 'admin' || user.email === 'admin@yeyemarket.bj' || meta.is_admin === true) {
+        ouvrirPanneauAdmin();
+      } else {
+        // Connecté mais pas admin
+        sb.auth.signOut();
+        document.getElementById('adminLoginError').style.display = 'block';
+        document.getElementById('adminLoginError').textContent = '⛔ Accès refusé — compte non administrateur';
+      }
+    }
+  });
+});
+
+async function connexionAdmin() {
+  var email = document.getElementById('adminEmailInput').value.trim();
+  var pass  = document.getElementById('adminPassInput').value;
+  var btn   = document.getElementById('adminLoginBtn');
+  var err   = document.getElementById('adminLoginError');
+
+  err.style.display = 'none';
+  if (!email || !pass) { err.textContent = '⚠️ Remplissez tous les champs'; err.style.display = 'block'; return; }
+
+  btn.textContent = '⏳ Connexion...';
+  btn.disabled = true;
+
+  try {
+    var res = await sb.auth.signInWithPassword({ email, password: pass });
+    if (res.error) throw res.error;
+
+    var user = res.data.user;
+    var meta = user.user_metadata || {};
+
+    // Vérifier rôle admin
+    if (meta.role !== 'admin' && user.email !== 'admin@yeyemarket.bj' && !meta.is_admin) {
+      await sb.auth.signOut();
+      throw new Error('Accès refusé — compte non administrateur');
+    }
+
+    ouvrirPanneauAdmin();
+
+  } catch(e) {
+    err.textContent = '❌ ' + (e.message.indexOf('Invalid') !== -1 ? 'Email ou mot de passe incorrect' : e.message);
+    err.style.display = 'block';
+    btn.textContent = '🔐 Se connecter';
+    btn.disabled = false;
+  }
+}
+
+function ouvrirPanneauAdmin() {
+  document.getElementById('adminLoginPage').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'block';
   testerConnexion();
   chargerDashboard();
   chargerBanner();
-  // Précharger boutiques et catégories dès le démarrage
   prechargerSelects();
-});
+}
+
+async function deconnexionAdmin() {
+  await sb.auth.signOut();
+  document.getElementById('adminApp').style.display = 'none';
+  document.getElementById('adminLoginPage').style.display = 'flex';
+  document.getElementById('adminEmailInput').value = '';
+  document.getElementById('adminPassInput').value = '';
+}
 
 async function prechargerSelects() {
   try {
@@ -1900,5 +1963,6 @@ document.querySelectorAll('.modal-ov').forEach(function(ov) {
   });
 });
 </script>
+</div>
 </body>
 </html>

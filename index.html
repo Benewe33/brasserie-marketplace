@@ -1138,6 +1138,20 @@ textarea.fi{resize:vertical;min-height:70px}
 </div>
 
 <script>
+// ============================================================
+// SÉCURITÉ — Sanitisation contre XSS
+// ============================================================
+function sanitize(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;')
+    .replace(/\//g, '&#x2F;');
+}
+
 var GZ = [
   {id:'cot',name:'Cotonou',       e:'🏙️',nb:6,nl:12},
   {id:'abc',name:'Abomey-Calavi', e:'🌆',nb:4,nl:7},
@@ -1784,7 +1798,7 @@ async function chargerBoutiquesSupabase(zoneId) {
     var res = await sb.from('boutiques').select('*').eq('statut','active').order('note_moyenne',{ascending:false});
     if(res.data && res.data.length > 0) {
       BOUTS = res.data.map(function(b){ return {
-        id:b.id, nom:b.nom, e:'🏪', bg:b.couleur||'#E8F5EE',
+        id:b.id, nom:sanitize(b.nom), e:'🏪', bg:b.couleur||'#E8F5EE',
         cat:b.categorie, ville:b.ville, np:b.nb_produits||0,
         note:parseFloat(b.note_moyenne)||0, ver:b.verifie||false,
         geo:b.zones_livraison||[]
@@ -1811,7 +1825,7 @@ async function chargerProduitsSupabase(zoneId) {
     PRODS = res.data.map(function(p){
       var bout=null;for(var i=0;i<BOUTS.length;i++){if(BOUTS[i].id===p.boutique_id){bout=BOUTS[i];break;}}
       var photoUrl=(p.photos&&p.photos.length>0)?p.photos[0]:null;
-      return {id:p.id,nom:p.nom||'',sh:bout?bout.nom:'Boutique',o:bout?bout.ville:'',
+      return {id:p.id,nom:sanitize(p.nom||''),sh:sanitize(bout?bout.nom:'Boutique'),o:sanitize(bout?bout.ville:''),
         e:'🛒',photoUrl:photoUrl,p:parseFloat(p.prix)||0,
         ppromo:p.prix_promo?parseFloat(p.prix_promo):null,
         u:p.unite||'kg',c:'Épicerie',b:p.badge||'nat',
