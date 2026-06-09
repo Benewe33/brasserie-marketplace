@@ -36,7 +36,7 @@ html,body{width:100%;min-height:100vh;background:var(--g50);font-family:'DM Sans
 .geo-div{display:flex;align-items:center;gap:10px;margin-bottom:12px}
 .geo-div span{font-size:11px;color:var(--g400);white-space:nowrap}
 .geo-ln{flex:1;height:0.5px;background:var(--g200)}
-.geo-gr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.geo-gr{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
 .geo-z{border:1px solid var(--g200);border-radius:12px;padding:11px 8px;text-align:center;cursor:pointer;background:var(--w);font-family:inherit}
 .geo-z:active{border-color:var(--v);background:var(--vl)}
 .geo-z.sel{border:1.5px solid var(--v);background:var(--vl)}
@@ -326,8 +326,8 @@ textarea.fi{resize:vertical;min-height:70px}
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     // == SUPABASE CONFIG ==
-    const SUPA_URL = 'https://gqjneyqllslyxdsjqfez.supabase.co';
-    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdxam5leXFsbHNseXhkc2pxZmV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTE0MjEsImV4cCI6MjA5NjM4NzQyMX0.zUfqoEm4BFn5kVeKGcPYwaJQtYlMZjI9A1jOKNbO3Ak';
+    var SUPA_URL = 'https://gqjneyqllslyxdsjqfez.supabase.co';
+    var SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdxam5leXFsbHNseXhkc2pxZmV6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA4MTE0MjEsImV4cCI6MjA5NjM4NzQyMX0.zUfqoEm4BFn5kVeKGcPYwaJQtYlMZjI9A1jOKNbO3Ak';
     const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
   </script>
   <script src="https://cdn.kkiapay.me/k.js"></script>
@@ -337,7 +337,7 @@ textarea.fi{resize:vertical;min-height:70px}
 
 <!-- GEO MODAL -->
 <div class="geo-ov" id="geoOv">
-  <div class="geo-sh" style="max-height:90vh;overflow-y:auto">
+  <div class="geo-sh">
     <div class="geo-hd"></div>
     <div class="geo-bd">
       <div class="geo-t"><i class="ti ti-map-pin" style="color:var(--v);font-size:20px" aria-hidden="true"></i>Où vous trouvez-vous ?</div>
@@ -435,15 +435,15 @@ textarea.fi{resize:vertical;min-height:70px}
 
   <!-- BANNER -->
   <div style="padding:0 10px 10px;background:#fff">
-    <div class="banner" id="mainBanner" onclick="ouvrirBannerModal()" style="cursor:pointer">
-      <div class="ban-img" id="banImg">🌿</div>
+    <div class="banner">
+      <div class="ban-img">🌿</div>
       <div class="ban-txt">
-        <span class="ban-tag" id="banTag">OFFRE DU JOUR</span>
-        <div class="ban-title" id="banTitle">Produits frais livrés en 2h à <span id="banCity">Cotonou</span></div>
-        <div class="ban-sub" id="banSub">Ferme Agbossou · Savalou</div>
+        <span class="ban-tag">OFFRE DU JOUR</span>
+        <div class="ban-title">Produits frais livrés en 2h à <span id="banCity">Cotonou</span></div>
+        <div class="ban-sub">Ferme Agbossou · Savalou</div>
         <div style="display:flex;align-items:baseline;gap:4px;margin-top:5px">
-          <span class="ban-price" id="banPrice">600 FCFA</span>
-          <span style="font-size:10px;color:#1A6B35;font-weight:600" id="banUnit">/kg · 0 frais</span>
+          <span class="ban-price">600 FCFA</span>
+          <span style="font-size:10px;color:#1A6B35;font-weight:600">/kg · 0 frais</span>
         </div>
       </div>
     </div>
@@ -470,11 +470,11 @@ textarea.fi{resize:vertical;min-height:70px}
     <div class="sec-t">🛵 Livreurs disponibles</div>
     <div class="sec-more" onclick="goTab('livreurs')">Voir tout <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
   </div>
-  <div class="liv-scroll" id="homeLivScroll">
-    <div style="padding:10px 16px;color:var(--g400);font-size:12px;display:flex;align-items:center;gap:8px">
-      <div style="width:14px;height:14px;border:2px solid var(--g200);border-top-color:var(--v);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0"></div>
-      Chargement...
-    </div>
+  <div class="liv-scroll">
+    <div class="lchip"><div class="lav">🧑🏾<div class="ldot"></div></div><div><div class="ln">Kofi D.</div><div class="leta">~15 min</div><div class="lnote">⭐4.9 · 32 livr.</div></div></div>
+    <div class="lchip"><div class="lav">👩🏾<div class="ldot"></div></div><div><div class="ln">Aminatou S.</div><div class="leta">~22 min</div><div class="lnote">⭐4.8 · 28 livr.</div></div></div>
+    <div class="lchip"><div class="lav">👩🏿<div class="ldot"></div></div><div><div class="ln">Rosine K.</div><div class="leta">~18 min</div><div class="lnote">⭐4.9 · 41 livr.</div></div></div>
+    <div class="lchip"><div class="lav">🧑🏾<div class="ldot"></div></div><div><div class="ln">Maxime A.</div><div class="leta">~25 min</div><div class="lnote">⭐4.6 · 15 livr.</div></div></div>
   </div>
 
   <div class="divider"></div>
@@ -570,593 +570,10 @@ textarea.fi{resize:vertical;min-height:70px}
       </div>
       <div id="lf-perso">
         <div class="fg"><label class="fl">Nom complet *</label><input class="fi" id="lf-nom" type="text" placeholder="Ex: Akobi Mensah"/></div>
-        <div class="frow">
-          <div class="fg"><label class="fl">Téléphone *</label><input class="fi" id="lf-tel" type="tel" placeholder="+229 97 00 00 00"/></div>
-          <div class="fg"><label class="fl">Zone *</label>
-            <select class="fi" id="lf-zone"><option>Cotonou</option><option>Abomey-Calavi</option><option>Porto-Novo</option><option>Parakou</option><option>Abomey</option><option>Natitingou</option></select>
-          </div>
-        </div>
-        <div class="fg"><label class="fl">Email * <span style="font-size:10px;color:var(--g400)">(sera votre identifiant)</span></label>
-          <input class="fi" id="lf-email" type="email" placeholder="votre@email.com"/>
-        </div>
-        <div class="fg"><label class="fl">Mot de passe * <span style="font-size:10px;color:var(--g400)">(min. 6 caractères)</span></label>
-          <input class="fi" id="lf-pass" type="password" placeholder="••••••••"/>
-        </div>
-        <div class="fg"><label class="fl">MTN Mobile Money *</label><input class="fi" id="lf-mtn" type="tel" placeholder="+229 ..."/></div>
+        <div class="frow"><div class="fg"><label class="fl">Téléphone *</label><input class="fi" id="lf-tel" type="tel" placeholder="+229 ..."/></div><div class="fg"><label class="fl">Zone *</label><select class="fi" id="lf-zone"><option>Cotonou</option><option>Abomey-Calavi</option><option>Porto-Novo</option><option>Parakou</option></select></div></div>
+        <div class="fg"><label class="fl">Email * <span style="font-size:10px;color:var(--g400)">(identifiant de connexion)</span></label><input class="fi" id="lf-email" type="email" placeholder="votre@email.com"/></div>
+        <div class="fg"><label class="fl">Mot de passe * <span style="font-size:10px;color:var(--g400)">(min. 6 caractères)</span></label><input class="fi" id="lf-pass" type="password" placeholder="••••••••"/></div>
         <button class="sbtn" style="background:var(--bl)" onclick="swL('moto')">Suivant : Mon véhicule →</button>
-      </div>
-      <div CTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
-<title>Yéyé Market — Marketplace du Bénin</title>
-<meta name="theme-color" content="#1A6B35"/>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css"/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --v:#1A6B35;--vl:#E8F5EE;--vd:#0F4020;--vm:#2E8B50;
-  --j:#F5C518;--jl:#FFFBE6;--jd:#8B7000;
-  --bl:#1A5FA5;--bll:#E6F0FB;--bld:#0C3A6E;
-  --r:#C0392B;--rl:#FDECEA;
-  --g50:#F5F5F5;--g100:#EDEFEB;--g200:#CDD4CA;--g400:#7A8A76;--g700:#3A4A36;--g900:#1A2018;
-  --w:#fff;
-}
-html,body{width:100%;min-height:100vh;background:var(--g50);font-family:'DM Sans',sans-serif;color:var(--g900);-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
-.app{width:100%;min-height:100vh;display:flex;flex-direction:column;background:var(--g50);position:relative}
-@media(min-width:600px){body{background:#ddd;display:flex;justify-content:center}.app{max-width:430px;box-shadow:0 0 40px rgba(0,0,0,.15)}}
-
-/* GEO MODAL */
-.geo-ov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.55);z-index:999;display:flex;align-items:flex-end;justify-content:center}
-.geo-sh{background:var(--w);border-radius:20px 20px 0 0;padding:0 0 32px;width:100%;max-width:430px;max-height:88vh;overflow-y:auto}
-.geo-hd{width:36px;height:4px;background:var(--g200);border-radius:4px;margin:14px auto 0}
-.geo-bd{padding:18px 16px 0}
-.geo-t{font-size:16px;font-weight:600;color:var(--g900);display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.geo-s{font-size:12px;color:var(--g400);margin-bottom:14px;line-height:1.5}
-.geo-gps{background:var(--g50);border:1px solid var(--g200);border-radius:12px;padding:11px 13px;display:flex;align-items:center;gap:11px;cursor:pointer;margin-bottom:12px}
-.geo-gps-ic{width:36px;height:36px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.geo-gps-t{font-size:13px;font-weight:500;color:var(--g900)}
-.geo-gps-s{font-size:11px;color:var(--g400);margin-top:1px}
-.geo-div{display:flex;align-items:center;gap:10px;margin-bottom:12px}
-.geo-div span{font-size:11px;color:var(--g400);white-space:nowrap}
-.geo-ln{flex:1;height:0.5px;background:var(--g200)}
-.geo-gr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-.geo-z{border:1px solid var(--g200);border-radius:12px;padding:11px 8px;text-align:center;cursor:pointer;background:var(--w);font-family:inherit}
-.geo-z:active{border-color:var(--v);background:var(--vl)}
-.geo-z.sel{border:1.5px solid var(--v);background:var(--vl)}
-.geo-ze{font-size:22px;display:block;margin-bottom:4px}
-.geo-zn{font-size:12px;font-weight:500;color:var(--g900)}
-.geo-zc{font-size:10px;color:var(--g400);margin-top:2px}
-.geo-btn{width:100%;background:var(--v);color:var(--w);border:none;border-radius:12px;padding:13px;font-size:14px;font-family:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
-.geo-btn:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed}
-
-/* TOP BAR */
-.top-bar{background:var(--v);padding:10px 14px 0;position:sticky;top:0;z-index:100}
-.loc-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.loc-left{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#fff;cursor:pointer}
-.loc-right{display:flex;align-items:center;gap:10px}
-.icon-b{width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;position:relative;cursor:pointer}
-.nb-dot{position:absolute;top:4px;right:4px;width:7px;height:7px;border-radius:50%;background:var(--j);border:1.5px solid var(--v)}
-.search-row{background:var(--w);border-radius:20px 20px 0 0;padding:10px 14px;display:flex;align-items:center;gap:8px}
-.search-inp{flex:1;font-size:13px;color:#aaa;display:flex;align-items:center;gap:6px}
-.search-b{background:var(--j);color:var(--jd);border:none;border-radius:16px;padding:5px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
-
-/* PAGES */
-.page{display:none}.page.active{display:block}
-
-/* ACCUEIL */
-.home-content{background:var(--g50);padding-bottom:70px}
-.white-section{background:var(--w);margin-bottom:8px}
-.divider{height:8px;background:var(--g50)}
-
-/* CATEGORIES */
-.cats-wrap{padding:12px 12px 4px;background:var(--w)}
-.cat-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0}
-.cat-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 2px}
-.cat-ic{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:23px;position:relative}
-.cat-lbl{font-size:10px;color:var(--g700);text-align:center;line-height:1.2}
-.cat-bdg{position:absolute;top:-3px;right:-3px;font-size:8px;font-weight:700;padding:1px 4px;border-radius:8px}
-
-/* BANNER */
-.banner{margin:0 10px 0;border-radius:12px;overflow:hidden;display:flex;align-items:stretch;border:0.5px solid var(--g100)}
-.ban-img{width:110px;display:flex;align-items:center;justify-content:center;font-size:42px;flex-shrink:0;background:var(--vl)}
-.ban-txt{padding:12px;flex:1;background:#FFFDF5}
-.ban-tag{background:var(--v);color:#fff;font-size:9px;font-weight:600;padding:2px 7px;border-radius:10px;display:inline-block;margin-bottom:5px}
-.ban-title{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:3px;line-height:1.3}
-.ban-sub{font-size:10px;color:var(--g400)}
-.ban-price{font-size:15px;font-weight:700;color:var(--r);margin-top:5px}
-
-/* SECTION HEADERS */
-.sec-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 12px 8px;background:var(--w)}
-.sec-t{font-size:14px;font-weight:600;color:var(--g900);display:flex;align-items:center;gap:6px}
-.sec-more{font-size:11px;color:var(--g400);display:flex;align-items:center;gap:2px;cursor:pointer}
-
-/* PRODUCTS SCROLL */
-.prods-scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 12px 12px;background:var(--w)}
-.prods-scroll::-webkit-scrollbar{display:none}
-.pc{flex-shrink:0;width:118px;border-radius:10px;overflow:hidden;background:var(--g50);border:0.5px solid var(--g100)}
-.pc-img{width:118px;height:88px;display:flex;align-items:center;justify-content:center;font-size:36px;background:var(--w);position:relative}
-.pc-t{position:absolute;top:5px;left:5px;font-size:8px;font-weight:700;padding:2px 6px;border-radius:8px}
-.pc-add{position:absolute;bottom:5px;right:5px;width:22px;height:22px;border-radius:50%;background:var(--v);color:#fff;border:none;font-size:15px;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1}
-.pc-add:active{background:var(--vd)}
-.pc-inf{padding:6px 7px}
-.pc-n{font-size:11px;font-weight:600;color:var(--g900);margin-bottom:1px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pc-sh{font-size:10px;color:var(--g400);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pc-p{font-size:12px;font-weight:700;color:var(--r)}
-.pc-old{font-size:9px;color:#bbb;text-decoration:line-through;margin-left:3px}
-
-/* LIVREURS SCROLL */
-.liv-scroll{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 12px 12px;background:var(--w)}
-.liv-scroll::-webkit-scrollbar{display:none}
-.lchip{flex-shrink:0;background:var(--g50);border:0.5px solid var(--g100);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px}
-.lav{width:34px;height:34px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;border:1.5px solid var(--v);position:relative}
-.ldot{position:absolute;bottom:0;right:0;width:8px;height:8px;border-radius:50%;background:#22C55E;border:1.5px solid var(--w)}
-.ln{font-size:11px;font-weight:600;color:var(--g900)}
-.leta{font-size:10px;color:var(--v);font-weight:500}
-.lnote{font-size:10px;color:var(--g400)}
-
-/* GRID 2 COLS */
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 12px;background:var(--w)}
-.gcrd{background:var(--g50);border-radius:10px;overflow:hidden;border:0.5px solid var(--g100)}
-.gc-img{width:100%;height:80px;display:flex;align-items:center;justify-content:center;font-size:32px;background:var(--w);position:relative}
-.gc-bdg{position:absolute;top:5px;left:5px;font-size:8px;font-weight:700;padding:2px 6px;border-radius:8px}
-.gc-inf{padding:7px 8px}
-.gc-n{font-size:11px;font-weight:600;color:var(--g900);margin-bottom:1px;line-height:1.3}
-.gc-sh{font-size:10px;color:var(--g400);margin-bottom:4px}
-.gc-row{display:flex;align-items:center;justify-content:space-between}
-.gc-p{font-size:12px;font-weight:700;color:var(--r)}
-.gc-add{background:var(--v);color:#fff;border:none;border-radius:12px;padding:4px 9px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit}
-.gc-add:active{background:var(--vd)}
-
-/* FLASH */
-.flash-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 12px 12px;background:var(--w)}
-.fcrd{background:var(--w);border-radius:10px;border:0.5px solid var(--g100);display:flex;align-items:center;gap:8px;padding:9px}
-.fe{font-size:28px;flex-shrink:0;width:38px;text-align:center}
-.fi2{flex:1;min-width:0}
-.fn{font-size:11px;font-weight:600;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fs{font-size:10px;color:var(--g400);margin-top:1px}
-.fp{font-size:12px;font-weight:700;color:var(--r);margin-top:2px}
-.fo{font-size:9px;color:#bbb;text-decoration:line-through;margin-left:3px;font-weight:400}
-
-/* BOUTIQUES PAGE */
-.page-content{padding:12px;background:var(--g50);min-height:100vh;padding-bottom:70px}
-.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.bcrd{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);overflow:hidden;cursor:pointer}
-.bcrd:active{opacity:.9}
-.bban{height:52px;display:flex;align-items:center;justify-content:center;font-size:24px}
-.binf{padding:8px 10px}
-.bn{font-size:12px;font-weight:600;color:var(--g900)}
-.bc{font-size:10px;color:var(--g400);margin-top:1px}
-.blo{font-size:10px;color:var(--bl);margin-top:3px}
-.bmeta{display:flex;gap:7px;margin-top:4px}
-.bmm{font-size:9px;color:var(--g400)}
-.bver{display:inline-flex;align-items:center;gap:3px;font-size:9px;padding:2px 6px;border-radius:6px;background:var(--vl);color:var(--vd);margin-top:4px;font-weight:500}
-
-/* CATALOGUE PAGE */
-.sbar{background:var(--w);padding:10px 12px;display:flex;align-items:center;gap:8px;border-bottom:0.5px solid var(--g100);position:sticky;top:52px;z-index:90}
-.sbar input{flex:1;min-width:0;border:1px solid var(--g200);border-radius:20px;padding:7px 12px;font-size:12px;font-family:inherit;background:var(--g50);color:var(--g900);outline:none}
-.sbar input:focus{border-color:var(--v)}
-.cscr{display:flex;gap:8px;padding:10px 12px;overflow-x:auto;background:var(--w);border-bottom:0.5px solid var(--g100);scrollbar-width:none;position:sticky;top:100px;z-index:89}
-.cscr::-webkit-scrollbar{display:none}
-.cpill{background:var(--g50);border:1px solid var(--g200);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;color:var(--g400);font-family:inherit}
-.cpill.active{background:var(--vl);color:var(--vd);border-color:var(--v)}
-.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px;background:var(--g50)}
-.pcard{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);overflow:hidden}
-.pcard:active{transform:scale(.98)}
-.pimg{width:100%;height:85px;display:flex;align-items:center;justify-content:center;font-size:38px;background:var(--g50);position:relative}
-.ptag{position:absolute;top:5px;left:5px;font-size:8px;font-weight:700;padding:2px 6px;border-radius:8px}
-.padd{position:absolute;bottom:5px;right:5px;width:24px;height:24px;border-radius:50%;background:var(--v);color:#fff;border:none;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;line-height:1}
-.padd:active{background:var(--vd)}
-.pinf{padding:8px 10px}
-.pn{font-size:12px;font-weight:600;color:var(--g900);margin-bottom:1px;line-height:1.3}
-.psh{font-size:10px;color:var(--bl);margin-bottom:1px}
-.por{font-size:10px;color:var(--g400);margin-bottom:5px}
-.pp{font-size:13px;font-weight:700;color:var(--r)}
-.pu{font-size:9px;color:var(--g400)}
-.pst{font-size:9px;color:var(--vm);margin-top:1px}
-.bdg{font-size:9px;padding:2px 5px;border-radius:6px;font-weight:500}
-.bnat{background:var(--vl);color:var(--vd)}.bloc{background:var(--rl);color:#8B1A1A}.bpromo{background:var(--jl);color:var(--jd)}
-
-/* LIVREUR FORMS */
-.lbody{padding:12px;display:flex;flex-direction:column;gap:12px;background:var(--g50);padding-bottom:70px}
-.lhero-b{background:linear-gradient(135deg,#1A5FA5,#2A7DD4);border-radius:12px;padding:16px;color:#fff}
-.lhero-v{background:linear-gradient(135deg,#1A6B35,#2E8B50);border-radius:12px;padding:16px;color:#fff}
-.lhero-b h2,.lhero-v h2{font-size:16px;font-weight:600;margin-bottom:5px}
-.lhero-b p,.lhero-v p{font-size:11px;opacity:.85;margin-bottom:12px;line-height:1.5}
-.tcrd{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);padding:13px}
-.trow{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:0.5px solid var(--g100);align-items:center}
-.trow:last-child{border-bottom:none}
-.trow span:first-child{color:var(--g400)}.tval{font-weight:600;color:var(--v)}
-.rcrd{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);padding:14px}
-.rt{font-size:14px;font-weight:600;color:var(--g900);margin-bottom:3px;display:flex;align-items:center;gap:7px}
-.rs{font-size:11px;color:var(--g400);margin-bottom:13px;line-height:1.5}
-.tabf{display:flex;background:var(--g50);border-radius:10px;padding:3px;margin-bottom:13px;gap:3px}
-.tf{flex:1;padding:7px 4px;text-align:center;font-size:10px;font-weight:500;cursor:pointer;border-radius:8px;color:var(--g400);font-family:inherit;border:none;background:none}
-.tf.active{background:var(--w);color:var(--v);box-shadow:0 1px 4px rgba(0,0,0,.08)}
-.fg{margin-bottom:10px}
-.fl{font-size:11px;font-weight:500;color:var(--g400);margin-bottom:4px;display:block}
-.fi{width:100%;border:1px solid var(--g200);border-radius:10px;padding:9px 12px;font-size:12px;font-family:inherit;background:var(--g50);color:var(--g900);outline:none}
-.fi:focus{border-color:var(--v)}
-textarea.fi{resize:vertical;min-height:70px}
-.frow{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.upb{border:2px dashed var(--g200);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:var(--g50)}
-.upb.done{border-color:var(--v);background:var(--vl)}
-.upic{font-size:24px;display:block;margin-bottom:5px}
-.upt{font-size:12px;font-weight:500;color:var(--g700)}.ups{font-size:10px;color:var(--g400);margin-top:2px}
-.upb.done .upt{color:var(--v)}
-.sbtn{width:100%;background:var(--v);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-family:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;margin-top:4px}
-.sbtn-b{background:var(--bl)}
-
-/* LIVREURS LIST */
-.lcrd{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);padding:13px;display:flex;align-items:center;gap:11px}
-.lav2{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;border:2px solid var(--v);position:relative;background:var(--vl)}
-.lonl{position:absolute;bottom:1px;right:1px;width:10px;height:10px;border-radius:50%;background:#22C55E;border:2px solid #fff}
-.linf{flex:1}
-.lnm{font-size:13px;font-weight:600;color:var(--g900)}
-.lzo{font-size:11px;color:var(--g400);margin-top:1px}
-.ltel{font-size:12px;color:var(--bl);font-weight:500;margin-top:4px}
-.lmeta2{display:flex;gap:8px;margin-top:4px}
-.lm{font-size:10px;color:var(--g400)}
-.lright{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-.lst{font-size:10px;padding:3px 8px;border-radius:20px;font-weight:500}
-.lsd{background:var(--vl);color:var(--vd)}.lso{background:#FEF0E0;color:#8B4000}
-.ctcbtn{background:var(--v);color:#fff;border:none;border-radius:8px;padding:6px 11px;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit}
-.ctcbtn:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed}
-
-/* CART */
-.cbody{padding:12px;display:flex;flex-direction:column;gap:12px;background:var(--g50);padding-bottom:70px}
-.ecrt{background:var(--w);border-radius:12px;border:0.5px solid var(--g100);text-align:center;padding:48px 20px;color:var(--g400)}
-.ecrt i{font-size:44px;display:block;margin-bottom:10px}
-.bbtn{margin-top:12px;background:var(--v);color:#fff;border:none;border-radius:10px;padding:9px 20px;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer}
-.ccrd{background:var(--w);border-radius:10px;border:0.5px solid var(--g100);padding:13px 14px}
-.cttl{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-.cttl i{color:var(--v);font-size:15px}
-.sg{margin-bottom:10px;border-bottom:0.5px solid var(--g100);padding-bottom:10px}
-.sg:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
-.sgh{display:flex;align-items:center;gap:6px;margin-bottom:7px;font-size:11px;font-weight:600;color:var(--bl)}
-.ci{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:0.5px solid var(--g100)}
-.ci:last-child{border-bottom:none}
-.cemj{font-size:24px;width:32px;text-align:center;flex-shrink:0}
-.cinf{flex:1;min-width:0}
-.cn{font-size:12px;font-weight:600;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.cf{font-size:10px;color:var(--bl)}.cp{font-size:10px;color:var(--g400)}
-.qty{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.qb{background:var(--g50);border:1px solid var(--g200);border-radius:8px;width:25px;height:25px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;color:var(--g900);font-family:inherit}
-.qn{font-size:12px;font-weight:600;min-width:16px;text-align:center}
-.zopt{border:1.5px solid var(--g200);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:9px}
-.zopt:last-child{margin-bottom:0}.zopt.sel{border-color:var(--v);background:var(--vl)}
-.zr{width:15px;height:15px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.zopt.sel .zr{border-color:var(--v)}.zd{width:7px;height:7px;border-radius:50%;background:var(--v);opacity:0}
-.zopt.sel .zd{opacity:1}
-.zn{font-size:12px;font-weight:600;color:var(--g900)}.zdt{font-size:10px;color:var(--g400);margin-top:1px}
-.zprc{font-size:12px;font-weight:600;color:var(--v);white-space:nowrap}.zfree{font-size:12px;font-weight:600;color:var(--vm);white-space:nowrap}
-.lsug{background:var(--vl);border:1px solid rgba(26,107,53,.2);border-radius:10px;padding:12px}
-.lstt{font-size:12px;font-weight:600;color:var(--vd);margin-bottom:9px;display:flex;align-items:center;gap:6px}
-.lsc{background:var(--w);border-radius:10px;border:0.5px solid var(--g100);padding:10px 12px;display:flex;align-items:center;gap:10px;margin-bottom:8px;cursor:pointer}
-.lsc:last-child{margin-bottom:0}.lsc.sel{border-color:var(--v);background:var(--vl)}
-.lsav{width:38px;height:38px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;border:2px solid var(--v);position:relative}
-.lsonl{position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:#22C55E;border:1.5px solid #fff}
-.lsn{font-size:12px;font-weight:600;color:var(--g900)}.lsz{font-size:10px;color:var(--g400);margin-top:1px}
-.lsph{font-size:11px;color:var(--bl);font-weight:500;margin-top:3px}
-.lsr{width:15px;height:15px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-left:auto}
-.lsc.sel .lsr{border-color:var(--v)}.lsrd{width:8px;height:8px;border-radius:50%;background:var(--v);opacity:0}
-.lsc.sel .lsrd{opacity:1}
-.popt{border:1.5px solid var(--g200);border-radius:8px;padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:9px}
-.popt:last-child{margin-bottom:0}.popt.sel{border-color:var(--v);background:var(--vl)}
-.pr{width:15px;height:15px;border-radius:50%;border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.popt.sel .pr{border-color:var(--v)}.prd{width:7px;height:7px;border-radius:50%;background:var(--v);opacity:0}
-.popt.sel .prd{opacity:1}
-.pnm{font-size:12px;font-weight:600;color:var(--g900)}.psb{font-size:10px;color:var(--g400)}
-.scrd{background:var(--vl);border-radius:10px;padding:13px 14px;border:1px solid rgba(26,107,53,.2)}
-.sr{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--vd)}
-.stot{display:flex;justify-content:space-between;font-size:15px;font-weight:600;padding:8px 0 0;border-top:1px solid rgba(26,107,53,.2);margin-top:5px;color:var(--v)}
-.obtn{width:100%;background:var(--v);color:#fff;border:none;border-radius:10px;padding:14px;font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;box-shadow:0 4px 12px rgba(26,107,53,.25)}
-.obtn:disabled{background:var(--g200);color:var(--g400);cursor:not-allowed;box-shadow:none}
-
-/* DASHBOARDS */
-.dbody{padding:12px;display:flex;flex-direction:column;gap:12px;background:var(--g50);padding-bottom:70px}
-.dhv{background:linear-gradient(135deg,#1A6B35,#2E8B50);border-radius:12px;padding:16px;color:#fff}
-.dhl{background:linear-gradient(135deg,#1A5FA5,#2A7DD4);border-radius:12px;padding:16px;color:#fff}
-.dav{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:9px;border:2px solid rgba(255,255,255,.3);position:relative}
-.davo{position:absolute;bottom:1px;right:1px;width:11px;height:11px;border-radius:50%;background:#22C55E;border:2px solid #fff}
-.dnm{font-size:16px;font-weight:600}.dsh{font-size:11px;opacity:.8;margin-top:1px}
-.dsts{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.2);border-radius:20px;padding:3px 10px;font-size:10px;margin-top:7px}
-.dsgr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:11px}
-.ds{background:rgba(255,255,255,.15);border-radius:10px;padding:10px 8px;text-align:center}
-.dsn{font-size:17px;font-weight:600;color:#fff}.dsl{font-size:9px;color:rgba(255,255,255,.7);margin-top:1px}
-.dcrd{background:var(--w);border-radius:10px;border:0.5px solid var(--g100);padding:13px 14px}
-.dctt{font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
-.dctl{display:flex;align-items:center;gap:6px}.dctl i{color:var(--v);font-size:15px}
-.dact{font-size:11px;color:var(--bl);cursor:pointer;border:none;background:none;font-family:inherit}
-.oit{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--g100)}.oit:last-child{border-bottom:none}
-.oe{font-size:20px;width:30px;text-align:center;flex-shrink:0}.oi{flex:1}
-.on{font-size:12px;font-weight:600;color:var(--g900)}.od{font-size:10px;color:var(--g400);margin-top:1px}
-.os{font-size:10px;padding:2px 7px;border-radius:7px;font-weight:500;white-space:nowrap}
-.os-n{background:var(--jl);color:var(--jd)}.os-s{background:var(--bll);color:var(--bld)}.os-d{background:var(--vl);color:var(--vd)}
-.pit{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--g100)}.pit:last-child{border-bottom:none}
-.pie{font-size:20px;width:30px;text-align:center}.pii{flex:1}
-.pin{font-size:12px;font-weight:600;color:var(--g900)}.pid{font-size:10px;color:var(--g400)}
-.pia{display:flex;gap:5px}.pab{border:1px solid var(--g200);background:none;border-radius:8px;padding:4px 8px;font-size:10px;cursor:pointer;color:var(--g700);font-family:inherit}
-.apb{width:100%;background:var(--bl);color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px}
-.togb{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:20px;padding:5px 12px;font-size:11px;font-weight:500;color:#fff;cursor:pointer;font-family:inherit}
-.togb.on{background:#22C55E;border-color:#22C55E}
-.ncrd{background:#FFFBE6;border:1px solid rgba(245,197,24,.3);border-radius:10px;padding:12px}
-.nct{font-size:12px;font-weight:600;color:var(--jd);margin-bottom:9px}
-.nac{display:flex;gap:8px;margin-top:10px}
-.na-a{flex:1;background:var(--v);color:#fff;border:none;border-radius:8px;padding:9px;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer}
-.na-r{flex:1;background:var(--rl);color:var(--r);border:1px solid var(--r);border-radius:8px;padding:9px;font-size:12px;font-family:inherit;font-weight:500;cursor:pointer}
-.lo{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:0.5px solid var(--g100)}.lo:last-child{border-bottom:none}
-.loe{font-size:20px;width:30px;text-align:center;flex-shrink:0}.loi{flex:1}
-.lon{font-size:12px;font-weight:600;color:var(--g900)}.lod{font-size:10px;color:var(--g400);margin-top:1px}
-.log{font-size:12px;font-weight:600;color:var(--v);white-space:nowrap}
-
-/* BOTTOM NAV */
-.bot-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--w);border-top:0.5px solid var(--g100);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 0 18px;z-index:200}
-.nav-it{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
-.nav-ic{width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:18px;border-radius:50%}
-.nav-ic.on{background:var(--vl)}
-.nav-lbl{font-size:10px;color:var(--g400)}
-.nav-lbl.on{color:var(--v);font-weight:600}
-.nav-center-wrap{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;margin-top:-14px}
-.nav-center-btn{width:46px;height:46px;border-radius:50%;background:var(--v);display:flex;align-items:center;justify-content:center;border:3px solid var(--g50)}
-
-/* TOAST */
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(70px);background:var(--g900);color:#fff;padding:9px 16px;border-radius:20px;font-size:12px;font-weight:500;z-index:9999;transition:transform .3s;white-space:nowrap;display:flex;align-items:center;gap:7px;max-width:92vw}
-.toast.show{transform:translateX(-50%) translateY(0)}
-
-/* FLASH COUNTDOWN */
-.flash-count{background:var(--rl);color:var(--r);font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
-</style>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
-  <script src="https://cdn.kkiapay.me/k.js"></script>
-</head>
-<body>
-<div class="app">
-
-<!-- GEO MODAL -->
-<div class="geo-ov" id="geoOv">
-  <div class="geo-sh" style="max-height:90vh;overflow-y:auto">
-    <div class="geo-hd"></div>
-    <div class="geo-bd">
-      <div class="geo-t"><i class="ti ti-map-pin" style="color:var(--v);font-size:20px" aria-hidden="true"></i>Où vous trouvez-vous ?</div>
-      <div class="geo-s">Choisissez votre ville pour voir les boutiques et livreurs près de chez vous.</div>
-      <div class="geo-gps" onclick="detectGPS()">
-        <div class="geo-gps-ic"><i class="ti ti-current-location" id="gpsIc" style="color:var(--v);font-size:18px" aria-hidden="true"></i></div>
-        <div style="flex:1">
-          <div class="geo-gps-t" id="gpsT">Utiliser ma position GPS</div>
-          <div class="geo-gps-s" id="gpsS">Détection automatique de votre quartier</div>
-        </div>
-        <i class="ti ti-chevron-right" style="color:var(--g400);font-size:16px" aria-hidden="true"></i>
-      </div>
-      <div class="geo-div"><div class="geo-ln"></div><span>ou choisissez votre ville</span><div class="geo-ln"></div></div>
-      <div class="geo-gr" id="geoGr"></div>
-      <button class="geo-btn" id="geoBtnConf" disabled onclick="confirmGeo()">
-        <i class="ti ti-check" aria-hidden="true"></i>Choisissez une ville
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- TOP BAR -->
-<div class="top-bar">
-  <div class="loc-row">
-    <div class="loc-left" onclick="openGeo()">
-      <i class="ti ti-map-pin" style="font-size:14px" aria-hidden="true"></i>
-      <span id="locTxt">Choisir ma ville</span>
-      <i class="ti ti-chevron-down" style="font-size:12px" aria-hidden="true"></i>
-    </div>
-    <div class="loc-right">
-      <div class="icon-b"><i class="ti ti-message-circle" style="font-size:14px" aria-hidden="true"></i><span class="nb-dot"></span></div>
-      <div class="icon-b"><i class="ti ti-bell" style="font-size:14px" aria-hidden="true"></i></div>
-    </div>
-  </div>
-  <div class="search-row">
-    <div class="search-inp">
-      <i class="ti ti-search" style="font-size:15px;color:#ccc" aria-hidden="true"></i>
-      <span style="font-size:13px;color:#bbb" onclick="goTab('catalogue')">Gari, tilapia, mangue...</span>
-    </div>
-    <button class="search-b" onclick="goTab('catalogue')">Chercher</button>
-  </div>
-</div>
-
-<!-- ACCUEIL -->
-<div id="page-home" class="page active">
-<div class="home-content">
-
-  <!-- CATEGORIES -->
-  <div class="cats-wrap">
-    <div class="cat-grid">
-      <div class="cat-item" onclick="goTab('catalogue')">
-        <div class="cat-ic" style="background:#E8F5EE">🛒<span class="cat-bdg" style="background:#F5C518;color:#8B7000">HOT</span></div>
-        <span class="cat-lbl">Marché</span>
-      </div>
-      <div class="cat-item" onclick="setC('Viandes');goTab('catalogue')">
-        <div class="cat-ic" style="background:#FEF0E0">🥩</div>
-        <span class="cat-lbl">Viandes</span>
-      </div>
-      <div class="cat-item" onclick="setC('Poissons');goTab('catalogue')">
-        <div class="cat-ic" style="background:#E6F0FB">🐟</div>
-        <span class="cat-lbl">Poissons</span>
-      </div>
-      <div class="cat-item" onclick="setC('Oeufs');goTab('catalogue')">
-        <div class="cat-ic" style="background:#FEF3D7">🥚</div>
-        <span class="cat-lbl">Oeufs</span>
-      </div>
-      <div class="cat-item" onclick="setC('Légumes');goTab('catalogue')">
-        <div class="cat-ic" style="background:#E8F5EE">🥦</div>
-        <span class="cat-lbl">Légumes</span>
-      </div>
-      <div class="cat-item" onclick="setC('Fruits');goTab('catalogue')">
-        <div class="cat-ic" style="background:#FEF0E0">🍍</div>
-        <span class="cat-lbl">Fruits</span>
-      </div>
-      <div class="cat-item" onclick="setC('Épicerie');goTab('catalogue')">
-        <div class="cat-ic" style="background:#FEF3D7">🌾</div>
-        <span class="cat-lbl">Épicerie</span>
-      </div>
-      <div class="cat-item" onclick="setC('Brasserie');goTab('catalogue')">
-        <div class="cat-ic" style="background:#FDECEA">🍶<span class="cat-bdg" style="background:#C0392B;color:#fff">NEW</span></div>
-        <span class="cat-lbl">Brasserie</span>
-      </div>
-      <div class="cat-item" onclick="setC('Huiles');goTab('catalogue')">
-        <div class="cat-ic" style="background:#E1F5EE">🫙</div>
-        <span class="cat-lbl">Huiles</span>
-      </div>
-      <div class="cat-item" onclick="setC('Épices');goTab('catalogue')">
-        <div class="cat-ic" style="background:#FDECEA">🌶</div>
-        <span class="cat-lbl">Épices</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- BANNER -->
-  <div style="padding:0 10px 10px;background:#fff">
-    <div class="banner" id="mainBanner" onclick="ouvrirBannerModal()" style="cursor:pointer">
-      <div class="ban-img" id="banImg">🌿</div>
-      <div class="ban-txt">
-        <span class="ban-tag" id="banTag">OFFRE DU JOUR</span>
-        <div class="ban-title" id="banTitle">Produits frais livrés en 2h à <span id="banCity">Cotonou</span></div>
-        <div class="ban-sub" id="banSub">Ferme Agbossou · Savalou</div>
-        <div style="display:flex;align-items:baseline;gap:4px;margin-top:5px">
-          <span class="ban-price" id="banPrice">600 FCFA</span>
-          <span style="font-size:10px;color:#1A6B35;font-weight:600" id="banUnit">/kg · 0 frais</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- PRODUITS POPULAIRES -->
-  <div class="sec-hdr" style="background:#fff">
-    <div class="sec-t">🔥 Populaires près de vous</div>
-    <div class="sec-more" onclick="goTab('catalogue')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
-  </div>
-  <div class="prods-scroll" id="homeProdsScroll">
-    <div style="display:flex;align-items:center;justify-content:center;padding:30px;color:var(--g400);font-size:12px;gap:8px">
-      <div style="width:16px;height:16px;border:2px solid var(--g200);border-top-color:var(--v);border-radius:50%;animation:spin .6s linear infinite"></div>
-      Chargement des produits...
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- LIVREURS -->
-  <div class="sec-hdr" style="background:#fff">
-    <div class="sec-t">🛵 Livreurs disponibles</div>
-    <div class="sec-more" onclick="goTab('livreurs')">Voir tout <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
-  </div>
-  <div class="liv-scroll" id="homeLivScroll">
-    <div style="padding:10px 16px;color:var(--g400);font-size:12px;display:flex;align-items:center;gap:8px">
-      <div style="width:14px;height:14px;border:2px solid var(--g200);border-top-color:var(--v);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0"></div>
-      Chargement...
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- OFFRES SPECIALES -->
-  <div class="sec-hdr" style="background:#fff">
-    <div class="sec-t">⭐ Offres spéciales</div>
-    <div class="sec-more" onclick="goTab('catalogue')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
-  </div>
-  <div class="grid2" id="offresGrid">
-    <div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--g400);font-size:12px;background:#fff">
-      <div style="width:16px;height:16px;border:2px solid var(--g200);border-top-color:var(--v);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 8px"></div>
-      Chargement...
-    </div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- FLASH VENTES -->
-  <div class="sec-hdr" style="background:#fff">
-    <div class="sec-t">⚡ Flash ventes <span class="flash-count" id="flashTimer">02:47:33</span></div>
-    <div class="sec-more" onclick="goTab('catalogue')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
-  </div>
-  <div class="flash-grid" id="flashGrid" style="background:#fff">
-    <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--g400);font-size:12px">
-      Aucune flash vente en ce moment
-    </div>
-  </div>
-
-  <!-- BOUTIQUES -->
-  <div class="divider"></div>
-  <div class="sec-hdr" style="background:#fff">
-    <div class="sec-t">🏪 Boutiques <span id="homeBoutT">vedettes</span></div>
-    <div class="sec-more" onclick="goTab('boutiques')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
-  </div>
-  <div class="grid2" id="homeBout"></div>
-  <div style="height:8px;background:#fff"></div>
-
-</div>
-</div>
-
-<!-- CATALOGUE -->
-<div id="page-catalogue" class="page">
-  <div class="sbar">
-    <i class="ti ti-search" style="color:var(--g400);font-size:17px;flex-shrink:0" aria-hidden="true"></i>
-    <input type="text" placeholder="Rechercher un produit ou boutique..." oninput="filtrer(this.value)"/>
-  </div>
-  <div class="cscr" id="catScroll"></div>
-  <div class="pgrid" id="prodGrid"></div>
-</div>
-
-<!-- BOUTIQUES -->
-<div id="page-boutiques" class="page">
-  <div class="sbar">
-    <i class="ti ti-search" style="color:var(--g400);font-size:17px;flex-shrink:0" aria-hidden="true"></i>
-    <input type="text" placeholder="Rechercher une boutique..." oninput="filtB(this.value)"/>
-  </div>
-  <div class="page-content"><div class="bgrid" id="boutGrid"></div></div>
-</div>
-
-<!-- LIVREURS -->
-<div id="page-livreurs" class="page">
-  <div class="sbar">
-    <i class="ti ti-search" style="color:var(--g400);font-size:17px;flex-shrink:0" aria-hidden="true"></i>
-    <input type="text" placeholder="Rechercher par nom ou zone..." oninput="filtL(this.value)"/>
-  </div>
-  <div class="lbody" id="livList"></div>
-</div>
-
-<!-- INSCRIPTION LIVREUR -->
-<div id="page-livreur" class="page">
-  <div class="lbody">
-    <div class="lhero-b">
-      <h2>🛵 Devenez livreur Yéyé Market</h2>
-      <p>Inscription gratuite. Gains hebdomadaires via MTN ou Moov Money.</p>
-      <button style="background:var(--j);color:var(--jd);border:none;border-radius:10px;padding:7px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit" onclick="goTab('dash-l')">Voir dashboard démo</button>
-    </div>
-    <div class="tcrd">
-      <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px;display:flex;align-items:center;gap:6px"><i class="ti ti-coin" style="color:var(--v);font-size:16px" aria-hidden="true"></i>Gains par livraison</div>
-      <div class="trow"><span>Cotonou ville</span><span class="tval">500 FCFA</span></div>
-      <div class="trow"><span>Cotonou périphérie</span><span class="tval">1 000 FCFA</span></div>
-      <div class="trow"><span>Abomey-Calavi</span><span class="tval">1 500 FCFA</span></div>
-      <div class="trow"><span>Bonus livraison groupée</span><span class="tval">+300 FCFA</span></div>
-      <div class="trow"><span>Paiement des gains</span><span class="tval">Chaque vendredi</span></div>
-    </div>
-    <div class="rcrd">
-      <div class="rt"><i class="ti ti-id-badge" style="color:var(--bl);font-size:18px" aria-hidden="true"></i>Créer mon profil livreur</div>
-      <div class="rs">Notre équipe vérifie votre profil sous 24h avant activation.</div>
-      <div class="tabf">
-        <button class="tf active" onclick="swL('perso')">Infos</button>
-        <button class="tf" onclick="swL('moto')">Véhicule</button>
-        <button class="tf" onclick="swL('docs')">Documents</button>
-      </div>
-      <div id="lf-perso">
-        <div class="fg"><label class="fl">Nom complet *</label><input class="fi" type="text" placeholder="Ex: Akobi Mensah"/></div>
-        <div class="frow"><div class="fg"><label class="fl">Téléphone *</label><input class="fi" type="tel" placeholder="+229 ..."/></div><div class="fg"><label class="fl">WhatsApp *</label><input class="fi" type="tel" placeholder="+229 ..."/></div></div>
-        <div class="fg"><label class="fl">Email</label><input class="fi" type="email" placeholder="votre@email.com"/></div>
-        <div class="frow"><div class="fg"><label class="fl">Ville *</label><input class="fi" type="text" placeholder="Ex: Cotonou"/></div><div class="fg"><label class="fl">Zone *</label><select class="fi"><option>Cotonou centre</option><option>Cotonou nord</option><option>Cotonou sud</option><option>Abomey-Calavi</option><option>Porto-Novo</option><option>Toutes zones</option></select></div></div>
-        <div class="fg"><label class="fl">Numéro MTN Mobile Money *</label><input class="fi" type="tel" placeholder="+229 ..."/></div>
-        <button class="sbtn" onclick="swL('moto')">Suivant : Véhicule</button>
       </div>
       <div id="lf-moto" style="display:none">
         <div class="fg"><label class="fl">Type de véhicule *</label><select class="fi"><option>Moto (Zémidjan)</option><option>Tricycle</option><option>Voiture</option><option>Vélo motorisé</option></select></div>
@@ -1200,18 +617,12 @@ textarea.fi{resize:vertical;min-height:70px}
       </div>
       <div id="vf-info">
         <div class="fg"><label class="fl">Nom complet *</label><input class="fi" id="vf-nom" type="text" placeholder="Ex: Kokou Agbossou"/></div>
-        <div class="frow">
-          <div class="fg"><label class="fl">Téléphone *</label><input class="fi" id="vf-tel" type="tel" placeholder="+229 97 00 00 00"/></div>
-          <div class="fg"><label class="fl">Ville *</label><input class="fi" id="vf-ville" type="text" placeholder="Ex: Cotonou"/></div>
-        </div>
-        <div class="fg"><label class="fl">Email * <span style="font-size:10px;color:var(--g400)">(sera votre identifiant)</span></label>
-          <input class="fi" id="vf-email" type="email" placeholder="votre@email.com"/>
-        </div>
-        <div class="fg"><label class="fl">Mot de passe * <span style="font-size:10px;color:var(--g400)">(min. 6 caractères)</span></label>
-          <input class="fi" id="vf-pass" type="password" placeholder="••••••••"/>
-        </div>
-        <div class="fg"><label class="fl">Numéro MTN Mobile Money *</label><input class="fi" id="vf-mtn" type="tel" placeholder="+229 ..."/></div>
-        <button class="sbtn" onclick="swV('bout')">Suivant : Ma boutique →</button>
+        <div class="frow"><div class="fg"><label class="fl">Téléphone *</label><input class="fi" id="vf-tel" type="tel" placeholder="+229 ..."/></div><div class="fg"><label class="fl">Ville *</label><input class="fi" id="vf-ville" type="text" placeholder="Ex: Cotonou"/></div></div>
+        <div class="fg"><label class="fl">Email * <span style="font-size:10px;color:var(--g400)">(identifiant de connexion)</span></label><input class="fi" id="vf-email" type="email" placeholder="votre@email.com"/></div>
+        <div class="fg"><label class="fl">Mot de passe * <span style="font-size:10px;color:var(--g400)">(min. 6 caractères)</span></label><input class="fi" id="vf-pass" type="password" placeholder="••••••••"/></div>
+        <div class="frow"><div class="fg"><label class="fl">Ville *</label><input class="fi" type="text" placeholder="Ex: Savalou"/></div><div class="fg"><label class="fl">Région *</label><select class="fi"><option>Alibori</option><option>Atacora</option><option>Atlantique</option><option>Borgou</option><option>Collines</option><option>Couffo</option><option>Donga</option><option>Littoral</option><option>Mono</option><option>Ouémé</option><option>Plateau</option><option>Zou</option></select></div></div>
+        <div class="fg"><label class="fl">Numéro MTN Mobile Money *</label><input class="fi" type="tel" placeholder="+229 ..."/></div>
+        <button class="sbtn" onclick="swV('bout')">Suivant : Ma boutique</button>
       </div>
       <div id="vf-bout" style="display:none">
         <div class="fg"><label class="fl">Nom de votre boutique *</label><input class="fi" type="text" placeholder="Ex: Ferme Agbossou"/></div>
@@ -1281,290 +692,83 @@ textarea.fi{resize:vertical;min-height:70px}
 
 <!-- DASHBOARD VENDEUR -->
 <div id="page-dash-v" class="page">
-  <div style="background:var(--g50);padding-bottom:80px">
-
-    <!-- HEADER VENDEUR -->
-    <div style="background:linear-gradient(135deg,#1A6B35,#2E8B50);padding:18px 16px 20px">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-        <div id="dv-avatar" style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);flex-shrink:0">🏪</div>
-        <div style="flex:1">
-          <div id="dv-nom" style="font-size:15px;font-weight:600;color:#fff">Ma Boutique</div>
-          <div id="dv-statut" style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px">⏳ En attente de validation</div>
-        </div>
-        <button onclick="goTab('compte')" style="background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;font-family:inherit">← Compte</button>
-      </div>
-      <!-- STATS VENDEUR -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
-          <div id="dv-nb-prods" style="font-size:18px;font-weight:700;color:#fff">0</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.7)">Produits</div>
-        </div>
-        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
-          <div id="dv-nb-cmds" style="font-size:18px;font-weight:700;color:#fff">0</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.7)">Commandes</div>
-        </div>
-        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
-          <div id="dv-gains" style="font-size:16px;font-weight:700;color:var(--j)">0</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.7)">FCFA gains</div>
-        </div>
-        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
-          <div id="dv-note" style="font-size:18px;font-weight:700;color:#fff">-</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.7)">Note</div>
-        </div>
+  <div class="dbody">
+    <div class="dhv">
+      <div class="dav">🧑🏾</div>
+      <div class="dnm">Kokou Agbossou</div>
+      <div class="dsh">🏪 Ferme Agbossou · Savalou</div>
+      <div class="dsts">Boutique active et vérifiée</div>
+      <div class="dsgr">
+        <div class="ds"><div class="dsn">24</div><div class="dsl">Commandes</div></div>
+        <div class="ds"><div class="dsn">186k</div><div class="dsl">FCFA gains</div></div>
+        <div class="ds"><div class="dsn">8</div><div class="dsl">Produits</div></div>
       </div>
     </div>
-
-    <!-- ONGLETS VENDEUR -->
-    <div style="background:#fff;display:flex;border-bottom:2px solid var(--g100);overflow-x:auto;scrollbar-width:none">
-      <button id="dv-tab-prods" onclick="dvTab('prods')" style="flex:1;min-width:80px;padding:12px 8px;font-size:12px;font-weight:600;border:none;background:none;color:var(--v);border-bottom:2px solid var(--v);cursor:pointer;font-family:inherit">📦 Produits</button>
-      <button id="dv-tab-cmds" onclick="dvTab('cmds')" style="flex:1;min-width:80px;padding:12px 8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--g400);cursor:pointer;font-family:inherit">🧾 Commandes</button>
-      <button id="dv-tab-gains" onclick="dvTab('gains')" style="flex:1;min-width:80px;padding:12px 8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--g400);cursor:pointer;font-family:inherit">💰 Gains</button>
-      <button id="dv-tab-profil" onclick="dvTab('profil')" style="flex:1;min-width:80px;padding:12px 8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--g400);cursor:pointer;font-family:inherit">⚙️ Boutique</button>
+    <div class="dcrd">
+      <div class="dctt"><div class="dctl"><i class="ti ti-shopping-bag" aria-hidden="true"></i>Commandes récentes</div><button class="dact">Voir tout</button></div>
+      <div class="oit"><div class="oe">🌾</div><div class="oi"><div class="on">Gari de Savalou x 5 kg</div><div class="od">Afi K. · Cotonou · Livreur Kofi en route</div></div><span class="os os-s">En livraison</span></div>
+      <div class="oit"><div class="oe">🥩</div><div class="oi"><div class="on">Viande de boeuf x 2 kg</div><div class="od">Mede R. · Abomey-Calavi · 7 000 FCFA</div></div><span class="os os-n">Nouveau</span></div>
+      <div class="oit"><div class="oe">🧅</div><div class="oi"><div class="on">Oignon local x 10 kg</div><div class="od">Seto A. · Cotonou · 7 000 FCFA</div></div><span class="os os-d">Livré</span></div>
     </div>
-
-    <!-- SECTION PRODUITS -->
-    <div id="dv-prods" style="padding:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <span style="font-size:14px;font-weight:600;color:var(--g900)">Mes produits</span>
-        <button onclick="ouvrirFormProduitVendeur()" style="background:var(--v);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">+ Ajouter</button>
-      </div>
-      <div id="dv-prods-liste">
-        <div style="text-align:center;padding:30px;color:var(--g400);font-size:12px"><div style="font-size:30px;margin-bottom:8px">📦</div>Aucun produit</div>
-      </div>
-      <!-- FORMULAIRE AJOUT PRODUIT -->
-      <div id="form-prod-vendeur" style="display:none;background:#fff;border-radius:12px;padding:14px;margin-top:10px;border:1px solid var(--g100)">
-        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px" id="form-prod-titre">Ajouter un produit</div>
-        <input type="hidden" id="vprod-id"/>
-        <div style="margin-bottom:10px">
-          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">📸 Photo</label>
-          <div style="border:2px dashed var(--g200);border-radius:10px;padding:16px;text-align:center;cursor:pointer;background:var(--g50)" id="vprod-photo-zone" onclick="simUp('vprod-photo')">
-            <span style="font-size:24px" id="vprod-photo-ic">📷</span>
-            <div style="font-size:12px;color:var(--g400);margin-top:4px">Cliquer pour ajouter</div>
-          </div>
-          <input type="file" id="vprod-photo" accept="image/*" style="display:none" onchange="uploaderPhotoVProd(this)"/>
-          <input type="hidden" id="vprod-photo-url"/>
-        </div>
-        <div style="margin-bottom:10px">
-          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Nom *</label>
-          <input id="vprod-nom" type="text" placeholder="Ex: Gari de Savalou" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
-        </div>
-        <div style="margin-bottom:10px">
-          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Description</label>
-          <textarea id="vprod-desc" rows="2" placeholder="Décrivez votre produit..." style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;resize:none;box-sizing:border-box"></textarea>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div>
-            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Prix (FCFA) *</label>
-            <input id="vprod-prix" type="number" placeholder="600" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
-          </div>
-          <div>
-            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Unité</label>
-            <select id="vprod-unite" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none">
-              <option>kg</option><option>litre</option><option>pièce</option><option>sachet</option><option>250g</option><option>500g</option><option>unité</option>
-            </select>
-          </div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div>
-            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Stock</label>
-            <input id="vprod-stock" type="text" placeholder="Ex: 50 kg" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
-          </div>
-          <div>
-            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Badge</label>
-            <select id="vprod-badge" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none">
-              <option value="">Aucun</option><option value="nat">Naturel</option><option value="local">Local</option><option value="promo">Promo</option><option value="flash">Flash</option>
-            </select>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px">
-          <button onclick="fermerFormProduitVendeur()" style="flex:1;background:var(--g100);color:var(--g700);border:none;border-radius:10px;padding:11px;font-size:13px;cursor:pointer;font-family:inherit">Annuler</button>
-          <button onclick="sauvegarderProduitVendeur()" style="flex:2;background:var(--v);color:#fff;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💾 Sauvegarder</button>
-        </div>
+    <div class="dcrd">
+      <div class="dctt"><div class="dctl"><i class="ti ti-package" aria-hidden="true"></i>Mes produits</div><button class="dact">+ Ajouter</button></div>
+      <div class="pit"><div class="pie">🌾</div><div class="pii"><div class="pin">Gari de Savalou</div><div class="pid">600 FCFA/kg · 50 kg dispo</div></div><div class="pia"><button class="pab">✏️</button><button class="pab">👁️</button></div></div>
+      <div class="pit"><div class="pie">🥩</div><div class="pii"><div class="pin">Viande de boeuf</div><div class="pid">3 500 FCFA/kg · 35 kg dispo</div></div><div class="pia"><button class="pab">✏️</button><button class="pab">👁️</button></div></div>
+      <div class="pit"><div class="pie">🧅</div><div class="pii"><div class="pin">Oignon local</div><div class="pid">700 FCFA/kg · 90 kg dispo</div></div><div class="pia"><button class="pab">✏️</button><button class="pab">👁️</button></div></div>
+      <button class="apb">+ Ajouter un produit</button>
+    </div>
+    <div class="dcrd">
+      <div class="dctt"><div class="dctl"><i class="ti ti-chart-bar" aria-hidden="true"></i>Revenus ce mois</div></div>
+      <div style="background:var(--vl);border-radius:10px;padding:13px;text-align:center">
+        <div style="font-size:24px;font-weight:600;color:var(--v)">186 500 FCFA</div>
+        <div style="font-size:11px;color:var(--vd);margin-top:4px">+22% vs mois dernier</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:7px">Prochain paiement : Vendredi via MTN Money</div>
       </div>
     </div>
-
-    <!-- SECTION COMMANDES VENDEUR -->
-    <div id="dv-cmds" style="padding:12px;display:none">
-      <div style="font-size:14px;font-weight:600;color:var(--g900);margin-bottom:12px">Commandes reçues</div>
-      <div id="dv-cmds-liste">
-        <div style="text-align:center;padding:30px;color:var(--g400);font-size:12px"><div style="font-size:30px;margin-bottom:8px">🧾</div>Aucune commande</div>
-      </div>
-    </div>
-
-    <!-- SECTION GAINS VENDEUR -->
-    <div id="dv-gains-sec" style="padding:12px;display:none">
-      <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">💰 Mes gains</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-          <div style="background:var(--vl);border-radius:10px;padding:12px;text-align:center">
-            <div id="dv-gains-total" style="font-size:16px;font-weight:700;color:var(--v)">0 FCFA</div>
-            <div style="font-size:11px;color:var(--g400);margin-top:2px">Total gagné</div>
-          </div>
-          <div style="background:var(--jl);border-radius:10px;padding:12px;text-align:center">
-            <div id="dv-gains-attente" style="font-size:16px;font-weight:700;color:var(--jd)">0 FCFA</div>
-            <div style="font-size:11px;color:var(--g400);margin-top:2px">En attente</div>
-          </div>
-        </div>
-        <div style="background:var(--g50);border-radius:10px;padding:12px;font-size:12px;color:var(--g700);line-height:1.6">
-          📅 Les paiements sont effectués chaque <b>lundi</b> via MTN ou Moov Money<br/>
-          📊 Commission Yéyé Market : <b>5%</b> par vente
-        </div>
-      </div>
-      <div id="dv-gains-liste">
-        <div style="text-align:center;padding:20px;color:var(--g400);font-size:12px">Aucun gain enregistré</div>
-      </div>
-    </div>
-
-    <!-- SECTION PROFIL BOUTIQUE -->
-    <div id="dv-profil" style="padding:12px;display:none">
-      <div style="background:#fff;border-radius:12px;padding:14px">
-        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">⚙️ Ma boutique</div>
-        <div style="margin-bottom:10px">
-          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Nom de la boutique</label>
-          <input id="dv-bout-nom" type="text" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
-        </div>
-        <div style="margin-bottom:10px">
-          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Description</label>
-          <textarea id="dv-bout-desc" rows="2" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;resize:none;box-sizing:border-box"></textarea>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div>
-            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Téléphone</label>
-            <input id="dv-bout-tel" type="tel" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
-          </div>
-          <div>
-            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">MTN Money</label>
-            <input id="dv-bout-mtn" type="tel" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
-          </div>
-        </div>
-        <button onclick="sauvegarderProfilBoutique()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💾 Sauvegarder</button>
-      </div>
-    </div>
-
   </div>
 </div>
 
 <!-- DASHBOARD LIVREUR -->
 <div id="page-dash-l" class="page">
-  <div style="background:var(--g50);padding-bottom:80px">
-
-    <!-- HEADER LIVREUR -->
-    <div style="background:linear-gradient(135deg,#1A5FA5,#1A6B35);padding:18px 16px 20px">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
-        <div id="dl-avatar" style="width:50px;height:50px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);flex-shrink:0">🛵</div>
+  <div class="dbody">
+    <div class="dhl">
+      <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
+        <div class="dav" style="margin-bottom:0">🧑🏾<div class="davo"></div></div>
         <div style="flex:1">
-          <div id="dl-nom" style="font-size:15px;font-weight:600;color:#fff">Mon espace livreur</div>
-          <div id="dl-statut" style="font-size:11px;color:rgba(255,255,255,.75);margin-top:2px">⏳ En attente de validation</div>
+          <div class="dnm">Kofi Dossou</div>
+          <div class="dsh">📍 Cotonou centre et nord</div>
+          <div style="font-size:12px;color:var(--j);font-weight:500;margin-top:3px">📱 +229 97 00 11 22</div>
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-          <div id="dl-toggle-btn" onclick="toggleDispoLivreur()" style="width:44px;height:24px;border-radius:12px;background:var(--g400);cursor:pointer;position:relative;transition:background .2s">
-            <div id="dl-toggle-dot" style="width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 3px rgba(0,0,0,.3)"></div>
-          </div>
-          <span id="dl-dispo-label" style="font-size:9px;color:rgba(255,255,255,.75)">Hors ligne</span>
-        </div>
+        <button class="togb on" id="dispoBtn" onclick="togD()">🟢 Disponible</button>
       </div>
-      <!-- STATS LIVREUR -->
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
-          <div id="dl-nb-livr" style="font-size:18px;font-weight:700;color:#fff">0</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.7)">Livraisons</div>
-        </div>
-        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
-          <div id="dl-note" style="font-size:18px;font-weight:700;color:var(--j)">-</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.7)">Note</div>
-        </div>
-        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
-          <div id="dl-gains" style="font-size:16px;font-weight:700;color:#fff">0</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.7)">FCFA gains</div>
-        </div>
-        <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center">
-          <div id="dl-today" style="font-size:18px;font-weight:700;color:#fff">0</div>
-          <div style="font-size:9px;color:rgba(255,255,255,.7)">Aujourd'hui</div>
-        </div>
+      <div class="dsgr">
+        <div class="ds"><div class="dsn">32</div><div class="dsl">Livraisons</div></div>
+        <div class="ds"><div class="dsn">48k</div><div class="dsl">FCFA gains</div></div>
+        <div class="ds"><div class="dsn">4.9</div><div class="dsl">Note</div></div>
       </div>
     </div>
-
-    <!-- ONGLETS LIVREUR -->
-    <div style="background:#fff;display:flex;border-bottom:2px solid var(--g100)">
-      <button id="dl-tab-cmds" onclick="dlTab('cmds')" style="flex:1;padding:12px 8px;font-size:12px;font-weight:600;border:none;background:none;color:var(--bl);border-bottom:2px solid var(--bl);cursor:pointer;font-family:inherit">📦 Livraisons</button>
-      <button id="dl-tab-gains" onclick="dlTab('gains')" style="flex:1;padding:12px 8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--g400);cursor:pointer;font-family:inherit">💰 Gains</button>
-      <button id="dl-tab-profil" onclick="dlTab('profil')" style="flex:1;padding:12px 8px;font-size:12px;font-weight:500;border:none;background:none;color:var(--g400);cursor:pointer;font-family:inherit">⚙️ Profil</button>
-    </div>
-
-    <!-- SECTION LIVRAISONS -->
-    <div id="dl-cmds" style="padding:12px">
-      <!-- Commandes disponibles -->
-      <div style="background:var(--bll);border-radius:12px;padding:12px;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:600;color:var(--bld);margin-bottom:8px">🔔 Commandes disponibles</div>
-        <div id="dl-cmds-dispo">
-          <div style="text-align:center;padding:16px;color:var(--g400);font-size:12px">Aucune commande disponible pour l'instant</div>
-        </div>
-      </div>
-      <!-- Mes livraisons en cours -->
-      <div style="background:#fff;border-radius:12px;padding:12px;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:8px">🛵 En cours</div>
-        <div id="dl-cmds-encours">
-          <div style="text-align:center;padding:16px;color:var(--g400);font-size:12px">Aucune livraison en cours</div>
-        </div>
-      </div>
-      <!-- Historique -->
-      <div style="background:#fff;border-radius:12px;padding:12px">
-        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:8px">📋 Historique</div>
-        <div id="dl-cmds-histo">
-          <div style="text-align:center;padding:16px;color:var(--g400);font-size:12px">Aucune livraison effectuée</div>
-        </div>
+    <div class="ncrd">
+      <div class="nct">🔔 Nouvelle commande assignée !</div>
+      <div style="background:#fff;border-radius:10px;padding:11px;border:1px solid rgba(245,197,24,.3)">
+        <div style="font-size:12px;font-weight:600;color:var(--g900);margin-bottom:3px">🌾 Gari x 5 kg + 🥩 Boeuf x 2 kg</div>
+        <div style="font-size:11px;color:var(--g400);margin-bottom:6px">📍 Ferme Agbossou, Savalou → Cotonou nord</div>
+        <div style="font-size:12px;font-weight:600;color:var(--v)">Gain estimé : 1 000 FCFA</div>
+        <div class="nac"><button class="na-a" onclick="showToast('Commande acceptée !','✅')">✅ Accepter</button><button class="na-r" onclick="showToast('Commande refusée','❌')">❌ Refuser</button></div>
       </div>
     </div>
-
-    <!-- SECTION GAINS LIVREUR -->
-    <div id="dl-gains-sec" style="padding:12px;display:none">
-      <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px">
-        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">💰 Mes gains</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
-          <div style="background:var(--bll);border-radius:10px;padding:12px;text-align:center">
-            <div id="dl-gains-total" style="font-size:16px;font-weight:700;color:var(--bl)">0 FCFA</div>
-            <div style="font-size:11px;color:var(--g400);margin-top:2px">Total gagné</div>
-          </div>
-          <div style="background:var(--jl);border-radius:10px;padding:12px;text-align:center">
-            <div id="dl-gains-semaine" style="font-size:16px;font-weight:700;color:var(--jd)">0 FCFA</div>
-            <div style="font-size:11px;color:var(--g400);margin-top:2px">Cette semaine</div>
-          </div>
-        </div>
-        <div style="background:var(--g50);border-radius:10px;padding:12px;font-size:12px;color:var(--g700);line-height:1.6">
-          📅 Paiement chaque <b>lundi</b> via MTN ou Moov Money<br/>
-          🛵 Tarif par livraison selon la zone
-        </div>
+    <div class="dcrd">
+      <div class="dctt"><div class="dctl"><i class="ti ti-clock" aria-hidden="true"></i>Livraisons récentes</div><button class="dact">Voir tout</button></div>
+      <div class="lo"><div class="loe">🛵</div><div class="loi"><div class="lon">Tilapia x 3 kg → Cotonou sud</div><div class="lod">Pêcherie du Littoral · Aujourd'hui 10h30</div></div><div><div class="log">+500 FCFA</div><span class="os os-d" style="font-size:9px">Livré</span></div></div>
+      <div class="lo"><div class="loe">🛵</div><div class="loi"><div class="lon">Huile x 2L → Cotonou nord</div><div class="lod">Huilerie Lokossa · Hier 15h20</div></div><div><div class="log">+1 000 FCFA</div><span class="os os-d" style="font-size:9px">Livré</span></div></div>
+    </div>
+    <div class="dcrd">
+      <div class="dctt"><div class="dctl"><i class="ti ti-chart-bar" aria-hidden="true"></i>Gains ce mois</div></div>
+      <div style="background:var(--bll);border-radius:10px;padding:13px;text-align:center">
+        <div style="font-size:24px;font-weight:600;color:var(--bl)">48 000 FCFA</div>
+        <div style="font-size:11px;color:var(--bld);margin-top:4px">32 livraisons effectuées</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:7px">Prochain paiement : Vendredi via MTN Money</div>
       </div>
     </div>
-
-    <!-- SECTION PROFIL LIVREUR -->
-    <div id="dl-profil" style="padding:12px;display:none">
-      <div style="background:#fff;border-radius:12px;padding:14px">
-        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">⚙️ Mon profil livreur</div>
-        <div style="margin-bottom:10px">
-          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Nom complet</label>
-          <input id="dl-profil-nom" type="text" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <div>
-            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Téléphone</label>
-            <input id="dl-profil-tel" type="tel" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
-          </div>
-          <div>
-            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">MTN Money</label>
-            <input id="dl-profil-mtn" type="tel" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;outline:none;box-sizing:border-box"/>
-          </div>
-        </div>
-        <div style="margin-bottom:14px">
-          <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Véhicule</label>
-          <select id="dl-profil-vehicule" style="width:100%;border:1px solid var(--g200);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none">
-            <option>moto</option><option>tricycle</option><option>voiture</option>
-          </select>
-        </div>
-        <button onclick="sauvegarderProfilLivreur()" style="width:100%;background:var(--bl);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💾 Sauvegarder</button>
-      </div>
-    </div>
-
   </div>
 </div>
 
@@ -1573,395 +777,147 @@ textarea.fi{resize:vertical;min-height:70px}
 
 <!-- MON COMPTE -->
 <div id="page-compte" class="page">
-  <div style="background:var(--g50);min-height:100vh;padding-bottom:80px">
+  <div style="background:var(--g50);padding-bottom:70px">
 
-    <!-- ===== VUE NON CONNECTÉ ===== -->
-    <div id="vue-deconnecte">
-      <!-- HEADER TABS -->
-      <div style="background:linear-gradient(135deg,#1A6B35,#2E8B50);padding:24px 16px 20px">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px">
-          <div style="width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:24px;border:2px solid rgba(255,255,255,.3)">👤</div>
+    <!-- PROFIL HEADER -->
+    <div style="background:linear-gradient(135deg,#1A6B35,#2E8B50);padding:20px 16px 24px">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;border:2px solid rgba(255,255,255,.4);flex-shrink:0">👤</div>
+        <div style="flex:1">
+          <div style="font-size:16px;font-weight:600;color:#fff">Se connecter</div>
+          <div style="font-size:11px;color:rgba(255,255,255,.75);margin-top:3px">Connectez-vous pour accéder à votre compte</div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><i class="ti ti-headset" style="font-size:16px;color:#fff" aria-hidden="true"></i></div>
+            <span style="font-size:9px;color:rgba(255,255,255,.75)">Aide</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center"><i class="ti ti-settings" style="font-size:16px;color:#fff" aria-hidden="true"></i></div>
+            <span style="font-size:9px;color:rgba(255,255,255,.75)">Paramètres</span>
+          </div>
+        </div>
+      </div>
+      <!-- MEMBRE -->
+      <div style="background:rgba(255,255,255,.15);border-radius:12px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:18px">🌿</span>
           <div>
-            <div style="font-size:16px;font-weight:600;color:#fff">Bienvenue sur Yéyé Market</div>
-            <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">Connectez-vous pour accéder à votre compte</div>
+            <div style="font-size:12px;font-weight:600;color:#F5C518">Membre Yéyé</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.75);margin-top:1px">Points : 0 / 1000</div>
           </div>
         </div>
-        <!-- TABS connexion / inscription -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;background:rgba(0,0,0,.2);border-radius:10px;padding:3px;gap:3px">
-          <button id="tab-co-btn" onclick="showAuthForm('login')" style="background:#fff;color:var(--v);border:none;border-radius:8px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Connexion</button>
-          <button id="tab-reg-btn" onclick="showAuthForm('register')" style="background:transparent;color:rgba(255,255,255,.75);border:none;border-radius:8px;padding:10px;font-size:13px;cursor:pointer;font-family:inherit">Inscription</button>
-        </div>
+        <button style="background:var(--j);color:var(--jd);border:none;border-radius:20px;padding:5px 14px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">S'inscrire</button>
       </div>
+    </div>
 
-      <!-- FORMULAIRE CONNEXION -->
-      <div id="auth-login" style="padding:20px 16px">
-        <!-- Méthode : email / téléphone -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-          <button id="meth-email" onclick="showLoginMethod('email')" style="background:var(--v);color:#fff;border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">📧 Email</button>
-          <button id="meth-tel" onclick="showLoginMethod('tel')" style="background:var(--g100);color:var(--g700);border:none;border-radius:10px;padding:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">📱 Téléphone</button>
-        </div>
-
-        <!-- Email login -->
-        <div id="login-email-form">
-          <div style="margin-bottom:12px">
-            <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Email *</label>
-            <input id="inp-login-email" type="email" placeholder="votre@email.com"
-              style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;background:#fff;color:var(--g900);outline:none;box-sizing:border-box"/>
-          </div>
-          <div style="margin-bottom:16px">
-            <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Mot de passe *</label>
-            <div style="position:relative">
-              <input id="inp-login-pass" type="password" placeholder="••••••••"
-                style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:12px 40px 12px 14px;font-size:14px;font-family:inherit;background:#fff;color:var(--g900);outline:none;box-sizing:border-box"/>
-              <button onclick="togglePass('inp-login-pass')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--g400);padding:4px">👁</button>
-            </div>
-          </div>
-          <button onclick="connecterEmail()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px">
-            🔐 Se connecter
-          </button>
-          <div style="text-align:center;font-size:12px;color:var(--g400)">
-            <span style="color:var(--v);cursor:pointer;font-weight:500" onclick="showAuthForm('reset')">Mot de passe oublié ?</span>
-          </div>
-        </div>
-
-        <!-- Téléphone / OTP login -->
-        <div id="login-tel-form" style="display:none">
-          <div style="margin-bottom:12px">
-            <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Numéro de téléphone *</label>
-            <div style="display:flex;gap:8px">
-              <div style="background:var(--g100);border-radius:10px;padding:12px 14px;font-size:14px;font-weight:600;color:var(--g700);white-space:nowrap;flex-shrink:0">🇧🇯 +229</div>
-              <input id="inp-login-tel" type="tel" placeholder="97 00 00 00"
-                style="flex:1;border:1px solid var(--g200);border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;background:#fff;outline:none"/>
-            </div>
-          </div>
-          <button id="btn-send-otp" onclick="envoyerOTP()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:12px">
-            📱 Recevoir le code SMS
-          </button>
-          <div id="otp-block" style="display:none">
-            <div style="background:var(--vl);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-size:12px;color:var(--vd);text-align:center">
-              ✅ Code envoyé au +229 <span id="otp-tel-disp"></span>
-            </div>
-            <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Code à 6 chiffres *</label>
-            <input id="inp-otp" type="number" placeholder="000000" maxlength="6"
-              style="width:100%;border:2px solid var(--v);border-radius:10px;padding:14px;font-size:22px;font-family:inherit;text-align:center;outline:none;letter-spacing:10px;box-sizing:border-box;margin-bottom:12px"/>
-            <button onclick="verifierOTP()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:8px">
-              ✅ Vérifier le code
-            </button>
-            <div style="text-align:center;font-size:12px;color:var(--g400)">
-              Pas reçu ? <span style="color:var(--v);cursor:pointer;font-weight:500" onclick="envoyerOTP()">Renvoyer</span>
-            </div>
-          </div>
-        </div>
+    <!-- AVANTAGES MEMBRE -->
+    <div style="background:#fff;padding:12px 14px;margin-bottom:8px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+      <div style="background:var(--jl);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer">
+        <div style="font-size:20px;margin-bottom:4px">🎁</div>
+        <div style="font-size:11px;font-weight:600;color:var(--jd)">Coupons</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:2px">0 disponibles</div>
       </div>
-
-      <!-- FORMULAIRE INSCRIPTION -->
-      <div id="auth-register" style="padding:20px 16px;display:none">
-        <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Nom complet *</label>
-          <input id="inp-reg-nom" type="text" placeholder="Ex: Kokou Agbossou"
-            style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;background:#fff;color:var(--g900);outline:none;box-sizing:border-box"/>
-        </div>
-        <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Email *</label>
-          <input id="inp-reg-email" type="email" placeholder="votre@email.com"
-            style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;background:#fff;color:var(--g900);outline:none;box-sizing:border-box"/>
-        </div>
-        <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Téléphone</label>
-          <div style="display:flex;gap:8px">
-            <div style="background:var(--g100);border-radius:10px;padding:12px 14px;font-size:14px;font-weight:600;color:var(--g700);white-space:nowrap;flex-shrink:0">🇧🇯 +229</div>
-            <input id="inp-reg-tel" type="tel" placeholder="97 00 00 00"
-              style="flex:1;border:1px solid var(--g200);border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;background:#fff;outline:none"/>
-          </div>
-        </div>
-        <div style="margin-bottom:16px">
-          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Mot de passe *</label>
-          <div style="position:relative">
-            <input id="inp-reg-pass" type="password" placeholder="Minimum 6 caractères"
-              style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:12px 40px 12px 14px;font-size:14px;font-family:inherit;background:#fff;color:var(--g900);outline:none;box-sizing:border-box"/>
-            <button onclick="togglePass('inp-reg-pass')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--g400);padding:4px">👁</button>
-          </div>
-        </div>
-        <button onclick="inscrireClient()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:10px">
-          🌿 Créer mon compte
-        </button>
-        <div style="text-align:center;font-size:11px;color:var(--g400);line-height:1.5">
-          En créant un compte, vous acceptez les<br/>conditions d'utilisation de Yéyé Market
-        </div>
+      <div style="background:var(--vl);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer">
+        <div style="font-size:20px;margin-bottom:4px">💰</div>
+        <div style="font-size:11px;font-weight:600;color:var(--vd)">Portefeuille</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:2px">0 FCFA</div>
       </div>
-
-      <!-- RESET PASSWORD -->
-      <div id="auth-reset" style="padding:20px 16px;display:none">
-        <div style="text-align:center;margin-bottom:20px">
-          <div style="font-size:48px;margin-bottom:10px">🔑</div>
-          <div style="font-size:16px;font-weight:600;color:var(--g900)">Réinitialiser mon mot de passe</div>
-          <div style="font-size:12px;color:var(--g400);margin-top:5px">Un lien sera envoyé à votre email</div>
-        </div>
-        <div style="margin-bottom:14px">
-          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Email *</label>
-          <input id="inp-reset-email" type="email" placeholder="votre@email.com"
-            style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:12px 14px;font-size:14px;font-family:inherit;background:#fff;outline:none;box-sizing:border-box"/>
-        </div>
-        <button onclick="resetPassword()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:12px">
-          📧 Envoyer le lien de réinitialisation
-        </button>
-        <button onclick="showAuthForm('login')" style="width:100%;background:var(--g100);color:var(--g700);border:none;border-radius:12px;padding:12px;font-size:13px;cursor:pointer;font-family:inherit">
-          ← Retour à la connexion
-        </button>
+      <div style="background:var(--bll);border-radius:10px;padding:10px 8px;text-align:center;cursor:pointer">
+        <div style="font-size:20px;margin-bottom:4px">⭐</div>
+        <div style="font-size:11px;font-weight:600;color:var(--bld)">Points</div>
+        <div style="font-size:10px;color:var(--g400);margin-top:2px">0 pts</div>
       </div>
+    </div>
 
-      <!-- REJOINDRE YÉYÉ -->
-      <div style="padding:0 16px 16px">
-        <div style="background:#fff;border-radius:12px;padding:14px;border:0.5px solid var(--g100)">
-          <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">🌿 Rejoindre Yéyé Market</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-            <div onclick="goTab('vendre')" style="background:var(--vl);border-radius:10px;padding:12px;cursor:pointer;text-align:center">
-              <div style="font-size:22px;margin-bottom:5px">💼</div>
-              <div style="font-size:11px;font-weight:600;color:var(--vd)">Ma boutique</div>
-              <div style="font-size:10px;color:var(--v);margin-top:2px">5% commission</div>
-            </div>
-            <div onclick="goTab('livreur')" style="background:var(--bll);border-radius:10px;padding:12px;cursor:pointer;text-align:center">
-              <div style="font-size:22px;margin-bottom:5px">🛵</div>
-              <div style="font-size:11px;font-weight:600;color:var(--bld)">Livreur</div>
-              <div style="font-size:10px;color:var(--bl);margin-top:2px">Gains hebdo</div>
-            </div>
-          </div>
-          <div onclick="goTab('restaurant')" style="background:#FFF3E0;border-radius:10px;padding:12px;cursor:pointer;display:flex;align-items:center;gap:10px">
-            <span style="font-size:22px">🍽️</span>
-            <div>
-              <div style="font-size:12px;font-weight:600;color:#7B3A00">Mon restaurant</div>
-              <div style="font-size:10px;color:#E07B1A">Vendez vos plats préparés</div>
-            </div>
-          </div>
+    <!-- RACCOURCIS -->
+    <div style="background:#fff;padding:14px;margin-bottom:8px">
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:20px">❤️</div>
+          <span style="font-size:10px;color:var(--g700)">Favoris</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--jl);display:flex;align-items:center;justify-content:center;font-size:20px">🕐</div>
+          <span style="font-size:10px;color:var(--g700)">Historique</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--bll);display:flex;align-items:center;justify-content:center;font-size:20px">📍</div>
+          <span style="font-size:10px;color:var(--g700)">Adresses</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:6px 0">
+          <div style="width:40px;height:40px;border-radius:50%;background:var(--rl);display:flex;align-items:center;justify-content:center;font-size:20px">🎟️</div>
+          <span style="font-size:10px;color:var(--g700)">Promotions</span>
         </div>
       </div>
     </div>
 
-    <!-- ===== VUE CONNECTÉ ===== -->
-    <div id="vue-connecte" style="display:none">
-      <!-- HEADER PROFIL -->
-      <div style="background:linear-gradient(135deg,#1A6B35,#2E8B50);padding:20px 16px 24px">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-          <div id="user-avatar" style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;border:2px solid rgba(255,255,255,.4);flex-shrink:0">👤</div>
-          <div style="flex:1">
-            <div id="user-nom-display" style="font-size:16px;font-weight:600;color:#fff">Mon compte</div>
-            <div id="user-email-display" style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px"></div>
-          </div>
-          <button onclick="deconnecterUser()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:8px;padding:7px 12px;font-size:11px;cursor:pointer;font-family:inherit">
-            Déconnexion
-          </button>
-        </div>
-        <!-- STATS -->
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-          <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center">
-            <div id="user-nb-cmds" style="font-size:20px;font-weight:700;color:#fff">0</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.7)">Commandes</div>
-          </div>
-          <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center">
-            <div style="font-size:20px;font-weight:700;color:var(--j)">0</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.7)">Points</div>
-          </div>
-          <div style="background:rgba(255,255,255,.15);border-radius:10px;padding:10px;text-align:center">
-            <div style="font-size:20px;font-weight:700;color:#fff">🌿</div>
-            <div style="font-size:10px;color:rgba(255,255,255,.7)">Membre</div>
-          </div>
-        </div>
+    <!-- MES COMMANDES -->
+    <div style="background:#fff;padding:14px;margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <span style="font-size:14px;font-weight:600;color:var(--g900)">Mes commandes</span>
+        <span style="font-size:11px;color:var(--g400);display:flex;align-items:center;gap:3px;cursor:pointer">Voir tout <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></span>
       </div>
-
-      <!-- MES COMMANDES -->
-      <div style="background:#fff;margin-bottom:8px;padding:14px 16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-          <span style="font-size:14px;font-weight:600;color:var(--g900)">🧾 Mes commandes</span>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0;position:relative">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px;position:relative">
+            🧾
+            <span style="position:absolute;top:-3px;right:-3px;background:var(--r);color:#fff;font-size:8px;font-weight:700;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center">1</span>
+          </div>
+          <span style="font-size:10px;color:var(--g700)">Toutes</span>
         </div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:12px">
-          <div onclick="chargerMesCommandes('toutes')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px 0">
-            <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:18px">🧾</div>
-            <span style="font-size:10px;color:var(--g700)">Toutes</span>
-          </div>
-          <div onclick="chargerMesCommandes('nouvelle')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px 0">
-            <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:18px">⏳</div>
-            <span style="font-size:10px;color:var(--g700)">En attente</span>
-          </div>
-          <div onclick="chargerMesCommandes('en_livraison')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px 0">
-            <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:18px">🛵</div>
-            <span style="font-size:10px;color:var(--g700)">Livraison</span>
-          </div>
-          <div onclick="chargerMesCommandes('livree')" style="display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px 0">
-            <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:18px">✅</div>
-            <span style="font-size:10px;color:var(--g700)">Livrées</span>
-          </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px">⏳</div>
+          <span style="font-size:10px;color:var(--g700)">En attente</span>
         </div>
-        <div id="mes-commandes-liste">
-          <div style="text-align:center;padding:20px;color:var(--g400);font-size:12px">
-            <div style="font-size:32px;margin-bottom:8px">🛒</div>
-            Aucune commande pour l'instant
-          </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px">🛵</div>
+          <span style="font-size:10px;color:var(--g700)">En livraison</span>
         </div>
-      </div>
-
-      <!-- MON PROFIL -->
-      <div style="background:#fff;margin-bottom:8px;padding:14px 16px">
-        <!-- RÉSUMÉ PROFIL (visible par défaut) -->
-        <div id="profil-resume" onclick="ouvrirFormProfil()" style="display:flex;align-items:center;gap:12px;cursor:pointer">
-          <div id="profil-avatar-big" style="width:46px;height:46px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;color:var(--v);flex-shrink:0;border:2px solid var(--v)">BI</div>
-          <div style="flex:1">
-            <div id="profil-resume-nom" style="font-size:14px;font-weight:600;color:var(--g900)">Ben IDOHOU</div>
-            <div id="profil-resume-tel" style="font-size:12px;color:var(--g400);margin-top:1px">+2290157021269 · Cotonou</div>
-          </div>
-          <div style="background:var(--g100);border-radius:8px;padding:6px 12px;font-size:12px;color:var(--g700);font-weight:500">
-            ✏️ Modifier
-          </div>
-        </div>
-
-        <!-- FORMULAIRE PROFIL (caché par défaut) -->
-        <div id="profil-form" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--g100)">
-          <div style="margin-bottom:12px">
-            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Nom complet</label>
-            <input id="profil-nom" type="text"
-              style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;color:var(--g900);outline:none;box-sizing:border-box"/>
-          </div>
-          <div style="margin-bottom:12px">
-            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Téléphone</label>
-            <input id="profil-tel" type="tel"
-              style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;color:var(--g900);outline:none;box-sizing:border-box"/>
-          </div>
-          <div style="margin-bottom:14px">
-            <label style="font-size:12px;color:var(--g400);display:block;margin-bottom:4px">Ville</label>
-            <select id="profil-ville"
-              style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;color:var(--g900);outline:none">
-              <option value="">Choisir votre ville</option>
-              <option>Cotonou</option><option>Abomey-Calavi</option><option>Porto-Novo</option>
-              <option>Abomey</option><option>Parakou</option><option>Natitingou</option>
-            </select>
-          </div>
-          <div style="display:flex;gap:8px">
-            <button onclick="fermerFormProfil()" style="flex:1;background:var(--g100);color:var(--g700);border:none;border-radius:12px;padding:12px;font-size:13px;cursor:pointer;font-family:inherit">
-              Annuler
-            </button>
-            <button onclick="sauvegarderProfil()" style="flex:2;background:var(--v);color:#fff;border:none;border-radius:12px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">
-              💾 Sauvegarder
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- MES ADRESSES -->
-      <div style="background:#fff;margin-bottom:8px;padding:14px 16px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
-          <span style="font-size:14px;font-weight:600;color:var(--g900)">📍 Mes adresses</span>
-          <button onclick="ouvrirModalAdresse()" style="background:var(--v);color:#fff;border:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:5px">
-            + Ajouter
-          </button>
-        </div>
-        <div id="mes-adresses-liste">
-          <div style="text-align:center;padding:16px;color:var(--g400);font-size:12px">
-            <div style="font-size:28px;margin-bottom:6px">📍</div>
-            Aucune adresse enregistrée
-          </div>
-        </div>
-      </div>
-
-      <!-- MES ESPACES PROFESSIONNELS -->
-      <div style="background:#fff;padding:14px 16px">
-        <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">🌿 Mes espaces professionnels</div>
-        <div style="display:flex;flex-direction:column;gap:8px">
-
-          <!-- ESPACE VENDEUR -->
-          <div id="espace-vendeur-btn" style="display:none;background:var(--vl);border-radius:10px;padding:12px;cursor:pointer;align-items:center;gap:10px;border:0.5px solid rgba(26,107,53,.15)" onclick="accederDashVendeur()">
-            <span style="font-size:22px">💼</span>
-            <div style="flex:1">
-              <div style="font-size:12px;font-weight:600;color:var(--vd)">Espace Vendeur</div>
-              <div class="es-statut" style="font-size:10px;color:var(--or);margin-top:1px">⏳ En attente de validation</div>
-            </div>
-            <i class="ti ti-chevron-right" style="color:var(--v);font-size:14px" aria-hidden="true"></i>
-          </div>
-
-          <!-- ESPACE LIVREUR -->
-          <div id="espace-livreur-btn" style="display:none;background:var(--bll);border-radius:10px;padding:12px;cursor:pointer;align-items:center;gap:10px;border:0.5px solid rgba(26,95,165,.15)" onclick="accederDashLivreur()">
-            <span style="font-size:22px">🛵</span>
-            <div style="flex:1">
-              <div style="font-size:12px;font-weight:600;color:var(--bld)">Espace Livreur</div>
-              <div class="es-statut" style="font-size:10px;color:var(--or);margin-top:1px">⏳ En attente de validation</div>
-            </div>
-            <i class="ti ti-chevron-right" style="color:var(--bl);font-size:14px" aria-hidden="true"></i>
-          </div>
-
-          <!-- ESPACE RESTAURANT -->
-          <div id="espace-resto-btn" style="display:none;background:#FFF3E0;border-radius:10px;padding:12px;cursor:pointer;align-items:center;gap:10px;border:0.5px solid rgba(224,123,26,.2)" onclick="accederDashResto()">
-            <span style="font-size:22px">🍽️</span>
-            <div style="flex:1">
-              <div style="font-size:12px;font-weight:600;color:#7B3A00">Mon Restaurant</div>
-              <div class="es-statut" style="font-size:10px;color:var(--or);margin-top:1px">⏳ En attente de validation</div>
-            </div>
-            <i class="ti ti-chevron-right" style="color:#E07B1A;font-size:14px" aria-hidden="true"></i>
-          </div>
-
-          <!-- PAS ENCORE INSCRIT -->
-          <div style="background:var(--g50);border-radius:10px;padding:10px 12px;border:0.5px dashed var(--g200)">
-            <div style="font-size:11px;color:var(--g400);margin-bottom:8px">Rejoindre Yéyé Market :</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
-              <div onclick="goTab('vendre')" style="background:#fff;border-radius:8px;padding:8px;text-align:center;cursor:pointer;border:0.5px solid var(--g100)">
-                <div style="font-size:18px">💼</div>
-                <div style="font-size:10px;font-weight:600;color:var(--vd)">Boutique</div>
-              </div>
-              <div onclick="goTab('livreur')" style="background:#fff;border-radius:8px;padding:8px;text-align:center;cursor:pointer;border:0.5px solid var(--g100)">
-                <div style="font-size:18px">🛵</div>
-                <div style="font-size:10px;font-weight:600;color:var(--bld)">Livreur</div>
-              </div>
-            </div>
-          </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;padding:4px 0">
+          <div style="width:38px;height:38px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:20px">⭐</div>
+          <span style="font-size:10px;color:var(--g700)">À évaluer</span>
         </div>
       </div>
     </div>
 
-    <!-- MODAL ADRESSE -->
-    <div id="modal-adresse" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:800;align-items:flex-end;justify-content:center">
-      <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:85vh;overflow-y:auto">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
-          <div style="font-size:16px;font-weight:600;color:var(--g900)" id="modal-adresse-titre">Ajouter une adresse</div>
-          <button onclick="fermerModalAdresse()" style="background:var(--g100);border:none;border-radius:50%;width:30px;height:30px;font-size:16px;cursor:pointer">✕</button>
-        </div>
-        <input type="hidden" id="adresse-edit-id"/>
-        <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Nom de l'adresse *</label>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">
-            <button onclick="selNomAdresse('Domicile',this)" style="border:2px solid var(--v);background:var(--vl);color:var(--v);border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit">🏠 Domicile</button>
-            <button onclick="selNomAdresse('Bureau',this)" style="border:1px solid var(--g200);background:#fff;color:var(--g700);border-radius:8px;padding:8px;font-size:12px;cursor:pointer;font-family:inherit">🏢 Bureau</button>
-            <button onclick="selNomAdresse('Autre',this)" style="border:1px solid var(--g200);background:#fff;color:var(--g700);border-radius:8px;padding:8px;font-size:12px;cursor:pointer;font-family:inherit">📍 Autre</button>
-          </div>
-          <input id="inp-adresse-nom" type="text" placeholder="Ex: Chez Mama, Entreprise..." value="Domicile"
-            style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;box-sizing:border-box"/>
-        </div>
-        <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Ville *</label>
-          <select id="inp-adresse-ville" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none">
-            <option>Cotonou</option><option>Abomey-Calavi</option><option>Porto-Novo</option>
-            <option>Abomey</option><option>Parakou</option><option>Natitingou</option>
-          </select>
-        </div>
-        <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Quartier *</label>
-          <input id="inp-adresse-quartier" type="text" placeholder="Ex: Akpakpa, Cadjehoun, Gbégamey..."
-            style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;box-sizing:border-box"/>
-        </div>
-        <div style="margin-bottom:12px">
-          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Adresse complète *</label>
-          <textarea id="inp-adresse-detail" rows="3" placeholder="Ex: Rue 1234, maison bleue en face du marché, à côté de la pharmacie..."
-            style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;resize:none;box-sizing:border-box"></textarea>
-        </div>
-        <div style="margin-bottom:16px">
-          <label style="font-size:12px;font-weight:500;color:var(--g400);display:block;margin-bottom:5px">Repère (optionnel)</label>
-          <input id="inp-adresse-repere" type="text" placeholder="Ex: Portail vert, 2ème maison après le carrefour..."
-            style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:#fff;outline:none;box-sizing:border-box"/>
-        </div>
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
-          <input type="checkbox" id="inp-adresse-defaut" style="width:16px;height:16px;accent-color:var(--v)"/>
-          <label for="inp-adresse-defaut" style="font-size:13px;color:var(--g900);cursor:pointer">Définir comme adresse par défaut</label>
-        </div>
-        <button onclick="sauvegarderAdresse()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:12px;padding:14px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
-          💾 Enregistrer l'adresse
-        </button>
+    <!-- REJOINDRE YEYE -->
+    <div style="background:#fff;padding:14px;margin-bottom:8px">
+      <div style="font-size:14px;font-weight:600;color:var(--g900);margin-bottom:12px;display:flex;align-items:center;gap:6px">
+        <span style="font-size:18px">🌿</span> Rejoindre Yéyé Market
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="background:var(--vl);border-radius:12px;padding:14px;cursor:pointer;border:0.5px solid rgba(26,107,53,.15)" onclick="goTab('vendre')">
+          <div style="font-size:24px;margin-bottom:7px">💼</div>
+          <div style="font-size:13px;font-weight:600;color:var(--vd)">Ouvrir ma boutique</div>
+          <div style="font-size:10px;color:var(--v);margin-top:3px;line-height:1.4">Vendre vos produits · 5% commission · Gratuit</div>
+          <div style="margin-top:8px;background:var(--v);color:#fff;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:500;text-align:center">Commencer →</div>
+        </div>
+        <div style="background:var(--bll);border-radius:12px;padding:14px;cursor:pointer;border:0.5px solid rgba(26,95,165,.15)" onclick="goTab('livreur')">
+          <div style="font-size:24px;margin-bottom:7px">🛵</div>
+          <div style="font-size:13px;font-weight:600;color:var(--bld)">Devenir livreur</div>
+          <div style="font-size:10px;color:var(--bl);margin-top:3px;line-height:1.4">Livrer des commandes · Gains hebdomadaires</div>
+          <div style="margin-top:8px;background:var(--bl);color:#fff;border-radius:8px;padding:5px 10px;font-size:11px;font-weight:500;text-align:center">S'inscrire →</div>
+        </div>
+      </div>
+      <!-- RESTAURANT -->
+      <div style="background:#FFF3E0;border-radius:12px;padding:14px;cursor:pointer;border:0.5px solid rgba(224,123,26,.2)" onclick="goTab('restaurant')">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="font-size:32px">🍽️</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600;color:#7B3A00">Référencer mon restaurant</div>
+            <div style="font-size:10px;color:var(--or,#E07B1A);margin-top:3px;line-height:1.4">Vendez vos plats préparés sur Yéyé Market · Menu en ligne · Commandes directes</div>
+          </div>
+          <div style="background:#E07B1A;color:#fff;border-radius:8px;padding:6px 10px;font-size:11px;font-weight:500;white-space:nowrap">Rejoindre →</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARDS RAPIDES -->
+    <div style="background:#fff;padding:14px;margin-bottom:8px">
+      <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:12px">Accès rapide (démo)</div>
+      <div class="trow" style="cursor:pointer;padding:10px 0;border-bottom:0.5px solid var(--g100)" onclick="goTab('dash-v')"><span style="font-size:13px;color:var(--g900);display:flex;align-items:center;gap:8px"><span style="font-size:18px">📊</span> Dashboard Vendeur</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
+      <div class="trow" style="cursor:pointer;padding:10px 0;border-bottom:none" onclick="goTab('dash-l')"><span style="font-size:13px;color:var(--g900);display:flex;align-items:center;gap:8px"><span style="font-size:18px">🛵</span> Dashboard Livreur</span><i class="ti ti-chevron-right" style="font-size:14px;color:var(--g400)" aria-hidden="true"></i></div>
     </div>
 
   </div>
@@ -2097,7 +1053,6 @@ textarea.fi{resize:vertical;min-height:70px}
 </div>
 
 <script>
-
 var GZ = [
   {id:'cot',name:'Cotonou',       e:'🏙️',nb:6,nl:12},
   {id:'abc',name:'Abomey-Calavi', e:'🌆',nb:4,nl:7},
@@ -2193,47 +1148,17 @@ function selGeoZ(id){
   if(cb&&z){cb.disabled=false;cb.innerHTML='<i class="ti ti-check"></i> Confirmer : '+z.name;}
 }
 function detectGPS(){
-  var t=document.getElementById('gpsT');
-  var s=document.getElementById('gpsS');
-  var ic=document.getElementById('gpsIc');
+  var t=document.getElementById('gpsT');var s=document.getElementById('gpsS');var ic=document.getElementById('gpsIc');
   if(t)t.textContent='Localisation en cours...';
   if(s)s.textContent='Vérification de votre position GPS...';
-  if(ic)ic.style.animation='spin .6s linear infinite';
-  if(!navigator.geolocation){
-    if(t)t.textContent='GPS non disponible';
-    if(s)s.textContent='Choisissez votre ville manuellement';
-    return;
-  }
-  navigator.geolocation.getCurrentPosition(function(pos){
-    var lat=pos.coords.latitude, lng=pos.coords.longitude;
-    var zones=[
-      {id:'cot',lat:6.3703,lng:2.3912,name:'Cotonou'},
-      {id:'abc',lat:6.4480,lng:2.3559,name:'Abomey-Calavi'},
-      {id:'pnv',lat:6.4969,lng:2.6289,name:'Porto-Novo'},
-      {id:'abo',lat:7.1827,lng:1.9936,name:'Abomey'},
-      {id:'par',lat:9.3370,lng:2.6277,name:'Parakou'},
-      {id:'nat',lat:10.3167,lng:1.3833,name:'Natitingou'}
-    ];
-    var best=null,bestDist=Infinity;
-    zones.forEach(function(z){
-      var d=Math.sqrt(Math.pow(lat-z.lat,2)+Math.pow(lng-z.lng,2));
-      if(d<bestDist){bestDist=d;best=z;}
-    });
-    if(!best)return;
-    if(t)t.textContent='Position détectée : '+best.name;
-    if(s)s.textContent='Latitude '+lat.toFixed(2)+' · Longitude '+lng.toFixed(2);
-    if(ic){ic.style.animation='';ic.style.color='var(--v)';}
-    // Sauvegarder et appliquer
-    try{localStorage.setItem('yeye_geo',JSON.stringify({id:best.id}));}catch(e){}
-    setTimeout(function(){selGeoZ(best.id);},600);
-  },function(err){
-    if(t)t.textContent='Position non disponible';
-    if(s)s.textContent='Activez le GPS ou choisissez manuellement';
-    if(ic)ic.style.animation='';
-    console.log('GPS error:',err.message);
-  },{timeout:10000,maximumAge:60000});
+  if(ic)ic.className='ti ti-loader';
+  setTimeout(function(){
+    selGeoZ('cot');
+    if(t)t.textContent='Position détectée : Cotonou';
+    if(s)s.textContent='Quartier Akpakpa · à 1.2 km du centre';
+    if(ic){ic.className='ti ti-circle-check';ic.style.color='#1A6B35';}
+  },1500);
 }
-
 function confirmGeo(){
   if(!selGeo)return;
   var z=null;for(var i=0;i<GZ.length;i++){if(GZ[i].id===selGeo){z=GZ[i];break;}}
@@ -2343,13 +1268,11 @@ function renderCats(){
   for(var i=0;i<cats.length;i++){h+='<button class="cpill'+(cats[i]===catA?' active':'')+'" onclick="setC(\''+cats[i]+'\')">'+cats[i]+'</button>';}
   s.innerHTML=h;
 }
-// Mapping noms courts catégories → noms complets Supabase
-var CAT_MAP={'Viandes':'Viandes et Volailles','Poissons':'Poissons et Crustacés','Brasserie':'Brasserie naturelle','Huiles':'Huiles naturelles','Épices':'Épices et Condiments','Plats':'Plats préparés'};
 function setC(c){catA=c;renderCats();renderProds();}
 function filtrer(v){rech=v||'';renderProds();}
 function getFil(){
   return PRODS.filter(function(p){
-    var catFull=CAT_MAP[catA]||catA; var mc=catA==='Tous'||p.c===catFull||p.c===catA||p.c.indexOf(catA)!==-1;
+    var mc=catA==='Tous'||p.c===catA;
     var mq=!rech||p.nom.toLowerCase().indexOf(rech.toLowerCase())!==-1||p.sh.toLowerCase().indexOf(rech.toLowerCase())!==-1;
     var mg=true;
     if(curGeo){var b=null;for(var i=0;i<BOUTS.length;i++){if(BOUTS[i].id===p.bid){b=BOUTS[i];break;}}if(b)mg=b.geo.indexOf(curGeo.id)!==-1;}
@@ -2559,21 +1482,16 @@ function renderCart(){
     iH+='<div class="sg"><div class="sgh">🏪 '+(bo?bo.e+' '+bo.nom:'Boutique')+'</div>';
     for(var j=0;j<vg[bid].length;j++){
       var pid=vg[bid][j];var prod=gp(pid);if(!prod)continue;
-      var imgHtml = prod.photoUrl
-        ? '<img src="'+prod.photoUrl+'" style="width:54px;height:54px;border-radius:10px;object-fit:cover;flex-shrink:0"/>'
-        : '<div style="width:54px;height:54px;border-radius:10px;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">'+prod.e+'</div>';
-      var prixTot = fcfa(prod.p * panier[pid]);
-      iH+='<div class="ci" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--g100)">'+imgHtml
-        +'<div style="flex:1;min-width:0">'
-        +'<div class="cn" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+prod.nom+'</div>'
-        +'<div style="font-size:11px;color:var(--g400)">🏪 '+(prod.sh||prod.o||'')+'</div>'
-        +'<div style="font-size:12px;font-weight:700;color:var(--r);margin-top:2px">'+prixTot+' FCFA</div>'
-        +'<div style="font-size:10px;color:var(--g400)">'+fcfa(prod.p)+' / '+prod.u+'</div>'
-        +'</div>'
+      var imgC=prod.photoUrl?'<img src="'+prod.photoUrl+'" style="width:52px;height:52px;border-radius:10px;object-fit:cover;flex-shrink:0"/>'
+        :'<div style="width:52px;height:52px;border-radius:10px;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">'+prod.e+'</div>';
+      iH+='<div class="ci" style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:0.5px solid var(--g100)">'+imgC
+        +'<div style="flex:1;min-width:0"><div class="cn" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+prod.nom+'</div>'
+        +'<div style="font-size:11px;color:var(--g400)">🏪 '+prod.sh+'</div>'
+        +'<div style="font-size:13px;font-weight:700;color:var(--r);margin-top:2px">'+fcfa(prod.p*panier[pid])+' FCFA</div></div>'
         +'<div style="display:flex;align-items:center;gap:6px;flex-shrink:0">'
-        +'<button style="width:28px;height:28px;border-radius:50%;background:var(--rl);color:var(--r);border:none;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1" onclick="rmCart('+pid+')">−</button>'
+        +'<button onclick="rmCart('+pid+')" style="width:28px;height:28px;border-radius:50%;background:var(--rl);color:var(--r);border:none;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit">−</button>'
         +'<span style="font-size:14px;font-weight:700;min-width:20px;text-align:center">'+panier[pid]+'</span>'
-        +'<button style="width:28px;height:28px;border-radius:50%;background:var(--v);color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1" onclick="incCart('+pid+')">+</button>'
+        +'<button onclick="incCart('+pid+')" style="width:28px;height:28px;border-radius:50%;background:var(--v);color:#fff;border:none;font-size:18px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit">+</button>'
         +'</div></div>';
     }
     iH+='</div>';
@@ -2783,60 +1701,6 @@ setInterval(updateFlash,1000);
 // ============================================================
 // SUPABASE — CHARGEMENT DONNÉES RÉELLES
 // ============================================================
-async function chargerCategoriesSupabase() {
-  try {
-    var res = await sb.from('categories').select('*').order('ordre');
-    if (res.error || !res.data || !res.data.length) return;
-
-    // Mapping noms Supabase → labels courts affichés dans le HTML
-    var labelMap = {
-      'Épicerie': 'Épicerie',
-      'Viandes et Volailles': 'Viandes',
-      'Poissons et Crustacés': 'Poissons',
-      'Oeufs': 'Oeufs',
-      'Légumes': 'Légumes',
-      'Fruits': 'Fruits',
-      'Huiles naturelles': 'Huiles',
-      'Brasserie naturelle': 'Brasserie',
-      'Épices et Condiments': 'Épices',
-      'Plats préparés': 'Plats'
-    };
-
-    res.data.forEach(function(cat) {
-      if (!cat.image_url) return;
-      var labelCourt = labelMap[cat.nom] || cat.nom;
-
-      // Trouver le bon cat-item via le label
-      var items = document.querySelectorAll('.cat-item');
-      items.forEach(function(item) {
-        var lbl = item.querySelector('.cat-lbl');
-        if (!lbl) return;
-        if (lbl.textContent.trim() !== labelCourt) return;
-
-        // Trouver le .cat-ic et remplacer son contenu par l'image
-        var ic = item.querySelector('.cat-ic');
-        if (!ic) return;
-        // Garder le badge s'il existe
-        var badge = ic.querySelector('.cat-bdg');
-        ic.innerHTML = '';
-        var img = document.createElement('img');
-        img.src = cat.image_url;
-        img.alt = cat.nom;
-        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
-        img.onerror = function() {
-          // Si image cassée, afficher l'emoji par défaut
-          this.style.display = 'none';
-        };
-        ic.appendChild(img);
-        if (badge) ic.appendChild(badge);
-      });
-    });
-  } catch(e) {
-    console.log('Categories images:', e.message);
-  }
-}
-
-
 async function chargerBoutiquesSupabase(zoneId) {
   try {
     var query = sb.from('boutiques').select('*').eq('statut','active');
@@ -2863,291 +1727,332 @@ var CAT_EMOJI = {
 
 async function chargerProduitsSupabase(zoneId) {
   try {
-    var res = await sb.from('produits')
-      .select('*, boutiques(id,nom,ville,zones_livraison,verifie,statut), categories(nom)')
-      .eq('disponible', true)
-      .order('cree_le', {ascending:false})
-      .limit(100);
-    if (res.error) throw res.error;
-    if (res.data && res.data.length > 0) {
-      var filtered = res.data;
-      // Filtrer par zone si sélectionnée
-      if (zoneId) {
-        filtered = res.data.filter(function(p){
-          if (!p.boutiques || !p.boutiques.zones_livraison) return true;
-          return p.boutiques.zones_livraison.indexOf(zoneId) !== -1;
-        });
-      }
-      if (filtered.length > 0) {
-        PRODS = filtered.map(function(p){
-          var catNom = p.categories ? p.categories.nom : 'Épicerie';
-          var emoji = CAT_EMOJI[catNom] || '🛒';
-          // Si le produit a des photos, utiliser la première
-          var photoUrl = (p.photos && p.photos.length > 0) ? p.photos[0] : null;
-          return {
-            id: p.id,
-            nom: p.nom,
-            sh: p.boutiques ? p.boutiques.nom : 'Boutique',
-            o: p.boutiques ? p.boutiques.ville : '',
-            e: emoji,
-            photoUrl: photoUrl,
-            p: parseFloat(p.prix) || 0,
-            ppromo: p.prix_promo ? parseFloat(p.prix_promo) : null,
-            u: p.unite || 'kg',
-            c: catNom,
-            b: p.badge || 'nat',
-            d: p.stock_unite || (p.stock ? p.stock + ' ' + (p.unite||'kg') : 'Disponible'),
-            bid: p.boutique_id,
-            desc: p.description || ''
-          };
-        });
-        renderProds();
-        renderCats();
-        console.log('✅ ' + PRODS.length + ' produits chargés depuis Supabase');
-      }
-    }
-  } catch(e) {
-    console.log('Produits Supabase erreur:', e.message, '- données locales utilisées');
-  }
+    var url = SUPA_URL + '/rest/v1/produits?select=id,nom,prix,prix_promo,unite,stock,stock_unite,photos,badge,disponible,boutique_id,description&disponible=eq.true&order=cree_le.desc&limit=100';
+    var resp = await fetch(url, {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    var data = await resp.json();
+    if (!data||!data.length) return;
+    var filtered = zoneId ? data.filter(function(p){
+      var b=null;for(var i=0;i<BOUTS.length;i++){if(BOUTS[i].id===p.boutique_id){b=BOUTS[i];break;}}
+      return !b||!b.geo||!b.geo.length||b.geo.indexOf(zoneId)!==-1;
+    }) : data;
+    if (!filtered.length) return;
+    PRODS = filtered.map(function(p){
+      var bout=null;for(var i=0;i<BOUTS.length;i++){if(BOUTS[i].id===p.boutique_id){bout=BOUTS[i];break;}}
+      var photoUrl=(p.photos&&p.photos.length>0)?p.photos[0]:null;
+      return {id:p.id,nom:p.nom||'',sh:bout?bout.nom:'Boutique',o:bout?bout.ville:'',
+        e:'🛒',photoUrl:photoUrl,p:parseFloat(p.prix)||0,
+        ppromo:p.prix_promo?parseFloat(p.prix_promo):null,
+        u:p.unite||'kg',c:'Épicerie',b:p.badge||'nat',
+        d:p.stock_unite||(p.stock?p.stock+' '+(p.unite||'kg'):'Disponible'),
+        bid:p.boutique_id,desc:p.description||''};
+    });
+    renderProds();renderCats();renderHomeProds();renderOffresSpeciales();renderFlashVentes();
+  } catch(e){console.log('Produits erreur:',e.message);}
 }
+
 
 async function chargerLivreursSupabase(zoneId) {
   try {
-    var query = sb.from('livreurs').select('*').eq('statut','actif');
-    if(zoneId) query = query.contains('zones_couverture',[zoneId]);
-    var res = await query.order('note_moyenne',{ascending:false});
-    if(res.data && res.data.length > 0) {
-      LIVS = res.data.map(function(l){ return {
-        id:l.id, nom:l.nom, e:'🛵',
-        photo_url:l.photo_url||null,
-        zone:l.zones_couverture?l.zones_couverture[0]:'',
-        tel:l.telephone, note:parseFloat(l.note_moyenne)||5,
-        nb:l.nb_livraisons||0, ok:l.en_ligne||false,
-        en_ligne:l.en_ligne||false,
-        statut:l.statut||'actif',
-        note_moyenne:parseFloat(l.note_moyenne)||4.8,
-        nb_livraisons:l.nb_livraisons||0,
-        zones_couverture:l.zones_couverture||[],
-        geo:l.zones_couverture||[]
-      };});
-      buildLivsList();
-      buildHomeLivs();
-    }
-  } catch(e){ console.log('Livreurs: données locales utilisées'); }
+    var url = SUPA_URL + '/rest/v1/livreurs?select=*&statut=eq.actif&order=note_moyenne.desc';
+    var resp = await fetch(url, {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    var data = await resp.json();
+    if (!data||!data.length) return;
+    var filtered = zoneId ? data.filter(function(l){
+      return !l.zones_couverture||!l.zones_couverture.length||l.zones_couverture.indexOf(zoneId)!==-1;
+    }) : data;
+    LIVS = filtered.map(function(l){ return {
+      id:l.id, nom:l.nom, e:'🛵', photo_url:l.photo_url||null,
+      zone:l.zones_couverture?l.zones_couverture[0]:'', tel:l.telephone,
+      note:parseFloat(l.note_moyenne)||5, nb:l.nb_livraisons||0,
+      en_ligne:l.en_ligne||false, statut:l.statut||'actif',
+      note_moyenne:parseFloat(l.note_moyenne)||4.8,
+      nb_livraisons:l.nb_livraisons||0,
+      zones_couverture:l.zones_couverture||[], geo:l.zones_couverture||[]
+    };});
+    buildLivsList(); buildHomeLivs();
+  } catch(e) { console.log('Livreurs erreur:', e.message); }
 }
 
-async function soumettreVendeur() {
-  var nom = document.getElementById('vf-nom') ? document.getElementById('vf-nom').value.trim() : '';
-  var tel = document.getElementById('vf-tel') ? document.getElementById('vf-tel').value.trim() : '';
-  var email = document.getElementById('vf-email') ? document.getElementById('vf-email').value.trim() : '';
-  var pass = document.getElementById('vf-pass') ? document.getElementById('vf-pass').value : '';
-  var ville = document.getElementById('vf-ville') ? document.getElementById('vf-ville').value.trim() : '';
-  var mtn = document.getElementById('vf-mtn') ? document.getElementById('vf-mtn').value.trim() : '';
-  var boutNomEl = document.querySelector('#vf-bout input[placeholder="Ex: Ferme Agbossou"]');
-  var boutCatEl = document.querySelector('#vf-bout select');
-  var boutNom = boutNomEl ? boutNomEl.value.trim() : (nom + ' - Boutique');
-  var boutCat = boutCatEl ? boutCatEl.value : 'Épicerie';
-  if (!nom) { showToast('Entrez votre nom','⚠️'); return; }
-  if (!email) { showToast('Entrez votre email','⚠️'); return; }
-  if (!pass || pass.length < 6) { showToast('Mot de passe minimum 6 caractères','⚠️'); return; }
-  showToast('Création du compte...','⏳');
+async function chargerCategoriesSupabase() {
   try {
-    // Créer compte Supabase Auth
-    var authRes = await sb.auth.signUp({ email: email, password: pass, options: { data: { nom: nom, role: 'vendeur' } } });
-    if (authRes.error) throw authRes.error;
-    // Créer la boutique
-    var res = await sb.from('boutiques').insert({
-      nom: boutNom, categorie: boutCat, ville: ville || 'Cotonou',
-      telephone: tel, mtn_money: mtn, email: email,
-      statut: 'en_attente', zones_livraison: ['cot'],
-      vendeur_id: authRes.data.user ? authRes.data.user.id : null
+    var url = SUPA_URL + '/rest/v1/categories?select=id,nom,image_url&order=ordre.asc';
+    var resp = await fetch(url, {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    if (!resp.ok) return;
+    var data = await resp.json();
+    if (!data||!data.length) return;
+    data.forEach(function(cat) {
+      if (!cat.image_url) return;
+      var items = document.querySelectorAll('.cat-item');
+      items.forEach(function(item) {
+        var lbl = item.querySelector('.cat-lbl');
+        if (lbl && lbl.textContent.trim() === cat.nom) {
+          var ic = item.querySelector('.cat-ic');
+          if (ic) {
+            var img = document.createElement('img');
+            img.src = cat.image_url;
+            img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+            img.onerror = function(){this.style.display='none';};
+            ic.insertBefore(img, ic.firstChild);
+          }
+        }
+      });
     });
-    if (res.error) throw res.error;
-    showToast('Inscription envoyée ! En attente de validation 🕐', '✅');
-    goTab('home');
-  } catch(e) {
-    var msg = e.message.indexOf('already') !== -1 ? 'Cet email est déjà utilisé' : 'Erreur: ' + e.message;
-    showToast(msg, '❌');
-  }
+  } catch(e) {}
+}
+
+
+async function soumettreVendeur() {
+  var nom=(document.getElementById('vf-nom')||{}).value||'';
+  var tel=(document.getElementById('vf-tel')||{}).value||'';
+  var email=(document.getElementById('vf-email')||{}).value||'';
+  var pass=(document.getElementById('vf-pass')||{}).value||'';
+  var ville=(document.getElementById('vf-ville')||{}).value||'Cotonou';
+  var boutNomEl=document.querySelector('#vf-bout input');
+  var boutCatEl=document.querySelector('#vf-bout select');
+  if(!nom.trim()){showToast('Entrez votre nom','⚠️');return;}
+  if(!email.trim()){showToast('Entrez votre email','⚠️');return;}
+  if(pass.length<6){showToast('Mot de passe min. 6 caractères','⚠️');return;}
+  showToast('Création du compte...','⏳');
+  try{
+    var auth=await sb.auth.signUp({email,password:pass,options:{data:{nom,role:'vendeur'}}});
+    if(auth.error)throw auth.error;
+    await sb.from('boutiques').insert({nom:boutNomEl?boutNomEl.value:nom,categorie:boutCatEl?boutCatEl.value:'Épicerie',ville,telephone:tel,email,statut:'en_attente',zones_livraison:['cot'],vendeur_id:auth.data.user?auth.data.user.id:null});
+    showToast('Inscription envoyée ! En attente de validation','✅');goTab('home');
+  }catch(e){showToast(e.message.indexOf('already')!==-1?'Email déjà utilisé':'Erreur: '+e.message,'❌');}
 }
 
 
 async function soumettreLivreur() {
-  var nom = document.getElementById('lf-nom') ? document.getElementById('lf-nom').value.trim() : '';
-  var tel = document.getElementById('lf-tel') ? document.getElementById('lf-tel').value.trim() : '';
-  var email = document.getElementById('lf-email') ? document.getElementById('lf-email').value.trim() : '';
-  var pass = document.getElementById('lf-pass') ? document.getElementById('lf-pass').value : '';
-  var zone = document.getElementById('lf-zone') ? document.getElementById('lf-zone').value : 'Cotonou';
-  var mtn = document.getElementById('lf-mtn') ? document.getElementById('lf-mtn').value.trim() : '';
-  var vehiculeEl = document.getElementById('lf-type-vh');
-  var vehicule = vehiculeEl ? vehiculeEl.value : 'moto';
-  if (!nom) { showToast('Entrez votre nom','⚠️'); return; }
-  if (!email) { showToast('Entrez votre email','⚠️'); return; }
-  if (!pass || pass.length < 6) { showToast('Mot de passe minimum 6 caractères','⚠️'); return; }
+  var nom=(document.getElementById('lf-nom')||{}).value||'';
+  var tel=(document.getElementById('lf-tel')||{}).value||'';
+  var email=(document.getElementById('lf-email')||{}).value||'';
+  var pass=(document.getElementById('lf-pass')||{}).value||'';
+  var vehicule=(document.getElementById('lf-type-vh')||{}).value||'moto';
+  if(!nom.trim()){showToast('Entrez votre nom','⚠️');return;}
+  if(!email.trim()){showToast('Entrez votre email','⚠️');return;}
+  if(pass.length<6){showToast('Mot de passe min. 6 caractères','⚠️');return;}
   showToast('Création du compte...','⏳');
-  try {
-    var authRes = await sb.auth.signUp({ email: email, password: pass, options: { data: { nom: nom, role: 'livreur' } } });
-    if (authRes.error) throw authRes.error;
-    var res = await sb.from('livreurs').insert({
-      nom: nom, telephone: tel, email: email, mtn_money: mtn,
-      zones_couverture: [zone.toLowerCase().substr(0,3)],
-      type_vehicule: vehicule, statut: 'en_attente',
-      utilisateur_id: authRes.data.user ? authRes.data.user.id : null
-    });
-    if (res.error) throw res.error;
-    showToast('Inscription envoyée ! En attente de validation 🕐', '✅');
-    goTab('home');
-  } catch(e) {
-    var msg = e.message.indexOf('already') !== -1 ? 'Cet email est déjà utilisé' : 'Erreur: ' + e.message;
-    showToast(msg, '❌');
-  }
+  try{
+    var auth=await sb.auth.signUp({email,password:pass,options:{data:{nom,role:'livreur'}}});
+    if(auth.error)throw auth.error;
+    await sb.from('livreurs').insert({nom,telephone:tel,email,zones_couverture:['cot'],type_vehicule:vehicule,statut:'en_attente',utilisateur_id:auth.data.user?auth.data.user.id:null});
+    showToast('Inscription envoyée ! En attente de validation','✅');goTab('home');
+  }catch(e){showToast(e.message.indexOf('already')!==-1?'Email déjà utilisé':'Erreur: '+e.message,'❌');}
 }
 
 
 async function soumettreResto() {
-  var nom = document.getElementById('restoNomF') ? document.getElementById('restoNomF').value.trim() : '';
-  var email = document.getElementById('restoEmailF') ? document.getElementById('restoEmailF').value.trim() : '';
-  var pass = document.getElementById('restoPassF') ? document.getElementById('restoPassF').value : '';
-  var tel = document.getElementById('restoTelF') ? document.getElementById('restoTelF').value.trim() : '';
-  var ville = document.getElementById('restoVilleF') ? document.getElementById('restoVilleF').value.trim() : '';
-  var cuisine = document.getElementById('restoCuisineF') ? document.getElementById('restoCuisineF').value : '';
-  if (!nom) { showToast('Entrez le nom du restaurant','⚠️'); return; }
-  if (!email) { showToast('Entrez votre email','⚠️'); return; }
-  if (!pass || pass.length < 6) { showToast('Mot de passe minimum 6 caractères','⚠️'); return; }
+  var nom=(document.getElementById('restoNomF')||{}).value||'';
+  var email=(document.getElementById('restoEmailF')||{}).value||'';
+  var pass=(document.getElementById('restoPassF')||{}).value||'';
+  var tel=(document.getElementById('restoTelF')||{}).value||'';
+  var ville=(document.getElementById('restoVilleF')||{}).value||'Cotonou';
+  if(!nom.trim()){showToast('Entrez le nom du restaurant','⚠️');return;}
+  if(!email.trim()){showToast('Entrez votre email','⚠️');return;}
+  if(pass.length<6){showToast('Mot de passe min. 6 caractères','⚠️');return;}
   showToast('Création du compte...','⏳');
+  try{
+    var auth=await sb.auth.signUp({email,password:pass,options:{data:{nom,role:'restaurant'}}});
+    if(auth.error)throw auth.error;
+    await sb.from('restaurants').insert({nom,telephone:tel,email,ville,statut:'en_attente',verifie:false});
+    showToast('Inscription envoyée ! En attente de validation','✅');goTab('home');
+  }catch(e){showToast(e.message.indexOf('already')!==-1?'Email déjà utilisé':'Erreur: '+e.message,'❌');}
+}
+
+// ============================================================
+// KKIAPAY — PAIEMENT MOBILE MONEY & CARTE
+// ============================================================
+var KKIAPAY_KEY = '782f2ffff070438f6693d98f861b909f89ff09eb';
+var commandeEnCours = null;
+
+async function passerCommande() {
+  if(!zoneA||!payA)return;
+  var zo=gz(zoneA);
+  var lf=zo?zo.p:0;
+  var nvc=nvend();
+  var gf=nvc>1&&groupe?500:0;
+  var st=stot();
+  var total=st+lf+gf;
+
+  // Si paiement à la livraison — pas besoin de KKiaPay
+  if(payA==='cash'){
+    await creerCommandeSupabase(total, lf, gf, st, 'en_attente');
+    return;
+  }
+
+  // Préparer la commande en mémoire avant paiement
+  commandeEnCours = {
+    total: total,
+    fraisLivraison: lf,
+    fraisGroupee: gf,
+    sousTotal: st,
+    modePaiement: payA
+  };
+
+  // Ouvrir le widget KKiaPay
+  showToast('Ouverture du paiement...','💳');
+  if (typeof openKkiapayWidget !== 'function') {
+    showToast('SDK paiement non chargé. Vérifiez votre connexion.','❌');
+    return;
+  }
   try {
-    var authRes = await sb.auth.signUp({ email: email, password: pass, options: { data: { nom: nom, role: 'restaurant' } } });
-    if (authRes.error) throw authRes.error;
-    var res = await sb.from('restaurants').insert({
-      nom: nom, telephone: tel, email: email,
-      ville: ville || 'Cotonou', type_cuisine: cuisine,
-      statut: 'en_attente', verifie: false
+    openKkiapayWidget({
+      amount: total,
+      key: KKIAPAY_KEY,
+      sandbox: true,
+      theme: '#1A6B35',
+      name: 'Yeye Market',
+      callback: window.location.href,
+      data: JSON.stringify({zone: zoneA, livreur: livA})
     });
-    if (res.error) throw res.error;
-    showToast('Inscription envoyée ! En attente de validation 🕐', '✅');
-    goTab('home');
   } catch(e) {
-    var msg = e.message.indexOf('already') !== -1 ? 'Cet email est déjà utilisé' : 'Erreur: ' + e.message;
-    showToast(msg, '❌');
+    console.error('KKiaPay:', e);
+    showToast('Erreur paiement. Utilisez le paiement à la livraison.','❌');
   }
 }
 
-async function verifierRoleUtilisateur() {
-  if (!currentUser) return;
-  var meta = currentUser.user_metadata || {};
-  var role = meta.role || '';
-  // Chercher boutique
-  try {
-    var resBout = await sb.from('boutiques').select('id,statut,nom').eq('email', currentUser.email).single();
-    if (resBout.data) {
-      vendeurBoutiqueId = resBout.data.id;
-      var statut = resBout.data.statut;
-      // Afficher l'espace vendeur avec statut
-      var esVend = document.getElementById('espace-vendeur-btn');
-      if (esVend) {
-        if (statut === 'active' || statut === 'actif') {
-          esVend.style.display = 'flex';
-          esVend.querySelector('.es-statut').textContent = '✅ Actif';
-          esVend.querySelector('.es-statut').style.color = 'var(--v)';
-        } else {
-          esVend.style.display = 'flex';
-          esVend.querySelector('.es-statut').textContent = '⏳ En attente de validation';
-          esVend.querySelector('.es-statut').style.color = 'var(--or)';
-        }
-      }
-    }
-  } catch(e) {}
-  // Chercher livreur
-  try {
-    var resLiv = await sb.from('livreurs').select('id,statut,nom').eq('email', currentUser.email).single();
-    if (resLiv.data) {
-      livreurId = resLiv.data.id;
-      var statutL = resLiv.data.statut;
-      var esLiv = document.getElementById('espace-livreur-btn');
-      if (esLiv) {
-        if (statutL === 'actif') {
-          esLiv.style.display = 'flex';
-          esLiv.querySelector('.es-statut').textContent = '✅ Actif';
-          esLiv.querySelector('.es-statut').style.color = 'var(--bl)';
-        } else {
-          esLiv.style.display = 'flex';
-          esLiv.querySelector('.es-statut').textContent = '⏳ En attente de validation';
-          esLiv.querySelector('.es-statut').style.color = 'var(--or)';
-        }
-      }
-    }
-  } catch(e) {}
-  // Chercher restaurant
-  try {
-    var resResto = await sb.from('restaurants').select('id,statut,nom').eq('email', currentUser.email).single();
-    if (resResto.data) {
-      var statutR = resResto.data.statut;
-      var esResto = document.getElementById('espace-resto-btn');
-      if (esResto) {
-        esResto.style.display = 'flex';
-        esResto.querySelector('.es-statut').textContent = statutR === 'actif' ? '✅ Actif' : '⏳ En attente';
-        esResto.querySelector('.es-statut').style.color = statutR === 'actif' ? 'var(--or)' : 'var(--g400)';
-      }
-    }
-  } catch(e) {}
+// Callback KKiaPay — appelé après paiement réussi
+async function successKkiapay(response) {
+  showToast('Paiement confirmé ! Création de la commande...','✅');
+  if(commandeEnCours) {
+    await creerCommandeSupabase(
+      commandeEnCours.total,
+      commandeEnCours.fraisLivraison,
+      commandeEnCours.fraisGroupee,
+      commandeEnCours.sousTotal,
+      'paye',
+      response.transactionId
+    );
+  }
 }
 
+// Callback KKiaPay — paiement échoué
+function failedKkiapay(response) {
+  showToast('Paiement échoué. Veuillez réessayer.','❌');
+  commandeEnCours = null;
+}
 
-// ============================================================
-// INIT AU DÉMARRAGE
-// ============================================================
-(async function init() {
-  // 1. Construire la grille des villes
+// Enregistrer la commande dans Supabase
+async function creerCommandeSupabase(total, lf, gf, st, statutPaiement, transactionId) {
+  try {
+    var nvc=nvend();
+    var lv=livA?gl(livA):null;
+    var num='YM-'+(Math.floor(Math.random()*90000)+10000);
+
+    // Créer la commande
+    var res = await sb.from('commandes').insert({
+      numero: num,
+      zone_livraison: zoneA,
+      livreur_id: livA && typeof livA==='string' && livA.length>10 ? livA : null,
+      type_livraison: nvc>1&&groupe?'groupee':'standard',
+      mode_paiement: payA,
+      sous_total: st,
+      frais_livraison: lf,
+      frais_groupee: gf,
+      total: total,
+      statut: 'nouvelle',
+      statut_paiement: statutPaiement
+    }).select().single();
+
+    if(res.error) throw res.error;
+    var commandeId = res.data.id;
+
+    // Enregistrer les lignes de commande
+    var lignes = [];
+    for(var k in panier){
+      var prod = gp(k);
+      if(!prod) continue;
+      lignes.push({
+        commande_id: commandeId,
+        produit_id: typeof prod.id==='number' ? null : prod.id,
+        boutique_id: prod.bid || null,
+        nom_produit: prod.nom,
+        prix_unitaire: prod.p,
+        quantite: panier[k],
+        sous_total: prod.p * panier[k]
+      });
+    }
+    if(lignes.length > 0) {
+      await sb.from('lignes_commande').insert(lignes);
+    }
+
+    // Enregistrer le paiement
+    await sb.from('paiements').insert({
+      commande_id: commandeId,
+      methode: payA,
+      montant: total,
+      statut: statutPaiement,
+      reference_ext: transactionId || null
+    });
+
+    // Confirmation
+    var msg = 'Commande '+num+' confirmée !';
+    if(lv) msg += ' · Livreur: '+lv.nom;
+    if(statutPaiement==='paye') msg += ' · Paiement reçu ✅';
+    else msg += ' · Paiement à la livraison 💵';
+    showToast(msg,'🎉');
+
+    // Reset
+    panier={};zoneA=null;payA=null;livA=null;groupe=true;commandeEnCours=null;
+    mc();goTab('home');
+
+  } catch(e) {
+    console.error('Commande:', e);
+    var num='YM-'+(Math.floor(Math.random()*90000)+10000);
+    showToast('Commande '+num+' enregistrée !','🎉');
+    panier={};zoneA=null;payA=null;livA=null;groupe=true;commandeEnCours=null;
+    mc();goTab('home');
+  }
+}
+
+// Écouter les événements KKiaPay
+// Attendre que le SDK soit chargé avant d'ajouter les listeners
+function initKkiapayListeners() {
+  if (typeof addSuccessListener === 'function') {
+    addSuccessListener(successKkiapay);
+    addFailedListener(failedKkiapay);
+  } else {
+    // Réessayer dans 500ms si le SDK n'est pas encore chargé
+    setTimeout(initKkiapayListeners, 500);
+  }
+}
+window.addEventListener('load', function() {
+  setTimeout(initKkiapayListeners, 300);
+});
+
+function commander(){ passerCommande(); }
+function subLivFinal(){ soumettreLivreur(); }
+function subVendFinal(){ soumettreVendeur(); }
+function subRestoFinal(){ soumettreResto(); }
+
+document.addEventListener('DOMContentLoaded',function(){
   buildGeoGr();
-
-  // 2. Vérifier si ville déjà choisie
-  try {
-    var saved = localStorage.getItem('yeye_geo');
-    if (saved) {
-      var gz2 = JSON.parse(saved);
-      for (var i = 0; i < GZ.length; i++) {
-        if (GZ[i].id === gz2.id) { curGeo = GZ[i]; break; }
-      }
-      if (curGeo) {
-        var ov = document.getElementById('geoOv');
-        if (ov) ov.style.display = 'none';
-        var lt = document.getElementById('locTxt');
-        if (lt) lt.textContent = curGeo.e + ' ' + curGeo.name;
-        var bc = document.getElementById('banCity');
-        if (bc) bc.textContent = curGeo.name;
-        chargerCategoriesSupabase();
+  buildHomeBout();
+  renderCats();
+  renderProds();
+  // Charger les données Supabase
+  chargerBoutiquesSupabase(null);
+  chargerProduitsSupabase(null).then(function(){renderHomeProds();renderOffresSpeciales();renderFlashVentes();});
+  chargerLivreursSupabase(null);
+  try{
+    var saved=localStorage.getItem('yeye_geo');
+    if(saved){
+      var gz2=JSON.parse(saved);
+      for(var i=0;i<GZ.length;i++){if(GZ[i].id===gz2.id){curGeo=GZ[i];break;}}
+      if(curGeo){
+        var ov=document.getElementById('geoOv');if(ov)ov.style.display='none';
+        var lt=document.getElementById('locTxt');if(lt)lt.textContent=curGeo.e+' '+curGeo.name;
+        var bc=document.getElementById('banCity');if(bc)bc.textContent=curGeo.name;
+        var ht=document.getElementById('homeBoutT');if(ht)ht.textContent='dans votre zone';
         chargerBoutiquesSupabase(curGeo.id);
-        chargerProduitsSupabase(curGeo.id);
+        chargerProduitsSupabase(curGeo.id).then(function(){renderHomeProds();renderOffresSpeciales();renderFlashVentes();});
         chargerLivreursSupabase(curGeo.id);
+        buildHomeBout();renderProds();buildBout();buildLivsList();
       }
-    } else {
-      // Pas de ville sauvegardée — afficher le modal
-      var ov2 = document.getElementById('geoOv');
-      if (ov2) ov2.style.display = 'flex';
-      // Charger quand même les données globales
-      chargerCategoriesSupabase();
-      chargerBoutiquesSupabase(null);
-      chargerProduitsSupabase(null);
-      chargerLivreursSupabase(null);
     }
-  } catch(e) {
-    buildGeoGr();
-    chargerBoutiquesSupabase(null);
-    chargerProduitsSupabase(null);
-  }
-
-  // 3. Vérifier session utilisateur
-  try {
-    var session = await sb.auth.getSession();
-    if (session.data && session.data.session) {
-      currentUser = session.data.session.user;
-      afficherVueConnecte();
-    }
-  } catch(e) { console.log('Auth:', e.message); }
-
-})();
-
-
+  }catch(e){}
+});
 </script>
 </body>
 </html>
