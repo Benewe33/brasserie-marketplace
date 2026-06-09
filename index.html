@@ -2032,6 +2032,7 @@ document.addEventListener('DOMContentLoaded',function(){
   renderCats();
   renderProds();
   // Charger les données Supabase
+  chargerCategoriesSupabase();
   chargerBoutiquesSupabase(null);
   chargerProduitsSupabase(null).then(function(){renderHomeProds();renderOffresSpeciales();renderFlashVentes();});
   chargerLivreursSupabase(null);
@@ -2053,6 +2054,38 @@ document.addEventListener('DOMContentLoaded',function(){
     }
   }catch(e){}
 });
+
+async function chargerCategoriesSupabase() {
+  try {
+    var res = await sb.from('categories').select('id,nom,image_url').order('ordre',{ascending:true});
+    if (res.error || !res.data || !res.data.length) return;
+    res.data.forEach(function(cat) {
+      if (!cat.image_url) return;
+      // Find the cat-item with this label
+      var items = document.querySelectorAll('.cat-item');
+      items.forEach(function(item) {
+        var lbl = item.querySelector('.cat-lbl');
+        if (!lbl || lbl.textContent.trim() !== cat.nom) return;
+        var ic = item.querySelector('.cat-ic');
+        if (!ic) return;
+        // Keep badge if exists
+        var badge = ic.querySelector('.cat-bdg');
+        // Replace content with image
+        var img = document.createElement('img');
+        img.src = cat.image_url;
+        img.alt = cat.nom;
+        img.style.cssText = 'width:100%;height:100%;object-fit:cover;border-radius:50%';
+        img.onerror = function() { this.style.display='none'; };
+        ic.innerHTML = '';
+        ic.appendChild(img);
+        if (badge) ic.appendChild(badge);
+      });
+    });
+    console.log('Categories images chargées OK');
+  } catch(e) {
+    console.log('Categories erreur:', e.message);
+  }
+}
 
 var currentUser=null;
 function goTabOrig(tab){} // placeholder
