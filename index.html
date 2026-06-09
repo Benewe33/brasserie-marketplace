@@ -2487,5 +2487,148 @@ async function changerMotDePasse(){
 
 </script>
 
+
+<!-- ===== MODALS MON COMPTE ===== -->
+<div id="modal-historique" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600;color:var(--g900)">🕐 Historique des commandes</div>
+      <button onclick="fermerModal('modal-historique')" style="background:var(--g100);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div id="historique-content"><div style="text-align:center;padding:20px;color:var(--g400)">Chargement...</div></div>
+  </div>
+</div>
+
+<div id="modal-adresses" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600;color:var(--g900)">📍 Mes adresses</div>
+      <button onclick="fermerModal('modal-adresses')" style="background:var(--g100);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div id="adresses-content"></div>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--g100)">
+      <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px">+ Nouvelle adresse</div>
+      <input id="adr-nom" type="text" placeholder="Nom (Maison, Bureau...)" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px;box-sizing:border-box"/>
+      <input id="adr-rue" type="text" placeholder="Rue / Quartier" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px;box-sizing:border-box"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+        <input id="adr-ville" type="text" placeholder="Ville" style="border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none"/>
+        <input id="adr-tel" type="tel" placeholder="Téléphone" style="border:1px solid var(--g200);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;outline:none"/>
+      </div>
+      <button onclick="sauvegarderAdresse()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:12px;padding:13px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">💾 Sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<div id="modal-favoris" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600;color:var(--g900)">❤️ Mes favoris</div>
+      <button onclick="fermerModal('modal-favoris')" style="background:var(--g100);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div id="favoris-content"><div style="text-align:center;padding:30px;color:var(--g400);font-size:12px"><div style="font-size:30px;margin-bottom:8px">❤️</div>Aucun favori pour l'instant</div></div>
+  </div>
+</div>
+
+<div id="modal-coupons" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600;color:var(--g900)">🎁 Mes Coupons</div>
+      <button onclick="fermerModal('modal-coupons')" style="background:var(--g100);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <input id="coupon-code" type="text" placeholder="Code promo (ex: YEYE10)" style="flex:1;border:1px solid var(--g200);border-radius:10px;padding:11px 14px;font-size:13px;font-family:inherit;outline:none;text-transform:uppercase"/>
+      <button onclick="appliquerCoupon()" style="background:var(--v);color:#fff;border:none;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Valider</button>
+    </div>
+    <div style="background:linear-gradient(135deg,var(--jl),#FFF8DC);border-radius:12px;padding:14px;border:1.5px dashed var(--j)">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div><div style="font-size:16px;font-weight:700;color:var(--jd);letter-spacing:2px">YEYE10</div><div style="font-size:11px;color:var(--g400);margin-top:3px">10% sur votre première commande</div><div style="font-size:10px;color:var(--or);margin-top:2px">Expire le 31/12/2026</div></div>
+        <div style="background:var(--j);color:var(--jd);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700">-10%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="modal-portefeuille" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600;color:var(--g900)">💰 Mon Portefeuille</div>
+      <button onclick="fermerModal('modal-portefeuille')" style="background:var(--g100);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div style="background:linear-gradient(135deg,var(--v),#2E8B50);border-radius:16px;padding:20px;text-align:center;margin-bottom:16px">
+      <div style="font-size:11px;color:rgba(255,255,255,.8);margin-bottom:6px">Solde disponible</div>
+      <div id="solde-affichage" style="font-size:28px;font-weight:700;color:#fff">0 FCFA</div>
+    </div>
+    <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px">Recharger via Mobile Money</div>
+    <input id="recharge-montant" type="number" placeholder="Montant (min. 500 FCFA)" min="500" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:11px 14px;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;box-sizing:border-box"/>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+      <button onclick="rechargerMomo('mtn')" style="background:#FFCB05;color:#1A1A1A;border:none;border-radius:12px;padding:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📱 MTN MoMo</button>
+      <button onclick="rechargerMomo('moov')" style="background:#0057A8;color:#fff;border:none;border-radius:12px;padding:14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">📱 Moov Money</button>
+    </div>
+    <div style="background:var(--g50);border-radius:10px;padding:12px;font-size:11px;color:var(--g400);line-height:1.8">📞 MTN MoMo : *126# · Moov Money : *155#<br>💡 Minimum : 500 FCFA</div>
+  </div>
+</div>
+
+<div id="modal-points" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600;color:var(--g900)">⭐ Points Yéyé</div>
+      <button onclick="fermerModal('modal-points')" style="background:var(--g100);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div style="background:linear-gradient(135deg,#F5C518,#E07B1A);border-radius:16px;padding:20px;text-align:center;margin-bottom:16px">
+      <div style="font-size:11px;color:rgba(255,255,255,.9);margin-bottom:4px">Vos points</div>
+      <div id="points-affichage" style="font-size:36px;font-weight:700;color:#fff">0</div>
+      <div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:4px">sur 1000 pour le niveau Or 🥇</div>
+      <div style="background:rgba(255,255,255,.3);border-radius:20px;height:6px;margin-top:10px">
+        <div id="points-barre" style="background:#fff;border-radius:20px;height:6px;width:0%;transition:width .5s"></div>
+      </div>
+    </div>
+    <div style="background:var(--g50);border-radius:10px;padding:12px;font-size:12px;color:var(--g700);line-height:1.8">
+      🥉 Bronze : 0-499 pts — Prix normal<br>
+      🥈 Argent : 500-999 pts — 5% réduction<br>
+      🥇 Or : 1000+ pts — 10% + livraison offerte
+    </div>
+  </div>
+</div>
+
+<div id="modal-aide" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600;color:var(--g900)">🎧 Centre d'aide</div>
+      <button onclick="fermerModal('modal-aide')" style="background:var(--g100);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
+      <a href="tel:+22900000000" style="text-decoration:none;background:var(--vl);border-radius:12px;padding:14px;text-align:center;display:block">
+        <div style="font-size:24px;margin-bottom:6px">📞</div>
+        <div style="font-size:12px;font-weight:600;color:var(--vd)">Appeler</div>
+        <div style="font-size:10px;color:var(--v);margin-top:2px">+229 00 00 00 00</div>
+      </a>
+      <a href="https://wa.me/22900000000" target="_blank" style="text-decoration:none;background:#E8F8F0;border-radius:12px;padding:14px;text-align:center;display:block">
+        <div style="font-size:24px;margin-bottom:6px">💬</div>
+        <div style="font-size:12px;font-weight:600;color:#1A6B35">WhatsApp</div>
+        <div style="font-size:10px;color:var(--v);margin-top:2px">8h — 20h</div>
+      </a>
+    </div>
+    <div style="font-size:13px;font-weight:600;color:var(--g900);margin-bottom:10px">Questions fréquentes</div>
+    <div id="faq-list"></div>
+  </div>
+</div>
+
+<div id="modal-parametres" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600;color:var(--g900)">⚙️ Paramètres</div>
+      <button onclick="fermerModal('modal-parametres')" style="background:var(--g100);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div style="font-size:12px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Mon profil</div>
+    <input id="param-nom" type="text" placeholder="Nom complet" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px;box-sizing:border-box"/>
+    <input id="param-email" type="email" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;background:var(--g100);outline:none;margin-bottom:12px;box-sizing:border-box" readonly/>
+    <button onclick="sauvegarderProfil()" style="width:100%;background:var(--v);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:14px">💾 Sauvegarder le profil</button>
+    <div style="font-size:12px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Changer mot de passe</div>
+    <input id="param-newpass" type="password" placeholder="Nouveau mot de passe (min. 6 car.)" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px;box-sizing:border-box"/>
+    <button onclick="changerMotDePasse()" style="width:100%;background:var(--bl);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:14px">🔑 Changer le mot de passe</button>
+    <button onclick="cptDeconnexion();fermerModal('modal-parametres')" style="width:100%;background:var(--rl);color:var(--r);border:1px solid var(--r);border-radius:12px;padding:12px;font-size:13px;font-family:inherit;cursor:pointer">🚪 Se déconnecter</button>
+  </div>
+</div>
+
 </body>
 </html>
