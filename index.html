@@ -608,8 +608,8 @@ textarea.fi{resize:vertical;min-height:70px}
       <i class="ti ti-chevron-down" style="font-size:12px" aria-hidden="true"></i>
     </div>
     <div class="loc-right">
-      <div class="icon-b"><i class="ti ti-message-circle" style="font-size:14px" aria-hidden="true"></i><span class="nb-dot"></span></div>
-      <div class="icon-b"><i class="ti ti-bell" style="font-size:14px" aria-hidden="true"></i></div>
+      <div class="icon-b" onclick="ouvrirMessages()" style="cursor:pointer"><i class="ti ti-message-circle" style="font-size:14px" aria-hidden="true"></i><span class="nb-dot" id="msg-dot"></span></div>
+      <div class="icon-b" onclick="ouvrirNotifications()" style="cursor:pointer"><i class="ti ti-bell" style="font-size:14px" aria-hidden="true"></i><span class="nb-dot" id="notif-dot" style="display:none"></span></div>
     </div>
   </div>
   <div class="search-row">
@@ -2451,6 +2451,8 @@ document.addEventListener('DOMContentLoaded',function(){
   buildHomeBout();
   renderCats();
   renderProds();
+  // Charger bannière depuis admin
+  chargerBanniereHome();
   // Charger les données Supabase
   chargerCategoriesSupabase();
   chargerBoutiquesSupabase(null);
@@ -2541,7 +2543,8 @@ var currentUser=null;
 function goTabOrig(tab){} // placeholder
 
 function onCompteTabOpen(){sb.auth.getSession().then(function(res){if(res.data&&res.data.session){currentUser=res.data.session.user;afficherVueConnecte();}});}
-async function cptConnexion(){var email=(document.getElementById('cpt-email-inp')||{}).value||'';var pass=(document.getElementById('cpt-pass-inp')||{}).value||'';if(!email||!pass){showToast('Email et mot de passe requis','⚠️');return;}showToast('Connexion...','⏳');try{var res=await sb.auth.signInWithPassword({email,password:pass});if(res.error)throw res.error;currentUser=res.data.user;await afficherVueConnecte();showToast('Bienvenue !','✅');}catch(e){showToast(e.message.indexOf('Invalid')!==-1?'Email ou mot de passe incorrect':'Erreur: '+e.message,'❌');}}
+async function cptConnexion(){var email=(document.getElementById('cpt-email-inp')||{}).value||'';var pass=(document.getElementById('cpt-pass-inp')||{}).value||'';if(!email||!pass){showToast('Email et mot de passe requis','⚠️');return;}showToast('Connexion...','⏳');try{var res=await sb.auth.signInWithPassword({email,password:pass});if(res.error)throw res.error;currentUser=res.data.user;await afficherVueConnecte();
+    verifierNouvellesNotifications();showToast('Bienvenue !','✅');}catch(e){showToast(e.message.indexOf('Invalid')!==-1?'Email ou mot de passe incorrect':'Erreur: '+e.message,'❌');}}
 async function cptDeconnexion(){await sb.auth.signOut();currentUser=null;['cpt-login-form'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='block';});['cpt-logout-form','cpt-espaces'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});var el=document.getElementById('cpt-auth-btn');if(el)el.textContent='Se connecter';showToast('Déconnecté','👋');}
 async function afficherVueConnecte(){if(!currentUser)return;var email=currentUser.email||'';var nom=(currentUser.user_metadata&&currentUser.user_metadata.nom)||email.split('@')[0];var el;el=document.getElementById('cpt-nom');if(el)el.textContent=nom;el=document.getElementById('cpt-email');if(el)el.textContent=email;el=document.getElementById('cpt-avatar');if(el)el.textContent=nom.charAt(0).toUpperCase();el=document.getElementById('cpt-auth-btn');if(el)el.textContent='Connecté ✅';el=document.getElementById('cpt-login-form');if(el)el.style.display='none';el=document.getElementById('cpt-logout-form');if(el)el.style.display='block';await verifierRoleUtilisateur(email);}
 async function verifierRoleUtilisateur(email){
@@ -3177,6 +3180,29 @@ function toggleFavori(p) {
     <input id="param-newpass" type="password" placeholder="Nouveau mot de passe (min. 6 car.)" style="width:100%;border:1px solid var(--g200);border-radius:10px;padding:10px 12px;font-size:13px;font-family:inherit;outline:none;margin-bottom:8px;box-sizing:border-box"/>
     <button onclick="changerMotDePasse()" style="width:100%;background:var(--bl);color:#fff;border:none;border-radius:10px;padding:12px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;margin-bottom:14px">🔑 Changer le mot de passe</button>
     <button onclick="cptDeconnexion();fermerModal('modal-parametres')" style="width:100%;background:var(--rl);color:var(--r);border:1px solid var(--r);border-radius:12px;padding:12px;font-size:13px;font-family:inherit;cursor:pointer">🚪 Se déconnecter</button>
+  </div>
+</div>
+
+
+<!-- MODAL MESSAGES -->
+<div id="modal-messages" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600;color:var(--g900)">💬 Messages</div>
+      <button onclick="fermerModal('modal-messages')" style="background:var(--g100);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div id="messages-content"><div style="text-align:center;padding:20px;color:var(--g400)">Chargement...</div></div>
+  </div>
+</div>
+
+<!-- MODAL NOTIFICATIONS -->
+<div id="modal-notifications" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);z-index:999;align-items:flex-end;justify-content:center">
+  <div style="background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:430px;padding:20px;max-height:88vh;overflow-y:auto">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:15px;font-weight:600;color:var(--g900)">🔔 Notifications</div>
+      <button onclick="fermerModal('modal-notifications')" style="background:var(--g100);border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer">✕</button>
+    </div>
+    <div id="notifications-content"><div style="text-align:center;padding:20px;color:var(--g400)">Chargement...</div></div>
   </div>
 </div>
 
