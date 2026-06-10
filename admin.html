@@ -568,7 +568,7 @@ function openAddCategorie(){
 }
 
 function editCategorie(c){
-  document.getElementById('cat-id').value=c.id;
+  document.getElementById('cat-id').value=String(c.id);
   document.getElementById('cat-nom').value=c.nom||'';
   document.getElementById('cat-icone').value=c.emoji||'';
   document.getElementById('cat-image-url').value=c.image_url||'';
@@ -590,7 +590,7 @@ async function sauvegarderCategorie(){
   if(!nom){showToast('Entrez un nom','error');return;}
   const payload={nom,emoji:icone||null,image_url};
   let error;
-  if(id){({error}=await sb.from('categories').update(payload).eq('id',id));}
+  if(id){({error}=await sb.from('categories').update(payload).eq('id',parseInt(id)));}
   else{({error}=await sb.from('categories').insert(payload));}
   if(error){showToast('Erreur: '+error.message,'error');return;}
   showToast(id?'✅ Catégorie modifiée !':'✅ Catégorie ajoutée !','success');
