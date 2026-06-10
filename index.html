@@ -1443,6 +1443,17 @@ function sanitize(str) {
     .replace(/\//g, '&#x2F;');
 }
 
+// Catégories chargées depuis Supabase
+var CATS = []; // {id, nom, image_url}
+
+function getCatNom(categorie_id) {
+  if (!categorie_id) return 'Épicerie';
+  for (var i = 0; i < CATS.length; i++) {
+    if (String(CATS[i].id) === String(categorie_id)) return CATS[i].nom;
+  }
+  return 'Épicerie';
+}
+
 var GZ = [
   {id:'cot',name:'Cotonou',       e:'🏙️',nb:6,nl:12},
   {id:'abc',name:'Abomey-Calavi', e:'🌆',nb:4,nl:7},
@@ -2123,7 +2134,7 @@ var CAT_EMOJI = {
 async function chargerProduitsSupabase(zoneId) {
   try {
     // Utiliser fetch direct pour éviter DataCloneError du SDK
-    var url = SUPA_URL + '/rest/v1/produits?select=id,nom,prix,prix_promo,unite,stock,stock_unite,photos,badge,disponible,boutique_id,description&disponible=eq.true&order=cree_le.desc&limit=100';
+    var url = SUPA_URL + '/rest/v1/produits?select=id,nom,prix,prix_promo,unite,stock,stock_unite,photos,badge,disponible,boutique_id,description,categorie_id&disponible=eq.true&order=cree_le.desc&limit=100';
     // Utiliser le token de session si disponible (évite CORS)
     var authToken = SUPA_KEY;
     try {
@@ -2154,7 +2165,7 @@ async function chargerProduitsSupabase(zoneId) {
         p:parseFloat(p.prix)||0,
         ppromo:p.prix_promo?parseFloat(p.prix_promo):null,
         u:p.unite||'kg',
-        c:'Épicerie',
+        c:getCatNom(p.categorie_id),
         b:p.badge||'nat',
         d:p.stock_unite||(p.stock?p.stock+' '+(p.unite||'kg'):'Disponible'),
         bid:p.boutique_id,
@@ -3136,6 +3147,99 @@ function chargerBanniereHome() {
       titleEl.innerHTML = b.title + (city ? ' <span id="banCity">'+city.textContent+'</span>' : '');
     }
   } catch(e) { console.log('Banniere:', e.message); }
+}
+
+
+// ============================================================
+// MESSAGERIE & NOTIFICATIONS
+// ============================================================
+function ouvrirMessages() {
+  var m = document.getElementById('modal-messages');
+  if (m) { m.style.display = 'flex'; chargerMessages(); }
+}
+
+function ouvrirNotifications() {
+  var m = document.getElementById('modal-notifications');
+  if (m) { m.style.display = 'flex'; chargerNotifications(); }
+}
+
+async function chargerMessages() {
+  var el = document.getElementById('messages-content');
+  if (!el) return;
+  if (!currentUser) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--g400);font-size:13px"><div style="font-size:30px;margin-bottom:8px">💬</div>Connectez-vous pour voir vos messages</div>';
+    return;
+  }
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--g400)">Chargement...</div>';
+  try {
+    var url = SUPA_URL + '/rest/v1/notifications?select=*&utilisateur_id=eq.'+currentUser.id+'&type=eq.message&order=cree_le.desc&limit=20';
+    var resp = await fetch(url, {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    var msgs = await resp.json();
+    if (!msgs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--g400);font-size:13px"><div style="font-size:30px;margin-bottom:8px">💬</div>Aucun message pour le moment</div>';
+      return;
+    }
+    var h = '';
+    msgs.forEach(function(m) {
+      var date = new Date(m.cree_le).toLocaleDateString('fr-FR');
+      h += '<div style="display:flex;gap:10px;padding:12px 0;border-bottom:0.5px solid var(--g100)">'
+        + '<div style="width:40px;height:40px;border-radius:50%;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">💬</div>'
+        + '<div style="flex:1"><div style="font-size:13px;font-weight:600">'+(m.titre||'Message')+'</div>'
+        + '<div style="font-size:12px;color:var(--g400);margin-top:2px">'+(m.contenu||'')+'</div>'
+        + '<div style="font-size:10px;color:var(--g300);margin-top:4px">'+date+'</div></div></div>';
+    });
+    el.innerHTML = h;
+  } catch(e) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--g400);font-size:12px">Erreur de chargement</div>';
+  }
+}
+
+async function chargerNotifications() {
+  var el = document.getElementById('notifications-content');
+  if (!el) return;
+  if (!currentUser) {
+    el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--g400);font-size:13px"><div style="font-size:30px;margin-bottom:8px">🔔</div>Connectez-vous pour voir vos notifications</div>';
+    return;
+  }
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--g400)">Chargement...</div>';
+  try {
+    var url = SUPA_URL + '/rest/v1/notifications?select=*&utilisateur_id=eq.'+currentUser.id+'&order=cree_le.desc&limit=30';
+    var resp = await fetch(url, {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    var notifs = await resp.json();
+    if (!notifs.length) {
+      el.innerHTML = '<div style="text-align:center;padding:30px;color:var(--g400);font-size:13px"><div style="font-size:30px;margin-bottom:8px">🔔</div>Aucune notification</div>';
+      return;
+    }
+    var dot = document.getElementById('notif-dot');
+    if (dot) dot.style.display = 'none';
+    var icons = {commande:'🧾',livraison:'🛵',paiement:'💰',systeme:'📢',message:'💬'};
+    var h = '';
+    notifs.forEach(function(n) {
+      var date = new Date(n.cree_le).toLocaleDateString('fr-FR');
+      var ic = icons[n.type]||'📢';
+      h += '<div style="display:flex;gap:10px;padding:12px 0;border-bottom:0.5px solid var(--g100);'+(n.lu?'':'background:var(--vl);')+'padding-left:8px">'
+        + '<div style="width:40px;height:40px;border-radius:50%;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">'+ic+'</div>'
+        + '<div style="flex:1"><div style="font-size:13px;font-weight:600">'+(n.titre||'Notification')+'</div>'
+        + '<div style="font-size:12px;color:var(--g400);margin-top:2px">'+(n.contenu||'')+'</div>'
+        + '<div style="font-size:10px;color:var(--g300);margin-top:4px">'+date+'</div></div>'
+        + (!n.lu?'<div style="width:8px;height:8px;border-radius:50%;background:var(--v);flex-shrink:0;margin-top:8px"></div>':'')
+        + '</div>';
+    });
+    el.innerHTML = h;
+  } catch(e) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--g400);font-size:12px">Erreur</div>';
+  }
+}
+
+async function verifierNouvellesNotifications() {
+  if (!currentUser) return;
+  try {
+    var url = SUPA_URL + '/rest/v1/notifications?select=id&utilisateur_id=eq.'+currentUser.id+'&lu=eq.false&limit=1';
+    var resp = await fetch(url, {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    var data = await resp.json();
+    var dot = document.getElementById('notif-dot');
+    if (dot && data && data.length) dot.style.display = 'block';
+  } catch(e) {}
 }
 
 </script>
