@@ -1462,9 +1462,23 @@ var LIVS = [
   {id:'l8',nom:'Dede Houngbo', e:'🧑🏿',zone:'Abomey',          tel:'+229 93 44 55 66',note:4.6,nb:8, ok:true, geo:['abo']}
 ];
 // Boutiques chargées dynamiquement depuis Supabase
-var BOUTS = [];
-// Produits chargés dynamiquement depuis Supabase
-var PRODS = [];
+// Données de démonstration (remplacées par Supabase au chargement)
+var BOUTS = [
+  {id:'b1',nom:'Ferme Agbossou',e:'🌿',bg:'#E8F5EE',cat:'Épicerie',ville:'Savalou',np:12,note:4.8,ver:true,geo:['cot'],logo_url:null},
+  {id:'b2',nom:'Marché de Cotonou',e:'🏪',bg:'#FEF0E0',cat:'Marché',ville:'Cotonou',np:25,note:4.6,ver:true,geo:['cot'],logo_url:null},
+  {id:'b3',nom:'KOKOU Fresh',e:'🥬',bg:'#E8F5EE',cat:'Légumes',ville:'Cotonou',np:8,note:4.9,ver:true,geo:['cot','abc'],logo_url:null},
+  {id:'b4',nom:'Boucherie Centrale',e:'🥩',bg:'#FDECEA',cat:'Viandes',ville:'Cotonou',np:15,note:4.7,ver:false,geo:['cot'],logo_url:null}
+];
+var PRODS = [
+  {id:'p1',nom:'Gingembre bio',sh:'Ferme Agbossou',o:'Savalou',e:'🫚',photoUrl:'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Ginger_roots.jpg/320px-Ginger_roots.jpg',p:300,ppromo:null,u:'kg',c:'Épicerie',b:'nat',d:'5 kg disponibles',bid:'b1',desc:'Gingembre frais de Savalou'},
+  {id:'p2',nom:'Gousse ail',sh:'KOKOU Fresh',o:'Cotonou',e:'🧄',photoUrl:null,p:250,ppromo:200,u:'kg',c:'Légumes',b:'promo',d:'10 kg disponibles',bid:'b3',desc:'Ail blanc frais'},
+  {id:'p3',nom:'Poisson Sylvie',sh:'Ferme Agbossou',o:'Savalou',e:'🐟',photoUrl:null,p:800,ppromo:null,u:'kg',c:'Poissons',b:'nat',d:'8 kg disponibles',bid:'b1',desc:'Poisson frais du lac'},
+  {id:'p4',nom:'Tomates fraîches',sh:'KOKOU Fresh',o:'Cotonou',e:'🍅',photoUrl:null,p:450,ppromo:null,u:'kg',c:'Légumes',b:'nat',d:'20 kg disponibles',bid:'b3',desc:'Tomates locales'},
+  {id:'p5',nom:'Gari blanc',sh:'Marché de Cotonou',o:'Cotonou',e:'🌾',photoUrl:null,p:350,ppromo:300,u:'kg',c:'Épicerie',b:'flash',d:'50 kg disponibles',bid:'b2',desc:'Gari de qualite'},
+  {id:'p6',nom:'Piment rouge',sh:'KOKOU Fresh',o:'Cotonou',e:'🌶',photoUrl:null,p:600,ppromo:null,u:'kg',c:'Épices',b:'nat',d:'5 kg disponibles',bid:'b3',desc:'Piment fort local'},
+  {id:'p7',nom:'Huile de palme',sh:'Marché de Cotonou',o:'Cotonou',e:'🫙',photoUrl:null,p:1200,ppromo:1000,u:'litre',c:'Huiles',b:'promo',d:'30 litres disponibles',bid:'b2',desc:'Huile de palme rouge'},
+  {id:'p8',nom:'Boeuf haché',sh:'Boucherie Centrale',o:'Cotonou',e:'🥩',photoUrl:null,p:2500,ppromo:null,u:'kg',c:'Viandes',b:'nat',d:'15 kg disponibles',bid:'b4',desc:'Boeuf frais du jour'}
+];
 var ZONES_LIV = [
   {id:'ret',n:'Point relais Cotonou',d:'Retrait gratuit',        p:0,   i:'🏪'},
   {id:'cot',n:'Cotonou ville',       d:'moins de 5 km, sous 2h', p:500, i:'🛵'},
@@ -2108,41 +2122,74 @@ var CAT_EMOJI = {
 
 async function chargerProduitsSupabase(zoneId) {
   try {
-    var res = await sb.from('produits')
-      .select('id,nom,prix,prix_promo,unite,stock,stock_unite,photos,badge,disponible,boutique_id,description')
-      .eq('disponible', true).order('cree_le',{ascending:false}).limit(100);
-    if (res.error) throw res.error;
-    if (!res.data || !res.data.length) return;
-    PRODS = res.data.map(function(p){
-      var bout=null;for(var i=0;i<BOUTS.length;i++){if(BOUTS[i].id===p.boutique_id){bout=BOUTS[i];break;}}
-      var photoUrl=(p.photos&&p.photos.length>0)?p.photos[0]:null;
-      return {id:p.id,nom:sanitize(p.nom||''),sh:sanitize(bout?bout.nom:'Boutique'),o:sanitize(bout?bout.ville:''),
-        e:'🛒',photoUrl:photoUrl,p:parseFloat(p.prix)||0,
-        ppromo:p.prix_promo?parseFloat(p.prix_promo):null,
-        u:p.unite||'kg',c:'Épicerie',b:p.badge||'nat',
-        d:p.stock_unite||(p.stock?p.stock+' '+(p.unite||'kg'):'Disponible'),
-        bid:p.boutique_id,desc:p.description||''};
+    // Utiliser fetch direct pour éviter DataCloneError du SDK
+    var url = SUPA_URL + '/rest/v1/produits?select=id,nom,prix,prix_promo,unite,stock,stock_unite,photos,badge,disponible,boutique_id,description,categorie&disponible=eq.true&order=cree_le.desc&limit=100';
+    var resp = await fetch(url, {
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': 'Bearer ' + SUPA_KEY,
+        'Content-Type': 'application/json'
+      }
     });
-    renderProds();renderCats();renderHomeProds();renderOffresSpeciales();renderFlashVentes();
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var data = await resp.json();
+    if (!data || !data.length) return;
+    PRODS = data.map(function(p){
+      var bout=null;
+      for(var i=0;i<BOUTS.length;i++){if(BOUTS[i].id===p.boutique_id){bout=BOUTS[i];break;}}
+      var photoUrl=(p.photos&&p.photos.length>0)?p.photos[0]:null;
+      return {
+        id:p.id,
+        nom:sanitize(p.nom||''),
+        sh:sanitize(bout?bout.nom:'Boutique'),
+        o:sanitize(bout?bout.ville:''),
+        e:'🛒',
+        photoUrl:photoUrl,
+        p:parseFloat(p.prix)||0,
+        ppromo:p.prix_promo?parseFloat(p.prix_promo):null,
+        u:p.unite||'kg',
+        c:p.categorie||'Épicerie',
+        b:p.badge||'nat',
+        d:p.stock_unite||(p.stock?p.stock+' '+(p.unite||'kg'):'Disponible'),
+        bid:p.boutique_id,
+        desc:p.description||''
+      };
+    });
+    renderProds();renderCats();
     console.log('OK '+PRODS.length+' produits');
-  } catch(e){ console.log('Produits erreur:',e.message); }
+  } catch(e){
+    console.log('Produits erreur:',e.message);
+    // Garder les données de demo si Supabase échoue
+  }
 }
 
 async function chargerLivreursSupabase(zoneId) {
   try {
-    var query = sb.from('livreurs').select('*').eq('statut','actif');
-    if(zoneId) query = query.contains('zones_couverture',[zoneId]);
-    var res = await query.order('note_moyenne',{ascending:false});
-    if(res.data && res.data.length > 0) {
-      LIVS = res.data.map(function(l){ return {
-        id:l.id, nom:l.nom, e:'🛵', zone:l.zones_couverture?l.zones_couverture[0]:'',
-        tel:l.telephone, note:parseFloat(l.note_moyenne)||5,
-        nb:l.nb_livraisons||0, ok:l.en_ligne||false,
+    var url = SUPA_URL + '/rest/v1/livreurs?select=id,nom,telephone,zones_couverture,note_moyenne,nb_livraisons,en_ligne,statut,photo_url&statut=eq.actif&order=note_moyenne.desc';
+    var resp = await fetch(url, {
+      headers: {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY}
+    });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    var data = await resp.json();
+    if (data && data.length > 0) {
+      var filtered = zoneId ? data.filter(function(l){
+        return !l.zones_couverture||!l.zones_couverture.length||l.zones_couverture.indexOf(zoneId)!==-1;
+      }) : data;
+      LIVS = filtered.map(function(l){ return {
+        id:l.id, nom:sanitize(l.nom), e:'🛵',
+        photo_url:l.photo_url||null, tel:l.telephone,
+        note:parseFloat(l.note_moyenne)||5,
+        nb:l.nb_livraisons||0,
+        ok:l.en_ligne||false, en_ligne:l.en_ligne||false,
+        statut:l.statut||'actif',
+        note_moyenne:parseFloat(l.note_moyenne)||4.8,
+        nb_livraisons:l.nb_livraisons||0,
+        zones_couverture:l.zones_couverture||[],
         geo:l.zones_couverture||[]
       };});
       buildLivsList();
     }
-  } catch(e){ console.log('Livreurs: données locales utilisées'); }
+  } catch(e){ console.log('Livreurs erreur:', e.message); }
 }
 
 async function soumettreVendeur() {
@@ -2448,10 +2495,10 @@ function verifierConsentementEtSoumettre(type) {
 
 document.addEventListener('DOMContentLoaded',function(){
   buildGeoGr();
-  buildHomeBout();
   renderCats();
   renderProds();
-  // Charger bannière depuis admin
+  // Afficher les données de demo immédiatement
+  renderToutesLesSections();
   chargerBanniereHome();
   // Charger les données Supabase
   chargerCategoriesSupabase();
@@ -3045,6 +3092,38 @@ function toggleFavori(p) {
     showToast('Retiré des favoris','🤍');
   }
   localStorage.setItem('yeye_favoris',JSON.stringify(favs));
+}
+
+
+// ============================================================
+// BANNIÈRE HOME
+// ============================================================
+function chargerBanniereHome() {
+  try {
+    var s = localStorage.getItem('yeye_banner');
+    if (!s) return;
+    var b = JSON.parse(s);
+    var imgEl = document.getElementById('ban-img-home');
+    if (imgEl) {
+      if (b.imgUrl) {
+        imgEl.innerHTML = '<img src="'+b.imgUrl+'" style="width:110px;height:100%;object-fit:cover"/>';
+        imgEl.style.padding = '0';
+      } else if (b.emoji) {
+        imgEl.textContent = b.emoji;
+      }
+    }
+    var tagEl = document.querySelector('.ban-tag');
+    if (tagEl && b.tag) tagEl.textContent = b.tag;
+    var subEl = document.querySelector('.ban-sub');
+    if (subEl && b.sub) subEl.textContent = b.sub;
+    var priceEl = document.querySelector('.ban-price');
+    if (priceEl && b.price) priceEl.textContent = fcfa(b.price) + ' FCFA';
+    var titleEl = document.querySelector('.ban-title');
+    if (titleEl && b.title) {
+      var city = document.getElementById('banCity');
+      titleEl.innerHTML = b.title + (city ? ' <span id="banCity">'+city.textContent+'</span>' : '');
+    }
+  } catch(e) { console.log('Banniere:', e.message); }
 }
 
 </script>
