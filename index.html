@@ -36,6 +36,9 @@ body{font-family:'Inter',sans-serif;background:#f0f0f0;min-height:100vh;display:
 /* BOTTOM NAV */
 .bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:var(--max);background:#fff;border-top:1px solid var(--g200);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
 .nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border:none;background:none;cursor:pointer;font-family:inherit;color:var(--g400);font-size:10px;font-weight:500;transition:color .15s}
+.nav-center-btn{position:relative;margin-top:-20px}
+.nav-center-ico{width:52px;height:52px;border-radius:50%;background:var(--vd);display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(26,107,60,.4);border:3px solid #fff;overflow:hidden;margin-bottom:2px}
+.nav-center-btn{color:var(--vd);font-weight:600}
 .nav-btn.active{color:var(--vd)}
 .nav-btn svg{width:22px;height:22px}
 .nav-btn .nb-badge{background:var(--r);color:#fff;font-size:9px;font-weight:700;padding:1px 5px;border-radius:10px;display:none}
@@ -45,12 +48,12 @@ body{font-family:'Inter',sans-serif;background:#f0f0f0;min-height:100vh;display:
 .page.active{display:block}
 
 /* HOME */
-.categories-scroll{overflow-x:auto;padding:16px;display:flex;gap:12px;scrollbar-width:none}
+.categories-scroll{padding:12px 16px;display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .categories-scroll::-webkit-scrollbar{display:none}
-.cat-chip{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;flex-shrink:0;min-width:64px}
-.cat-chip-img{width:56px;height:56px;border-radius:14px;object-fit:cover;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:26px;border:2px solid transparent;transition:all .2s}
+.cat-chip{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
+.cat-chip-img{width:100%;aspect-ratio:1;border-radius:12px;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:22px;border:2px solid transparent;transition:all .2s;overflow:hidden}
 .cat-chip.active .cat-chip-img,.cat-chip:hover .cat-chip-img{border-color:var(--vd);background:var(--vl)}
-.cat-chip-label{font-size:11px;font-weight:500;color:var(--g600);text-align:center;white-space:nowrap}
+.cat-chip-label{font-size:10px;font-weight:500;color:var(--g600);text-align:center;line-height:1.2}
 
 .section-title{display:flex;align-items:center;justify-content:space-between;padding:0 16px;margin-bottom:12px}
 .section-title h2{font-size:16px;font-weight:700}
@@ -237,6 +240,16 @@ body{font-family:'Inter',sans-serif;background:#f0f0f0;min-height:100vh;display:
     </div>
   </div>
 
+  <!-- PAGE CATALOGUE -->
+  <div class="page" id="page-catalogue">
+    <div class="page-header"><h2>🛍️ Catalogue</h2></div>
+    <div class="categories-scroll" id="cat-scroll-2" style="margin-bottom:0"></div>
+    <div style="padding:16px 16px 0"><div class="srch-bar"><input type="text" placeholder="Rechercher dans le catalogue..." oninput="doSearch(this.value)" style="width:100%;padding:10px 14px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;outline:none"/></div></div>
+    <div class="products-grid" id="catalogue-grid" style="margin-top:16px">
+      <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Chargement...</div>
+    </div>
+  </div>
+
   <!-- PAGE PANIER -->
   <div class="page" id="page-cart">
     <div class="page-header"><h2>🛒 Mon panier</h2></div>
@@ -257,7 +270,11 @@ body{font-family:'Inter',sans-serif;background:#f0f0f0;min-height:100vh;display:
   <div class="page" id="page-profile">
     <div id="auth-section">
       <div class="auth-wrap">
-        <div style="text-align:center;margin-bottom:24px"><div style="font-size:48px">🌿</div><h2 style="margin-top:8px">Yéyé Market</h2><p style="color:var(--g400);font-size:13px;margin-top:4px">Connectez-vous pour commander</p></div>
+        <div style="text-align:center;margin-bottom:24px">
+          <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" onerror="this.style.display='none'" style="width:80px;height:80px;object-fit:contain;margin:0 auto 8px;display:block"/>
+          <h2 style="margin-top:8px">Yéyé Market</h2>
+          <p style="color:var(--g400);font-size:13px;margin-top:4px">Le meilleur de chez nous, livré chez vous.</p>
+        </div>
         <div class="auth-tabs">
           <button class="auth-tab active" onclick="switchAuth('login',this)">Se connecter</button>
           <button class="auth-tab" onclick="switchAuth('register',this)">S'inscrire</button>
@@ -277,20 +294,73 @@ body{font-family:'Inter',sans-serif;background:#f0f0f0;min-height:100vh;display:
       </div>
     </div>
     <div id="profile-section" style="display:none">
-      <div class="profile-wrap">
-        <div class="profile-head">
-          <div class="profile-avatar">👤</div>
-          <div class="profile-name" id="profile-name">—</div>
-          <div class="profile-email" id="profile-email">—</div>
-        </div>
-        <div class="profile-menu">
-          <div class="profile-item" onclick="goPage('orders')">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Mes commandes
+      <!-- PROFILE HEADER -->
+      <div style="background:linear-gradient(135deg,var(--vd),#0d3d22);padding:24px 16px 32px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">👤</div>
+          <div>
+            <div style="color:#fff;font-size:18px;font-weight:700" id="profile-name">—</div>
+            <div style="color:rgba(255,255,255,.7);font-size:13px;margin-top:2px" id="profile-tel">—</div>
           </div>
-          <div class="profile-item" onclick="doLogout()" style="color:var(--r)">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Se déconnecter
+          <div style="margin-left:auto">
+            <div style="background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px">Client</div>
           </div>
         </div>
+      </div>
+
+      <!-- COMMANDES RAPIDES -->
+      <div style="background:#fff;margin:-16px 16px 0;border-radius:14px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.08);position:relative;z-index:1">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center">
+          <div onclick="goPage('orders')" style="cursor:pointer">
+            <div style="font-size:22px;margin-bottom:4px">🛒</div>
+            <div style="font-size:10px;color:var(--g600);font-weight:500">Toutes</div>
+          </div>
+          <div onclick="goPage('orders')" style="cursor:pointer">
+            <div style="font-size:22px;margin-bottom:4px">⏳</div>
+            <div style="font-size:10px;color:var(--g600);font-weight:500">En attente</div>
+          </div>
+          <div onclick="goPage('orders')" style="cursor:pointer">
+            <div style="font-size:22px;margin-bottom:4px">🚴</div>
+            <div style="font-size:10px;color:var(--g600);font-weight:500">En livraison</div>
+          </div>
+          <div onclick="goPage('orders')" style="cursor:pointer">
+            <div style="font-size:22px;margin-bottom:4px">✅</div>
+            <div style="font-size:10px;color:var(--g600);font-weight:500">Livrées</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MENU -->
+      <div style="margin:16px">
+        <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)">
+          <div style="padding:10px 16px;font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--g100)">Mon compte</div>
+          <div onclick="goPage('orders')" style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--g100)">
+            <span style="font-size:20px">📋</span><span style="font-size:14px;font-weight:500;flex:1">Mes commandes</span><span style="color:var(--g400)">›</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;border-bottom:1px solid var(--g100)">
+            <span style="font-size:20px">📍</span><span style="font-size:14px;font-weight:500;flex:1">Mes adresses</span><span style="color:var(--g400)">›</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer">
+            <span style="font-size:20px">📞</span><span style="font-size:14px;font-weight:500;flex:1">Contacter le support</span><span style="color:var(--g400)">›</span>
+          </div>
+        </div>
+
+        <div style="background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08);margin-top:12px">
+          <div style="padding:10px 16px;font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--g100)">Partenaires</div>
+          <a href="vendeur.html" style="display:flex;align-items:center;gap:12px;padding:14px 16px;text-decoration:none;color:inherit;border-bottom:1px solid var(--g100)">
+            <span style="font-size:20px">🏪</span><span style="font-size:14px;font-weight:500;flex:1">Devenir vendeur</span><span style="color:var(--g400)">›</span>
+          </a>
+          <a href="restaurant.html" style="display:flex;align-items:center;gap:12px;padding:14px 16px;text-decoration:none;color:inherit;border-bottom:1px solid var(--g100)">
+            <span style="font-size:20px">🍽️</span><span style="font-size:14px;font-weight:500;flex:1">Devenir restaurant partenaire</span><span style="color:var(--g400)">›</span>
+          </a>
+          <a href="livreur.html" style="display:flex;align-items:center;gap:12px;padding:14px 16px;text-decoration:none;color:inherit">
+            <span style="font-size:20px">🚴</span><span style="font-size:14px;font-weight:500;flex:1">Devenir livreur</span><span style="color:var(--g400)">›</span>
+          </a>
+        </div>
+
+        <button onclick="doLogout()" style="width:100%;margin-top:16px;padding:14px;background:#fff;border:1.5px solid var(--r);color:var(--r);border-radius:12px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit">
+          Se déconnecter
+        </button>
       </div>
     </div>
   </div>
@@ -300,17 +370,49 @@ body{font-family:'Inter',sans-serif;background:#f0f0f0;min-height:100vh;display:
     <button class="nav-btn active" id="nav-home" onclick="goPage('home')">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Accueil
     </button>
+    <button class="nav-btn" id="nav-catalogue" onclick="goPage('catalogue')">
+      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>Catalogue
+    </button>
+    <button class="nav-btn nav-center-btn" onclick="openPartnerMenu()">
+      <div class="nav-center-ico">
+        <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>
+        <span style="display:none;font-size:22px">🌿</span>
+      </div>
+      Yéyé
+    </button>
     <button class="nav-btn" id="nav-cart" onclick="goPage('cart')">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
       Panier<span class="nb-badge" id="nav-cart-badge">0</span>
-    </button>
-    <button class="nav-btn" id="nav-orders" onclick="goPage('orders')">
-      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Commandes
     </button>
     <button class="nav-btn" id="nav-profile" onclick="goPage('profile')">
       <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mon compte
     </button>
   </nav>
+</div>
+
+
+<!-- PARTNER MENU -->
+<div class="modal-overlay-bg" id="partner-bg" onclick="closePartnerMenu()" style="display:none"></div>
+<div id="partner-menu" style="position:fixed;bottom:-300px;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-radius:24px 24px 0 0;z-index:301;transition:bottom .3s;padding:20px 16px 40px;box-shadow:0 -10px 40px rgba(0,0,0,.15)">
+  <div style="width:40px;height:4px;background:var(--g200);border-radius:2px;margin:0 auto 20px"></div>
+  <p style="font-size:13px;color:var(--g400);text-align:center;margin-bottom:16px">Rejoindre Yéyé Market comme :</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+    <a href="vendeur.html" style="text-decoration:none;background:var(--vl);border:2px solid var(--vd);border-radius:16px;padding:20px 10px;text-align:center;display:block">
+      <div style="font-size:32px;margin-bottom:8px">🏪</div>
+      <div style="font-size:13px;font-weight:700;color:var(--vd)">Vendeur</div>
+      <div style="font-size:11px;color:var(--g400);margin-top:3px">Vendre mes produits</div>
+    </a>
+    <a href="livreur.html" style="text-decoration:none;background:#eff6ff;border:2px solid #2563eb;border-radius:16px;padding:20px 10px;text-align:center;display:block">
+      <div style="font-size:32px;margin-bottom:8px">🚴</div>
+      <div style="font-size:13px;font-weight:700;color:#2563eb">Livreur</div>
+      <div style="font-size:11px;color:var(--g400);margin-top:3px">Livrer et gagner</div>
+    </a>
+    <a href="restaurant.html" style="text-decoration:none;background:#fffbeb;border:2px solid #d97706;border-radius:16px;padding:20px 10px;text-align:center;display:block">
+      <div style="font-size:32px;margin-bottom:8px">🍽️</div>
+      <div style="font-size:13px;font-weight:700;color:#d97706">Restaurant</div>
+      <div style="font-size:11px;color:var(--g400);margin-top:3px">Proposer mes plats</div>
+    </a>
+  </div>
 </div>
 
 <!-- MODAL PRODUIT -->
@@ -355,6 +457,7 @@ function goPage(name){
   if(nb)nb.classList.add('active');
   if(name==='orders')loadOrders();
   if(name==='cart')renderCart();
+  if(name==='catalogue')loadCatalogue();
 }
 
 // AUTH
@@ -688,6 +791,41 @@ function catEmoji(nom){const m={'Viandes':'🥩','Poissons':'🐟','Légumes':'�
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 
 // INIT
+// PARTNER MENU
+function openPartnerMenu(){
+  document.getElementById('partner-menu').style.bottom='0';
+  document.getElementById('partner-bg').style.display='block';
+}
+function closePartnerMenu(){
+  document.getElementById('partner-menu').style.bottom='-300px';
+  document.getElementById('partner-bg').style.display='none';
+}
+
+// CATALOGUE PAGE
+async function loadCatalogue(){
+  const {data}=await sb.from('produits').select('*,categories(nom),boutiques(nom)').eq('actif',true).gt('stock',0).order('created_at',{ascending:false});
+  const grid=document.getElementById('catalogue-grid');
+  if(!data?.length){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Aucun produit</div>';return;}
+  grid.innerHTML=data.map(p=>`
+    <div class="prod-card" onclick="openProdModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+      <div style="position:relative">
+        ${p.image_url?`<img src="${p.image_url}" class="prod-img" alt="${p.nom}"/>`:`<div class="prod-img">${catEmoji(p.categories?.nom||'')}</div>`}
+        ${p.prix_promo?'<span class="promo-badge">PROMO</span>':''}
+      </div>
+      <div class="prod-body">
+        <div class="prod-name">${p.nom}</div>
+        <div class="prod-vendor">🏪 ${p.boutiques?.nom||'Yéyé Market'}</div>
+        <div class="prod-footer">
+          <div>
+            <div class="prod-price">${fmt(p.prix_promo||p.prix)} FCFA<span style="font-size:10px;font-weight:400">/${p.unite}</span></div>
+            ${p.prix_promo?`<div class="prod-promo">${fmt(p.prix)} FCFA</div>`:''}
+          </div>
+          <button class="add-btn" onclick="event.stopPropagation();addToCart('${p.id}',1)">+</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
 checkSession();
 loadCategories();
 loadProducts();
