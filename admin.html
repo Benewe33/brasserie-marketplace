@@ -509,10 +509,39 @@ async function doLogin(){
   err.style.display='none';
   const {error}=await sb.auth.signInWithPassword({email,password:pwd});
   if(error){err.textContent='❌ '+error.message;err.style.display='block';return;}
+  // Vérifier que c'est bien un admin
+  const {data:{user}}=await sb.auth.getUser();
+  const {data:profile, error:profileError}=await sb.from('utilisateurs').select('role').eq('id',user.id).single();
+  if(profileError||!profile||profile.role!=='admin'){
+    await sb.auth.signOut();
+    err.textContent='❌ Accès refusé — réservé aux administrateurs';
+    err.style.display='block';
+    return;
+  }
   showApp();
 }
 async function doLogout(){await sb.auth.signOut();document.getElementById('app').style.display='none';document.getElementById('loginWrap').style.display='flex';}
-async function checkSession(){const {data:{session}}=await sb.auth.getSession();if(session)showApp();}
+async function checkSession(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session)return;
+  // Vérifier le rôle admin - si null ou pas admin = refus
+  try {
+    const {data:profile, error}=await sb.from('utilisateurs').select('role').eq('id',session.user.id).single();
+    if(error||!profile||profile.role!=='admin'){
+      await sb.auth.signOut();
+      document.getElementById('lerr').textContent='❌ Accès refusé — réservé aux administrateurs';
+      document.getElementById('lerr').style.display='block';
+      document.getElementById('loginWrap').style.display='flex';
+      return;
+    }
+    showApp();
+  } catch(e) {
+    await sb.auth.signOut();
+    document.getElementById('lerr').textContent='❌ Erreur de vérification — accès refusé';
+    document.getElementById('lerr').style.display='block';
+    document.getElementById('loginWrap').style.display='flex';
+  }
+}
 function showApp(){document.getElementById('loginWrap').style.display='none';document.getElementById('app').style.display='flex';loadDashboard();loadZones();loadCatSelect();}
 
 // NAVIGATION
