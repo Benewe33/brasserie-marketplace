@@ -212,6 +212,10 @@ tr:hover td{background:var(--g50)}
       <button class="sb-btn" onclick="go('livreurs',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>Livreurs <span class="sb-badge" id="b-livreurs" style="display:none">0</span>
       </button>
+      <div class="sb-sec">Clients</div>
+      <button class="sb-btn" onclick="go('clients',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Clients <span class="sb-badge" id="b-clients" style="display:none">0</span>
+      </button>
       <div class="sb-sec">Comptes</div>
       <button class="sb-btn" onclick="go('comptes',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Créer des comptes
@@ -378,16 +382,29 @@ tr:hover td{background:var(--g50)}
         <div class="fgm"><label>Catégorie</label><select id="prod-cat"><option value="">Choisir...</option></select></div>
         <div class="fgm"><label>Prix (FCFA) *</label><input type="number" id="prod-prix"/></div>
         <div class="fgm"><label>Prix promo</label><input type="number" id="prod-promo" placeholder="Optionnel"/></div>
-        <div class="fgm"><label>Unité</label><select id="prod-unite"><option value="kg">kg</option><option value="g">g</option><option value="litre">litre</option><option value="pièce">pièce</option><option value="sachet">sachet</option><option value="boîte">boîte</option></select></div>
+        <div class="fgm"><label>Unité</label><select id="prod-unite"><option value="kg">kg</option><option value="g">g</option><option value="litre">litre</option><option value="pièce">pièce</option><option value="sachet">sachet</option><option value="boîte">boîte</option><option value="panier">panier</option><option value="plateau">plateau</option><option value="tas">tas</option><option value="botte">botte</option><option value="sac">sac</option></select></div>
         <div class="fgm"><label>Stock *</label><input type="number" id="prod-stock"/></div>
         <div class="fgm fcol"><label>Description</label><textarea id="prod-desc"></textarea></div>
         <div class="fgm fcol">
           <label>Photo</label>
-          <div class="cur-img" id="prod-cur"><p>Photo actuelle</p><img id="prod-cur-img" src="" alt=""/></div>
-          <div class="upzone"><input type="file" accept="image/*" onchange="upload(this,'produits','prod-url','prod-prev','prod-prog')"/><div class="upzone-ico">📸</div><p>Glisse ou <strong>clique</strong> pour choisir</p></div>
-          <div class="up-prog" id="prod-prog"><div class="up-prog-bar" id="prod-prog-bar"></div></div>
-          <img class="up-prev" id="prod-prev" alt=""/>
-          <input type="hidden" id="prod-url"/>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <p style="font-size:12px;color:var(--g400);margin-bottom:6px">📸 Photo principale *</p>
+              <div class="cur-img" id="prod-cur"><p>Actuelle</p><img id="prod-cur-img" src="" alt=""/></div>
+              <div class="upzone"><input type="file" accept="image/*" onchange="upload(this,'produits','prod-url','prod-prev','prod-prog')"/><div class="upzone-ico">📸</div><p><strong>Photo 1</strong></p></div>
+              <div class="up-prog" id="prod-prog"><div class="up-prog-bar" id="prod-prog-bar"></div></div>
+              <img class="up-prev" id="prod-prev" alt=""/>
+              <input type="hidden" id="prod-url"/>
+            </div>
+            <div>
+              <p style="font-size:12px;color:var(--g400);margin-bottom:6px">📸 Photo secondaire</p>
+              <div class="cur-img" id="prod-cur-2"><p>Actuelle</p><img id="prod-cur-img-2" src="" alt=""/></div>
+              <div class="upzone"><input type="file" accept="image/*" onchange="upload(this,'produits','prod-url-2','prod-prev-2','prod-prog-2')"/><div class="upzone-ico">🖼️</div><p><strong>Photo 2</strong></p></div>
+              <div class="up-prog" id="prod-prog-2"><div class="up-prog-bar" id="prod-prog-2-bar"></div></div>
+              <img class="up-prev" id="prod-prev-2" alt=""/>
+              <input type="hidden" id="prod-url-2"/>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -404,6 +421,52 @@ tr:hover td{background:var(--g50)}
       <div class="fgm"><label>Ville *</label><input type="text" id="zone-ville" placeholder="Cotonou" value="Cotonou"/></div>
     </div>
     <div class="modal-foot"><button class="btn btn-out" onclick="closeModal('m-zone')">Annuler</button><button class="btn btn-p" onclick="saveZone()">Ajouter</button></div>
+  </div>
+</div>
+
+<!-- MODAL CLIENT -->
+<div class="overlay" id="m-client">
+  <div class="modal" style="max-width:680px">
+    <div class="modal-head"><h3 id="m-client-title">Dossier client</h3><button class="modal-x" onclick="closeModal('m-client')">✕</button></div>
+    <div class="modal-body">
+      <!-- Infos client -->
+      <div style="background:linear-gradient(135deg,var(--vd),#0d3d22);border-radius:12px;padding:20px;color:#fff;margin-bottom:20px;display:flex;align-items:center;gap:16px">
+        <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">👤</div>
+        <div>
+          <div style="font-size:18px;font-weight:700" id="c-nom">—</div>
+          <div style="font-size:13px;opacity:.8;margin-top:2px" id="c-email">—</div>
+          <div style="font-size:13px;opacity:.8;margin-top:2px" id="c-tel">—</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div style="font-size:11px;opacity:.7">Inscrit le</div>
+          <div style="font-size:14px;font-weight:600" id="c-date">—</div>
+        </div>
+      </div>
+      <!-- Stats client -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px">
+        <div style="background:var(--g50);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:var(--vd)" id="c-nb-cmds">0</div>
+          <div style="font-size:12px;color:var(--g400)">Commandes</div>
+        </div>
+        <div style="background:var(--g50);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:var(--vd)" id="c-total">0</div>
+          <div style="font-size:12px;color:var(--g400)">Total dépensé</div>
+        </div>
+        <div style="background:var(--g50);border-radius:10px;padding:14px;text-align:center">
+          <div style="font-size:22px;font-weight:700;color:var(--vd)" id="c-livrees">0</div>
+          <div style="font-size:12px;color:var(--g400)">Livrées</div>
+        </div>
+      </div>
+      <!-- Commandes -->
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:12px">📋 Historique des commandes</h4>
+      <div class="tbl-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Total</th><th>Zone</th><th>Statut</th><th>Date</th></tr></thead>
+          <tbody id="c-cmds-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-foot"><button class="btn btn-out" onclick="closeModal('m-client')">Fermer</button></div>
   </div>
 </div>
 
@@ -437,7 +500,7 @@ function go(name,btn){
   document.getElementById('sec-'+name).classList.add('active');
   btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),zones:loadZonesTable};
+  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),zones:loadZonesTable,clients:loadClients};
   if(loaders[name])loaders[name]();
 }
 
@@ -596,6 +659,9 @@ function openProd(){
   document.getElementById('prod-url').value='';
   document.getElementById('prod-prev').style.display='none';
   document.getElementById('prod-cur').style.display='none';
+  document.getElementById('prod-url-2').value='';
+  document.getElementById('prod-prev-2').style.display='none';
+  document.getElementById('prod-cur-2').style.display='none';
   document.getElementById('m-prod-title').textContent='Ajouter un produit';
   document.getElementById('prod-save-btn').textContent='Ajouter';
   document.getElementById('prod-save-btn').dataset.label='Ajouter';
@@ -614,6 +680,11 @@ function editProd(p){
   const cur=document.getElementById('prod-cur');
   if(p.image_url){cur.style.display='block';document.getElementById('prod-cur-img').src=p.image_url;}
   else cur.style.display='none';
+  document.getElementById('prod-url-2').value=p.image_url_2||'';
+  document.getElementById('prod-prev-2').style.display='none';
+  const cur2=document.getElementById('prod-cur-2');
+  if(p.image_url_2){cur2.style.display='block';document.getElementById('prod-cur-img-2').src=p.image_url_2;}
+  else cur2.style.display='none';
   document.getElementById('m-prod-title').textContent='Modifier : '+p.nom;
   document.getElementById('prod-save-btn').textContent='Enregistrer';
   document.getElementById('prod-save-btn').dataset.label='Enregistrer';
@@ -634,6 +705,7 @@ async function saveProd(){
     unite:document.getElementById('prod-unite').value,
     prix_promo:parseFloat(document.getElementById('prod-promo').value)||null,
     image_url:document.getElementById('prod-url').value||null,
+    image_url_2:document.getElementById('prod-url-2').value||null,
     actif:true
   };
   const {error}=id?await sb.from('produits').update(payload).eq('id',id):await sb.from('produits').insert(payload);
@@ -836,6 +908,75 @@ function toast(msg,type='info'){const t=document.getElementById('toast');t.textC
 function filterTbl(inp,tbId){const q=inp.value.toLowerCase();document.querySelectorAll('#'+tbId+' tr').forEach(tr=>{tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none';});}
 document.querySelectorAll('.overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
 document.getElementById('lpass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+// CLIENTS
+async function loadClients(){
+  const {data:clients}=await sb.from('utilisateurs').select('*').eq('role','client').order('created_at',{ascending:false});
+  if(!clients?.length){
+    document.getElementById('s-clients-total').textContent='0';
+    document.getElementById('s-clients-cmd').textContent='0';
+    document.getElementById('s-clients-month').textContent='0';
+    document.getElementById('clients-body').innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--g400);padding:32px">Aucun client inscrit</td></tr>';
+    return;
+  }
+
+  // Stats
+  const thisMonth=new Date();thisMonth.setDate(1);thisMonth.setHours(0,0,0,0);
+  const monthCount=clients.filter(c=>new Date(c.created_at)>=thisMonth).length;
+  document.getElementById('s-clients-total').textContent=clients.length;
+  document.getElementById('s-clients-month').textContent=monthCount;
+
+  // Load commandes for each client
+  const clientIds=clients.map(c=>c.id);
+  const {data:cmds}=await sb.from('commandes').select('client_id,total,statut').in('client_id',clientIds);
+  
+  const cmdByClient={};
+  (cmds||[]).forEach(c=>{
+    if(!cmdByClient[c.client_id])cmdByClient[c.client_id]={count:0,total:0};
+    cmdByClient[c.client_id].count++;
+    cmdByClient[c.client_id].total+=c.total||0;
+  });
+
+  const withCmds=Object.keys(cmdByClient).length;
+  document.getElementById('s-clients-cmd').textContent=withCmds;
+
+  const tb=document.getElementById('clients-body');
+  tb.innerHTML=clients.map(c=>`<tr>
+    <td><strong>${c.nom||'—'}</strong></td>
+    <td>${c.email||'—'}</td>
+    <td>${c.telephone||'—'}</td>
+    <td><span class="badge ${cmdByClient[c.id]?.count>0?'bg':'bgr'}">${cmdByClient[c.id]?.count||0} commande${(cmdByClient[c.id]?.count||0)>1?'s':''}</span></td>
+    <td><strong>${fmt(cmdByClient[c.id]?.total||0)} FCFA</strong></td>
+    <td>${fdate(c.created_at)}</td>
+    <td><button class="btn btn-sm btn-ed" onclick="openClientDetail('${c.id}','${c.nom||''}','${c.email||''}','${c.telephone||''}','${c.created_at}')">👁️ Voir</button></td>
+  </tr>`).join('');
+}
+
+async function openClientDetail(id,nom,email,tel,date){
+  document.getElementById('m-client-title').textContent='Dossier — '+nom;
+  document.getElementById('c-nom').textContent=nom||'—';
+  document.getElementById('c-email').textContent=email||'—';
+  document.getElementById('c-tel').textContent=tel||'—';
+  document.getElementById('c-date').textContent=fdate(date);
+
+  const {data:cmds}=await sb.from('commandes').select('*,zones(nom)').eq('client_id',id).order('created_at',{ascending:false});
+  const total=(cmds||[]).reduce((s,c)=>s+(c.total||0),0);
+  const livrees=(cmds||[]).filter(c=>c.statut==='livree').length;
+  document.getElementById('c-nb-cmds').textContent=(cmds||[]).length;
+  document.getElementById('c-total').textContent=fmt(total)+' FCFA';
+  document.getElementById('c-livrees').textContent=livrees;
+
+  const tb=document.getElementById('c-cmds-body');
+  if(!cmds?.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';openModal('m-client');return;}
+  tb.innerHTML=cmds.map(c=>`<tr>
+    <td><code>#${c.id.substring(0,8)}</code></td>
+    <td><strong>${fmt(c.total)} FCFA</strong></td>
+    <td>${c.zones?.nom||'—'}</td>
+    <td>${sbadge(c.statut)}</td>
+    <td>${fdate(c.created_at)}</td>
+  </tr>`).join('');
+  openModal('m-client');
+}
+
 checkSession();
 </script>
 </body>
