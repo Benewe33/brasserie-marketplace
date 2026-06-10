@@ -310,6 +310,29 @@ tr:hover td{background:var(--g50)}
     </div>
 
     <!-- COMPTES -->
+    <!-- CLIENTS -->
+    <div class="sec" id="sec-clients">
+      <div class="stats" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat"><div class="stat-ico">👥</div><div class="stat-label">Total clients</div><div class="stat-val" id="s-clients-total">—</div></div>
+        <div class="stat"><div class="stat-ico">🛒</div><div class="stat-label">Avec commandes</div><div class="stat-val" id="s-clients-cmd">—</div></div>
+        <div class="stat"><div class="stat-ico">📅</div><div class="stat-label">Inscrits ce mois</div><div class="stat-val" id="s-clients-month">—</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h2>👥 Liste des clients</h2>
+          <input type="text" placeholder="Rechercher..." oninput="filterTbl(this,'clients-body')" style="padding:7px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;outline:none;width:200px"/>
+        </div>
+        <div class="card-body">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Nom</th><th>Email</th><th>Téléphone</th><th>Commandes</th><th>Total dépensé</th><th>Inscription</th><th>Actions</th></tr></thead>
+              <tbody id="clients-body"><tr><td colspan="7" style="text-align:center;color:var(--g400);padding:32px">Chargement...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="sec" id="sec-comptes">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
         <div class="card"><div class="card-head"><h2>🏪 Compte vendeur</h2></div><div class="card-body">
