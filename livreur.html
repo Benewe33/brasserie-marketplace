@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Yéyé Market — Espace Livreur</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚴</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --vd:#1d4ed8;--vl:#eff6ff;--v:#2563eb;
+  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g400:#9ca3af;--g600:#4b5563;--g900:#111827;
+  --r:#dc2626;--rl:#fef2f2;--or:#d97706;--orl:#fffbeb;--bl:#2563eb;--bll:#eff6ff;
+  --gr:#16a34a;--grl:#f0fdf4;
+  --shadow:0 1px 3px rgba(0,0,0,.1);--shadow-md:0 4px 12px rgba(0,0,0,.1);
+}
+body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g900);min-height:100vh}
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1e3a5f,#1d4ed8,#1e40af);padding:20px}
+.auth-card{background:#fff;border-radius:20px;padding:36px;width:100%;max-width:520px;box-shadow:0 25px 60px rgba(0,0,0,.25)}
+.auth-logo{text-align:center;margin-bottom:24px}
+.auth-logo .ico{font-size:44px}
+.auth-logo h1{font-size:22px;font-weight:700;margin-top:8px}
+.auth-logo p{font-size:13px;color:var(--g400);margin-top:4px}
+.auth-tabs{display:flex;background:var(--g100);border-radius:10px;padding:4px;margin-bottom:20px}
+.atab{flex:1;text-align:center;padding:8px;border-radius:7px;font-size:14px;font-weight:500;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--g400);transition:all .15s}
+.atab.active{background:#fff;color:var(--g900);box-shadow:var(--shadow)}
+.aform{display:none}.aform.active{display:block}
+.steps{display:flex;align-items:center;margin-bottom:24px;gap:4px}
+.step{flex:1;text-align:center}
+.step-dot{width:32px;height:32px;border-radius:50%;background:var(--g200);color:var(--g400);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 4px;transition:all .3s}
+.step.active .step-dot{background:var(--vd);color:#fff}
+.step.done .step-dot{background:var(--gr);color:#fff}
+.step-label{font-size:10px;color:var(--g400);font-weight:500}
+.step.active .step-label{color:var(--vd);font-weight:600}
+.step-line{flex:1;height:2px;background:var(--g200);margin-bottom:18px;transition:background .3s}
+.step-line.done{background:var(--gr)}
+.step-content{display:none}.step-content.active{display:block}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:13px;font-weight:500;color:var(--g600);margin-bottom:5px}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 14px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border .2s}
+.fg input:focus,.fg select:focus{border-color:var(--vd)}
+.fg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg-col{grid-column:1/-1}
+
+/* VEHICLE SELECTOR */
+.vehicle-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+.vehicle-opt{border:2px solid var(--g200);border-radius:12px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .2s}
+.vehicle-opt:hover{border-color:var(--vd);background:var(--vl)}
+.vehicle-opt.active{border-color:var(--vd);background:var(--vl)}
+.vehicle-opt .vico{font-size:28px;margin-bottom:6px}
+.vehicle-opt .vname{font-size:12px;font-weight:600}
+.vehicle-opt .vnote{font-size:10px;color:var(--g400);margin-top:2px}
+
+/* PERMIS NOTE */
+.permis-note{background:var(--orl);border:1px solid #fde68a;border-radius:10px;padding:12px;font-size:13px;color:#92400e;margin-bottom:12px;display:none}
+.permis-note.show{display:flex;align-items:flex-start;gap:8px}
+
+.upzone{border:2px dashed var(--g200);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--g50);margin-top:6px}
+.upzone:hover{border-color:var(--vd);background:var(--vl)}
+.upzone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upzone .uico{font-size:24px;margin-bottom:4px}
+.upzone p{font-size:12px;color:var(--g400)}
+.upzone strong{color:var(--vd);font-size:12px}
+.up-prev{width:100%;height:100px;object-fit:cover;border-radius:8px;margin-top:8px;display:none}
+.up-status{font-size:12px;margin-top:6px;font-weight:500;display:none}
+.up-status.ok{color:var(--gr)}.up-status.loading{color:var(--or)}
+.up-prog{height:3px;background:var(--g200);border-radius:2px;margin-top:6px;display:none}
+.up-prog-bar{height:100%;background:var(--vd);border-radius:2px;width:0%;transition:width .3s}
+
+.contrat-box{background:var(--g50);border:1.5px solid var(--g200);border-radius:12px;padding:16px;height:280px;overflow-y:auto;font-size:13px;line-height:1.7;color:var(--g600);margin-bottom:12px}
+.contrat-box h3{font-size:14px;font-weight:700;color:var(--g900);margin-bottom:8px;margin-top:16px}
+.contrat-box h3:first-child{margin-top:0}
+.contrat-box p{margin-bottom:8px}
+.contrat-box ul{margin-left:16px;margin-bottom:8px}
+.contrat-scroll-note{font-size:11px;color:var(--g400);text-align:center;margin-bottom:8px}
+.checkbox-wrap{display:flex;align-items:flex-start;gap:10px;padding:12px;background:#fff;border:1.5px solid var(--g200);border-radius:10px;cursor:pointer;transition:border .2s}
+.checkbox-wrap:hover{border-color:var(--vd)}
+.checkbox-wrap input[type=checkbox]{width:18px;height:18px;cursor:pointer;flex-shrink:0;margin-top:2px;accent-color:var(--vd)}
+.checkbox-wrap label{font-size:13px;font-weight:500;cursor:pointer;line-height:1.4}
+.btn-row{display:flex;gap:10px;margin-top:16px}
+.btn-main{flex:1;padding:13px;background:var(--vd);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-main:hover{background:var(--v)}
+.btn-main:disabled{background:var(--g400);cursor:not-allowed}
+.btn-back{padding:13px 20px;background:#fff;border:1.5px solid var(--g200);color:var(--g600);border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit}
+.auth-err{background:var(--rl);color:var(--r);padding:10px 14px;border-radius:8px;font-size:13px;margin-top:12px;display:none;text-align:center}
+
+.pending-page{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--g50);padding:20px}
+.pending-card{background:#fff;border-radius:20px;padding:40px;max-width:420px;width:100%;text-align:center;box-shadow:var(--shadow-md)}
+.pending-card .ico{font-size:56px;margin-bottom:16px}
+.pending-card h2{font-size:20px;font-weight:700;margin-bottom:8px}
+.pending-card p{font-size:14px;color:var(--g400);line-height:1.6}
+
+.app{display:none;min-height:100vh}
+.sidebar{width:240px;background:var(--vd);position:fixed;top:0;left:0;bottom:0;z-index:100;display:flex;flex-direction:column}
+.sb-head{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-head .ico{font-size:26px}
+.sb-head h2{color:#fff;font-size:15px;font-weight:700;margin-top:6px}
+.sb-head p{color:rgba(255,255,255,.45);font-size:11px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sb-nav{padding:10px 8px;flex:1}
+.sb-sec{font-size:10px;font-weight:600;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.8px;padding:10px 10px 4px}
+.sb-btn{display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.7);font-size:13px;font-weight:500;transition:all .15s;border:none;background:none;width:100%;text-align:left;font-family:inherit}
+.sb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+.sb-btn.active{background:rgba(255,255,255,.18);color:#fff}
+.sb-btn svg{width:17px;height:17px;flex-shrink:0}
+.sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.1)}
+.main{margin-left:240px;padding:28px;min-height:100vh}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.topbar h1{font-size:22px;font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
+.stat{background:#fff;border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);border-top:3px solid var(--vd)}
+.stat-ico{font-size:30px;margin-bottom:8px}
+.stat-label{font-size:12px;color:var(--g400)}
+.stat-val{font-size:28px;font-weight:700;margin-top:2px}
+.card{background:#fff;border-radius:14px;box-shadow:var(--shadow);margin-bottom:20px}
+.card-head{padding:18px 22px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between}
+.card-head h2{font-size:15px;font-weight:600}
+.card-body{padding:20px 22px}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:9px 14px;font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;border-bottom:2px solid var(--g100)}
+td{padding:11px 14px;border-bottom:1px solid var(--g100);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--g50)}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.bg{background:var(--grl);color:var(--gr)}.bo{background:var(--orl);color:var(--or)}.br{background:var(--rl);color:var(--r)}.bb{background:var(--bll);color:var(--bl)}.bgr{background:var(--g100);color:var(--g600)}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.btn-p{background:var(--vd);color:#fff}.btn-sm{padding:5px 11px;font-size:12px;border-radius:6px}
+.btn-ok{background:var(--grl);color:var(--gr);border:1px solid #bbf7d0}
+.fgm{margin-bottom:13px}
+.fgm label{font-size:13px;font-weight:500;color:var(--g600);display:block;margin-bottom:5px}
+.fgm input,.fgm select{width:100%;padding:9px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:border .2s;background:#fff}
+.fgm input:focus,.fgm select:focus{border-color:var(--vd)}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:500;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;box-shadow:var(--shadow-md)}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{background:var(--gr);color:#fff}.toast.err{background:var(--r);color:#fff}.toast.info{background:var(--g900);color:#fff}
+.sec{display:none}.sec.active{display:block}
+
+/* DISPO TOGGLE */
+.dispo-card{background:linear-gradient(135deg,#1e3a5f,#1d4ed8);border-radius:14px;padding:24px;color:#fff;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between}
+.dispo-info h2{font-size:18px;font-weight:700}
+.dispo-info p{font-size:13px;opacity:.8;margin-top:4px}
+.toggle-wrap{display:flex;flex-direction:column;align-items:center;gap:8px}
+.toggle{width:56px;height:30px;background:rgba(255,255,255,.3);border-radius:15px;cursor:pointer;position:relative;transition:background .3s;border:none}
+.toggle.on{background:#22c55e}
+.toggle::after{content:'';position:absolute;width:24px;height:24px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .3s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.toggle.on::after{left:29px}
+.toggle-label{font-size:12px;font-weight:600;opacity:.9}
+
+/* LIVRAISON CARD */
+.liv-card{background:#fff;border-radius:14px;box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden;border-left:4px solid var(--vd)}
+.liv-head{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--g100)}
+.liv-body{padding:14px 16px}
+.liv-adresse{font-size:13px;color:var(--g600);margin-bottom:8px}
+.liv-total{font-size:16px;font-weight:700;color:var(--vd)}
+.acts{display:flex;gap:8px}
+
+@media(max-width:768px){.sidebar{display:none}.main{margin-left:0;padding:16px}.stats{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-page" class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo"><div class="ico">🚴</div><h1>Espace Livreur</h1><p>Yéyé Market — Bénin 🇧🇯</p></div>
+    <div class="auth-tabs">
+      <button class="atab active" onclick="switchTab('login',this)">Se connecter</button>
+      <button class="atab" onclick="switchTab('register',this)">S'inscrire</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="aform active" id="form-login">
+      <div class="fg"><label>Email</label><input type="email" id="l-email" placeholder="email@exemple.com"/></div>
+      <div class="fg"><label>Mot de passe</label><input type="password" id="l-pass" placeholder="••••••••"/></div>
+      <button class="btn-main" onclick="doLogin()" style="width:100%;margin-top:4px">🔐 Se connecter</button>
+      <div class="auth-err" id="l-err"></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="aform" id="form-register">
+      <div class="steps">
+        <div class="step active" id="step-ind-1"><div class="step-dot">1</div><div class="step-label">Infos</div></div>
+        <div class="step-line" id="line-1"></div>
+        <div class="step" id="step-ind-2"><div class="step-dot">2</div><div class="step-label">Véhicule</div></div>
+        <div class="step-line" id="line-2"></div>
+        <div class="step" id="step-ind-3"><div class="step-dot">3</div><div class="step-label">Documents</div></div>
+        <div class="step-line" id="line-3"></div>
+        <div class="step" id="step-ind-4"><div class="step-dot">4</div><div class="step-label">Contrat</div></div>
+      </div>
+
+      <!-- STEP 1 : INFOS -->
+      <div class="step-content active" id="step-1">
+        <div class="fg-grid">
+          <div class="fg fg-col"><label>Nom complet *</label><input type="text" id="r-nom" placeholder="Kofi Mensah"/></div>
+          <div class="fg"><label>Téléphone *</label><input type="tel" id="r-tel" placeholder="97 00 00 00"/></div>
+          <div class="fg"><label>Téléphone 2</label><input type="tel" id="r-tel2" placeholder="Optionnel"/></div>
+          <div class="fg fg-col"><label>Email *</label><input type="email" id="r-email" placeholder="email@exemple.com"/></div>
+          <div class="fg fg-col"><label>Zone de livraison principale *</label><select id="r-zone"><option value="">Choisir votre zone...</option></select></div>
+          <div class="fg fg-col"><label>Mot de passe *</label><input type="password" id="r-pass" placeholder="Min. 6 caractères"/></div>
+        </div>
+        <div class="btn-row"><button class="btn-main" onclick="goStep(2)">Suivant →</button></div>
+        <div class="auth-err" id="r-err-1"></div>
+      </div>
+
+      <!-- STEP 2 : VÉHICULE -->
+      <div class="step-content" id="step-2">
+        <div class="fg">
+          <label>Type de véhicule *</label>
+          <div class="vehicle-grid">
+            <div class="vehicle-opt" id="v-velo" onclick="selectVehicle('velo',this)">
+              <div class="vico">🚲</div>
+              <div class="vname">Vélo</div>
+              <div class="vnote">Pas de permis</div>
+            </div>
+            <div class="vehicle-opt" id="v-moto" onclick="selectVehicle('moto',this)">
+              <div class="vico">🏍️</div>
+              <div class="vname">Moto</div>
+              <div class="vnote">Permis A requis</div>
+            </div>
+            <div class="vehicle-opt" id="v-voiture" onclick="selectVehicle('voiture',this)">
+              <div class="vico">🚗</div>
+              <div class="vname">Voiture</div>
+              <div class="vnote">Permis B requis</div>
+            </div>
+          </div>
+          <input type="hidden" id="r-vehicule"/>
+        </div>
+
+        <div class="permis-note show" id="permis-note">
+          <span>⚠️</span>
+          <span id="permis-note-text">Sélectionnez un véhicule pour voir les documents requis.</span>
+        </div>
+
+        <div class="fg">
+          <label>Numéro de plaque / immatriculation <span id="plaque-required"></span></label>
+          <input type="text" id="r-plaque" placeholder="Ex: BJ 1234 AB"/>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goStep(1)">← Retour</button>
+          <button class="btn-main" onclick="goStep(3)">Suivant →</button>
+        </div>
+        <div class="auth-err" id="r-err-2"></div>
+      </div>
+
+      <!-- STEP 3 : DOCUMENTS -->
+      <div class="step-content" id="step-3">
+        <p style="font-size:13px;color:var(--g600);margin-bottom:16px;line-height:1.5" id="doc-intro">📋 Documents requis pour votre inscription.</p>
+
+        <div class="fg">
+          <label>📸 Photo de vous (selfie professionnel) *</label>
+          <div class="upzone"><input type="file" accept="image/*" onchange="uploadDoc(this,'livreurs','doc-photo-url','prev-photo','prog-photo','status-photo')"/>
+          <div class="uico">🤳</div><p>Photo claire de votre visage</p><p><strong>Cliquez ou glissez</strong></p></div>
+          <div class="up-prog" id="prog-photo"><div class="up-prog-bar" id="prog-photo-bar"></div></div>
+          <div class="up-status" id="status-photo"></div>
+          <img class="up-prev" id="prev-photo" alt=""/>
+          <input type="hidden" id="doc-photo-url"/>
+        </div>
+
+        <div class="fg">
+          <label>🪪 Pièce d'identité (CNI / Passeport) *</label>
+          <div class="upzone"><input type="file" accept="image/*,.pdf" onchange="uploadDoc(this,'livreurs','doc-cni-url','prev-cni','prog-cni','status-cni')"/>
+          <div class="uico">🪪</div><p>Recto de votre CNI ou passeport</p><p><strong>Cliquez ou glissez</strong></p></div>
+          <div class="up-prog" id="prog-cni"><div class="up-prog-bar" id="prog-cni-bar"></div></div>
+          <div class="up-status" id="status-cni"></div>
+          <img class="up-prev" id="prev-cni" alt=""/>
+          <input type="hidden" id="doc-cni-url"/>
+        </div>
+
+        <!-- PERMIS (affiché selon véhicule) -->
+        <div class="fg" id="permis-upload-wrap" style="display:none">
+          <label id="permis-upload-label">📋 Permis de conduire *</label>
+          <div class="upzone"><input type="file" accept="image/*,.pdf" onchange="uploadDoc(this,'livreurs','doc-permis-url','prev-permis','prog-permis','status-permis')"/>
+          <div class="uico">📋</div><p id="permis-upload-desc">Recto de votre permis de conduire</p><p><strong>Cliquez ou glissez</strong></p></div>
+          <div class="up-prog" id="prog-permis"><div class="up-prog-bar" id="prog-permis-bar"></div></div>
+          <div class="up-status" id="status-permis"></div>
+          <img class="up-prev" id="prev-permis" alt=""/>
+          <input type="hidden" id="doc-permis-url"/>
+        </div>
+
+        <!-- PHOTO VÉHICULE -->
+        <div class="fg" id="vehicle-photo-wrap" style="display:none">
+          <label id="vehicle-photo-label">📸 Photo de votre véhicule *</label>
+          <div class="upzone"><input type="file" accept="image/*" onchange="uploadDoc(this,'livreurs','doc-vehicule-url','prev-vehicule','prog-vehicule','status-vehicule')"/>
+          <div class="uico">🚗</div><p>Photo de votre véhicule avec la plaque visible</p><p><strong>Cliquez ou glissez</strong></p></div>
+          <div class="up-prog" id="prog-vehicule"><div class="up-prog-bar" id="prog-vehicule-bar"></div></div>
+          <div class="up-status" id="status-vehicule"></div>
+          <img class="up-prev" id="prev-vehicule" alt=""/>
+          <input type="hidden" id="doc-vehicule-url"/>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn-back" onclick="goStep(2)">← Retour</button>
+          <button class="btn-main" onclick="goStep(4)">Suivant →</button>
+        </div>
+        <div class="auth-err" id="r-err-3"></div>
+      </div>
+
+      <!-- STEP 4 : CONTRAT -->
+      <div class="step-content" id="step-4">
+        <p style="font-size:13px;font-weight:600;margin-bottom:8px">📄 Contrat Livreur — Yéyé Market</p>
+        <p class="contrat-scroll-note">↕️ Faites défiler pour lire le contrat complet</p>
+        <div class="contrat-box" onscroll="checkScroll(this)">
+          <h3>CONTRAT DE PARTENARIAT LIVREUR</h3>
+          <p>Entre <strong>Yéyé Market</strong> et le Livreur Partenaire, il est convenu ce qui suit :</p>
+          <h3>Article 1 — Objet</h3>
+          <p>Ce contrat définit les conditions dans lesquelles le Livreur effectue des livraisons pour le compte de Yéyé Market au Bénin.</p>
+          <h3>Article 2 — Obligations du Livreur</h3>
+          <ul>
+            <li>Effectuer les livraisons dans les délais convenus</li>
+            <li>Traiter les colis avec soin et professionnalisme</li>
+            <li>Se présenter correctement aux clients</li>
+            <li>Maintenir son véhicule en bon état de fonctionnement</li>
+            <li>Respecter le code de la route béninois</li>
+            <li>Être disponible pendant les heures déclarées</li>
+            <li>Signaler immédiatement tout problème de livraison</li>
+            <li>Ne pas ouvrir ou endommager les colis</li>
+            <li>Remettre les commandes uniquement au bon destinataire</li>
+          </ul>
+          <h3>Article 3 — Rémunération</h3>
+          <p>Le Livreur reçoit <strong>500 FCFA par livraison</strong> effectuée avec succès dans sa zone. Le paiement est effectué chaque semaine par Mobile Money. Des bonus peuvent être accordés pour les performances exceptionnelles.</p>
+          <h3>Article 4 — Zones et Disponibilité</h3>
+          <p>Le Livreur s'engage à couvrir sa zone déclarée et à mettre à jour sa disponibilité en temps réel sur l'application.</p>
+          <h3>Article 5 — Sécurité et Responsabilité</h3>
+          <p>Le Livreur est responsable des colis pendant le transport. En cas de perte ou dommage causé par sa négligence, une retenue peut être appliquée sur sa rémunération.</p>
+          <h3>Article 6 — Documents et Véhicule</h3>
+          <p>Le Livreur s'engage à maintenir en validité tous ses documents (permis, assurance) et à informer Yéyé Market de tout changement.</p>
+          <h3>Article 7 — Suspension</h3>
+          <p>Yéyé Market peut suspendre un livreur en cas de : retards répétés, plaintes clients, comportement inapproprié, ou non-respect des obligations contractuelles.</p>
+          <h3>Article 8 — Indépendance</h3>
+          <p>Le Livreur est un partenaire indépendant et non un employé de Yéyé Market. Il est responsable de ses propres charges sociales et fiscales.</p>
+          <h3>Article 9 — Droit Applicable</h3>
+          <p>Ce contrat est soumis au droit béninois. Tout litige sera soumis aux tribunaux compétents de Cotonou.</p>
+          <p style="margin-top:16px;font-style:italic;color:var(--g400)">En acceptant, vous confirmez avoir lu et accepté toutes les dispositions ci-dessus.</p>
+        </div>
+        <div class="checkbox-wrap" id="consent-wrap" style="opacity:.5;pointer-events:none">
+          <input type="checkbox" id="consent-check" onchange="checkConsent()"/>
+          <label for="consent-check">J'ai lu et j'accepte le contrat de partenariat livreur Yéyé Market. Je m'engage à respecter toutes les obligations mentionnées.</label>
+        </div>
+        <p id="scroll-hint" style="font-size:11px;color:var(--or);margin-top:6px">⬇️ Lisez le contrat jusqu'à la fin pour pouvoir accepter</p>
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn-back" onclick="goStep(3)">← Retour</button>
+          <button class="btn-main" id="btn-submit" onclick="doRegister()" disabled style="opacity:.5">✅ Créer mon compte</button>
+        </div>
+        <div class="auth-err" id="r-err-4"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PENDING -->
+<div id="pending-page" style="display:none" class="pending-page">
+  <div class="pending-card">
+    <div class="ico">⏳</div>
+    <h2>Dossier soumis !</h2>
+    <p>Votre dossier a été envoyé à l'équipe Yéyé Market.<br/>Nous allons vérifier vos documents et valider votre compte sous 24-48h.<br/><br/>Vous serez notifié par SMS ou email.</p>
+    <button class="btn-main" style="margin-top:24px;width:100%" onclick="doLogout()">← Retour</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <aside class="sidebar">
+    <div class="sb-head"><div class="ico">🚴</div><h2 id="sb-nom">Mon espace</h2><p id="sb-email">—</p></div>
+    <nav class="sb-nav">
+      <div class="sb-sec">Livraisons</div>
+      <button class="sb-btn active" onclick="go('dashboard',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord
+      </button>
+      <button class="sb-btn" onclick="go('livraisons',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/></svg>Mes livraisons <span class="sb-badge" id="b-liv" style="display:none">0</span>
+      </button>
+      <button class="sb-btn" onclick="go('historique',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Historique
+      </button>
+      <div class="sb-sec">Paramètres</div>
+      <button class="sb-btn" onclick="go('profil',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mon profil
+      </button>
+    </nav>
+    <div class="sb-foot">
+      <button class="sb-btn" onclick="doLogout()" style="color:rgba(255,120,120,.9)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Déconnexion
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar"><h1 id="ptitle">Tableau de bord</h1><span class="badge bg" id="statut-badge">✅ Actif</span></div>
+
+    <!-- DASHBOARD -->
+    <div class="sec active" id="sec-dashboard">
+      <div class="dispo-card">
+        <div class="dispo-info">
+          <h2>🟢 Disponibilité</h2>
+          <p id="dispo-text">Vous êtes disponible pour recevoir des livraisons</p>
+        </div>
+        <div class="toggle-wrap">
+          <button class="toggle on" id="dispo-toggle" onclick="toggleDispo()"></button>
+          <span class="toggle-label" id="dispo-label">EN LIGNE</span>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="stat-ico">🚴</div><div class="stat-label">Livraisons aujourd'hui</div><div class="stat-val" id="s-today">0</div></div>
+        <div class="stat"><div class="stat-ico">✅</div><div class="stat-label">Total livrées</div><div class="stat-val" id="s-total">—</div></div>
+        <div class="stat"><div class="stat-ico">💰</div><div class="stat-label">Gains totaux</div><div class="stat-val" id="s-gains">—</div></div>
+      </div>
+      <div class="card"><div class="card-head"><h2>📦 Livraisons en cours</h2></div><div class="card-body" id="current-livraisons"><div style="text-align:center;padding:32px;color:var(--g400)">Aucune livraison en cours</div></div></div>
+    </div>
+
+    <!-- LIVRAISONS -->
+    <div class="sec" id="sec-livraisons">
+      <div class="card"><div class="card-head"><h2>🚴 Mes livraisons assignées</h2></div><div class="card-body" id="liv-list"><div style="text-align:center;padding:32px;color:var(--g400)">Aucune livraison assignée</div></div></div>
+    </div>
+
+    <!-- HISTORIQUE -->
+    <div class="sec" id="sec-historique">
+      <div class="card"><div class="card-head"><h2>📋 Historique des livraisons</h2></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Commande</th><th>Statut</th><th>Gain</th><th>Date</th></tr></thead><tbody id="hist-body"></tbody></table></div></div></div>
+    </div>
+
+    <!-- PROFIL -->
+    <div class="sec" id="sec-profil">
+      <div class="card"><div class="card-head"><h2>👤 Mon profil</h2></div><div class="card-body" id="profil-content"></div></div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
+const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+let currentUser=null,currentLivreur=null,uploading=false,uploadCount=0,contratLu=false;
+let selectedVehicule='';
+
+// STEPS (4 étapes pour livreur)
+let currentStep=1;
+function goStep(n){
+  if(n===2&&!validateStep1())return;
+  if(n===3&&!validateStep2())return;
+  if(n===4&&!validateStep3())return;
+  currentStep=n;
+  document.querySelectorAll('.step-content').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step-'+n).classList.add('active');
+  for(let i=1;i<=4;i++){
+    const ind=document.getElementById('step-ind-'+i);
+    ind.classList.remove('active','done');
+    if(i<n)ind.classList.add('done');
+    else if(i===n)ind.classList.add('active');
+    if(i<4)document.getElementById('line-'+i).classList.toggle('done',i<n);
+  }
+}
+
+function validateStep1(){
+  const err=document.getElementById('r-err-1');err.style.display='none';
+  const fields=[['r-nom','Nom complet'],['r-email','Email'],['r-tel','Téléphone'],['r-zone','Zone'],['r-pass','Mot de passe']];
+  for(const [id,label] of fields){if(!document.getElementById(id).value.trim()){err.textContent='⚠️ '+label+' est obligatoire';err.style.display='block';return false;}}
+  if(document.getElementById('r-pass').value.length<6){err.textContent='⚠️ Mot de passe min. 6 caractères';err.style.display='block';return false;}
+  return true;
+}
+
+function validateStep2(){
+  const err=document.getElementById('r-err-2');err.style.display='none';
+  if(!selectedVehicule){err.textContent='⚠️ Choisissez votre type de véhicule';err.style.display='block';return false;}
+  return true;
+}
+
+function validateStep3(){
+  const err=document.getElementById('r-err-3');err.style.display='none';
+  if(!document.getElementById('doc-photo-url').value){err.textContent='⚠️ La photo (selfie) est obligatoire';err.style.display='block';return false;}
+  if(!document.getElementById('doc-cni-url').value){err.textContent='⚠️ La pièce d\'identité est obligatoire';err.style.display='block';return false;}
+  if(selectedVehicule!=='velo'&&!document.getElementById('doc-permis-url').value){err.textContent='⚠️ Le permis de conduire est obligatoire pour moto/voiture';err.style.display='block';return false;}
+  if(uploading){err.textContent='⚠️ Attendez la fin des uploads';err.style.display='block';return false;}
+  return true;
+}
+
+// VEHICLE SELECTION
+function selectVehicle(type,el){
+  selectedVehicule=type;
+  document.getElementById('r-vehicule').value=type;
+  document.querySelectorAll('.vehicle-opt').forEach(v=>v.classList.remove('active'));
+  el.classList.add('active');
+
+  const note=document.getElementById('permis-note');
+  const noteText=document.getElementById('permis-note-text');
+  const permisWrap=document.getElementById('permis-upload-wrap');
+  const vehiclePhotoWrap=document.getElementById('vehicle-photo-wrap');
+
+  if(type==='velo'){
+    note.className='permis-note show';
+    noteText.textContent='✅ Le vélo ne nécessite pas de permis. Vous aurez besoin de votre CNI et une photo de votre vélo.';
+    permisWrap.style.display='none';
+    document.getElementById('vehicle-photo-label').textContent='📸 Photo de votre vélo *';
+    document.getElementById('permis-upload-label').textContent='📋 Permis de conduire *';
+    vehiclePhotoWrap.style.display='block';
+  } else if(type==='moto'){
+    note.className='permis-note show';
+    noteText.textContent='⚠️ La moto nécessite un permis de conduire de catégorie A. Vous devrez le fournir lors de l\'inscription.';
+    permisWrap.style.display='block';
+    document.getElementById('permis-upload-label').textContent='📋 Permis de conduire catégorie A *';
+    document.getElementById('permis-upload-desc').textContent='Recto de votre permis moto (catégorie A)';
+    document.getElementById('vehicle-photo-label').textContent='📸 Photo de votre moto *';
+    vehiclePhotoWrap.style.display='block';
+  } else if(type==='voiture'){
+    note.className='permis-note show';
+    noteText.textContent='⚠️ La voiture nécessite un permis de conduire de catégorie B. Vous devrez le fournir lors de l\'inscription.';
+    permisWrap.style.display='block';
+    document.getElementById('permis-upload-label').textContent='📋 Permis de conduire catégorie B *';
+    document.getElementById('permis-upload-desc').textContent='Recto de votre permis voiture (catégorie B)';
+    document.getElementById('vehicle-photo-label').textContent='📸 Photo de votre voiture (plaque visible) *';
+    vehiclePhotoWrap.style.display='block';
+  }
+}
+
+// CONTRAT
+function checkScroll(el){
+  if(el.scrollTop+el.clientHeight>=el.scrollHeight-20&&!contratLu){
+    contratLu=true;
+    const w=document.getElementById('consent-wrap');w.style.opacity='1';w.style.pointerEvents='auto';
+    document.getElementById('scroll-hint').style.display='none';
+  }
+}
+function checkConsent(){
+  const checked=document.getElementById('consent-check').checked;
+  const btn=document.getElementById('btn-submit');btn.disabled=!checked;btn.style.opacity=checked?'1':'0.5';
+}
+
+// UPLOADS
+async function uploadDoc(input,bucket,urlId,prevId,progId,statusId){
+  const file=input.files[0];if(!file)return;
+  if(file.size>10*1024*1024)return;
+  uploadCount++;uploading=true;
+  const status=document.getElementById(statusId);
+  status.textContent='⏳ Upload en cours...';status.className='up-status loading';status.style.display='block';
+  if(file.type.startsWith('image/')){const reader=new FileReader();reader.onload=e=>{const i=document.getElementById(prevId);i.src=e.target.result;i.style.display='block';};reader.readAsDataURL(file);}
+  const prog=document.getElementById(progId);const bar=document.getElementById(progId+'-bar');
+  prog.style.display='block';bar.style.width='40%';
+  const ext=file.name.split('.').pop().toLowerCase();
+  const fname=`docs/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const {error}=await sb.storage.from(bucket).upload(fname,file,{cacheControl:'3600',upsert:false});
+  bar.style.width='100%';setTimeout(()=>prog.style.display='none',500);
+  uploadCount--;if(uploadCount===0)uploading=false;
+  if(error){status.textContent='❌ '+error.message;status.className='up-status';return;}
+  const {data:{publicUrl}}=sb.storage.from(bucket).getPublicUrl(fname);
+  document.getElementById(urlId).value=publicUrl;
+  status.textContent='✅ Uploadé avec succès';status.className='up-status ok';
+}
+
+// AUTH
+async function checkSession(){const {data:{session}}=await sb.auth.getSession();if(!session){showAuth();return;}currentUser=session.user;await loadLivreur();}
+function showAuth(){document.getElementById('auth-page').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pending-page').style.display='none';loadZonesSelect();}
+
+async function doLogin(){
+  const email=document.getElementById('l-email').value.trim();const pass=document.getElementById('l-pass').value;
+  const err=document.getElementById('l-err');err.style.display='none';
+  const {error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){err.textContent='❌ '+error.message;err.style.display='block';return;}
+  const {data:{user}}=await sb.auth.getUser();currentUser=user;await loadLivreur();
+}
+
+async function doRegister(){
+  if(!document.getElementById('consent-check').checked)return;
+  const btn=document.getElementById('btn-submit');btn.disabled=true;btn.textContent='⏳ Création...';
+  const nom=document.getElementById('r-nom').value.trim();
+  const email=document.getElementById('r-email').value.trim();
+  const tel=document.getElementById('r-tel').value.trim();
+  const zone_id=document.getElementById('r-zone').value;
+  const pass=document.getElementById('r-pass').value;
+  const {data,error}=await sb.auth.signUp({email,password:pass});
+  if(error){document.getElementById('r-err-4').textContent='❌ '+error.message;document.getElementById('r-err-4').style.display='block';btn.disabled=false;btn.textContent='✅ Créer mon compte';return;}
+  await sb.from('utilisateurs').insert({id:data.user.id,nom,email,telephone:tel,role:'livreur',statut:'actif'});
+  await sb.from('livreurs').insert({user_id:data.user.id,nom,telephone:tel,zone_id,disponible:false,statut:'en_attente'});
+  await sb.auth.updateUser({data:{
+    vehicule:selectedVehicule,plaque:document.getElementById('r-plaque').value,
+    photo_selfie:document.getElementById('doc-photo-url').value,
+    photo_cni:document.getElementById('doc-cni-url').value,
+    photo_permis:document.getElementById('doc-permis-url').value,
+    photo_vehicule:document.getElementById('doc-vehicule-url').value,
+    contrat_accepte:true,contrat_date:new Date().toISOString()
+  }});
+  currentUser=data.user;
+  document.getElementById('auth-page').style.display='none';
+  document.getElementById('pending-page').style.display='flex';
+}
+
+async function doLogout(){await sb.auth.signOut();window.location.reload();}
+
+async function loadLivreur(){
+  const {data}=await sb.from('livreurs').select('*,zones(nom)').eq('user_id',currentUser.id).single();
+  if(!data){showAuth();return;}
+  currentLivreur=data;
+  if(data.statut==='en_attente'){document.getElementById('auth-page').style.display='none';document.getElementById('pending-page').style.display='flex';return;}
+  if(data.statut==='suspendu'){document.getElementById('auth-page').style.display='none';document.getElementById('pending-page').style.display='flex';document.querySelector('#pending-page .ico').textContent='🚫';document.querySelector('#pending-page h2').textContent='Compte suspendu';return;}
+  showApp();
+}
+
+function showApp(){
+  document.getElementById('auth-page').style.display='none';document.getElementById('pending-page').style.display='none';document.getElementById('app').style.display='flex';
+  document.getElementById('sb-nom').textContent=currentLivreur.nom;document.getElementById('sb-email').textContent=currentUser.email;
+  const tog=document.getElementById('dispo-toggle');
+  if(!currentLivreur.disponible){tog.classList.remove('on');document.getElementById('dispo-text').textContent='Vous êtes hors ligne';document.getElementById('dispo-label').textContent='HORS LIGNE';}
+  loadDashboard();
+}
+
+const titles={dashboard:'Tableau de bord',livraisons:'Mes livraisons',historique:'Historique',profil:'Mon profil'};
+function go(name,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');btn.classList.add('active');
+  document.getElementById('ptitle').textContent=titles[name]||name;
+  const loaders={livraisons:loadLivraisons,historique:loadHistorique,profil:loadProfil};
+  if(loaders[name])loaders[name]();
+}
+
+async function toggleDispo(){
+  const tog=document.getElementById('dispo-toggle');
+  const newVal=!currentLivreur.disponible;
+  await sb.from('livreurs').update({disponible:newVal}).eq('id',currentLivreur.id);
+  currentLivreur.disponible=newVal;
+  if(newVal){
+    tog.classList.add('on');
+    document.getElementById('dispo-text').textContent='Vous êtes disponible pour recevoir des livraisons';
+    document.getElementById('dispo-label').textContent='EN LIGNE';
+    toast('✅ Vous êtes maintenant en ligne','ok');
+  } else {
+    tog.classList.remove('on');
+    document.getElementById('dispo-text').textContent='Vous êtes hors ligne';
+    document.getElementById('dispo-label').textContent='HORS LIGNE';
+    toast('Vous êtes maintenant hors ligne','info');
+  }
+}
+
+async function loadDashboard(){
+  const {data:livs}=await sb.from('livraisons').select('*,commandes(id,total,adresse_livraison,statut,utilisateurs(nom))').eq('livreur_id',currentLivreur.id);
+  const total=(livs||[]).filter(l=>l.statut==='livree').length;
+  const gains=total*500;
+  const today=new Date().toDateString();
+  const todayCount=(livs||[]).filter(l=>l.statut==='livree'&&new Date(l.heure_livraison||l.created_at).toDateString()===today).length;
+  document.getElementById('s-today').textContent=todayCount;
+  document.getElementById('s-total').textContent=total;
+  document.getElementById('s-gains').textContent=fmt(gains)+' FCFA';
+  const enCours=(livs||[]).filter(l=>l.statut==='assignee'||l.statut==='en_cours');
+  if(enCours.length>0){document.getElementById('b-liv').textContent=enCours.length;document.getElementById('b-liv').style.display='inline';}
+  const wrap=document.getElementById('current-livraisons');
+  if(!enCours.length){wrap.innerHTML='<div style="text-align:center;padding:32px;color:var(--g400)"><div style="font-size:36px;margin-bottom:8px">✅</div><p>Aucune livraison en cours</p></div>';return;}
+  wrap.innerHTML=enCours.map(l=>`<div class="liv-card">
+    <div class="liv-head"><span style="font-size:13px;font-weight:600">Commande #${l.commandes?.id?.substring(0,8)||'—'}</span>${sbadge(l.statut)}</div>
+    <div class="liv-body">
+      <div class="liv-adresse">📍 ${l.commandes?.adresse_livraison||'—'}</div>
+      <div class="liv-adresse">👤 ${l.commandes?.utilisateurs?.nom||'—'}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+        <div class="liv-total">💰 500 FCFA</div>
+        <div class="acts">
+          ${l.statut==='assignee'?`<button class="btn btn-sm btn-p" onclick="updateLivraison('${l.id}','en_cours')">🚴 Démarrer</button>`:''}
+          ${l.statut==='en_cours'?`<button class="btn btn-sm btn-ok" onclick="updateLivraison('${l.id}','livree')">✅ Livré !</button>`:''}
+        </div>
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+async function updateLivraison(id,statut){
+  const update={statut};
+  if(statut==='livree')update.heure_livraison=new Date().toISOString();
+  const {error}=await sb.from('livraisons').update(update).eq('id',id);
+  if(error){toast('Erreur: '+error.message,'err');return;}
+  if(statut==='livree'){
+    const {data:liv}=await sb.from('livraisons').select('commande_id').eq('id',id).single();
+    if(liv)await sb.from('commandes').update({statut:'livree'}).eq('id',liv.commande_id);
+    toast('🎉 Livraison confirmée ! +500 FCFA','ok');
+  } else {
+    toast('🚴 Livraison démarrée !','ok');
+  }
+  loadDashboard();
+}
+
+async function loadLivraisons(){
+  const {data}=await sb.from('livraisons').select('*,commandes(id,total,adresse_livraison,statut,utilisateurs(nom))').eq('livreur_id',currentLivreur.id).in('statut',['assignee','en_cours']);
+  const wrap=document.getElementById('liv-list');
+  if(!data?.length){wrap.innerHTML='<div style="text-align:center;padding:32px;color:var(--g400)">Aucune livraison assignée</div>';return;}
+  wrap.innerHTML=data.map(l=>`<div class="liv-card">
+    <div class="liv-head"><span style="font-size:13px;font-weight:600">#${l.commandes?.id?.substring(0,8)}</span>${sbadge(l.statut)}</div>
+    <div class="liv-body">
+      <div class="liv-adresse">📍 ${l.commandes?.adresse_livraison||'—'}</div>
+      <div class="liv-adresse">👤 ${l.commandes?.utilisateurs?.nom||'—'}</div>
+      <div class="acts" style="margin-top:8px">
+        ${l.statut==='assignee'?`<button class="btn btn-sm btn-p" onclick="updateLivraison('${l.id}','en_cours')">🚴 Démarrer</button>`:''}
+        ${l.statut==='en_cours'?`<button class="btn btn-sm btn-ok" onclick="updateLivraison('${l.id}','livree')">✅ Marquer comme livré</button>`:''}
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+async function loadHistorique(){
+  const {data}=await sb.from('livraisons').select('*,commandes(id)').eq('livreur_id',currentLivreur.id).order('created_at',{ascending:false});
+  const tb=document.getElementById('hist-body');
+  if(!data?.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:32px">Aucune livraison</td></tr>';return;}
+  tb.innerHTML=data.map(l=>`<tr>
+    <td><code>#${l.commandes?.id?.substring(0,8)||'—'}</code></td>
+    <td>${sbadge(l.statut)}</td>
+    <td>${l.statut==='livree'?'<strong>500 FCFA</strong>':'—'}</td>
+    <td>${fdate(l.created_at)}</td>
+  </tr>`).join('');
+}
+
+function loadProfil(){
+  const m=document.getElementById('profil-content');
+  m.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="fgm"><label>Nom</label><input value="${currentLivreur.nom||''}" readonly style="background:var(--g50)"/></div>
+    <div class="fgm"><label>Téléphone</label><input value="${currentLivreur.telephone||''}" readonly style="background:var(--g50)"/></div>
+    <div class="fgm"><label>Zone</label><input value="${currentLivreur.zones?.nom||'—'}" readonly style="background:var(--g50)"/></div>
+    <div class="fgm"><label>Statut</label><input value="${currentLivreur.statut}" readonly style="background:var(--g50)"/></div>
+  </div>`;
+}
+
+async function loadZonesSelect(){
+  const {data}=await sb.from('zones').select('*').eq('actif',true).order('nom');
+  const sel=document.getElementById('r-zone');if(!sel)return;
+  sel.innerHTML='<option value="">Choisir votre zone...</option>';
+  (data||[]).forEach(z=>sel.innerHTML+=`<option value="${z.id}">${z.ville} — ${z.nom}</option>`);
+}
+function switchTab(type,btn){document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.aform').forEach(f=>f.classList.remove('active'));btn.classList.add('active');document.getElementById('form-'+type).classList.add('active');}
+function sbadge(s){const m={en_attente:'<span class="badge bo">⏳</span>',assignee:'<span class="badge bb">📋 Assignée</span>',en_cours:'<span class="badge bo">🚴 En cours</span>',livree:'<span class="badge bg">✅ Livrée</span>',echouee:'<span class="badge br">❌</span>'};return m[s]||`<span class="badge bgr">${s||'—'}</span>`;}
+function fmt(n){return(n||0).toLocaleString('fr-FR');}
+function fdate(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
+function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+checkSession();
+</script>
+</body>
+</html>
