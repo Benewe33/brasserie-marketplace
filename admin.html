@@ -385,23 +385,50 @@ function showSection(name,btn){
 }
 
 // UPLOAD
+let uploadInProgress = false;
+
 async function previewAndUpload(input,bucket,urlId,previewId,progId){
   const file=input.files[0];if(!file)return;
   if(file.size>5*1024*1024){showToast('Image trop grande (max 5MB)','error');return;}
+  
+  // Preview local immédiat
   const reader=new FileReader();
   reader.onload=e=>{const img=document.getElementById(previewId);img.src=e.target.result;img.style.display='block';};
   reader.readAsDataURL(file);
+  
+  // Bloquer les boutons pendant l'upload
+  uploadInProgress = true;
+  document.getElementById('btn-save-produit').disabled = true;
+  document.getElementById('btn-save-cat').disabled = true;
+  document.getElementById('btn-save-produit').textContent = '⏳ Upload en cours...';
+  document.getElementById('btn-save-cat').textContent = '⏳ Upload en cours...';
+
   const prog=document.getElementById(progId);
   const bar=document.getElementById(progId+'-bar');
   prog.style.display='block';bar.style.width='30%';
+  
   const ext=file.name.split('.').pop();
   const fileName=`${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
-  const {error}=await sb.storage.from(bucket).upload(fileName,file,{cacheControl:'3600',upsert:false});
-  bar.style.width='100%';setTimeout(()=>prog.style.display='none',500);
+  const {data, error}=await sb.storage.from(bucket).upload(fileName,file,{cacheControl:'3600',upsert:false});
+  
+  bar.style.width='100%';
+  setTimeout(()=>prog.style.display='none',500);
+  
+  // Débloquer les boutons
+  uploadInProgress = false;
+  const isCat = urlId === 'cat-image-url';
+  document.getElementById('btn-save-produit').disabled = false;
+  document.getElementById('btn-save-cat').disabled = false;
+  const savedTextProduit = document.getElementById('p-id').value ? 'Enregistrer les modifications' : 'Ajouter le produit';
+  const savedTextCat = document.getElementById('cat-id').value ? 'Enregistrer les modifications' : 'Ajouter';
+  document.getElementById('btn-save-produit').textContent = savedTextProduit;
+  document.getElementById('btn-save-cat').textContent = savedTextCat;
+
   if(error){showToast('Erreur upload: '+error.message,'error');return;}
+  
   const {data:{publicUrl}}=sb.storage.from(bucket).getPublicUrl(fileName);
   document.getElementById(urlId).value=publicUrl;
-  showToast('Photo uploadée ✅','success');
+  showToast('Photo uploadée ✅ — cliquez Enregistrer','success');
 }
 
 // DASHBOARD
@@ -484,6 +511,7 @@ function editProduit(p){
 }
 
 async function sauvegarderProduit(){
+  if(uploadInProgress){showToast('⏳ Attendez la fin de l\'upload...','error');return;}
   const id=document.getElementById('p-id').value;
   const nom=document.getElementById('p-nom').value.trim();
   const prix=parseFloat(document.getElementById('p-prix').value);
@@ -554,6 +582,7 @@ function editCategorie(c){
 }
 
 async function sauvegarderCategorie(){
+  if(uploadInProgress){showToast('⏳ Attendez la fin de l\'upload...','error');return;}
   const id=document.getElementById('cat-id').value;
   const nom=document.getElementById('cat-nom').value.trim();
   const icone=document.getElementById('cat-icone').value.trim();
