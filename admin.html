@@ -285,14 +285,27 @@ tr:hover td{background:var(--g50)}
 
     <!-- DASHBOARD -->
     <div class="sec active" id="sec-dashboard">
-      <div class="stats">
-        <div class="stat"><div class="stat-ico">📦</div><div class="stat-label">Produits</div><div class="stat-val" id="s-produits">—</div></div>
-        <div class="stat"><div class="stat-ico">🛒</div><div class="stat-label">Commandes</div><div class="stat-val" id="s-commandes">—</div></div>
-        <div class="stat"><div class="stat-ico">🏪</div><div class="stat-label">Vendeurs actifs</div><div class="stat-val" id="s-vendeurs">—</div></div>
-        <div class="stat"><div class="stat-ico">🚴</div><div class="stat-label">Livreurs actifs</div><div class="stat-val" id="s-livreurs">—</div></div>
+      <!-- KPIs -->
+      <div class="kpi-grid">
+        <div class="kpi" style="border-color:var(--vd)"><div class="kpi-ico">💰</div><div class="kpi-val" id="kpi-ca">—</div><div class="kpi-label">Chiffre d'affaires</div><div class="kpi-trend trend-up" id="kpi-ca-trend"></div></div>
+        <div class="kpi" style="border-color:#2563eb"><div class="kpi-ico">🛒</div><div class="kpi-val" id="kpi-cmds">—</div><div class="kpi-label">Commandes totales</div><div class="kpi-trend" id="kpi-cmds-trend"></div></div>
+        <div class="kpi" style="border-color:#d97706"><div class="kpi-ico">👥</div><div class="kpi-val" id="kpi-clients">—</div><div class="kpi-label">Clients inscrits</div><div class="kpi-trend trend-up" id="kpi-clients-trend"></div></div>
+        <div class="kpi" style="border-color:#16a34a"><div class="kpi-ico">📦</div><div class="kpi-val" id="kpi-prods">—</div><div class="kpi-label">Produits actifs</div><div class="kpi-trend" id="kpi-prods-trend"></div></div>
       </div>
-      <div class="card"><div class="card-head"><h2>⏳ Inscriptions en attente de validation</h2></div><div class="card-body" id="pending-wrap"><div class="empty"><span class="eico">✅</span><p>Aucune inscription en attente</p></div></div></div>
-      <div class="card"><div class="card-head"><h2>📋 Dernières commandes</h2></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead><tbody id="dash-cmd"></tbody></table></div></div></div>
+      <!-- CHARTS -->
+      <div class="stats-grid-2">
+        <div class="chart-card"><h3>📈 Commandes — 7 derniers jours</h3><div class="chart-wrap"><canvas id="chart-cmds"></canvas></div></div>
+        <div class="chart-card"><h3>💰 Revenus — 7 derniers jours</h3><div class="chart-wrap"><canvas id="chart-ca"></canvas></div></div>
+      </div>
+      <div class="stats-grid-2">
+        <div class="chart-card"><h3>🏆 Top 5 produits vendus</h3><div id="top-produits"><div style="text-align:center;color:var(--g400);padding:20px">Chargement...</div></div></div>
+        <div class="chart-card"><h3>🥧 Répartition des statuts</h3><div class="chart-wrap"><canvas id="chart-statuts"></canvas></div></div>
+      </div>
+      <!-- BOTTOM ROW -->
+      <div class="stats-grid-2">
+        <div class="card" style="margin-bottom:0"><div class="card-head"><h2>⏳ Inscriptions en attente</h2></div><div class="card-body" id="pending-wrap"><div class="empty"><span class="eico">✅</span><p>Aucune inscription en attente</p></div></div></div>
+        <div class="card" style="margin-bottom:0"><div class="card-head"><h2>📋 Dernières commandes</h2></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead><tbody id="dash-cmd"></tbody></table></div></div></div>
+      </div>
     </div>
 
     <!-- CATEGORIES -->
