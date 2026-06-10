@@ -7,6 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -157,6 +158,33 @@ tr:hover td{background:var(--g50)}
 .empty .eico{font-size:44px;display:block;margin-bottom:12px}
 .srch input{width:100%;padding:9px 14px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;outline:none;margin-bottom:16px}
 .srch input:focus{border-color:var(--v)}
+
+.notif-item{padding:14px 16px;border-bottom:1px solid var(--g100);cursor:pointer;transition:background .15s;display:flex;gap:12px;align-items:flex-start}
+.notif-item:hover{background:var(--g50)}
+.notif-item.unread{background:#f0fdf4;border-left:3px solid var(--vd)}
+.notif-ico{font-size:24px;flex-shrink:0;margin-top:2px}
+.notif-content{flex:1;min-width:0}
+.notif-titre{font-size:13px;font-weight:600;margin-bottom:3px}
+.notif-msg{font-size:12px;color:var(--g400);line-height:1.4}
+.notif-time{font-size:11px;color:var(--g400);margin-top:4px}
+
+.chart-card{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:20px;margin-bottom:20px}
+.chart-card h3{font-size:14px;font-weight:600;margin-bottom:16px;color:var(--g600)}
+.chart-wrap{position:relative;height:220px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.kpi{background:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow);text-align:center;border-top:3px solid}
+.kpi-ico{font-size:28px;margin-bottom:8px}
+.kpi-val{font-size:22px;font-weight:700}
+.kpi-label{font-size:12px;color:var(--g400);margin-top:2px}
+.kpi-trend{font-size:11px;margin-top:4px;font-weight:500}
+.trend-up{color:var(--gr)}.trend-down{color:var(--r)}
+.stats-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.top-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--g100)}
+.top-item:last-child{border-bottom:none}
+.top-rank{font-size:16px;font-weight:700;color:var(--g400);width:24px}
+.top-img{width:36px;height:36px;border-radius:8px;object-fit:cover;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.top-name{flex:1;font-size:13px;font-weight:500}
+.top-val{font-size:13px;font-weight:700;color:var(--vd)}
 </style>
 </head>
 <body>
@@ -232,7 +260,28 @@ tr:hover td{background:var(--g50)}
   </aside>
 
   <main class="main">
-    <div class="topbar"><h1 id="ptitle">Tableau de bord</h1><span class="badge-role">🛡️ Administrateur</span></div>
+    <div class="topbar">
+      <h1 id="ptitle">Tableau de bord</h1>
+      <div style="display:flex;align-items:center;gap:12px">
+        <button onclick="openNotifs()" style="position:relative;background:rgba(255,255,255,.1);border:none;cursor:pointer;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;transition:background .2s" onmouseover="this.style.background='rgba(0,0,0,.08)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">
+          🔔<span id="notif-badge" style="position:absolute;top:-2px;right:-2px;background:var(--r);color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center">0</span>
+        </button>
+        <span class="badge-role">🛡️ Administrateur</span>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS PANEL -->
+    <div id="notif-overlay" onclick="closeNotifs()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:150"></div>
+    <div id="notif-panel" style="display:none;position:fixed;top:0;right:0;width:380px;height:100vh;background:#fff;z-index:151;box-shadow:-4px 0 20px rgba(0,0,0,.15);overflow-y:auto">
+      <div style="padding:20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff">
+        <h2 style="font-size:16px;font-weight:700">🔔 Notifications</h2>
+        <div style="display:flex;gap:8px">
+          <button onclick="markAllRead()" style="font-size:12px;color:var(--vd);background:none;border:none;cursor:pointer;font-weight:500">Tout lire</button>
+          <button onclick="closeNotifs()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--g400)">✕</button>
+        </div>
+      </div>
+      <div id="notif-list" style="padding:8px"></div>
+    </div>
 
     <!-- DASHBOARD -->
     <div class="sec active" id="sec-dashboard">
@@ -542,7 +591,17 @@ async function checkSession(){
     document.getElementById('loginWrap').style.display='flex';
   }
 }
-function showApp(){document.getElementById('loginWrap').style.display='none';document.getElementById('app').style.display='flex';loadDashboard();loadZones();loadCatSelect();}
+function showApp(){
+  loadAdvancedStats();
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('app').style.display='flex';
+  loadDashboard();loadZones();loadCatSelect();
+  loadNotifs();
+  // Subscribe to realtime
+  sb.auth.getSession().then(({data:{session}})=>{
+    if(session) subscribeToNotifs(session.user.id);
+  });
+}
 
 // NAVIGATION
 const titles={dashboard:'Tableau de bord',categories:'Catégories',produits:'Produits',menus:'Menus restaurants',commandes:'Commandes',livraisons:'Livraisons',vendeurs:'Vendeurs',restaurants:'Restaurants',livreurs:'Livreurs',comptes:'Créer des comptes',zones:'Zones de livraison'};
@@ -692,6 +751,7 @@ async function delCat(id){
 // PRODUITS
 async function loadProds(){
   const {data}=await sb.from('produits').select('*,categories(nom),boutiques(nom)').order('created_at',{ascending:false});
+  const {data:allAvis}=await sb.from('avis').select('produit_id,note');
   const tb=document.getElementById('prod-body');
   if(!data?.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--g400);padding:32px">Aucun produit</td></tr>';return;}
   tb.innerHTML=data.map(p=>`<tr>
@@ -1027,6 +1087,128 @@ async function openClientDetail(id,nom,email,tel,date){
     <td>${fdate(c.created_at)}</td>
   </tr>`).join('');
   openModal('m-client');
+}
+
+// NOTIFICATIONS REALTIME
+let notifsOpen = false;
+
+async function loadNotifs(){
+  const {data:{session}} = await sb.auth.getSession();
+  if(!session) return;
+  
+  const {data} = await sb.from('notifications')
+    .select('*')
+    .eq('user_id', session.user.id)
+    .order('created_at', {ascending: false})
+    .limit(50);
+  
+  const unread = (data||[]).filter(n=>!n.lu).length;
+  const badge = document.getElementById('notif-badge');
+  if(unread > 0){
+    badge.textContent = unread > 99 ? '99+' : unread;
+    badge.style.display = 'flex';
+  } else {
+    badge.style.display = 'none';
+  }
+  
+  const list = document.getElementById('notif-list');
+  if(!data?.length){
+    list.innerHTML = '<div style="text-align:center;padding:48px 20px;color:var(--g400)"><div style="font-size:40px;margin-bottom:12px">🔔</div><p>Aucune notification</p></div>';
+    return;
+  }
+  
+  const icons = {commande:'🛒', inscription:'👤', paiement:'💰', livraison:'🚴', info:'ℹ️'};
+  list.innerHTML = data.map(n => `
+    <div class="notif-item ${n.lu?'':'unread'}" onclick="readNotif('${n.id}','${n.lien||''}')">
+      <div class="notif-ico">${icons[n.type]||'🔔'}</div>
+      <div class="notif-content">
+        <div class="notif-titre">${n.titre}</div>
+        <div class="notif-msg">${n.message}</div>
+        <div class="notif-time">${fdate(n.created_at)}</div>
+      </div>
+      ${!n.lu ? '<div style="width:8px;height:8px;border-radius:50%;background:var(--vd);flex-shrink:0;margin-top:6px"></div>' : ''}
+    </div>
+  `).join('');
+}
+
+async function readNotif(id, lien){
+  await sb.from('notifications').update({lu:true}).eq('id',id);
+  loadNotifs();
+}
+
+async function markAllRead(){
+  const {data:{session}} = await sb.auth.getSession();
+  if(!session) return;
+  await sb.from('notifications').update({lu:true}).eq('user_id', session.user.id).eq('lu', false);
+  loadNotifs();
+  toast('✅ Toutes les notifications lues','ok');
+}
+
+function openNotifs(){
+  document.getElementById('notif-panel').style.display='block';
+  document.getElementById('notif-overlay').style.display='block';
+  loadNotifs();
+  notifsOpen = true;
+}
+
+function closeNotifs(){
+  document.getElementById('notif-panel').style.display='none';
+  document.getElementById('notif-overlay').style.display='none';
+  notifsOpen = false;
+}
+
+// REALTIME SUBSCRIPTION
+function subscribeToNotifs(userId){
+  sb.channel('notifications')
+    .on('postgres_changes', {
+      event: 'INSERT',
+      schema: 'public',
+      table: 'notifications',
+      filter: `user_id=eq.${userId}`
+    }, (payload) => {
+      // Show toast
+      toast('🔔 ' + payload.new.titre, 'info');
+      // Update badge
+      loadNotifs();
+      // If panel open, refresh
+      if(notifsOpen) loadNotifs();
+    })
+    .subscribe();
+}
+
+
+async function loadAdvancedStats(){
+  const {data:cmds}=await sb.from('commandes').select('*,utilisateurs(nom)').order('created_at',{ascending:false});
+  const {data:clients}=await sb.from('utilisateurs').select('id').eq('role','client');
+  const {count:prodsCount}=await sb.from('produits').select('id',{count:'exact',head:true}).eq('actif',true);
+  const totalCA=(cmds||[]).filter(c=>c.statut==='livree').reduce((s,c)=>s+(c.total||0),0);
+  document.getElementById('kpi-ca').textContent=fmt(totalCA)+' FCFA';
+  document.getElementById('kpi-cmds').textContent=(cmds||[]).length;
+  document.getElementById('kpi-clients').textContent=(clients||[]).length;
+  document.getElementById('kpi-prods').textContent=prodsCount||0;
+  // 7 days
+  const labels7=[],days7=[],ca7=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);d.setHours(0,0,0,0);
+    const next=new Date(d);next.setDate(next.getDate()+1);
+    const dc=(cmds||[]).filter(c=>new Date(c.created_at)>=d&&new Date(c.created_at)<next);
+    days7.push(dc.length);
+    ca7.push(dc.filter(c=>c.statut==='livree').reduce((s,c)=>s+(c.total||0),0));
+    labels7.push(d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'}));
+  }
+  ['chart-cmds','chart-ca','chart-statuts'].forEach(id=>{const e=Chart.getChart(id);if(e)e.destroy();});
+  new Chart(document.getElementById('chart-cmds'),{type:'bar',data:{labels:labels7,datasets:[{label:'Commandes',data:days7,backgroundColor:'rgba(26,107,60,.7)',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
+  new Chart(document.getElementById('chart-ca'),{type:'line',data:{labels:labels7,datasets:[{label:'FCFA',data:ca7,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.1)',fill:true,tension:.4,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
+  const sm={};(cmds||[]).forEach(c=>{sm[c.statut]=(sm[c.statut]||0)+1;});
+  const sl=Object.keys(sm);
+  const sc={'en_attente':'#f59e0b','confirmee':'#3b82f6','en_preparation':'#f97316','en_livraison':'#8b5cf6','livree':'#10b981','annulee':'#ef4444'};
+  new Chart(document.getElementById('chart-statuts'),{type:'doughnut',data:{labels:sl.map(s=>s.replace(/_/g,' ')),datasets:[{data:Object.values(sm),backgroundColor:sl.map(s=>sc[s]||'#9ca3af'),borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}}});
+  const {data:lignes}=await sb.from('lignes_commande').select('produit_id,nom_item,quantite,produits(image_url)');
+  const pm={};(lignes||[]).forEach(l=>{if(!pm[l.produit_id])pm[l.produit_id]={nom:l.nom_item,qty:0,img:l.produits?.image_url};pm[l.produit_id].qty+=l.quantite;});
+  const tp=Object.values(pm).sort((a,b)=>b.qty-a.qty).slice(0,5);
+  const tw=document.getElementById('top-produits');
+  if(!tp.length){tw.innerHTML='<div style="text-align:center;color:var(--g400);padding:20px">Aucune vente encore</div>';return;}
+  tw.innerHTML=tp.map((p,i)=>`<div class="top-item"><div class="top-rank">${i+1}</div><div class="top-img">${p.img?`<img src="${p.img}" style="width:100%;height:100%;object-fit:cover;border-radius:8px"/>`:'📦'}</div><div class="top-name">${p.nom}</div><div class="top-val">${p.qty} vendus</div></div>`).join('');
 }
 
 checkSession();
