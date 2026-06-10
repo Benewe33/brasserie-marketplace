@@ -322,6 +322,246 @@ textarea.fi{resize:vertical;min-height:70px}
 
 /* FLASH COUNTDOWN */
 .flash-count{background:var(--rl);color:var(--r);font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
+
+/* ===== SKELETON LOADING ===== */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.skeleton-card {
+  width: 150px;
+  height: 210px;
+  border-radius: 14px;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+.skeleton-row {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  overflow: hidden;
+}
+.skeleton-chip {
+  width: 100px;
+  height: 90px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 400px 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+/* ===== ANIMATIONS MEITUAN ===== */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.sec-hdr {
+  animation: fadeIn .4s ease;
+}
+.prod-card {
+  animation: slideUp .35s ease both;
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.prod-card:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 8px rgba(0,0,0,.12);
+}
+.cat-item {
+  transition: transform .15s ease;
+}
+.cat-item:active {
+  transform: scale(0.92);
+}
+.cat-item.active-cat .cat-ic {
+  box-shadow: 0 0 0 3px var(--v);
+}
+.lchip {
+  transition: transform .15s ease;
+}
+.lchip:active {
+  transform: scale(0.95);
+}
+
+/* ===== SCROLL HORIZONTAL FLUIDE ===== */
+.prods-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  padding: 8px 12px 14px;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  background: #fff;
+}
+.prods-scroll::-webkit-scrollbar { display: none; }
+
+/* ===== CARTE PRODUIT MEITUAN ===== */
+.prod-card-h {
+  width: 150px;
+  flex-shrink: 0;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 0.5px solid var(--g100);
+  cursor: pointer;
+  position: relative;
+}
+.prod-card-h .prod-img-wrap {
+  width: 150px;
+  height: 130px;
+  background: var(--g50);
+  position: relative;
+  overflow: hidden;
+}
+.prod-card-h .prod-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .3s ease;
+}
+.prod-card-h:active .prod-img-wrap img {
+  transform: scale(1.05);
+}
+.prod-card-h .prod-emoji {
+  width: 150px;
+  height: 130px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  background: var(--g50);
+}
+.prod-card-h .prod-info {
+  padding: 8px 9px 10px;
+}
+.prod-card-h .prod-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--g900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 2px;
+}
+.prod-card-h .prod-shop {
+  font-size: 10px;
+  color: var(--g400);
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.prod-card-h .prod-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--r);
+}
+.prod-card-h .prod-unit {
+  font-size: 10px;
+  color: var(--g400);
+}
+.prod-card-h .prod-add-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 9px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--v);
+  color: #fff;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  line-height: 1;
+  box-shadow: 0 2px 6px rgba(26,107,53,.3);
+  transition: transform .1s ease;
+}
+.prod-card-h .prod-add-btn:active {
+  transform: scale(1.2);
+}
+.prod-card-h .fav-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.85);
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform .15s ease;
+  z-index: 2;
+}
+.prod-card-h .fav-btn:active { transform: scale(1.3); }
+.prod-card-h .prod-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: var(--r);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  z-index: 2;
+}
+
+/* ===== CARTE BOUTIQUE HORIZONTALE ===== */
+.bout-card-h {
+  width: 160px;
+  flex-shrink: 0;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 0.5px solid var(--g100);
+  cursor: pointer;
+}
+.bout-card-h .bout-img {
+  width: 160px;
+  height: 90px;
+  background: var(--vl);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+.bout-card-h .bout-info {
+  padding: 8px 10px 10px;
+}
+.bout-card-h .bout-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--g900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.bout-card-h .bout-meta {
+  font-size: 10px;
+  color: var(--g400);
+  margin-top: 3px;
+}
+
+/* ===== FILTRE CATÉGORIE ===== */
+#catFiltreBar { display: none; }
+#catFiltreBar.visible { display: flex; }
+#catFiltreSection { display: none; }
+#catFiltreSection.visible { display: block; }
+
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -385,58 +625,72 @@ textarea.fi{resize:vertical;min-height:70px}
 <div id="page-home" class="page active">
 <div class="home-content">
 
-  <!-- CATEGORIES -->
+  <!-- CATEGORIES (filtrantes) -->
   <div class="cats-wrap">
     <div class="cat-grid">
-      <div class="cat-item" onclick="goTab('catalogue')">
+      <div class="cat-item" onclick="filtrerParCategorie('Marché')">
         <div class="cat-ic" style="background:#E8F5EE">🛒<span class="cat-bdg" style="background:#F5C518;color:#8B7000">HOT</span></div>
         <span class="cat-lbl">Marché</span>
       </div>
-      <div class="cat-item" onclick="setC('Viandes');goTab('catalogue')">
+      <div class="cat-item" onclick="filtrerParCategorie('Viandes')">
         <div class="cat-ic" style="background:#FEF0E0">🥩</div>
         <span class="cat-lbl">Viandes</span>
       </div>
-      <div class="cat-item" onclick="setC('Poissons');goTab('catalogue')">
+      <div class="cat-item" onclick="filtrerParCategorie('Poissons')">
         <div class="cat-ic" style="background:#E6F0FB">🐟</div>
         <span class="cat-lbl">Poissons</span>
       </div>
-      <div class="cat-item" onclick="setC('Oeufs');goTab('catalogue')">
+      <div class="cat-item" onclick="filtrerParCategorie('Oeufs')">
         <div class="cat-ic" style="background:#FEF3D7">🥚</div>
         <span class="cat-lbl">Oeufs</span>
       </div>
-      <div class="cat-item" onclick="setC('Légumes');goTab('catalogue')">
+      <div class="cat-item" onclick="filtrerParCategorie('Légumes')">
         <div class="cat-ic" style="background:#E8F5EE">🥦</div>
         <span class="cat-lbl">Légumes</span>
       </div>
-      <div class="cat-item" onclick="setC('Fruits');goTab('catalogue')">
+      <div class="cat-item" onclick="filtrerParCategorie('Fruits')">
         <div class="cat-ic" style="background:#FEF0E0">🍍</div>
         <span class="cat-lbl">Fruits</span>
       </div>
-      <div class="cat-item" onclick="setC('Épicerie');goTab('catalogue')">
+      <div class="cat-item" onclick="filtrerParCategorie('Épicerie')">
         <div class="cat-ic" style="background:#FEF3D7">🌾</div>
         <span class="cat-lbl">Épicerie</span>
       </div>
-      <div class="cat-item" onclick="setC('Brasserie');goTab('catalogue')">
+      <div class="cat-item" onclick="filtrerParCategorie('Brasserie')">
         <div class="cat-ic" style="background:#FDECEA">🍶<span class="cat-bdg" style="background:#C0392B;color:#fff">NEW</span></div>
         <span class="cat-lbl">Brasserie</span>
       </div>
-      <div class="cat-item" onclick="setC('Huiles');goTab('catalogue')">
+      <div class="cat-item" onclick="filtrerParCategorie('Huiles')">
         <div class="cat-ic" style="background:#E1F5EE">🫙</div>
         <span class="cat-lbl">Huiles</span>
       </div>
-      <div class="cat-item" onclick="setC('Épices');goTab('catalogue')">
+      <div class="cat-item" onclick="filtrerParCategorie('Épices')">
         <div class="cat-ic" style="background:#FDECEA">🌶</div>
         <span class="cat-lbl">Épices</span>
       </div>
     </div>
   </div>
 
+  <!-- FILTRE CATÉGORIE ACTIF -->
+  <div id="catFiltreBar" style="display:none;background:#fff;padding:10px 14px;display:none;align-items:center;justify-content:space-between;border-bottom:1px solid var(--g100)">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span id="catFiltreLabel" style="font-size:13px;font-weight:600;color:var(--v)"></span>
+      <span id="catFiltreCount" style="font-size:11px;color:var(--g400)"></span>
+    </div>
+    <button onclick="reinitialiserFiltre()" style="background:var(--g100);border:none;border-radius:20px;padding:4px 12px;font-size:11px;color:var(--g700);cursor:pointer;font-family:inherit">✕ Tout afficher</button>
+  </div>
+
+  <!-- PRODUITS FILTRÉS PAR CATÉGORIE -->
+  <div id="catFiltreSection" style="display:none;background:#fff;padding:0 0 8px">
+    <div id="catFiltreGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 12px"></div>
+  </div>
+
   <div class="divider"></div>
 
-  <!-- BANNER -->
+  <!-- BANNIÈRE -->
   <div style="padding:0 10px 10px;background:#fff">
     <div class="banner">
-      <div class="ban-img">🌿</div>
+      <div class="ban-img" id="ban-img-home">🌿</div>
       <div class="ban-txt">
         <span class="ban-tag">OFFRE DU JOUR</span>
         <div class="ban-title">Produits frais livrés en 2h à <span id="banCity">Cotonou</span></div>
@@ -451,67 +705,104 @@ textarea.fi{resize:vertical;min-height:70px}
 
   <div class="divider"></div>
 
-  <!-- PRODUITS POPULAIRES -->
+  <!-- 🔥 POPULAIRES -->
   <div class="sec-hdr" style="background:#fff">
     <div class="sec-t">🔥 Populaires près de vous</div>
     <div class="sec-more" onclick="goTab('catalogue')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
   </div>
   <div class="prods-scroll" id="homeProdsScroll">
-    <div style="display:flex;align-items:center;justify-content:center;padding:30px;color:var(--g400);font-size:12px;gap:8px">
-      <div style="width:16px;height:16px;border:2px solid var(--g200);border-top-color:var(--v);border-radius:50%;animation:spin .6s linear infinite"></div>
-      Chargement des produits...
+    <div class="skeleton-row">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- LIVREURS -->
-  <div class="sec-hdr" style="background:#fff">
-    <div class="sec-t">🛵 Livreurs disponibles</div>
-    <div class="sec-more" onclick="goTab('livreurs')">Voir tout <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
-  </div>
-  <div class="liv-scroll">
-    <div class="lchip"><div class="lav">🧑🏾<div class="ldot"></div></div><div><div class="ln">Kofi D.</div><div class="leta">~15 min</div><div class="lnote">⭐4.9 · 32 livr.</div></div></div>
-    <div class="lchip"><div class="lav">👩🏾<div class="ldot"></div></div><div><div class="ln">Aminatou S.</div><div class="leta">~22 min</div><div class="lnote">⭐4.8 · 28 livr.</div></div></div>
-    <div class="lchip"><div class="lav">👩🏿<div class="ldot"></div></div><div><div class="ln">Rosine K.</div><div class="leta">~18 min</div><div class="lnote">⭐4.9 · 41 livr.</div></div></div>
-    <div class="lchip"><div class="lav">🧑🏾<div class="ldot"></div></div><div><div class="ln">Maxime A.</div><div class="leta">~25 min</div><div class="lnote">⭐4.6 · 15 livr.</div></div></div>
-  </div>
-
-  <div class="divider"></div>
-
-  <!-- OFFRES SPECIALES -->
+  <!-- ⭐ OFFRES SPÉCIALES -->
   <div class="sec-hdr" style="background:#fff">
     <div class="sec-t">⭐ Offres spéciales</div>
     <div class="sec-more" onclick="goTab('catalogue')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
   </div>
-  <div class="grid2" id="offresGrid">
-    <div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--g400);font-size:12px;background:#fff">
-      <div style="width:16px;height:16px;border:2px solid var(--g200);border-top-color:var(--v);border-radius:50%;animation:spin .6s linear infinite;margin:0 auto 8px"></div>
-      Chargement...
+  <div class="prods-scroll" id="offresScroll">
+    <div class="skeleton-row">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
     </div>
   </div>
 
   <div class="divider"></div>
 
-  <!-- FLASH VENTES -->
+  <!-- 🏪 LES MARCHÉS -->
   <div class="sec-hdr" style="background:#fff">
-    <div class="sec-t">⚡ Flash ventes <span class="flash-count" id="flashTimer">02:47:33</span></div>
-    <div class="sec-more" onclick="goTab('catalogue')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
+    <div class="sec-t">🏪 Les marchés</div>
+    <div class="sec-more" onclick="goTab('boutiques')">Voir tout <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
   </div>
-  <div class="flash-grid" id="flashGrid" style="background:#fff">
-    <div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--g400);font-size:12px">
-      Aucune flash vente en ce moment
+  <div class="prods-scroll" id="marchesScroll">
+    <div class="skeleton-row">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
     </div>
   </div>
 
-  <!-- BOUTIQUES -->
   <div class="divider"></div>
+
+  <!-- 🥬 PRODUITS FRAIS -->
   <div class="sec-hdr" style="background:#fff">
-    <div class="sec-t">🏪 Boutiques <span id="homeBoutT">vedettes</span></div>
+    <div class="sec-t">🥬 Produits frais</div>
+    <div class="sec-more" onclick="filtrerParCategorie('Légumes')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
+  </div>
+  <div class="prods-scroll" id="fraisScroll">
+    <div class="skeleton-row">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 🍽️ PRODUITS PRÉPARÉS RESTAURANTS -->
+  <div class="sec-hdr" style="background:#fff">
+    <div class="sec-t">🍽️ Produits préparés</div>
+    <div class="sec-more" onclick="goTab('restaurant')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
+  </div>
+  <div class="prods-scroll" id="restoProdsScroll">
+    <div class="skeleton-row">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 🏬 BOUTIQUES PROCHES -->
+  <div class="sec-hdr" style="background:#fff">
+    <div class="sec-t">🏬 Boutiques près de chez vous</div>
     <div class="sec-more" onclick="goTab('boutiques')">Plus <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
   </div>
-  <div class="grid2" id="homeBout"></div>
-  <div style="height:8px;background:#fff"></div>
+  <div class="prods-scroll" id="homeBoutScroll">
+    <div class="skeleton-row">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- 🛵 LIVREURS DISPONIBLES -->
+  <div class="sec-hdr" style="background:#fff">
+    <div class="sec-t">🛵 Livreurs disponibles</div>
+    <div class="sec-more" onclick="goTab('livreurs')">Voir tout <i class="ti ti-chevron-right" style="font-size:12px" aria-hidden="true"></i></div>
+  </div>
+  <div class="liv-scroll" id="homeLivScroll">
+    <div class="lchip skeleton-chip"></div>
+    <div class="lchip skeleton-chip"></div>
+    <div class="lchip skeleton-chip"></div>
+  </div>
+
+  <div style="height:20px;background:var(--g50)"></div>
 
 </div>
 </div>
@@ -2163,7 +2454,7 @@ document.addEventListener('DOMContentLoaded',function(){
   // Charger les données Supabase
   chargerCategoriesSupabase();
   chargerBoutiquesSupabase(null);
-  chargerProduitsSupabase(null).then(function(){renderHomeProds();renderOffresSpeciales();renderFlashVentes();});
+  chargerProduitsSupabase(null).then(function(){renderToutesLesSections();});
   chargerLivreursSupabase(null);
   try{
     var saved=localStorage.getItem('yeye_geo');
@@ -2498,6 +2789,251 @@ async function changerMotDePasse(){
 }
 
 
+
+
+
+// ============================================================
+// RENDER FONCTIONS MEITUAN — PAGE ACCUEIL
+// ============================================================
+
+function creerCarteH(p, delay) {
+  var isFav = estFavori(p.id);
+  var div = document.createElement('div');
+  div.className = 'prod-card-h prod-card';
+  div.style.animationDelay = (delay||0) + 'ms';
+  var wrapHtml = p.photoUrl
+    ? '<div class="prod-img-wrap"><img src="'+p.photoUrl+'" alt="" loading="lazy" style="width:100%;height:100%;object-fit:cover"></div>'
+    : '<div class="prod-emoji">'+p.e+'</div>';
+  var badgeHtml = p.ppromo ? '<span class="prod-badge">PROMO</span>' : '';
+  div.innerHTML = wrapHtml + badgeHtml
+    + '<button class="fav-btn">'+(isFav?'❤️':'🤍')+'</button>'
+    + '<div class="prod-info">'
+    + '<div class="prod-name">'+sanitize(p.nom)+'</div>'
+    + '<div class="prod-shop">🏪 '+sanitize(p.sh)+'</div>'
+    + '<span class="prod-price">'+fcfa(p.ppromo||p.p)+'</span>'
+    + ' <span class="prod-unit">F/'+p.u+'</span>'
+    + '</div>'
+    + '<button class="prod-add-btn">+</button>';
+  div.addEventListener('click', function(e) {
+    if (e.target.classList.contains('prod-add-btn') || e.target.classList.contains('fav-btn')) return;
+    if (typeof ouvrirDetailProduit === 'function') ouvrirDetailProduit(p.id);
+  });
+  div.querySelector('.prod-add-btn').addEventListener('click', function(e) {
+    e.stopPropagation(); addCart(p.id);
+    var btn=this; btn.style.transform='scale(1.3)';
+    setTimeout(function(){btn.style.transform='';},200);
+  });
+  div.querySelector('.fav-btn').addEventListener('click', function(e) {
+    e.stopPropagation(); toggleFavori(p);
+    this.textContent = estFavori(p.id)?'❤️':'🤍';
+  });
+  return div;
+}
+
+function remplirSection(elId, produits, maxItems) {
+  var el = document.getElementById(elId); if (!el) return;
+  var items = (produits||[]).slice(0, maxItems||8);
+  if (!items.length) {
+    el.innerHTML = '<div style="padding:20px;color:var(--g400);font-size:12px;text-align:center;min-width:200px">Aucun produit disponible</div>';
+    return;
+  }
+  el.innerHTML = '';
+  items.forEach(function(p,i){ el.appendChild(creerCarteH(p, i*50)); });
+}
+
+function renderHomeProds() { remplirSection('homeProdsScroll', PRODS.slice(0,10), 10); }
+
+function renderOffresSpeciales() {
+  var offres = PRODS.filter(function(p){ return p.ppromo && p.ppromo < p.p; });
+  if (!offres.length) offres = PRODS.slice(0,6);
+  remplirSection('offresScroll', offres.slice(0,8), 8);
+}
+
+function renderProduitsFrais() {
+  var cats = ['légume','fruit','poisson','viande','oeuf','frais'];
+  var frais = PRODS.filter(function(p){
+    var cat=(p.c||'').toLowerCase();
+    return cats.some(function(s){ return cat.indexOf(s)!==-1; });
+  });
+  if (!frais.length) frais = PRODS.slice(0,8);
+  remplirSection('fraisScroll', frais.slice(0,10), 10);
+}
+
+function renderProduitsResto() {
+  var cats = ['restaurant','plat','brasserie','préparé','repas'];
+  var resto = PRODS.filter(function(p){
+    var cat=(p.c||'').toLowerCase();
+    return cats.some(function(s){ return cat.indexOf(s)!==-1; });
+  });
+  if (!resto.length) resto = PRODS.slice(Math.floor(PRODS.length/2));
+  remplirSection('restoProdsScroll', resto.slice(0,8), 8);
+}
+
+function renderFlashVentes() {
+  var el = document.getElementById('flashGrid');
+  if (!el) return;
+  var flash = PRODS.filter(function(p){ return p.b==='flash'; });
+  if (!flash.length) el.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--g400);font-size:12px">Aucune flash vente en ce moment</div>';
+}
+
+function renderMarches() {
+  var el = document.getElementById('marchesScroll'); if (!el) return;
+  if (!BOUTS.length) { el.innerHTML = '<div style="padding:20px;color:var(--g400);font-size:12px;min-width:200px">Aucun marché</div>'; return; }
+  el.innerHTML = '';
+  BOUTS.slice(0,8).forEach(function(b,i) {
+    var div = document.createElement('div');
+    div.className = 'bout-card-h';
+    div.innerHTML = '<div class="bout-img">'+(b.logo_url?'<img src="'+b.logo_url+'" style="width:100%;height:100%;object-fit:cover"/>':b.e||'🏪')+'</div>'
+      +'<div class="bout-info"><div class="bout-name">'+sanitize(b.nom)+'</div>'
+      +'<div class="bout-meta">📍 '+(b.ville||'-')+'</div>'
+      +'<div class="bout-meta">⭐'+(b.note||4.5)+(b.ver?' ✅':'')+'</div></div>';
+    div.addEventListener('click', function(){ goTab('boutiques'); });
+    el.appendChild(div);
+  });
+}
+
+function buildHomeBout() {
+  renderMarches();
+  var el = document.getElementById('homeBoutScroll'); if (!el) return;
+  if (!BOUTS.length) { el.innerHTML = '<div style="padding:20px;color:var(--g400);font-size:12px;min-width:200px">Aucune boutique</div>'; return; }
+  el.innerHTML = '';
+  BOUTS.slice(0,8).forEach(function(b) {
+    var div = document.createElement('div');
+    div.className = 'bout-card-h';
+    div.innerHTML = '<div class="bout-img">'+(b.logo_url?'<img src="'+b.logo_url+'" style="width:100%;height:100%;object-fit:cover"/>':b.e||'🏪')+'</div>'
+      +'<div class="bout-info"><div class="bout-name">'+sanitize(b.nom)+'</div>'
+      +'<div class="bout-meta">📍 '+(b.ville||'-')+'</div>'
+      +'<div class="bout-meta">⭐'+(b.note||4.5)+(b.ver?' ✅':'')+'</div></div>';
+    div.addEventListener('click', function(){ goTab('boutiques'); });
+    el.appendChild(div);
+  });
+}
+
+function buildHomeLivs() {
+  var el = document.getElementById('homeLivScroll'); if (!el) return;
+  var src = LIVS.length ? LIVS : [];
+  var actifs = src.filter(function(l){ return l.ok||l.en_ligne; }).slice(0,6);
+  if (!actifs.length) actifs = src.slice(0,6);
+  if (!actifs.length) { el.innerHTML = '<div style="padding:16px;color:var(--g400);font-size:12px">Aucun livreur disponible</div>'; return; }
+  el.innerHTML = '';
+  actifs.forEach(function(l,i) {
+    var init=(l.nom||'L').split(' ').map(function(n){return n.charAt(0);}).join('').substr(0,2).toUpperCase();
+    var chip = document.createElement('div');
+    chip.className = 'lchip';
+    chip.innerHTML = '<div class="lav">'
+      +(l.photo_url?'<img src="'+l.photo_url+'" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>':'<span style="font-size:16px;font-weight:700;color:var(--v)">'+init+'</span>')
+      +'<div class="ldot" style="background:'+(l.ok||l.en_ligne?'#2ECC71':'#bbb')+'"></div></div>'
+      +'<div><div class="lv-n" style="font-size:12px">'+(l.nom||'').split(' ')[0]+'</div>'
+      +'<div style="font-size:10px;color:var(--g400)">~'+(Math.floor(Math.random()*20)+10)+' min</div>'
+      +'<div style="font-size:10px;color:var(--j)">⭐'+(l.note_moyenne||l.note||4.8)+'</div></div>';
+    el.appendChild(chip);
+  });
+}
+
+function renderToutesLesSections() {
+  renderHomeProds();
+  renderOffresSpeciales();
+  renderProduitsFrais();
+  renderProduitsResto();
+  renderFlashVentes();
+  buildHomeBout();
+  buildHomeLivs();
+}
+
+// ============================================================
+// FILTRAGE PAR CATÉGORIE
+// ============================================================
+var catFiltreActif = null;
+
+function filtrerParCategorie(cat) {
+  catFiltreActif = cat;
+  document.querySelectorAll('.cat-item').forEach(function(item) {
+    var lbl = item.querySelector('.cat-lbl');
+    item.classList.toggle('active-cat', lbl && lbl.textContent.trim() === cat);
+  });
+  var map = {
+    'marché':['marché','épicerie','epicerie','marche'],
+    'légumes':['légume','legume'],
+    'fruits':['fruit'],
+    'viandes':['viande','boucherie'],
+    'poissons':['poisson'],
+    'oeufs':['oeuf'],
+    'épicerie':['épicerie','epicerie'],
+    'brasserie':['brasserie','boisson'],
+    'huiles':['huile'],
+    'épices':['épice','epice','condiment']
+  };
+  var synonymes = map[cat.toLowerCase()] || [cat.toLowerCase()];
+  var prodsFiltres = PRODS.filter(function(p) {
+    var pcat=(p.c||'').toLowerCase();
+    return synonymes.some(function(s){ return pcat.indexOf(s)!==-1; });
+  });
+  var bar = document.getElementById('catFiltreBar');
+  var label = document.getElementById('catFiltreLabel');
+  var count = document.getElementById('catFiltreCount');
+  var section = document.getElementById('catFiltreSection');
+  var grid = document.getElementById('catFiltreGrid');
+  if (bar) bar.style.display = 'flex';
+  if (label) label.textContent = cat;
+  if (count) count.textContent = prodsFiltres.length+' produit'+(prodsFiltres.length>1?'s':'');
+  if (section) section.style.display = 'block';
+  if (grid) {
+    if (!prodsFiltres.length) {
+      grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--g400);font-size:12px"><div style="font-size:30px;margin-bottom:8px">🔍</div>Aucun produit dans cette catégorie</div>';
+    } else {
+      grid.innerHTML = '';
+      prodsFiltres.forEach(function(p,i){ grid.appendChild(creerCarteGridV(p,i)); });
+    }
+  }
+  setTimeout(function(){ if(bar) bar.scrollIntoView({behavior:'smooth',block:'start'}); },100);
+}
+
+function reinitialiserFiltre() {
+  catFiltreActif = null;
+  document.querySelectorAll('.cat-item').forEach(function(item){ item.classList.remove('active-cat'); });
+  var bar=document.getElementById('catFiltreBar');
+  var section=document.getElementById('catFiltreSection');
+  if(bar) bar.style.display='none';
+  if(section) section.style.display='none';
+}
+
+function creerCarteGridV(p, i) {
+  var div = document.createElement('div');
+  div.style.cssText = 'background:#fff;border-radius:12px;overflow:hidden;border:0.5px solid var(--g100);cursor:pointer;animation:slideUp .3s ease both;animation-delay:'+(i*40)+'ms';
+  var imgHtml = p.photoUrl
+    ? '<img src="'+p.photoUrl+'" style="width:100%;height:110px;object-fit:cover" loading="lazy">'
+    : '<div style="height:110px;background:var(--g50);display:flex;align-items:center;justify-content:center;font-size:36px">'+p.e+'</div>';
+  div.innerHTML = '<div style="position:relative">'+imgHtml+'</div>'
+    +'<div style="padding:8px 9px 10px">'
+    +'<div style="font-size:12px;font-weight:600;color:var(--g900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+sanitize(p.nom)+'</div>'
+    +'<div style="font-size:10px;color:var(--g400);margin-bottom:4px">🏪 '+sanitize(p.sh)+'</div>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between">'
+    +'<span style="font-size:13px;font-weight:700;color:var(--r)">'+fcfa(p.ppromo||p.p)+' F</span>'
+    +'<button style="width:26px;height:26px;border-radius:50%;background:var(--v);color:#fff;border:none;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit">+</button>'
+    +'</div></div>';
+  div.querySelector('button').addEventListener('click', function(e){ e.stopPropagation(); addCart(p.id); });
+  div.addEventListener('click', function(e){ if(e.target.tagName==='BUTTON') return; ouvrirDetailProduit&&ouvrirDetailProduit(p.id); });
+  return div;
+}
+
+// ============================================================
+// FAVORIS
+// ============================================================
+function getFavoris(){ try{return JSON.parse(localStorage.getItem('yeye_favoris')||'[]');}catch(e){return[];} }
+function estFavori(id){ return getFavoris().some(function(f){return String(f.id)===String(id);}); }
+function toggleFavori(p) {
+  var favs=getFavoris();
+  var idx=-1;
+  for(var i=0;i<favs.length;i++){if(String(favs[i].id)===String(p.id)){idx=i;break;}}
+  if(idx===-1){
+    favs.push({id:p.id,nom:p.nom,photoUrl:p.photoUrl||'',e:p.e,p:p.p,u:p.u,sh:p.sh||''});
+    showToast(sanitize(p.nom)+' ajouté aux favoris','❤️');
+  } else {
+    favs.splice(idx,1);
+    showToast('Retiré des favoris','🤍');
+  }
+  localStorage.setItem('yeye_favoris',JSON.stringify(favs));
+}
 
 </script>
 
