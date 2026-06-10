@@ -17,21 +17,19 @@
   --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
 }
 body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g900);min-height:100vh}
-
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f4c2a 0%,#1a6b3c 50%,#0d3d22 100%)}
 .login-card{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
 .login-logo{text-align:center;margin-bottom:24px}
 .login-logo span{font-size:40px}
-.login-logo h1{font-size:22px;font-weight:700;color:var(--g900);margin-top:8px}
+.login-logo h1{font-size:22px;font-weight:700;margin-top:8px}
 .login-logo p{font-size:13px;color:var(--g400);margin-top:4px}
 .form-group{margin-bottom:16px}
 .form-group label{display:block;font-size:13px;font-weight:500;color:var(--g600);margin-bottom:6px}
 .form-group input{width:100%;padding:10px 14px;border:1.5px solid var(--g200);border-radius:8px;font-size:14px;font-family:inherit;outline:none;transition:border .2s}
 .form-group input:focus{border-color:var(--v)}
-.btn-login{width:100%;padding:12px;background:var(--vd);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .2s}
+.btn-login{width:100%;padding:12px;background:var(--vd);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit}
 .btn-login:hover{background:var(--v2)}
 .login-error{background:var(--rl);color:var(--r);padding:10px 14px;border-radius:8px;font-size:13px;margin-top:12px;display:none}
-
 .app{display:none;min-height:100vh}
 .sidebar{width:240px;background:var(--vd);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100}
 .sb-logo{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,.1)}
@@ -46,68 +44,62 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g900);min-
 .sb-item svg{width:16px;height:16px;flex-shrink:0}
 .sb-badge{margin-left:auto;background:var(--r);color:#fff;font-size:10px;padding:1px 6px;border-radius:10px;font-weight:600}
 .sb-logout{padding:12px 8px;border-top:1px solid rgba(255,255,255,.1)}
-
 .main{margin-left:240px;padding:24px;min-height:100vh}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
 .topbar h1{font-size:20px;font-weight:700}
 .badge-admin{background:var(--vl);color:var(--vd);font-size:12px;font-weight:600;padding:4px 10px;border-radius:20px}
-
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
 .stat-card{background:#fff;border-radius:12px;padding:16px 20px;box-shadow:var(--shadow)}
 .stat-label{font-size:12px;color:var(--g400);font-weight:500;margin-bottom:4px}
-.stat-value{font-size:28px;font-weight:700;color:var(--g900)}
+.stat-value{font-size:28px;font-weight:700}
 .stat-icon{float:right;font-size:28px;margin-top:-4px}
-
 .card{background:#fff;border-radius:12px;box-shadow:var(--shadow);margin-bottom:20px}
 .card-header{padding:16px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between}
 .card-header h2{font-size:15px;font-weight:600}
 .card-body{padding:20px}
-
 .table-wrap{overflow-x:auto}
 table{width:100%;border-collapse:collapse;font-size:13px}
 th{text-align:left;padding:8px 12px;font-size:11px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid var(--g100)}
 td{padding:10px 12px;border-bottom:1px solid var(--g100);vertical-align:middle}
 tr:last-child td{border-bottom:none}
 tr:hover td{background:var(--g50)}
-
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600}
 .badge-green{background:var(--grl);color:var(--gr)}
 .badge-orange{background:var(--orl);color:var(--or)}
 .badge-red{background:var(--rl);color:var(--r)}
 .badge-blue{background:var(--bll);color:var(--bl)}
 .badge-gray{background:var(--g100);color:var(--g600)}
-
 .btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
 .btn-primary{background:var(--vd);color:#fff}
 .btn-primary:hover{background:var(--v2)}
 .btn-sm{padding:4px 10px;font-size:12px;border-radius:6px}
+.btn-edit{background:var(--bll);color:var(--bl);border:1px solid #bfdbfe}
+.btn-edit:hover{background:#dbeafe}
 .btn-approve{background:var(--grl);color:var(--gr);border:1px solid #bbf7d0}
 .btn-approve:hover{background:#dcfce7}
 .btn-reject{background:var(--rl);color:var(--r);border:1px solid #fecaca}
 .btn-reject:hover{background:#fee2e2}
 .btn-outline{background:#fff;border:1.5px solid var(--g200);color:var(--g600)}
 .btn-outline:hover{border-color:var(--g400)}
-
-/* UPLOAD PHOTO */
-.upload-zone{border:2px dashed var(--g200);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--g50)}
+/* UPLOAD */
+.upload-zone{border:2px dashed var(--g200);border-radius:10px;padding:16px;text-align:center;cursor:pointer;transition:all .2s;position:relative;background:var(--g50)}
 .upload-zone:hover{border-color:var(--v);background:var(--vl)}
 .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.upload-zone .upload-icon{font-size:28px;margin-bottom:6px}
-.upload-zone p{font-size:13px;color:var(--g400)}
-.upload-zone strong{color:var(--vd);font-size:13px}
-.upload-preview{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-top:10px;display:none}
-.upload-progress{height:4px;background:var(--g200);border-radius:2px;margin-top:8px;display:none}
+.upload-zone .uico{font-size:24px;margin-bottom:4px}
+.upload-zone p{font-size:12px;color:var(--g400)}
+.upload-zone strong{color:var(--vd)}
+.upload-preview{width:100%;height:100px;object-fit:cover;border-radius:8px;margin-top:8px;display:none;border:1px solid var(--g200)}
+.upload-progress{height:4px;background:var(--g200);border-radius:2px;margin-top:6px;display:none}
 .upload-progress-bar{height:100%;background:var(--vd);border-radius:2px;width:0%;transition:width .3s}
-
+/* FORM */
 .form-group-modal{margin-bottom:12px}
 .form-group-modal label{font-size:13px;font-weight:500;color:var(--g600);display:block;margin-bottom:5px}
 .form-group-modal input,.form-group-modal select,.form-group-modal textarea{width:100%;padding:9px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;outline:none;transition:border .2s;background:#fff}
 .form-group-modal input:focus,.form-group-modal select:focus,.form-group-modal textarea:focus{border-color:var(--v)}
 .form-group-modal textarea{resize:vertical;min-height:70px}
-
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .form-full{grid-column:1/-1}
-
+/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
 .modal-overlay.open{display:flex}
 .modal{background:#fff;border-radius:16px;width:100%;max-width:580px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
@@ -116,29 +108,31 @@ tr:hover td{background:var(--g50)}
 .modal-close{background:none;border:none;cursor:pointer;color:var(--g400);font-size:20px;line-height:1;padding:4px}
 .modal-body{padding:24px}
 .modal-footer{padding:16px 24px;border-top:1px solid var(--g100);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:#fff}
-
+/* CURRENT IMAGE */
+.current-img-wrap{margin-bottom:10px;display:none}
+.current-img-wrap p{font-size:12px;color:var(--g400);margin-bottom:4px}
+.current-img-wrap img{width:80px;height:80px;object-fit:cover;border-radius:8px;border:1px solid var(--g200)}
+/* TOAST */
 .toast{position:fixed;bottom:24px;right:24px;background:var(--g900);color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;z-index:999;transform:translateY(80px);opacity:0;transition:all .3s;max-width:320px}
 .toast.show{transform:translateY(0);opacity:1}
 .toast.success{background:var(--gr)}
 .toast.error{background:var(--r)}
-
 .section{display:none}
 .section.active{display:block}
-
 .tabs{display:flex;gap:4px;background:var(--g100);padding:4px;border-radius:10px;margin-bottom:20px;width:fit-content}
 .tab{padding:7px 16px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;color:var(--g600);border:none;background:none;font-family:inherit;transition:all .15s}
 .tab.active{background:#fff;color:var(--g900);box-shadow:var(--shadow)}
-
 .empty{text-align:center;padding:48px 20px;color:var(--g400)}
 .empty span{font-size:40px;display:block;margin-bottom:12px}
-.search-bar{display:flex;gap:10px;margin-bottom:16px}
-.search-bar input{flex:1;padding:8px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;outline:none}
+.search-bar input{width:100%;padding:8px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;outline:none;margin-bottom:16px}
 .search-bar input:focus{border-color:var(--v)}
-.thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;background:var(--g100)}
+.thumb{width:38px;height:38px;border-radius:6px;object-fit:cover;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:18px}
+.actions-cell{display:flex;gap:6px;flex-wrap:wrap}
 </style>
 </head>
 <body>
 
+<!-- LOGIN -->
 <div class="login-wrap" id="loginWrap">
   <div class="login-card">
     <div class="login-logo"><span>🌿</span><h1>Yéyé Market</h1><p>Espace Administrateur</p></div>
@@ -149,60 +143,49 @@ tr:hover td{background:var(--g50)}
   </div>
 </div>
 
+<!-- APP -->
 <div class="app" id="app">
   <aside class="sidebar">
     <div class="sb-logo"><span>🌿</span><h2>Yéyé Market</h2><p>Administration</p></div>
     <nav class="sb-nav">
       <div class="sb-section">Vue d'ensemble</div>
       <button class="sb-item active" onclick="showSection('dashboard',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-        Tableau de bord
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord
       </button>
       <div class="sb-section">Gestion</div>
       <button class="sb-item" onclick="showSection('produits',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
-        Produits
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>Produits
       </button>
       <button class="sb-item" onclick="showSection('categories',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>
-        Catégories
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>Catégories
       </button>
       <button class="sb-item" onclick="showSection('commandes',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-        Commandes
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Commandes
       </button>
       <div class="sb-section">Validations</div>
       <button class="sb-item" onclick="showSection('vendeurs',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
-        Vendeurs <span class="sb-badge" id="badge-vendeurs" style="display:none">0</span>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Vendeurs <span class="sb-badge" id="badge-vendeurs" style="display:none">0</span>
       </button>
       <button class="sb-item" onclick="showSection('restaurants',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20M21 15V2a5 5 0 00-5 5v6h5zm0 0v7"/></svg>
-        Restaurants <span class="sb-badge" id="badge-restaurants" style="display:none">0</span>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20M21 15V2a5 5 0 00-5 5v6h5zm0 0v7"/></svg>Restaurants <span class="sb-badge" id="badge-restaurants" style="display:none">0</span>
       </button>
       <button class="sb-item" onclick="showSection('livreurs',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
-        Livreurs <span class="sb-badge" id="badge-livreurs" style="display:none">0</span>
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>Livreurs <span class="sb-badge" id="badge-livreurs" style="display:none">0</span>
       </button>
       <div class="sb-section">Comptes</div>
       <button class="sb-item" onclick="showSection('creer-comptes',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-        Créer des comptes
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Créer des comptes
       </button>
     </nav>
     <div class="sb-logout">
       <button class="sb-item" onclick="doLogout()" style="color:rgba(255,100,100,.8)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-        Déconnexion
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Déconnexion
       </button>
     </div>
   </aside>
 
   <main class="main">
-    <div class="topbar">
-      <h1 id="pageTitle">Tableau de bord</h1>
-      <span class="badge-admin">🛡️ Administrateur</span>
-    </div>
+    <div class="topbar"><h1 id="pageTitle">Tableau de bord</h1><span class="badge-admin">🛡️ Administrateur</span></div>
 
     <!-- DASHBOARD -->
     <div class="section active" id="sec-dashboard">
@@ -212,22 +195,16 @@ tr:hover td{background:var(--g50)}
         <div class="stat-card"><span class="stat-icon">🏪</span><div class="stat-label">Vendeurs actifs</div><div class="stat-value" id="stat-vendeurs">—</div></div>
         <div class="stat-card"><span class="stat-icon">🚴</span><div class="stat-label">Livreurs actifs</div><div class="stat-value" id="stat-livreurs">—</div></div>
       </div>
-      <div class="card">
-        <div class="card-header"><h2>⏳ Inscriptions en attente</h2></div>
-        <div class="card-body" id="pending-list"><div class="empty"><span>✅</span><p>Aucune inscription en attente</p></div></div>
-      </div>
-      <div class="card">
-        <div class="card-header"><h2>📋 Dernières commandes</h2></div>
-        <div class="card-body"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead><tbody id="dash-commandes-body"></tbody></table></div></div>
-      </div>
+      <div class="card"><div class="card-header"><h2>⏳ Inscriptions en attente</h2></div><div class="card-body" id="pending-list"><div class="empty"><span>✅</span><p>Aucune inscription en attente</p></div></div></div>
+      <div class="card"><div class="card-header"><h2>📋 Dernières commandes</h2></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Montant</th><th>Statut</th><th>Date</th></tr></thead><tbody id="dash-commandes-body"></tbody></table></div></div></div>
     </div>
 
     <!-- PRODUITS -->
     <div class="section" id="sec-produits">
       <div class="card">
-        <div class="card-header"><h2>📦 Produits</h2><button class="btn btn-primary" onclick="openModal('modal-produit')">+ Ajouter un produit</button></div>
+        <div class="card-header"><h2>📦 Produits</h2><button class="btn btn-primary" onclick="openAddProduit()">+ Ajouter un produit</button></div>
         <div class="card-body">
-          <div class="search-bar"><input type="text" placeholder="Rechercher..." oninput="filterTable(this,'produits-body')"/></div>
+          <div class="search-bar"><input type="text" placeholder="Rechercher un produit..." oninput="filterTable(this,'produits-body')"/></div>
           <div class="table-wrap"><table><thead><tr><th>Photo</th><th>Nom</th><th>Catégorie</th><th>Prix</th><th>Stock</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="produits-body"></tbody></table></div>
         </div>
       </div>
@@ -236,7 +213,7 @@ tr:hover td{background:var(--g50)}
     <!-- CATEGORIES -->
     <div class="section" id="sec-categories">
       <div class="card">
-        <div class="card-header"><h2>🏷️ Catégories</h2><button class="btn btn-primary" onclick="openModal('modal-categorie')">+ Ajouter</button></div>
+        <div class="card-header"><h2>🏷️ Catégories</h2><button class="btn btn-primary" onclick="openAddCategorie()">+ Ajouter</button></div>
         <div class="card-body"><div class="table-wrap"><table><thead><tr><th>Photo</th><th>Nom</th><th>Icône</th><th>Actions</th></tr></thead><tbody id="categories-body"></tbody></table></div></div>
       </div>
     </div>
@@ -250,40 +227,25 @@ tr:hover td{background:var(--g50)}
         <button class="tab" onclick="filterCommandes('livree',this)">Livrées</button>
         <button class="tab" onclick="filterCommandes('annulee',this)">Annulées</button>
       </div>
-      <div class="card">
-        <div class="card-header"><h2>🛒 Commandes</h2></div>
-        <div class="card-body"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Montant</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead><tbody id="commandes-body"></tbody></table></div></div>
-      </div>
+      <div class="card"><div class="card-header"><h2>🛒 Commandes</h2></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Montant</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead><tbody id="commandes-body"></tbody></table></div></div></div>
     </div>
 
     <!-- VENDEURS -->
     <div class="section" id="sec-vendeurs">
-      <div class="tabs">
-        <button class="tab active" onclick="filterService('vendeurs','en_attente',this)">En attente</button>
-        <button class="tab" onclick="filterService('vendeurs','actif',this)">Actifs</button>
-        <button class="tab" onclick="filterService('vendeurs','suspendu',this)">Suspendus</button>
-      </div>
+      <div class="tabs"><button class="tab active" onclick="filterService('vendeurs','en_attente',this)">En attente</button><button class="tab" onclick="filterService('vendeurs','actif',this)">Actifs</button><button class="tab" onclick="filterService('vendeurs','suspendu',this)">Suspendus</button></div>
       <div class="card"><div class="card-header"><h2>🏪 Vendeurs</h2></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Nom boutique</th><th>Téléphone</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead><tbody id="vendeurs-body"></tbody></table></div></div></div>
     </div>
 
     <!-- RESTAURANTS -->
     <div class="section" id="sec-restaurants">
-      <div class="tabs">
-        <button class="tab active" onclick="filterService('restaurants','en_attente',this)">En attente</button>
-        <button class="tab" onclick="filterService('restaurants','actif',this)">Actifs</button>
-        <button class="tab" onclick="filterService('restaurants','suspendu',this)">Suspendus</button>
-      </div>
+      <div class="tabs"><button class="tab active" onclick="filterService('restaurants','en_attente',this)">En attente</button><button class="tab" onclick="filterService('restaurants','actif',this)">Actifs</button><button class="tab" onclick="filterService('restaurants','suspendu',this)">Suspendus</button></div>
       <div class="card"><div class="card-header"><h2>🍽️ Restaurants</h2></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Nom</th><th>Téléphone</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead><tbody id="restaurants-body"></tbody></table></div></div></div>
     </div>
 
     <!-- LIVREURS -->
     <div class="section" id="sec-livreurs">
-      <div class="tabs">
-        <button class="tab active" onclick="filterService('livreurs','en_attente',this)">En attente</button>
-        <button class="tab" onclick="filterService('livreurs','actif',this)">Actifs</button>
-        <button class="tab" onclick="filterService('livreurs','suspendu',this)">Suspendus</button>
-      </div>
-      <div class="card"><div class="card-header"><h2>🚴 Livreurs</h2><button class="btn btn-primary" onclick="openModal('modal-livreur-create')">+ Créer un livreur</button></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Nom</th><th>Téléphone</th><th>Zone</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead><tbody id="livreurs-body"></tbody></table></div></div></div>
+      <div class="tabs"><button class="tab active" onclick="filterService('livreurs','en_attente',this)">En attente</button><button class="tab" onclick="filterService('livreurs','actif',this)">Actifs</button><button class="tab" onclick="filterService('livreurs','suspendu',this)">Suspendus</button></div>
+      <div class="card"><div class="card-header"><h2>🚴 Livreurs</h2></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Nom</th><th>Téléphone</th><th>Zone</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead><tbody id="livreurs-body"></tbody></table></div></div></div>
     </div>
 
     <!-- CRÉER COMPTES -->
@@ -316,65 +278,75 @@ tr:hover td{background:var(--g50)}
   </main>
 </div>
 
-<!-- MODAL PRODUIT -->
+<!-- MODAL PRODUIT (Ajouter / Modifier) -->
 <div class="modal-overlay" id="modal-produit">
   <div class="modal">
-    <div class="modal-header"><h3>Ajouter un produit</h3><button class="modal-close" onclick="closeModal('modal-produit')">✕</button></div>
+    <div class="modal-header"><h3 id="modal-produit-title">Ajouter un produit</h3><button class="modal-close" onclick="closeModal('modal-produit')">✕</button></div>
     <div class="modal-body">
+      <input type="hidden" id="p-id"/>
       <div class="form-grid">
         <div class="form-group-modal"><label>Nom *</label><input type="text" id="p-nom" placeholder="ex: Gingembre bio"/></div>
-        <div class="form-group-modal"><label>Catégorie *</label><select id="p-categorie"><option value="">Choisir...</option></select></div>
-        <div class="form-group-modal"><label>Prix (FCFA) *</label><input type="number" id="p-prix" placeholder="500"/></div>
+        <div class="form-group-modal"><label>Catégorie</label><select id="p-categorie"><option value="">Choisir...</option></select></div>
+        <div class="form-group-modal"><label>Prix (FCFA) *</label><input type="number" id="p-prix"/></div>
         <div class="form-group-modal"><label>Prix promo (FCFA)</label><input type="number" id="p-prix-promo" placeholder="Optionnel"/></div>
         <div class="form-group-modal"><label>Unité</label>
           <select id="p-unite"><option value="kg">kg</option><option value="g">g</option><option value="litre">litre</option><option value="pièce">pièce</option><option value="sachet">sachet</option><option value="boîte">boîte</option></select>
         </div>
-        <div class="form-group-modal"><label>Stock *</label><input type="number" id="p-stock" placeholder="100"/></div>
+        <div class="form-group-modal"><label>Stock *</label><input type="number" id="p-stock"/></div>
         <div class="form-group-modal form-full"><label>Description</label><textarea id="p-desc" placeholder="Description..."></textarea></div>
         <div class="form-group-modal form-full">
           <label>Photo du produit</label>
-          <div class="upload-zone" id="upload-zone-produit">
-            <input type="file" accept="image/*" onchange="previewAndUpload(this,'produit','p-image-url','preview-produit','prog-produit')"/>
-            <div class="upload-icon">📸</div>
-            <p>Glisse une photo ici ou <strong>clique pour choisir</strong></p>
-            <p style="font-size:11px;color:var(--g400);margin-top:4px">JPG, PNG, WEBP — max 5MB</p>
+          <div class="current-img-wrap" id="p-current-img-wrap">
+            <p>Photo actuelle :</p>
+            <img id="p-current-img" src="" alt="Photo actuelle"/>
           </div>
-          <div class="upload-progress" id="prog-produit"><div class="upload-progress-bar" id="prog-produit-bar"></div></div>
-          <img class="upload-preview" id="preview-produit" alt="Aperçu"/>
+          <div class="upload-zone">
+            <input type="file" accept="image/*" onchange="previewAndUpload(this,'produits','p-image-url','p-preview','p-prog')"/>
+            <div class="uico">📸</div>
+            <p>Glisse ou <strong>clique pour changer la photo</strong></p>
+            <p style="font-size:11px;margin-top:2px">JPG, PNG, WEBP — max 5MB</p>
+          </div>
+          <div class="upload-progress" id="p-prog"><div class="upload-progress-bar" id="p-prog-bar"></div></div>
+          <img class="upload-preview" id="p-preview" alt="Aperçu"/>
           <input type="hidden" id="p-image-url"/>
         </div>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-produit')">Annuler</button>
-      <button class="btn btn-primary" onclick="ajouterProduit()">Ajouter le produit</button>
+      <button class="btn btn-primary" id="btn-save-produit" onclick="sauvegarderProduit()">Ajouter le produit</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL CATEGORIE -->
+<!-- MODAL CATEGORIE (Ajouter / Modifier) -->
 <div class="modal-overlay" id="modal-categorie">
   <div class="modal">
-    <div class="modal-header"><h3>Ajouter une catégorie</h3><button class="modal-close" onclick="closeModal('modal-categorie')">✕</button></div>
+    <div class="modal-header"><h3 id="modal-cat-title">Ajouter une catégorie</h3><button class="modal-close" onclick="closeModal('modal-categorie')">✕</button></div>
     <div class="modal-body">
+      <input type="hidden" id="cat-id"/>
       <div class="form-group-modal"><label>Nom *</label><input type="text" id="cat-nom" placeholder="ex: Légumes"/></div>
       <div class="form-group-modal"><label>Icône (emoji)</label><input type="text" id="cat-icone" placeholder="🥦"/></div>
       <div class="form-group-modal">
         <label>Photo de la catégorie</label>
-        <div class="upload-zone">
-          <input type="file" accept="image/*" onchange="previewAndUpload(this,'categories','cat-image-url','preview-cat','prog-cat')"/>
-          <div class="upload-icon">🖼️</div>
-          <p>Glisse une photo ici ou <strong>clique pour choisir</strong></p>
-          <p style="font-size:11px;color:var(--g400);margin-top:4px">JPG, PNG, WEBP — max 5MB</p>
+        <div class="current-img-wrap" id="cat-current-img-wrap">
+          <p>Photo actuelle :</p>
+          <img id="cat-current-img" src="" alt="Photo actuelle"/>
         </div>
-        <div class="upload-progress" id="prog-cat"><div class="upload-progress-bar" id="prog-cat-bar"></div></div>
-        <img class="upload-preview" id="preview-cat" alt="Aperçu"/>
+        <div class="upload-zone">
+          <input type="file" accept="image/*" onchange="previewAndUpload(this,'categories','cat-image-url','cat-preview','cat-prog')"/>
+          <div class="uico">🖼️</div>
+          <p>Glisse ou <strong>clique pour choisir / changer la photo</strong></p>
+          <p style="font-size:11px;margin-top:2px">JPG, PNG, WEBP — max 5MB</p>
+        </div>
+        <div class="upload-progress" id="cat-prog"><div class="upload-progress-bar" id="cat-prog-bar"></div></div>
+        <img class="upload-preview" id="cat-preview" alt="Aperçu"/>
         <input type="hidden" id="cat-image-url"/>
       </div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal('modal-categorie')">Annuler</button>
-      <button class="btn btn-primary" onclick="ajouterCategorie()">Ajouter</button>
+      <button class="btn btn-primary" id="btn-save-cat" onclick="sauvegarderCategorie()">Ajouter</button>
     </div>
   </div>
 </div>
@@ -382,37 +354,26 @@ tr:hover td{background:var(--g50)}
 <div class="toast" id="toast"></div>
 
 <script>
-const SUPA_URL = 'https://omkmmlbdkzhorrrbeabm.supabase.co';
-const SUPA_KEY = 'sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
-const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
+const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
 // AUTH
 async function doLogin(){
-  const email = document.getElementById('loginEmail').value.trim();
-  const pwd = document.getElementById('loginPassword').value;
-  const err = document.getElementById('loginError');
+  const email=document.getElementById('loginEmail').value.trim();
+  const pwd=document.getElementById('loginPassword').value;
+  const err=document.getElementById('loginError');
   err.style.display='none';
-  const {error} = await sb.auth.signInWithPassword({email,password:pwd});
+  const {error}=await sb.auth.signInWithPassword({email,password:pwd});
   if(error){err.textContent='❌ '+error.message;err.style.display='block';return;}
   showApp();
 }
-async function doLogout(){
-  await sb.auth.signOut();
-  document.getElementById('app').style.display='none';
-  document.getElementById('loginWrap').style.display='flex';
-}
-async function checkSession(){
-  const {data:{session}} = await sb.auth.getSession();
-  if(session) showApp();
-}
-function showApp(){
-  document.getElementById('loginWrap').style.display='none';
-  document.getElementById('app').style.display='flex';
-  loadDashboard();
-}
+async function doLogout(){await sb.auth.signOut();document.getElementById('app').style.display='none';document.getElementById('loginWrap').style.display='flex';}
+async function checkSession(){const {data:{session}}=await sb.auth.getSession();if(session)showApp();}
+function showApp(){document.getElementById('loginWrap').style.display='none';document.getElementById('app').style.display='flex';loadDashboard();}
 
 // NAVIGATION
-function showSection(name, btn){
+function showSection(name,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
@@ -420,48 +381,32 @@ function showSection(name, btn){
   const titles={dashboard:'Tableau de bord',produits:'Produits',categories:'Catégories',commandes:'Commandes',vendeurs:'Vendeurs',restaurants:'Restaurants',livreurs:'Livreurs','creer-comptes':'Créer des comptes'};
   document.getElementById('pageTitle').textContent=titles[name]||name;
   const loaders={produits:loadProduits,categories:loadCategories,commandes:()=>loadCommandes('all'),vendeurs:()=>loadService('vendeurs','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente')};
-  if(loaders[name]) loaders[name]();
+  if(loaders[name])loaders[name]();
 }
 
-// UPLOAD PHOTO
-async function previewAndUpload(input, bucket, urlInputId, previewId, progId){
-  const file = input.files[0];
-  if(!file) return;
-  if(file.size > 5*1024*1024){showToast('Image trop grande (max 5MB)','error');return;}
-
-  // Preview local
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = document.getElementById(previewId);
-    img.src = e.target.result;
-    img.style.display = 'block';
-  };
+// UPLOAD
+async function previewAndUpload(input,bucket,urlId,previewId,progId){
+  const file=input.files[0];if(!file)return;
+  if(file.size>5*1024*1024){showToast('Image trop grande (max 5MB)','error');return;}
+  const reader=new FileReader();
+  reader.onload=e=>{const img=document.getElementById(previewId);img.src=e.target.result;img.style.display='block';};
   reader.readAsDataURL(file);
-
-  // Progress bar
-  const prog = document.getElementById(progId);
-  const bar = document.getElementById(progId+'-bar');
-  prog.style.display='block';
-  bar.style.width='30%';
-
-  // Upload Supabase Storage
-  const ext = file.name.split('.').pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
-  const {data, error} = await sb.storage.from(bucket).upload(fileName, file, {cacheControl:'3600',upsert:false});
-  
-  bar.style.width='100%';
-  setTimeout(()=>prog.style.display='none',500);
-
+  const prog=document.getElementById(progId);
+  const bar=document.getElementById(progId+'-bar');
+  prog.style.display='block';bar.style.width='30%';
+  const ext=file.name.split('.').pop();
+  const fileName=`${Date.now()}-${Math.random().toString(36).substring(2)}.${ext}`;
+  const {error}=await sb.storage.from(bucket).upload(fileName,file,{cacheControl:'3600',upsert:false});
+  bar.style.width='100%';setTimeout(()=>prog.style.display='none',500);
   if(error){showToast('Erreur upload: '+error.message,'error');return;}
-  
-  const {data:{publicUrl}} = sb.storage.from(bucket).getPublicUrl(fileName);
-  document.getElementById(urlInputId).value = publicUrl;
+  const {data:{publicUrl}}=sb.storage.from(bucket).getPublicUrl(fileName);
+  document.getElementById(urlId).value=publicUrl;
   showToast('Photo uploadée ✅','success');
 }
 
 // DASHBOARD
 async function loadDashboard(){
-  const [p,c,v,l] = await Promise.all([
+  const [p,c,v,l]=await Promise.all([
     sb.from('produits').select('id',{count:'exact',head:true}),
     sb.from('commandes').select('id',{count:'exact',head:true}),
     sb.from('boutiques').select('id',{count:'exact',head:true}).eq('statut','actif'),
@@ -471,80 +416,96 @@ async function loadDashboard(){
   document.getElementById('stat-commandes').textContent=c.count||0;
   document.getElementById('stat-vendeurs').textContent=v.count||0;
   document.getElementById('stat-livreurs').textContent=l.count||0;
-
-  const [vp,rp,lp] = await Promise.all([
-    sb.from('boutiques').select('*').eq('statut','en_attente'),
-    sb.from('restaurants').select('*').eq('statut','en_attente'),
-    sb.from('livreurs').select('*').eq('statut','en_attente')
-  ]);
+  const [vp,rp,lp]=await Promise.all([sb.from('boutiques').select('*').eq('statut','en_attente'),sb.from('restaurants').select('*').eq('statut','en_attente'),sb.from('livreurs').select('*').eq('statut','en_attente')]);
   updateBadges(vp.data?.length||0,rp.data?.length||0,lp.data?.length||0);
   const pending=[...(vp.data||[]).map(x=>({...x,_type:'vendeur'})),...(rp.data||[]).map(x=>({...x,_type:'restaurant'})),...(lp.data||[]).map(x=>({...x,_type:'livreur'}))];
   const pl=document.getElementById('pending-list');
   if(!pending.length){pl.innerHTML='<div class="empty"><span>✅</span><p>Aucune inscription en attente</p></div>';return;}
-  pl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Type</th><th>Nom</th><th>Contact</th><th>Date</th><th>Actions</th></tr></thead><tbody>
-  ${pending.map(p=>`<tr>
-    <td><span class="badge ${p._type==='vendeur'?'badge-blue':p._type==='restaurant'?'badge-orange':'badge-green'}">${p._type==='vendeur'?'🏪 Vendeur':p._type==='restaurant'?'🍽️ Restaurant':'🚴 Livreur'}</span></td>
-    <td><strong>${p.nom||p.nom_boutique||'—'}</strong></td>
-    <td>${p.telephone||'—'}</td>
-    <td>${new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
-    <td style="display:flex;gap:6px">
-      <button class="btn btn-sm btn-approve" onclick="validerInscription('${p._type}','${p.id}','actif')">✅ Valider</button>
-      <button class="btn btn-sm btn-reject" onclick="validerInscription('${p._type}','${p.id}','suspendu')">❌ Refuser</button>
-    </td>
-  </tr>`).join('')}
-  </tbody></table></div>`;
-
-  const {data:cmd} = await sb.from('commandes').select('*').order('created_at',{ascending:false}).limit(8);
+  pl.innerHTML=`<div class="table-wrap"><table><thead><tr><th>Type</th><th>Nom</th><th>Contact</th><th>Date</th><th>Actions</th></tr></thead><tbody>${pending.map(p=>`<tr><td><span class="badge ${p._type==='vendeur'?'badge-blue':p._type==='restaurant'?'badge-orange':'badge-green'}">${p._type==='vendeur'?'🏪 Vendeur':p._type==='restaurant'?'🍽️ Restaurant':'🚴 Livreur'}</span></td><td><strong>${p.nom||p.nom_boutique||'—'}</strong></td><td>${p.telephone||'—'}</td><td>${new Date(p.created_at).toLocaleDateString('fr-FR')}</td><td style="display:flex;gap:6px"><button class="btn btn-sm btn-approve" onclick="validerInscription('${p._type}','${p.id}','actif')">✅ Valider</button><button class="btn btn-sm btn-reject" onclick="validerInscription('${p._type}','${p.id}','suspendu')">❌ Refuser</button></td></tr>`).join('')}</tbody></table></div>`;
+  const {data:cmd}=await sb.from('commandes').select('*').order('created_at',{ascending:false}).limit(8);
   const cb=document.getElementById('dash-commandes-body');
   if(!cmd?.length){cb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';return;}
   cb.innerHTML=cmd.map(c=>`<tr><td><code>#${c.id?.substring(0,8)}</code></td><td>${c.client_nom||'—'}</td><td><strong>${(c.total||0).toLocaleString('fr-FR')} FCFA</strong></td><td>${statusBadge(c.statut)}</td><td>${new Date(c.created_at).toLocaleDateString('fr-FR')}</td></tr>`).join('');
 }
-
-function updateBadges(v,r,l){
-  ['vendeurs','restaurants','livreurs'].forEach((t,i)=>{
-    const n=[v,r,l][i];
-    const b=document.getElementById('badge-'+t);
-    if(n>0){b.textContent=n;b.style.display='inline';}else b.style.display='none';
-  });
-}
+function updateBadges(v,r,l){['vendeurs','restaurants','livreurs'].forEach((t,i)=>{const n=[v,r,l][i];const b=document.getElementById('badge-'+t);if(n>0){b.textContent=n;b.style.display='inline';}else b.style.display='none';});}
 
 // PRODUITS
 async function loadProduits(){
-  const {data} = await sb.from('produits').select('*,categories(nom)').order('created_at',{ascending:false});
+  const {data}=await sb.from('produits').select('*,categories(nom)').order('created_at',{ascending:false});
   const tbody=document.getElementById('produits-body');
   if(!data?.length){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--g400);padding:32px">Aucun produit</td></tr>';return;}
   tbody.innerHTML=data.map(p=>`<tr>
-    <td>${p.image_url?`<img class="thumb" src="${p.image_url}" alt="${p.nom}"/>`:`<div class="thumb" style="display:flex;align-items:center;justify-content:center;font-size:18px">📦</div>`}</td>
+    <td>${p.image_url?`<img style="width:38px;height:38px;border-radius:6px;object-fit:cover" src="${p.image_url}"/>`:`<div style="width:38px;height:38px;border-radius:6px;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:18px">📦</div>`}</td>
     <td><strong>${p.nom||'—'}</strong></td>
     <td>${p.categories?.nom||'—'}</td>
     <td>${(p.prix||0).toLocaleString('fr-FR')} FCFA/${p.unite||'kg'}</td>
     <td>${p.stock||0}</td>
     <td>${p.actif?'<span class="badge badge-green">Actif</span>':'<span class="badge badge-gray">Inactif</span>'}</td>
-    <td><button class="btn btn-sm btn-reject" onclick="supprimerProduit('${p.id}')">Supprimer</button></td>
+    <td><div class="actions-cell">
+      <button class="btn btn-sm btn-edit" onclick='editProduit(${JSON.stringify(p)})'>✏️ Modifier</button>
+      <button class="btn btn-sm btn-reject" onclick="supprimerProduit('${p.id}')">Supprimer</button>
+    </div></td>
   </tr>`).join('');
   loadCategoriesSelect();
 }
 
-async function ajouterProduit(){
+function openAddProduit(){
+  document.getElementById('p-id').value='';
+  document.getElementById('p-nom').value='';
+  document.getElementById('p-prix').value='';
+  document.getElementById('p-prix-promo').value='';
+  document.getElementById('p-stock').value='';
+  document.getElementById('p-desc').value='';
+  document.getElementById('p-image-url').value='';
+  document.getElementById('p-preview').style.display='none';
+  document.getElementById('p-current-img-wrap').style.display='none';
+  document.getElementById('modal-produit-title').textContent='Ajouter un produit';
+  document.getElementById('btn-save-produit').textContent='Ajouter le produit';
+  loadCategoriesSelect();
+  openModal('modal-produit');
+}
+
+function editProduit(p){
+  document.getElementById('p-id').value=p.id;
+  document.getElementById('p-nom').value=p.nom||'';
+  document.getElementById('p-prix').value=p.prix||'';
+  document.getElementById('p-prix-promo').value=p.prix_promo||'';
+  document.getElementById('p-stock').value=p.stock||'';
+  document.getElementById('p-desc').value=p.description||'';
+  document.getElementById('p-image-url').value=p.image_url||'';
+  document.getElementById('p-preview').style.display='none';
+  const wrap=document.getElementById('p-current-img-wrap');
+  if(p.image_url){wrap.style.display='block';document.getElementById('p-current-img').src=p.image_url;}
+  else wrap.style.display='none';
+  document.getElementById('modal-produit-title').textContent='Modifier le produit';
+  document.getElementById('btn-save-produit').textContent='Enregistrer les modifications';
+  loadCategoriesSelect(p.categorie_id);
+  openModal('modal-produit');
+}
+
+async function sauvegarderProduit(){
+  const id=document.getElementById('p-id').value;
   const nom=document.getElementById('p-nom').value.trim();
   const prix=parseFloat(document.getElementById('p-prix').value);
   const stock=parseInt(document.getElementById('p-stock').value);
-  const categorie_id=document.getElementById('p-categorie').value;
+  const categorie_id=document.getElementById('p-categorie').value||null;
   const description=document.getElementById('p-desc').value;
   const unite=document.getElementById('p-unite').value;
   const prix_promo=parseFloat(document.getElementById('p-prix-promo').value)||null;
   const image_url=document.getElementById('p-image-url').value||null;
   if(!nom||!prix||!stock){showToast('Remplissez les champs obligatoires (*)','error');return;}
-  const {error}=await sb.from('produits').insert({nom,prix,stock,categorie_id:categorie_id||null,description,unite,prix_promo,image_url,actif:true});
+  const payload={nom,prix,stock,categorie_id,description,unite,prix_promo,image_url,actif:true};
+  let error;
+  if(id){({error}=await sb.from('produits').update(payload).eq('id',id));}
+  else{({error}=await sb.from('produits').insert(payload));}
   if(error){showToast('Erreur: '+error.message,'error');return;}
-  showToast('Produit ajouté ✅','success');
+  showToast(id?'✅ Produit modifié !':'✅ Produit ajouté !','success');
   closeModal('modal-produit');
-  resetUpload('produit');
   loadProduits();
 }
 
 async function supprimerProduit(id){
-  if(!confirm('Supprimer ce produit ?')) return;
+  if(!confirm('Supprimer ce produit ?'))return;
   await sb.from('produits').delete().eq('id',id);
   showToast('Produit supprimé','success');
   loadProduits();
@@ -556,75 +517,83 @@ async function loadCategories(){
   const tbody=document.getElementById('categories-body');
   if(!data?.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:32px">Aucune catégorie</td></tr>';return;}
   tbody.innerHTML=data.map(c=>`<tr>
-    <td>${c.image_url?`<img class="thumb" src="${c.image_url}" alt="${c.nom}"/>`:`<div class="thumb" style="display:flex;align-items:center;justify-content:center;font-size:20px">${c.icone||'🏷️'}</div>`}</td>
+    <td>${c.image_url?`<img style="width:38px;height:38px;border-radius:6px;object-fit:cover" src="${c.image_url}"/>`:`<div style="width:38px;height:38px;border-radius:6px;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:20px">${c.icone||'🏷️'}</div>`}</td>
     <td><strong>${c.nom||'—'}</strong></td>
     <td style="font-size:22px">${c.icone||'—'}</td>
-    <td><button class="btn btn-sm btn-reject" onclick="supprimerCategorie('${c.id}')">Supprimer</button></td>
+    <td><div class="actions-cell">
+      <button class="btn btn-sm btn-edit" onclick='editCategorie(${JSON.stringify(c)})'>✏️ Modifier</button>
+      <button class="btn btn-sm btn-reject" onclick="supprimerCategorie('${c.id}')">Supprimer</button>
+    </div></td>
   </tr>`).join('');
 }
 
-async function loadCategoriesSelect(){
-  const {data}=await sb.from('categories').select('*').order('nom');
-  const sel=document.getElementById('p-categorie');
-  sel.innerHTML='<option value="">Choisir...</option>';
-  (data||[]).forEach(c=>sel.innerHTML+=`<option value="${c.id}">${c.icone||''} ${c.nom}</option>`);
+function openAddCategorie(){
+  document.getElementById('cat-id').value='';
+  document.getElementById('cat-nom').value='';
+  document.getElementById('cat-icone').value='';
+  document.getElementById('cat-image-url').value='';
+  document.getElementById('cat-preview').style.display='none';
+  document.getElementById('cat-current-img-wrap').style.display='none';
+  document.getElementById('modal-cat-title').textContent='Ajouter une catégorie';
+  document.getElementById('btn-save-cat').textContent='Ajouter';
+  openModal('modal-categorie');
 }
 
-async function ajouterCategorie(){
+function editCategorie(c){
+  document.getElementById('cat-id').value=c.id;
+  document.getElementById('cat-nom').value=c.nom||'';
+  document.getElementById('cat-icone').value=c.icone||'';
+  document.getElementById('cat-image-url').value=c.image_url||'';
+  document.getElementById('cat-preview').style.display='none';
+  const wrap=document.getElementById('cat-current-img-wrap');
+  if(c.image_url){wrap.style.display='block';document.getElementById('cat-current-img').src=c.image_url;}
+  else wrap.style.display='none';
+  document.getElementById('modal-cat-title').textContent='Modifier : '+c.nom;
+  document.getElementById('btn-save-cat').textContent='Enregistrer les modifications';
+  openModal('modal-categorie');
+}
+
+async function sauvegarderCategorie(){
+  const id=document.getElementById('cat-id').value;
   const nom=document.getElementById('cat-nom').value.trim();
   const icone=document.getElementById('cat-icone').value.trim();
   const image_url=document.getElementById('cat-image-url').value||null;
   if(!nom){showToast('Entrez un nom','error');return;}
-  const {error}=await sb.from('categories').insert({nom,icone:icone||null,image_url});
+  const payload={nom,icone:icone||null,image_url};
+  let error;
+  if(id){({error}=await sb.from('categories').update(payload).eq('id',id));}
+  else{({error}=await sb.from('categories').insert(payload));}
   if(error){showToast('Erreur: '+error.message,'error');return;}
-  showToast('Catégorie ajoutée ✅','success');
+  showToast(id?'✅ Catégorie modifiée !':'✅ Catégorie ajoutée !','success');
   closeModal('modal-categorie');
-  resetUpload('cat');
   loadCategories();
 }
 
 async function supprimerCategorie(id){
-  if(!confirm('Supprimer cette catégorie ?')) return;
+  if(!confirm('Supprimer cette catégorie ?'))return;
   await sb.from('categories').delete().eq('id',id);
   showToast('Catégorie supprimée','success');
   loadCategories();
 }
 
+async function loadCategoriesSelect(selectedId=''){
+  const {data}=await sb.from('categories').select('*').order('nom');
+  const sel=document.getElementById('p-categorie');
+  sel.innerHTML='<option value="">Choisir...</option>';
+  (data||[]).forEach(c=>sel.innerHTML+=`<option value="${c.id}" ${c.id===selectedId?'selected':''}>${c.icone||''} ${c.nom}</option>`);
+}
+
 // COMMANDES
 async function loadCommandes(filtre){
   let q=sb.from('commandes').select('*').order('created_at',{ascending:false});
-  if(filtre!=='all') q=q.eq('statut',filtre);
+  if(filtre!=='all')q=q.eq('statut',filtre);
   const {data}=await q;
   const tbody=document.getElementById('commandes-body');
   if(!data?.length){tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--g400);padding:32px">Aucune commande</td></tr>';return;}
-  tbody.innerHTML=data.map(c=>`<tr>
-    <td><code>#${c.id?.substring(0,8)}</code></td>
-    <td>${c.client_nom||'—'}</td>
-    <td><strong>${(c.total||0).toLocaleString('fr-FR')} FCFA</strong></td>
-    <td>${statusBadge(c.statut)}</td>
-    <td>${new Date(c.created_at).toLocaleDateString('fr-FR')}</td>
-    <td><select onchange="changerStatutCommande('${c.id}',this.value)" style="padding:4px 8px;border:1px solid var(--g200);border-radius:6px;font-size:12px">
-      <option value="">Changer...</option>
-      <option value="en_attente">En attente</option>
-      <option value="en_cours">En cours</option>
-      <option value="livree">Livrée</option>
-      <option value="annulee">Annulée</option>
-    </select></td>
-  </tr>`).join('');
+  tbody.innerHTML=data.map(c=>`<tr><td><code>#${c.id?.substring(0,8)}</code></td><td>${c.client_nom||'—'}</td><td><strong>${(c.total||0).toLocaleString('fr-FR')} FCFA</strong></td><td>${statusBadge(c.statut)}</td><td>${new Date(c.created_at).toLocaleDateString('fr-FR')}</td><td><select onchange="changerStatutCommande('${c.id}',this.value)" style="padding:4px 8px;border:1px solid var(--g200);border-radius:6px;font-size:12px"><option value="">Changer...</option><option value="en_attente">En attente</option><option value="en_cours">En cours</option><option value="livree">Livrée</option><option value="annulee">Annulée</option></select></td></tr>`).join('');
 }
-
-function filterCommandes(f,btn){
-  document.querySelectorAll('#sec-commandes .tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  loadCommandes(f);
-}
-
-async function changerStatutCommande(id,statut){
-  if(!statut) return;
-  await sb.from('commandes').update({statut}).eq('id',id);
-  showToast('Statut mis à jour ✅','success');
-  loadCommandes('all');
-}
+function filterCommandes(f,btn){document.querySelectorAll('#sec-commandes .tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');loadCommandes(f);}
+async function changerStatutCommande(id,statut){if(!statut)return;await sb.from('commandes').update({statut}).eq('id',id);showToast('Statut mis à jour ✅','success');loadCommandes('all');}
 
 // SERVICES
 async function loadService(type,statut){
@@ -639,20 +608,14 @@ async function loadService(type,statut){
     ${type==='livreurs'?`<td>${item.zone||'—'}</td>`:''}
     <td>${statusBadge(item.statut)}</td>
     <td>${new Date(item.created_at).toLocaleDateString('fr-FR')}</td>
-    <td style="display:flex;gap:6px;flex-wrap:wrap">
+    <td><div class="actions-cell">
       ${statut==='en_attente'?`<button class="btn btn-sm btn-approve" onclick="validerInscription('${typeKey}','${item.id}','actif')">✅ Valider</button><button class="btn btn-sm btn-reject" onclick="validerInscription('${typeKey}','${item.id}','suspendu')">❌ Refuser</button>`:''}
       ${statut==='actif'?`<button class="btn btn-sm btn-reject" onclick="validerInscription('${typeKey}','${item.id}','suspendu')">Suspendre</button>`:''}
       ${statut==='suspendu'?`<button class="btn btn-sm btn-approve" onclick="validerInscription('${typeKey}','${item.id}','actif')">Réactiver</button>`:''}
-    </td>
+    </div></td>
   </tr>`).join('');
 }
-
-function filterService(type,statut,btn){
-  document.querySelectorAll(`#sec-${type} .tab`).forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  loadService(type,statut);
-}
-
+function filterService(type,statut,btn){document.querySelectorAll(`#sec-${type} .tab`).forEach(t=>t.classList.remove('active'));btn.classList.add('active');loadService(type,statut);}
 async function validerInscription(type,id,statut){
   const table=type==='vendeur'?'boutiques':type==='restaurant'?'restaurants':'livreurs';
   const {error}=await sb.from(table).update({statut}).eq('id',id);
@@ -663,11 +626,7 @@ async function validerInscription(type,id,statut){
 
 // CRÉER COMPTES
 async function creerCompte(type){
-  const cfg={
-    vendeur:{email:'v-email',mdp:'v-mdp',nom:'v-nom',tel:'v-tel',table:'boutiques',nomField:'nom_boutique'},
-    restaurant:{email:'r-email',mdp:'r-mdp',nom:'r-nom',tel:'r-tel',table:'restaurants',nomField:'nom'},
-    livreur:{email:'l-email',mdp:'l-mdp',nom:'l-nom',tel:'l-tel',table:'livreurs',nomField:'nom',zone:'l-zone'}
-  };
+  const cfg={vendeur:{email:'v-email',mdp:'v-mdp',nom:'v-nom',tel:'v-tel',table:'boutiques',nomField:'nom_boutique'},restaurant:{email:'r-email',mdp:'r-mdp',nom:'r-nom',tel:'r-tel',table:'restaurants',nomField:'nom'},livreur:{email:'l-email',mdp:'l-mdp',nom:'l-nom',tel:'l-tel',table:'livreurs',nomField:'nom',zone:'l-zone'}};
   const c=cfg[type];
   const email=document.getElementById(c.email).value.trim();
   const mdp=document.getElementById(c.mdp).value;
@@ -677,38 +636,18 @@ async function creerCompte(type){
   const {data:authData,error:authErr}=await sb.auth.signUp({email,password:mdp});
   if(authErr){showToast('Erreur: '+authErr.message,'error');return;}
   const insert={[c.nomField]:nom,telephone:tel,email,statut:'actif',user_id:authData.user?.id};
-  if(type==='livreur') insert.zone=document.getElementById('l-zone').value;
+  if(type==='livreur')insert.zone=document.getElementById('l-zone').value;
   await sb.from(c.table).insert(insert);
   showToast(`✅ Compte ${type} créé pour ${email}`,'success');
-  ['email','mdp','nom','tel'].forEach(f=>document.getElementById(c[f]).value='');
+  ['email','mdp','nom','tel'].forEach(f=>{if(c[f])document.getElementById(c[f]).value='';});
 }
 
 // UTILS
-function resetUpload(prefix){
-  document.getElementById('preview-'+prefix).style.display='none';
-  document.getElementById(prefix==='produit'?'p-image-url':'cat-image-url').value='';
-}
-
-function statusBadge(s){
-  const map={en_attente:'<span class="badge badge-orange">⏳ En attente</span>',actif:'<span class="badge badge-green">✅ Actif</span>',suspendu:'<span class="badge badge-red">🚫 Suspendu</span>',en_cours:'<span class="badge badge-blue">🔄 En cours</span>',livree:'<span class="badge badge-green">✅ Livrée</span>',annulee:'<span class="badge badge-red">❌ Annulée</span>'};
-  return map[s]||`<span class="badge badge-gray">${s||'—'}</span>`;
-}
-
+function statusBadge(s){const map={en_attente:'<span class="badge badge-orange">⏳ En attente</span>',actif:'<span class="badge badge-green">✅ Actif</span>',suspendu:'<span class="badge badge-red">🚫 Suspendu</span>',en_cours:'<span class="badge badge-blue">🔄 En cours</span>',livree:'<span class="badge badge-green">✅ Livrée</span>',annulee:'<span class="badge badge-red">❌ Annulée</span>'};return map[s]||`<span class="badge badge-gray">${s||'—'}</span>`;}
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
-
-function showToast(msg,type=''){
-  const t=document.getElementById('toast');
-  t.textContent=msg;t.className='toast'+(type?' '+type:'');
-  t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),3500);
-}
-
-function filterTable(input,tbodyId){
-  const q=input.value.toLowerCase();
-  document.querySelectorAll('#'+tbodyId+' tr').forEach(tr=>{tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none';});
-}
-
+function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className='toast'+(type?' '+type:'');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+function filterTable(input,tbodyId){const q=input.value.toLowerCase();document.querySelectorAll('#'+tbodyId+' tr').forEach(tr=>{tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none';});}
 document.querySelectorAll('.modal-overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
 document.getElementById('loginPassword').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
 checkSession();
