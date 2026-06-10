@@ -2123,11 +2123,17 @@ var CAT_EMOJI = {
 async function chargerProduitsSupabase(zoneId) {
   try {
     // Utiliser fetch direct pour éviter DataCloneError du SDK
-    var url = SUPA_URL + '/rest/v1/produits?select=id,nom,prix,prix_promo,unite,stock,stock_unite,photos,badge,disponible,boutique_id,description,categorie&disponible=eq.true&order=cree_le.desc&limit=100';
+    var url = SUPA_URL + '/rest/v1/produits?select=id,nom,prix,prix_promo,unite,stock,stock_unite,photos,badge,disponible,boutique_id,description&disponible=eq.true&order=cree_le.desc&limit=100';
+    // Utiliser le token de session si disponible (évite CORS)
+    var authToken = SUPA_KEY;
+    try {
+      var sess = await sb.auth.getSession();
+      if (sess.data && sess.data.session) authToken = sess.data.session.access_token;
+    } catch(e2) {}
     var resp = await fetch(url, {
       headers: {
         'apikey': SUPA_KEY,
-        'Authorization': 'Bearer ' + SUPA_KEY,
+        'Authorization': 'Bearer ' + authToken,
         'Content-Type': 'application/json'
       }
     });
@@ -2148,7 +2154,7 @@ async function chargerProduitsSupabase(zoneId) {
         p:parseFloat(p.prix)||0,
         ppromo:p.prix_promo?parseFloat(p.prix_promo):null,
         u:p.unite||'kg',
-        c:p.categorie||'Épicerie',
+        c:'Épicerie',
         b:p.badge||'nat',
         d:p.stock_unite||(p.stock?p.stock+' '+(p.unite||'kg'):'Disponible'),
         bid:p.boutique_id,
@@ -2166,8 +2172,10 @@ async function chargerProduitsSupabase(zoneId) {
 async function chargerLivreursSupabase(zoneId) {
   try {
     var url = SUPA_URL + '/rest/v1/livreurs?select=id,nom,telephone,zones_couverture,note_moyenne,nb_livraisons,en_ligne,statut,photo_url&statut=eq.actif&order=note_moyenne.desc';
+    var authToken3 = SUPA_KEY;
+    try { var s3=await sb.auth.getSession(); if(s3.data&&s3.data.session) authToken3=s3.data.session.access_token; } catch(e3) {}
     var resp = await fetch(url, {
-      headers: {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + SUPA_KEY}
+      headers: {'apikey': SUPA_KEY, 'Authorization': 'Bearer ' + authToken3}
     });
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     var data = await resp.json();
@@ -2535,10 +2543,14 @@ document.addEventListener('DOMContentLoaded',function(){
 
 async function chargerCategoriesSupabase() {
   try {
-    var res = await sb.from('categories').select('id,nom,image_url').order('ordre',{ascending:true});
-    if (res.error || !res.data || !res.data.length) return;
+    var url = SUPA_URL + '/rest/v1/categories?select=id,nom,image_url&order=ordre.asc';
+    var resp = await fetch(url, {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    var data = await resp.json();
+    var res = {data: data, error: null};
+    if (!res.data || !res.data.length) return;
 
-    res.data.forEach(function(cat) {
+    data.forEach(function(cat) {
       if (!cat.image_url) return;
       var nomLower = (cat.nom||'').toLowerCase().trim();
 
@@ -3117,7 +3129,7 @@ function chargerBanniereHome() {
     var subEl = document.querySelector('.ban-sub');
     if (subEl && b.sub) subEl.textContent = b.sub;
     var priceEl = document.querySelector('.ban-price');
-    if (priceEl && b.price) priceEl.textContent = fcfa(b.price) + ' FCFA';
+    if (priceEl && b.price) priceEl.textContent = Number(b.price).toLocaleString('fr-FR') + ' FCFA';
     var titleEl = document.querySelector('.ban-title');
     if (titleEl && b.title) {
       var city = document.getElementById('banCity');
