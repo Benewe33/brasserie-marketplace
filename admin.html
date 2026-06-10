@@ -517,9 +517,9 @@ async function loadCategories(){
   const tbody=document.getElementById('categories-body');
   if(!data?.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:32px">Aucune catégorie</td></tr>';return;}
   tbody.innerHTML=data.map(c=>`<tr>
-    <td>${c.image_url?`<img style="width:38px;height:38px;border-radius:6px;object-fit:cover" src="${c.image_url}"/>`:`<div style="width:38px;height:38px;border-radius:6px;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:20px">${c.icone||'🏷️'}</div>`}</td>
+    <td>${c.image_url?`<img style="width:38px;height:38px;border-radius:6px;object-fit:cover" src="${c.image_url}"/>`:`<div style="width:38px;height:38px;border-radius:6px;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:20px">${c.emoji||'🏷️'}</div>`}</td>
     <td><strong>${c.nom||'—'}</strong></td>
-    <td style="font-size:22px">${c.icone||'—'}</td>
+    <td style="font-size:22px">${c.emoji||'—'}</td>
     <td><div class="actions-cell">
       <button class="btn btn-sm btn-edit" onclick='editCategorie(${JSON.stringify(c)})'>✏️ Modifier</button>
       <button class="btn btn-sm btn-reject" onclick="supprimerCategorie('${c.id}')">Supprimer</button>
@@ -542,7 +542,7 @@ function openAddCategorie(){
 function editCategorie(c){
   document.getElementById('cat-id').value=c.id;
   document.getElementById('cat-nom').value=c.nom||'';
-  document.getElementById('cat-icone').value=c.icone||'';
+  document.getElementById('cat-icone').value=c.emoji||'';
   document.getElementById('cat-image-url').value=c.image_url||'';
   document.getElementById('cat-preview').style.display='none';
   const wrap=document.getElementById('cat-current-img-wrap');
@@ -559,7 +559,7 @@ async function sauvegarderCategorie(){
   const icone=document.getElementById('cat-icone').value.trim();
   const image_url=document.getElementById('cat-image-url').value||null;
   if(!nom){showToast('Entrez un nom','error');return;}
-  const payload={nom,icone:icone||null,image_url};
+  const payload={nom,emoji:icone||null,image_url};
   let error;
   if(id){({error}=await sb.from('categories').update(payload).eq('id',id));}
   else{({error}=await sb.from('categories').insert(payload));}
@@ -580,7 +580,7 @@ async function loadCategoriesSelect(selectedId=''){
   const {data}=await sb.from('categories').select('*').order('nom');
   const sel=document.getElementById('p-categorie');
   sel.innerHTML='<option value="">Choisir...</option>';
-  (data||[]).forEach(c=>sel.innerHTML+=`<option value="${c.id}" ${c.id===selectedId?'selected':''}>${c.icone||''} ${c.nom}</option>`);
+  (data||[]).forEach(c=>sel.innerHTML+=`<option value="${c.id}" ${c.id===selectedId?'selected':''}>${c.emoji||''} ${c.nom}</option>`);
 }
 
 // COMMANDES
