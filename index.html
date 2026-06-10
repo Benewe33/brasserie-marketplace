@@ -2455,9 +2455,18 @@ document.addEventListener('DOMContentLoaded',function(){
   chargerBanniereHome();
   // Charger les données Supabase
   chargerCategoriesSupabase();
-  chargerBoutiquesSupabase(null);
-  chargerProduitsSupabase(null).then(function(){renderToutesLesSections();});
-  chargerLivreursSupabase(null);
+  // Chain: boutiques → produits → tout rendre
+  chargerBoutiquesSupabase(null).then(function(){
+    return chargerProduitsSupabase(null);
+  }).then(function(){
+    renderToutesLesSections();
+  }).catch(function(e){
+    console.log('Chargement erreur:', e);
+    renderToutesLesSections(); // render quand même avec données locales
+  });
+  chargerLivreursSupabase(null).then(function(){
+    buildHomeLivs();
+  });
   try{
     var saved=localStorage.getItem('yeye_geo');
     if(saved){
