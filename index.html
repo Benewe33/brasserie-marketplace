@@ -7,6 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.kkiapay.me/k.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -171,6 +172,12 @@ body{font-family:'Inter',sans-serif;background:#f0f0f0;min-height:100vh;display:
 .back-btn{background:none;border:none;cursor:pointer;color:var(--g600);display:flex;align-items:center}
 
 /* TOAST */
+.notif-item-c{padding:14px 16px;border-bottom:1px solid var(--g100);display:flex;gap:12px;align-items:flex-start}
+.notif-item-c.unread{background:#f0fdf4;border-left:3px solid var(--vd)}
+.notif-ico-c{font-size:22px;flex-shrink:0}
+.notif-titre-c{font-size:13px;font-weight:600;margin-bottom:2px}
+.notif-msg-c{font-size:12px;color:var(--g400);line-height:1.4}
+.notif-time-c{font-size:11px;color:var(--g400);margin-top:3px}
 .toast{position:fixed;top:80px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--g900);color:#fff;padding:12px 20px;border-radius:24px;font-size:13px;font-weight:500;z-index:999;opacity:0;transition:all .3s;white-space:nowrap;max-width:calc(var(--max) - 32px)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.ok{background:var(--vd)}
@@ -210,11 +217,14 @@ body{font-family:'Inter',sans-serif;background:#f0f0f0;min-height:100vh;display:
         <button class="icon-btn" onclick="goPage('cart')">
           🛒<span class="cart-badge" id="cart-badge">0</span>
         </button>
+        <button class="icon-btn" id="notif-btn" onclick="toggleNotifPanel()" style="display:none;position:relative">
+          🔔<span id="notif-badge-client" style="position:absolute;top:-2px;right:-2px;background:var(--r);color:#fff;font-size:10px;font-weight:700;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center">0</span>
+        </button>
         <button class="icon-btn" onclick="goPage('profile')">👤</button>
       </div>
     </div>
     <div class="search-bar">
-      <input type="text" id="search-input" placeholder="Gari, tilapia, mangue..." oninput="doSearch(this.value)"/>
+      <input type="text" id="search-input" placeholder="Gari, tilapia, mangue..." autocomplete="off" oninput="doSearch(this.value)"/>
       <button onclick="doSearch(document.getElementById('search-input').value)">Chercher</button>
     </div>
   </header>
@@ -281,14 +291,14 @@ body{font-family:'Inter',sans-serif;background:#f0f0f0;min-height:100vh;display:
         </div>
         <div class="auth-form active" id="form-login">
           <div class="fgc"><label>Email</label><input type="email" id="l-email" placeholder="email@exemple.com"/></div>
-          <div class="fgc"><label>Mot de passe</label><input type="password" id="l-pass" placeholder="••••••••"/></div>
+          <div class="fgc"><label>Mot de passe</label><input type="password" id="l-pass" autocomplete="current-password" placeholder="••••••••"/></div>
           <button class="btn-main" onclick="doLogin()">🔐 Se connecter</button>
         </div>
         <div class="auth-form" id="form-register">
           <div class="fgc"><label>Nom complet *</label><input type="text" id="r-nom" placeholder="Ex: Kofi Mensah"/></div>
           <div class="fgc"><label>Email *</label><input type="email" id="r-email" placeholder="email@exemple.com"/></div>
           <div class="fgc"><label>Téléphone *</label><input type="tel" id="r-tel" placeholder="97 00 00 00"/></div>
-          <div class="fgc"><label>Mot de passe *</label><input type="password" id="r-pass" placeholder="Min. 6 caractères"/></div>
+          <div class="fgc"><label>Mot de passe *</label><input type="password" id="r-pass" autocomplete="new-password" placeholder="Min. 6 caractères"/></div>
           <button class="btn-main" onclick="doRegister()">✅ Créer mon compte</button>
         </div>
       </div>
@@ -365,6 +375,19 @@ body{font-family:'Inter',sans-serif;background:#f0f0f0;min-height:100vh;display:
     </div>
   </div>
 
+  <!-- NOTIFICATION PANEL CLIENT -->
+  <div id="client-notif-overlay" onclick="closeNotifPanel()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:150"></div>
+  <div id="client-notif-panel" style="display:none;position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:100vh;background:#fff;z-index:151;overflow-y:auto">
+    <div style="padding:16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff">
+      <h2 style="font-size:16px;font-weight:700">🔔 Notifications</h2>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button onclick="markAllReadClient()" style="font-size:12px;color:var(--vd);background:none;border:none;cursor:pointer;font-weight:500">Tout lire</button>
+        <button onclick="closeNotifPanel()" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--g400)">✕</button>
+      </div>
+    </div>
+    <div id="client-notif-list" style="padding:8px"></div>
+  </div>
+
   <!-- BOTTOM NAV -->
   <nav class="bottom-nav">
     <button class="nav-btn active" id="nav-home" onclick="goPage('home')">
@@ -418,7 +441,12 @@ body{font-family:'Inter',sans-serif;background:#f0f0f0;min-height:100vh;display:
 <!-- MODAL PRODUIT -->
 <div class="modal-overlay-bg" id="modal-bg" onclick="closeProdModal()"></div>
 <div class="prod-modal" id="prod-modal">
-  <div id="prod-modal-img" class="prod-modal-img">📦</div>
+  <div style="position:relative">
+    <div id="prod-modal-img" class="prod-modal-img" style="transition:opacity .3s">📦</div>
+    <div id="prod-carousel-dots" style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);display:none;gap:6px"></div>
+    <button id="prod-carousel-prev" onclick="carouselNav(-1)" style="position:absolute;left:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.4);color:#fff;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:none">‹</button>
+    <button id="prod-carousel-next" onclick="carouselNav(1)" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.4);color:#fff;border:none;border-radius:50%;width:32px;height:32px;font-size:16px;cursor:pointer;display:none">›</button>
+  </div>
   <div class="prod-modal-body">
     <div id="prod-modal-name" class="prod-modal-name"></div>
     <div id="prod-modal-vendor" style="font-size:12px;color:var(--g400);margin-bottom:8px"></div>
@@ -469,10 +497,14 @@ async function checkSession(){
   }
 }
 
+let loginAttempts=0;let loginBlocked=false;
 async function doLogin(){
+  if(loginBlocked){toast('Trop de tentatives. Attendez 30 secondes.','err');return;}
   const email=document.getElementById('l-email').value.trim();
   const pass=document.getElementById('l-pass').value;
   if(!email||!pass){toast('Remplissez tous les champs','err');return;}
+  loginAttempts++;
+  if(loginAttempts>=5){loginBlocked=true;setTimeout(()=>{loginBlocked=false;loginAttempts=0;},30000);}
   const {error}=await sb.auth.signInWithPassword({email,password:pass});
   if(error){toast('❌ '+error.message,'err');return;}
   const {data:{user}}=await sb.auth.getUser();
@@ -505,6 +537,9 @@ async function doLogout(){
 }
 
 async function showProfile(){
+  document.getElementById('notif-btn').style.display='flex';
+  loadClientNotifs();
+  subscribeClientNotifs();
   document.getElementById('auth-section').style.display='none';
   document.getElementById('profile-section').style.display='block';
   const {data}=await sb.from('utilisateurs').select('*').eq('id',currentUser.id).single();
@@ -584,11 +619,18 @@ function doSearch(q){
 }
 
 // MODAL PRODUIT
+let carouselImages=[];let carouselIndex=0;
 function openProdModal(p){
   currentProduct=p;
   document.getElementById('modal-qty').textContent='1';
-  const imgEl=document.getElementById('prod-modal-img');
-  imgEl.innerHTML=p.image_url?`<img src="${p.image_url}" style="width:100%;height:100%;object-fit:cover"/>`:catEmoji(p.categories?.nom||'');
+  
+  // Build carousel
+  carouselImages=[];
+  if(p.image_url)carouselImages.push(p.image_url);
+  if(p.image_url_2)carouselImages.push(p.image_url_2);
+  carouselIndex=0;
+  renderCarousel();
+  
   document.getElementById('prod-modal-name').textContent=p.nom;
   document.getElementById('prod-modal-vendor').textContent='🏪 '+(p.boutiques?.nom||'Yéyé Market');
   document.getElementById('prod-modal-desc').textContent=p.description||'';
@@ -690,12 +732,20 @@ function showCheckout(){
       <div class="fgc"><label>Téléphone *</label><input type="tel" id="chk-tel" placeholder="97 00 00 00"/></div>
       <div class="fgc"><label>Notes (optionnel)</label><input type="text" id="chk-notes" placeholder="Instructions spéciales..."/></div>
       <p style="font-size:13px;font-weight:600;margin-bottom:10px">Mode de paiement</p>
-      <div class="payment-methods">
-        <div class="pay-opt active" id="pay-mtn" onclick="selectPay('mtn')"><div class="pay-ico">📱</div><div class="pay-name">MTN Money</div></div>
-        <div class="pay-opt" id="pay-moov" onclick="selectPay('moov')"><div class="pay-ico">📱</div><div class="pay-name">Moov Money</div></div>
+      <div style="background:var(--g50);border-radius:12px;padding:14px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <img src="https://cdn.kkiapay.me/logo.png" onerror="this.style.display='none'" style="height:28px"/>
+          <span style="font-size:13px;font-weight:600">KKiaPay — Paiement sécurisé</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span style="background:#ffcb00;color:#000;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">MTN MoMo</span>
+          <span style="background:#0066cc;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">Moov Money</span>
+          <span style="background:#1a1a2e;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">Visa/MC</span>
+        </div>
+        <p style="font-size:11px;color:var(--g400);margin-top:8px">🔒 Paiement 100% sécurisé par KKiaPay</p>
       </div>
       <div class="fgc"><label>Numéro Mobile Money *</label><input type="tel" id="chk-momo" placeholder="97 00 00 00"/></div>
-      <button class="btn-main" onclick="passOrder()">🛒 Passer la commande — ${fmt(total)} FCFA</button>
+      <button class="btn-main" onclick="passOrder()">💳 Payer — \${fmt(total)} FCFA</button>
       <button class="btn-main" style="background:#fff;color:var(--g600);border:1.5px solid var(--g200);margin-top:8px" onclick="renderCart()">← Retour au panier</button>
     </div>`;
   loadZonesSelect();
@@ -715,6 +765,8 @@ async function loadZonesSelect(){
   (data||[]).forEach(z=>sel.innerHTML+=`<option value="${z.id}">${z.ville} — ${z.nom}</option>`);
 }
 
+let pendingOrder = null;
+
 async function passOrder(){
   const adresse=document.getElementById('chk-adresse').value.trim();
   const zone_id=document.getElementById('chk-zone').value;
@@ -722,22 +774,72 @@ async function passOrder(){
   const momo=document.getElementById('chk-momo').value.trim();
   const notes=document.getElementById('chk-notes').value;
   if(!adresse||!zone_id||!tel||!momo){toast('Remplissez tous les champs obligatoires','err');return;}
+  if(!currentUser){toast('Connectez-vous pour commander','err');return;}
+
   const items=Object.values(cart);
   const subtotal=items.reduce((s,i)=>s+(i.prix_promo||i.prix)*i.qty,0);
   const total=subtotal+500;
 
+  // Sauvegarder les infos en attendant le paiement
+  pendingOrder={adresse,zone_id,tel,momo,notes,items,total,operateur:selectedPay.toUpperCase()};
+
+  // Lancer KKiaPay
+  openKkiapayWidget({
+    amount: total,
+    api_key: "782f2ffff070438f6693d98f861b909f89ff09eb",
+    sandbox: false,
+    phone: momo,
+    name: currentUser.email,
+    callback: window.location.href,
+    theme: "#1a6b3c"
+  });
+}
+
+// Succès paiement KKiaPay
+async function onKKiapaySuccess(response){
+  if(!pendingOrder) return;
+  toast('💳 Paiement confirmé ! Enregistrement...','ok');
+
   const {data:cmd,error}=await sb.from('commandes').insert({
-    client_id:currentUser.id,total,adresse_livraison:adresse,zone_id,notes,statut:'en_attente'
+    client_id:currentUser.id,
+    total:pendingOrder.total,
+    adresse_livraison:pendingOrder.adresse,
+    zone_id:pendingOrder.zone_id,
+    notes:pendingOrder.notes,
+    statut:'confirmee'
   }).select().single();
-  if(error){toast('Erreur: '+error.message,'err');return;}
 
-  const lignes=items.map(i=>({commande_id:cmd.id,produit_id:i.id,nom_item:i.nom,prix_unitaire:i.prix_promo||i.prix,quantite:i.qty,sous_total:(i.prix_promo||i.prix)*i.qty}));
+  if(error){toast('Erreur commande: '+error.message,'err');return;}
+
+  const lignes=pendingOrder.items.map(i=>({
+    commande_id:cmd.id,
+    produit_id:i.id,
+    nom_item:i.nom,
+    prix_unitaire:i.prix_promo||i.prix,
+    quantite:i.qty,
+    sous_total:(i.prix_promo||i.prix)*i.qty
+  }));
   await sb.from('lignes_commande').insert(lignes);
-  await sb.from('paiements').insert({commande_id:cmd.id,montant:total,methode:'mobile_money',operateur:selectedPay.toUpperCase(),telephone:momo,statut:'en_attente'});
+  await sb.from('paiements').insert({
+    commande_id:cmd.id,
+    montant:pendingOrder.total,
+    methode:'mobile_money',
+    operateur:pendingOrder.operateur,
+    telephone:pendingOrder.momo,
+    statut:'confirme',
+    reference:response.transactionId||response.transaction_id||''
+  });
 
+  pendingOrder=null;
   cart={};updateCartBadge();
-  toast('🎉 Commande passée avec succès !','ok');
+  toast('🎉 Commande confirmée et payée !','ok');
   goPage('orders');
+}
+
+// Échec paiement KKiaPay
+function onKKiapayFailed(error){
+  toast('❌ Paiement échoué: '+( error.message||'Réessayez'),'err');
+  pendingOrder=null;
 }
 
 // MES COMMANDES
@@ -784,6 +886,10 @@ function renderTracking(statut){
 }
 
 // UTILS
+function escHtml(str){
+  if(!str)return'—';
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
 function sbadge(s){const m={en_attente:'<span class="s-badge s-attente">⏳ En attente</span>',confirmee:'<span class="s-badge s-confirmee">✅ Confirmée</span>',en_preparation:'<span class="s-badge s-preparation">👨‍🍳 Préparation</span>',prete:'<span class="s-badge s-confirmee">📦 Prête</span>',en_livraison:'<span class="s-badge s-livraison">🚴 En livraison</span>',livree:'<span class="s-badge s-livree">🎉 Livrée</span>',annulee:'<span class="s-badge s-annulee">❌ Annulée</span>'};return m[s]||`<span class="s-badge">${s}</span>`;}
 function fmt(n){return(n||0).toLocaleString('fr-FR');}
 function fdate(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
@@ -824,6 +930,87 @@ async function loadCatalogue(){
         </div>
       </div>
     </div>`).join('');
+}
+
+// NOTIFICATIONS CLIENT
+async function loadClientNotifs(){
+  if(!currentUser) return;
+  const {data} = await sb.from('notifications')
+    .select('*').eq('user_id', currentUser.id)
+    .order('created_at', {ascending: false}).limit(30);
+  const unread = (data||[]).filter(n=>!n.lu).length;
+  const badge = document.getElementById('notif-badge-client');
+  if(unread > 0){badge.textContent=unread;badge.style.display='flex';}
+  else badge.style.display='none';
+  const list = document.getElementById('client-notif-list');
+  if(!data?.length){list.innerHTML='<div style="text-align:center;padding:48px 20px;color:var(--g400)"><div style="font-size:40px;margin-bottom:12px">🔔</div><p>Aucune notification</p></div>';return;}
+  const icons={commande:'🛒',inscription:'👤',paiement:'💰',livraison:'🚴',info:'ℹ️'};
+  list.innerHTML=data.map(n=>`<div class="notif-item-c ${n.lu?'':'unread'}" onclick="readClientNotif('${n.id}')">
+    <div class="notif-ico-c">${icons[n.type]||'🔔'}</div>
+    <div style="flex:1">
+      <div class="notif-titre-c">${n.titre}</div>
+      <div class="notif-msg-c">${n.message}</div>
+      <div class="notif-time-c">${fdate(n.created_at)}</div>
+    </div>
+    ${!n.lu?'<div style="width:8px;height:8px;border-radius:50%;background:var(--vd);flex-shrink:0;margin-top:6px"></div>':''}
+  </div>`).join('');
+}
+
+async function readClientNotif(id){
+  await sb.from('notifications').update({lu:true}).eq('id',id);
+  loadClientNotifs();
+}
+
+async function markAllReadClient(){
+  if(!currentUser) return;
+  await sb.from('notifications').update({lu:true}).eq('user_id',currentUser.id).eq('lu',false);
+  loadClientNotifs();
+  toast('✅ Tout lu','ok');
+}
+
+function toggleNotifPanel(){
+  const panel=document.getElementById('client-notif-panel');
+  const overlay=document.getElementById('client-notif-overlay');
+  if(panel.style.display==='none'){panel.style.display='block';overlay.style.display='block';loadClientNotifs();}
+  else closeNotifPanel();
+}
+
+function closeNotifPanel(){
+  document.getElementById('client-notif-panel').style.display='none';
+  document.getElementById('client-notif-overlay').style.display='none';
+}
+
+function subscribeClientNotifs(){
+  if(!currentUser) return;
+  sb.channel('client-notifs')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:`user_id=eq.${currentUser.id}`},(payload)=>{
+      toast('🔔 '+payload.new.titre,'ok');
+      loadClientNotifs();
+    }).subscribe();
+}
+
+// CAROUSEL
+function renderCarousel(){
+  const imgEl=document.getElementById('prod-modal-img');
+  const dots=document.getElementById('prod-carousel-dots');
+  const prev=document.getElementById('prod-carousel-prev');
+  const next=document.getElementById('prod-carousel-next');
+  if(carouselImages.length>0){
+    imgEl.innerHTML=`<img src="${carouselImages[carouselIndex]}" style="width:100%;height:100%;object-fit:cover"/>`;
+  } else {
+    imgEl.innerHTML=catEmoji(currentProduct?.categories?.nom||'');
+  }
+  if(carouselImages.length>1){
+    dots.style.display='flex';
+    prev.style.display='block';next.style.display='block';
+    dots.innerHTML=carouselImages.map((_,i)=>`<div onclick="carouselNav(${i-carouselIndex})" style="width:${i===carouselIndex?'20px':'8px'};height:8px;border-radius:4px;background:${i===carouselIndex?'#fff':'rgba(255,255,255,.5)'};cursor:pointer;transition:all .2s"></div>`).join('');
+  } else {
+    dots.style.display='none';prev.style.display='none';next.style.display='none';
+  }
+}
+function carouselNav(dir){
+  carouselIndex=Math.max(0,Math.min(carouselImages.length-1,carouselIndex+dir));
+  renderCarousel();
 }
 
 checkSession();
