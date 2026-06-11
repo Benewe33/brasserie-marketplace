@@ -291,8 +291,8 @@ body{font-family:'Inter',sans-serif;background:#0B3D2E;min-height:100vh;display:
 
   <!-- QUICK REPLIES -->
   <div class="qr-wrap" id="qr-wrap">
-    <button class="qr" onclick="sendQuick('Je veux manger pour 5000 FCFA')">🍽️ 5000 FCFA</button>
-    <button class="qr" onclick="sendQuick('Produits frais du marche')">🥬 Marché frais</button>
+    <button class="qr" onclick="sendQuick('Quel est votre budget ?')">💰 Mon budget</button>
+    <button class="qr" onclick="sendQuick('Produits frais du marché')">🥬 Marché frais</button>
     <button class="qr" onclick="sendQuick('Quelles sont les promotions')">🔥 Promos</button>
     <button class="qr" onclick="sendQuick('Je cherche du poisson')">🐟 Poisson</button>
     <button class="qr" onclick="sendQuick('Voir mon panier')">🛒 Mon panier</button>
@@ -569,7 +569,7 @@ function welcome() {
   const greet = hour < 12 ? 'Bonjour' : hour < 18 ? 'Bonne après-midi' : 'Bonsoir';
   const name = currentUser ? '' : '';
   addAIMsg(greet + ' ! Je suis Yéyé Assistant, votre vendeur IA. Je peux vous aider à trouver les meilleurs produits, créer votre panier et finaliser votre commande. Que souhaitez-vous acheter aujourd\'hui ?');
-  setTimeout(() => addSuggs(['Repas pour 5000 FCFA', 'Légumes frais', 'Voir les promotions', 'Poisson fumé']), 400);
+  setTimeout(() => addSuggs(['Que cherchez-vous ?', 'Légumes frais', 'Voir les promotions', 'Poisson fumé']), 400);
 }
 
 // ============================================================
@@ -781,7 +781,7 @@ async function processAI(userMsg) {
     'Tu as accès à des outils pour chercher des produits réels — utilise-les à chaque fois que le client cherche quelque chose.',
     '',
     'RÈGLES:',
-    '- Budget mentionné → appelle create_bundle',
+    '- Budget mentionné par le CLIENT → appelle create_bundle (ne jamais imposer de budget)',
     '- Produit ou catégorie mentionné → appelle search_products',
     '- "voir panier" / "mon panier" → appelle show_cart',
     '- "ajouter" + produit → appelle add_to_cart avec les IDs corrects',
@@ -896,7 +896,7 @@ async function localFallback(msg) {
     if (res.found?.length) { addAIMsg('Voici ce que j\'ai trouvé 🛒'); addProds(res.found); }
     else addAIMsg('Dites-moi votre budget ou le produit souhaité ! 😊');
   }
-  addSuggs(['5000 FCFA', 'Légumes frais 🌿', 'Poisson fumé 🐟', 'Promos 🔥']);
+  addSuggs(['Légumes frais 🌿', 'Poisson fumé 🐟', 'Promos 🔥', 'Voir mon panier 🛒']);
 }
 
 // RENDU VISUEL DES OUTILS
@@ -1621,7 +1621,7 @@ async function trackLastOrder() {
     openTracking(cmds[0].id);
   } else {
     addAIMsg('Aucune commande trouvée. Passez votre première commande !');
-    addSuggs(['Voir le catalogue', '5000 FCFA de courses', 'Promotions']);
+    addSuggs(['Voir le catalogue', 'Promos 🔥', 'Légumes frais 🌿']);
   }
 }
 
