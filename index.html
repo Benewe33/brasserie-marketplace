@@ -663,7 +663,7 @@ async function loadCategories(){
 async function loadProducts(catId=null){
   const grid=document.getElementById('products-grid');
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Chargement...</div>';
-  let q=sb.from('produits').select('*,categories(nom),boutiques(nom)').eq('actif',true).gt('stock',0);
+  let q=sb.from('produits').select('id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,boutique_id,categorie_id,categories(nom),boutiques(nom)').eq('actif',true).gt('stock',0);
   if(catId)q=q.eq('categorie_id',catId);
   q=q.order('created_at',{ascending:false}).limit(20);
   const {data}=await q;
@@ -674,7 +674,7 @@ async function loadProducts(catId=null){
 async function loadCatalogue(){
   const grid=document.getElementById('catalogue-grid');
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Chargement...</div>';
-  const {data}=await sb.from('produits').select('*,categories(nom),boutiques(nom)').eq('actif',true).gt('stock',0).order('created_at',{ascending:false});
+  const {data}=await sb.from('produits').select('id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,boutique_id,categorie_id,categories(nom),boutiques(nom)').eq('actif',true).gt('stock',0).order('created_at',{ascending:false});
   renderProducts(data||[],'catalogue-grid');
 }
 
