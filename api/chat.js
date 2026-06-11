@@ -61,7 +61,7 @@ export default async function handler(req, res) {
     }));
 
     const body = {
-      model: 'mistralai/mistral-small-3.1-24b-instruct:free',
+      model: 'meta-llama/llama-3.1-8b-instruct:free',
       max_tokens: max_tokens || 1000,
       messages: openRouterMessages
     };
