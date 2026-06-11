@@ -760,153 +760,143 @@ async function executeTool(name, input) {
 }
 
 // ============================================================
-// TRAITEMENT IA LOCAL (sans clé API — 100% gratuit)
+// MOTEUR IA — LLM + TOOL CALLING via OpenRouter
 // ============================================================
 async function processAI(userMsg) {
   isTyping = true;
   document.getElementById('send-btn').disabled = true;
   showTyping();
-  await delay(600);
-  hideTyping();
-  await smartFallbackEnhanced(userMsg);
+
+  // Contexte système
+  const prodCtx = allProducts.slice(0, 60).map(p =>
+    'ID:' + p.id + ' | ' + p.nom + ' | ' + (p.categories?.nom || '-') + ' | ' + (p.prix_promo || p.prix) + ' FCFA/' + (p.unite || 'u') + (p.prix_promo ? ' [PROMO]' : '')
+  ).join('\n');
+  const cartCtx = Object.values(cart).length > 0
+    ? Object.values(cart).map(i => i.nom + ' x' + i.qty + ' (' + fmt(i.prix_promo||i.prix) + ' FCFA)').join(', ')
+    : 'vide';
+
+  const systemPrompt = [
+    'Tu es Yéyé Assistant, vendeur IA de YéyéMarket (marketplace béninoise).',
+    'Réponds TOUJOURS en français, style WhatsApp : court, naturel, avec emojis. Maximum 2-3 phrases.',
+    'Tu as accès à des outils pour chercher des produits réels — utilise-les à chaque fois que le client cherche quelque chose.',
+    '',
+    'RÈGLES:',
+    '- Budget mentionné → appelle create_bundle',
+    '- Produit ou catégorie mentionné → appelle search_products',
+    '- "voir panier" / "mon panier" → appelle show_cart',
+    '- "ajouter" + produit → appelle add_to_cart avec les IDs corrects',
+    '- Propose TOUJOURS une action suivante',
+    '',
+    'CATALOGUE (' + allProducts.length + ' produits, IDs complets):',
+    prodCtx,
+    '',
+    'PANIER ACTUEL: ' + cartCtx
+  ].join('\n');
+
+  // Ajouter le message user à l'historique
   history.push({ role: 'user', content: userMsg });
-  await saveSession();
+
+  try {
+    let continueLoop = true;
+    let loopCount = 0;
+
+    while (continueLoop && loopCount < 4) {
+      loopCount++;
+
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 12000);
+
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        signal: controller.signal,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          system: systemPrompt,
+          tools: TOOLS,
+          max_tokens: 800,
+          messages: history.slice(-14)
+        })
+      });
+
+      clearTimeout(timeout);
+      const data = await response.json();
+      if (data.error) throw new Error(data.error);
+
+      hideTyping();
+
+      // Traiter les blocs de réponse
+      const textBlocks = (data.content || []).filter(b => b.type === 'text');
+      const toolBlocks = (data.content || []).filter(b => b.type === 'tool_use');
+
+      // Afficher le texte IA
+      const aiText = textBlocks.map(b => b.text).join('').trim();
+      if (aiText) addAIMsg(aiText);
+
+      if (toolBlocks.length > 0 && data.stop_reason === 'tool_use') {
+        // Ajouter la réponse assistant à l'historique
+        history.push({ role: 'assistant', content: data.content });
+
+        // Exécuter les outils et collecter les résultats
+        const toolResults = [];
+        for (const tb of toolBlocks) {
+          const result = await executeTool(tb.name, tb.input);
+          await renderTool(tb.name, tb.input, result);
+          toolResults.push({
+            type: 'tool_result',
+            tool_use_id: tb.id,
+            content: JSON.stringify(result)
+          });
+        }
+
+        // Ajouter les résultats d'outils à l'historique
+        history.push({ role: 'user', content: toolResults });
+
+        // Continuer la boucle pour que l'IA génère une réponse finale
+        showTyping();
+
+      } else {
+        // Réponse finale — pas d'autres outils
+        history.push({ role: 'assistant', content: data.content });
+        continueLoop = false;
+      }
+    }
+
+    await saveSession();
+
+  } catch (e) {
+    console.error('AI Error:', e.message);
+    hideTyping();
+    // Fallback local si l'API échoue
+    await localFallback(userMsg);
+  }
+
   isTyping = false;
   document.getElementById('send-btn').disabled = false;
 }
 
-async function smartFallbackEnhanced(msg) {
+// Fallback local minimal — uniquement si l'API est totalement indisponible
+async function localFallback(msg) {
   const low = msg.toLowerCase();
-  const budget = parseInt((msg.match(/(\d[\d\s]*\d|\d+)/) || [])[0]?.replace(/\s/g,'') || '0');
+  const budget = parseInt((msg.match(/\d+/) || [])[0] || '0');
 
-  // SALUTATIONS
-  if (/^(bonjour|bonsoir|salut|hello|bj|bjr|cc|coucou|hi)/.test(low)) {
-    const h = new Date().getHours();
-    const sal = h < 12 ? 'Bonjour' : h < 18 ? 'Bonne après-midi' : 'Bonsoir';
-    addAIMsg(sal + ' ! 👋 Je suis Yéyé Assistant, votre vendeur IA. Comment puis-je vous aider aujourd\'hui ?');
-    addSuggs(['Voir les promos 🔥', 'Marché frais 🌿', 'Mon budget', 'Voir mon panier']);
-    return;
-  }
-
-  // MERCI / FIN
-  if (/merci|super|parfait|ok merci|bravo/.test(low)) {
-    addAIMsg('Avec plaisir ! 😊 N\'hésitez pas si vous avez besoin d\'autre chose.');
-    addSuggs(['Nouvelle commande', 'Voir mon panier', 'Promotions']);
-    return;
-  }
-
-  // PANIER
-  if (low.includes('panier') || low.includes('cart') || low.includes('voir commande')) {
-    if (Object.keys(cart).length > 0) {
-      openDrawer();
-      addAIMsg('Voici votre panier 🛒 — ' + Object.values(cart).reduce((s,i)=>s+i.qty,0) + ' article(s) pour ' + fmt(calcTotal()) + ' FCFA.');
-    } else {
-      addAIMsg('Votre panier est vide 🛒. Que souhaitez-vous acheter ?');
-    }
-    addSuggs(['Légumes frais', 'Poisson fumé', '5000 FCFA de courses']);
-    return;
-  }
-
-  // VALIDER / COMMANDER
-  if (/valider|commander|passer commande|checkout|finaliser/.test(low)) {
-    if (Object.keys(cart).length === 0) {
-      addAIMsg('Votre panier est vide ! Ajoutez des produits d\'abord. 😊');
-      addSuggs(['Légumes frais', 'Poisson fumé', '5000 FCFA']);
-    } else {
-      addAIMsg('Super ! 🎉 Je vous redirige vers le paiement. Total : ' + fmt(calcTotal()) + ' FCFA.');
-      setTimeout(() => checkout(), 1200);
-    }
-    return;
-  }
-
-  // SUIVRE COMMANDE
-  if (/suivre|tracking|où est|statut commande/.test(low)) {
+  if (/panier|cart/.test(low)) {
+    if (Object.keys(cart).length > 0) { openDrawer(); addAIMsg('Voici votre panier 🛒'); }
+    else addAIMsg('Panier vide 🛒. Que cherchez-vous ?');
+  } else if (/suivre|tracking/.test(low)) {
     await trackLastOrder();
-    return;
-  }
-
-  // PROMOTIONS
-  if (/promo|promotion|réduction|solde|offre/.test(low)) {
-    const promos = allProducts.filter(p => p.prix_promo && p.prix_promo < p.prix).slice(0, 6);
-    if (promos.length) {
-      addAIMsg('🔥 Voici nos meilleures promos du moment !');
-      addProds(promos);
-      addSuggs(['Ajouter au panier', 'Voir plus', 'Mon budget']);
-    } else {
-      addAIMsg('Pas de promotions en ce moment. Voici nos produits populaires :');
-      addProds(allProducts.slice(0, 5));
-    }
-    return;
-  }
-
-  // NOUVEAUTÉS
-  if (/nouveau|nouveauté|arrivage|récent/.test(low)) {
-    const news = [...allProducts].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0)).slice(0, 5);
-    addAIMsg('✨ Voici nos dernières arrivées !');
-    addProds(news);
-    addSuggs(['Ajouter au panier', 'Voir les promos', 'Mon budget']);
-    return;
-  }
-
-  // BUDGET
-  if (budget >= 500) {
+  } else if (/valider|commander|payer/.test(low)) {
+    if (Object.keys(cart).length > 0) { addAIMsg('Redirection vers le paiement... 🎉'); setTimeout(() => checkout(), 1000); }
+    else addAIMsg('Votre panier est vide !');
+  } else if (budget >= 500) {
     const res = await executeTool('create_bundle', { budget });
-    addAIMsg('🎁 Voici ce que je vous propose pour ' + fmt(budget) + ' FCFA !');
+    addAIMsg('🎁 Voici pour ' + fmt(budget) + ' FCFA :');
     if (res.bundle?.length) addBundle(res.bundle, budget, res.total);
-    else addAIMsg('Pas assez de produits disponibles pour ce budget. Essayez un montant plus élevé.');
-    addSuggs(['Ajouter tout au panier', 'Autre budget', 'Valider commande']);
-    return;
+  } else {
+    const res = await executeTool('search_products', { query: msg });
+    if (res.found?.length) { addAIMsg('Voici ce que j\'ai trouvé 🛒'); addProds(res.found); }
+    else addAIMsg('Dites-moi votre budget ou le produit souhaité ! 😊');
   }
-
-  // CATEGORIES
-  const catMap = {
-    'légume|legume|verdure|haricot|gombo|gboman|épinard': 'légumes',
-    'poisson|sardine|maquereau|capitaine|fumé|fume': 'poisson',
-    'viande|bœuf|boeuf|poulet|agneau|mouton': 'viande',
-    'fruit|banane|mangue|ananas|orange|papaye': 'fruits',
-    'céréale|cereale|riz|gari|maïs|mais|farine|semoule': 'céréales',
-    'huile|graisse|beurre': 'huile',
-    'épice|epice|piment|poivre|sel|cube': 'épices',
-    'lait|yaourt|fromage|œuf|oeuf|crème|creme': 'laitier',
-  };
-
-  for (const [pattern, catName] of Object.entries(catMap)) {
-    if (new RegExp(pattern).test(low)) {
-      const found = allProducts.filter(p =>
-        p.nom.toLowerCase().match(new RegExp(pattern)) ||
-        p.categories?.nom?.toLowerCase().includes(catName)
-      ).slice(0, 6);
-      if (found.length) {
-        addAIMsg('Voici nos ' + catName + ' disponibles 🌿');
-        addProds(found);
-        addSuggs(['Ajouter au panier', 'Voir mon panier', 'Autre produit']);
-        return;
-      }
-    }
-  }
-
-  // RECHERCHE GÉNÉRALE par mots du message
-  const words = low.split(/\s+/).filter(w => w.length > 3);
-  let found = [];
-  for (const w of words) {
-    found = allProducts.filter(p =>
-      p.nom.toLowerCase().includes(w) ||
-      p.categories?.nom?.toLowerCase().includes(w) ||
-      (p.description || '').toLowerCase().includes(w)
-    ).slice(0, 5);
-    if (found.length) break;
-  }
-
-  if (found.length) {
-    addAIMsg('Voici ce que j\'ai trouvé pour vous ! 🛒');
-    addProds(found);
-    addSuggs(['Ajouter au panier', 'Voir mon panier', 'Autre produit']);
-    return;
-  }
-
-  // DÉFAUT
-  addAIMsg('Je n\'ai pas trouvé ce que vous cherchez. 🤔 Dites-moi votre budget ou le produit souhaité !');
-  addSuggs(['5000 FCFA de courses', 'Légumes frais 🌿', 'Poisson fumé 🐟', 'Promos 🔥']);
+  addSuggs(['5000 FCFA', 'Légumes frais 🌿', 'Poisson fumé 🐟', 'Promos 🔥']);
 }
 
 // RENDU VISUEL DES OUTILS
@@ -946,42 +936,7 @@ async function renderTool(name, input, result) {
   }
 }
 
-// FALLBACK INTELLIGENT (sans API)
-async function smartFallback(msg) {
-  const low = msg.toLowerCase();
-  const budget = parseInt((msg.match(/(\d+)/) || [])[1] || '0');
 
-  if (low.includes('panier') || low.includes('voir') && low.includes('cart')) {
-    if (Object.keys(cart).length > 0) { openDrawer(); addAIMsg('Voici votre panier !'); }
-    else addAIMsg('Votre panier est vide. Que souhaitez-vous acheter ?');
-    addSuggs(['Legumes frais', 'Poisson fume', '5000 FCFA']);
-    return;
-  }
-  if (budget >= 500) {
-    const res = await executeTool('create_bundle', { budget });
-    addAIMsg('Voici ce que je vous propose pour ' + fmt(budget) + ' FCFA !');
-    if (res.bundle?.length) addBundle(res.bundle, budget, res.total);
-    addSuggs(['Ajouter tout au panier', 'Autre budget', 'Valider commande']);
-    return;
-  }
-  // Recherche par mots-clés
-  const keys = ['poisson', 'viande', 'legume', 'gombo', 'gboman', 'gari', 'riz', 'huile', 'tomate', 'oignon', 'oeuf', 'haricot', 'piment', 'banane', 'mangue'];
-  let found = [];
-  for (const k of keys) {
-    if (low.includes(k) || low.includes(k.replace('e', 'é'))) {
-      found = allProducts.filter(p => !Object.keys(cart).includes(p.id) && (p.nom.toLowerCase().includes(k) || p.categories?.nom?.toLowerCase().includes(k))).slice(0, 5);
-      if (found.length) break;
-    }
-  }
-  if (found.length) {
-    addAIMsg('Voici ce que j\'ai trouvé !');
-    addProds(found);
-    addSuggs(['Ajouter au panier', 'Autre produit', 'Voir mon panier']);
-  } else {
-    addAIMsg('Dites-moi votre budget ou le produit que vous cherchez, je vous trouve les meilleures options !');
-    addSuggs(['5000 FCFA', 'Legumes frais', 'Poisson fume', 'Promotions']);
-  }
-}
 
 async function saveSession() {
   if (!sessionId || !currentUser) return;
@@ -1670,7 +1625,7 @@ async function trackLastOrder() {
   }
 }
 
-// Le tracking est déjà géré dans smartFallbackEnhanced
+
 
 checkSession();
 </script>
