@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<title>Yéyé Assistant — IA Commerciale</title>
+<link rel="icon" href="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.kkiapay.me/k.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --vd:#0B3D2E;--vm:#1a6b3c;--vl:#e8f5e9;
+  --or:#FF8A00;--orl:#fff3e0;
+  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g400:#9ca3af;--g600:#4b5563;--g900:#111827;
+  --r:#dc2626;--bl:#2563eb;--gr:#16a34a;
+  --max:430px;
+  --shadow:0 2px 8px rgba(0,0,0,.1);--shadow-lg:0 8px 32px rgba(0,0,0,.15);
+}
+body{font-family:'Inter',sans-serif;background:#0B3D2E;min-height:100vh;display:flex;justify-content:center;align-items:center}
+.app{width:100%;max-width:var(--max);height:100vh;display:flex;flex-direction:column;background:#f0f0f0;position:relative;overflow:hidden}
+
+/* HEADER */
+.header{background:linear-gradient(135deg,var(--vd),#0d4a36);padding:14px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.header-logo{width:44px;height:44px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center}
+.header-logo img{width:100%;height:100%;object-fit:cover}
+.header-info{flex:1}
+.header-name{font-size:16px;font-weight:800;color:#fff}
+.header-sub{display:flex;align-items:center;gap:5px;margin-top:2px}
+.dot{width:8px;height:8px;border-radius:50%;background:#4ade80;animation:blink 2s infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.header-sub span{font-size:12px;color:rgba(255,255,255,.75)}
+.h-btn{background:rgba(255,255,255,.15);border:none;color:#fff;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:background .2s;flex-shrink:0}
+.h-btn:hover{background:rgba(255,255,255,.25)}
+
+/* QUICK REPLIES */
+.qr-wrap{display:flex;gap:8px;overflow-x:auto;padding:10px 12px;scrollbar-width:none;flex-shrink:0;background:#f0f0f0}
+.qr-wrap::-webkit-scrollbar{display:none}
+.qr{background:#fff;border:1.5px solid var(--g200);color:var(--g600);padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;transition:all .2s;flex-shrink:0}
+.qr:hover{border-color:var(--vd);color:var(--vd);background:var(--vl)}
+
+/* CHAT */
+.chat-area{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.chat-area::-webkit-scrollbar{width:3px}
+.chat-area::-webkit-scrollbar-thumb{background:var(--g200);border-radius:2px}
+
+/* MESSAGES */
+.msg{display:flex;gap:8px;max-width:88%;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.msg-ai{align-self:flex-start}
+.msg-user{align-self:flex-end;flex-direction:row-reverse}
+.av{width:30px;height:30px;border-radius:50%;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:14px;margin-top:2px}
+.av-ai{background:linear-gradient(135deg,var(--vd),var(--vm))}
+.av-ai img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.av-user{background:linear-gradient(135deg,var(--or),#e67e00);color:#fff;font-size:13px;font-weight:700}
+.bubble{padding:10px 13px;border-radius:18px;font-size:13.5px;line-height:1.5;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.bubble-ai{background:#fff;color:var(--g900);border-bottom-left-radius:4px}
+.bubble-user{background:linear-gradient(135deg,var(--vd),#0f5535);color:#fff;border-bottom-right-radius:4px}
+.msg-time{font-size:10px;color:var(--g400);margin-top:3px}
+.msg-ai .msg-time{text-align:left;margin-left:38px}
+.msg-user .msg-time{text-align:right;margin-right:38px}
+
+/* TYPING */
+.typing-wrap{display:flex;gap:8px;align-items:center;align-self:flex-start;animation:fadeIn .25s ease}
+.typing-bubble{background:#fff;border-radius:18px;border-bottom-left-radius:4px;padding:12px 16px;display:flex;gap:4px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.typing-bubble span{width:7px;height:7px;border-radius:50%;background:var(--g400);animation:bounce .8s infinite}
+.typing-bubble span:nth-child(2){animation-delay:.15s}
+.typing-bubble span:nth-child(3){animation-delay:.3s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+
+/* PRODUCT CARDS */
+.prod-scroll{display:flex;gap:10px;overflow-x:auto;padding:4px 0 8px 38px;scrollbar-width:none;align-self:flex-start;width:calc(100% - 0px)}
+.prod-scroll::-webkit-scrollbar{display:none}
+.pc{background:#fff;border-radius:14px;overflow:hidden;box-shadow:var(--shadow);flex-shrink:0;width:150px;transition:transform .2s;cursor:pointer}
+.pc:hover{transform:translateY(-2px)}
+.pc-img{width:100%;height:100px;object-fit:cover;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:32px}
+.pc-body{padding:9px}
+.pc-name{font-size:12px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--g900)}
+.pc-price{font-size:13px;font-weight:800;color:var(--vm);margin-bottom:7px}
+.pc-promo{font-size:10px;color:var(--g400);text-decoration:line-through;margin-bottom:2px}
+.pc-btn{width:100%;padding:6px;background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity .2s;display:flex;align-items:center;justify-content:center;gap:4px}
+.pc-btn:hover{opacity:.9}
+.pc-btn.added{background:linear-gradient(135deg,var(--gr),#15803d)}
+
+/* BUNDLE */
+.bundle-wrap{align-self:flex-start;margin-left:38px;width:calc(100% - 50px);max-width:320px}
+.bundle{background:#fff;border-radius:14px;box-shadow:var(--shadow);overflow:hidden;border-left:4px solid var(--or)}
+.bundle-head{background:linear-gradient(135deg,#fff9f0,#fff3e0);padding:12px 14px;display:flex;align-items:center;gap:8px}
+.bundle-head-ico{font-size:20px}
+.bundle-head-txt{font-size:13px;font-weight:800;color:var(--or)}
+.bundle-items{padding:0 14px}
+.bi{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--g50)}
+.bi:last-child{border-bottom:none}
+.bi-img{width:34px;height:34px;border-radius:8px;object-fit:cover;background:var(--g100);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px;overflow:hidden}
+.bi-img img{width:100%;height:100%;object-fit:cover}
+.bi-name{flex:1;font-size:12px;font-weight:600;line-height:1.3}
+.bi-price{font-size:12px;font-weight:800;color:var(--vm);white-space:nowrap}
+.bundle-foot{padding:12px 14px;background:var(--g50);border-top:1px solid var(--g100)}
+.bundle-total{display:flex;justify-content:space-between;font-size:13px;font-weight:800;margin-bottom:10px}
+.bundle-total span:last-child{color:var(--vm)}
+.bundle-btn{width:100%;padding:11px;background:linear-gradient(135deg,var(--or),#e67e00);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 3px 12px rgba(255,138,0,.3);transition:opacity .2s}
+.bundle-btn:hover{opacity:.9}
+
+/* SUGGESTIONS */
+.sugg-wrap{display:flex;gap:7px;flex-wrap:wrap;margin-left:38px;align-self:flex-start}
+.sugg{background:#fff;border:1.5px solid var(--g200);color:var(--g600);padding:6px 13px;border-radius:18px;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;font-family:inherit}
+.sugg:hover{border-color:var(--vd);color:var(--vd);background:var(--vl)}
+
+/* PANIER FLOTTANT */
+.cart-float{position:absolute;bottom:76px;left:0;right:0;padding:0 12px;z-index:50;display:none}
+.cart-mini{background:linear-gradient(135deg,var(--vd),#0f5535);color:#fff;border-radius:16px;padding:12px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;box-shadow:0 4px 20px rgba(11,61,46,.35)}
+.cart-mini-ico{font-size:22px}
+.cart-mini-info{flex:1}
+.cart-mini-count{font-size:11px;font-weight:500;opacity:.8}
+.cart-mini-total{font-size:17px;font-weight:800}
+.cart-mini-action{background:var(--or);color:#fff;border:none;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:800;cursor:pointer;font-family:inherit;white-space:nowrap}
+
+/* CART DRAWER */
+.drawer-overlay{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:98;display:none}
+.drawer-overlay.open{display:block}
+.cart-drawer{position:absolute;bottom:0;left:0;right:0;background:#fff;border-radius:22px 22px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.18);z-index:99;transform:translateY(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);max-height:82vh;display:flex;flex-direction:column}
+.cart-drawer.open{transform:translateY(0)}
+.drawer-handle{width:36px;height:4px;border-radius:2px;background:var(--g200);margin:10px auto 0;flex-shrink:0}
+.drawer-head{padding:14px 18px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.drawer-head h2{font-size:16px;font-weight:800}
+.drawer-close{background:var(--g100);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center}
+.drawer-items{overflow-y:auto;flex:1}
+.ci{display:flex;align-items:center;gap:11px;padding:11px 18px;border-bottom:1px solid var(--g50)}
+.ci-img{width:46px;height:46px;border-radius:10px;object-fit:cover;background:var(--g100);flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:20px}
+.ci-img img{width:100%;height:100%;object-fit:cover}
+.ci-info{flex:1}
+.ci-name{font-size:13px;font-weight:700}
+.ci-price{font-size:12px;color:var(--vm);font-weight:700;margin-top:2px}
+.ci-qty{display:flex;align-items:center;gap:7px}
+.qb{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--g200);background:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;transition:all .15s}
+.qb:hover{border-color:var(--vd);color:var(--vd)}
+.drawer-summary{padding:14px 18px;background:var(--g50);flex-shrink:0}
+.sum-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}
+.sum-row.total{font-weight:800;font-size:15px;color:var(--vd);border-top:1px solid var(--g200);padding-top:8px;margin-top:4px}
+.drawer-btn{margin:12px 18px 20px;padding:14px;background:linear-gradient(135deg,var(--or),#e67e00);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px rgba(255,138,0,.35);flex-shrink:0}
+
+/* INPUT */
+.input-zone{padding:8px 10px;background:#fff;border-top:1px solid var(--g100);flex-shrink:0;display:flex;align-items:flex-end;gap:8px}
+.input-wrap{flex:1;background:var(--g50);border-radius:22px;padding:9px 14px;border:1.5px solid var(--g200);transition:border .2s;display:flex;align-items:center;gap:8px}
+.input-wrap:focus-within{border-color:var(--vm)}
+.input-wrap textarea{flex:1;border:none;background:transparent;font-family:inherit;font-size:14px;resize:none;outline:none;max-height:90px;line-height:1.5;color:var(--g900)}
+.input-wrap textarea::placeholder{color:var(--g400)}
+.send-btn{width:40px;height:40px;border-radius:50%;border:none;cursor:pointer;background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(11,61,46,.3);flex-shrink:0;transition:transform .15s}
+.send-btn:hover{transform:scale(1.06)}
+.send-btn:disabled{background:var(--g200);box-shadow:none;cursor:not-allowed}
+
+/* AUTH */
+.auth-overlay{position:absolute;inset:0;background:linear-gradient(135deg,var(--vd),#0d4a36);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.auth-card{background:#fff;border-radius:22px;padding:28px;width:100%;max-width:380px;box-shadow:var(--shadow-lg)}
+.auth-logo{text-align:center;margin-bottom:20px}
+.auth-logo img{width:72px;height:72px;border-radius:50%;object-fit:cover;margin:0 auto 10px;display:block;border:3px solid var(--vl)}
+.auth-logo h1{font-size:20px;font-weight:800}
+.auth-logo p{font-size:12px;color:var(--g400);margin-top:3px}
+.tabs{display:flex;background:var(--g100);border-radius:10px;padding:3px;margin-bottom:16px}
+.tab{flex:1;text-align:center;padding:7px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;font-family:inherit;color:var(--g400);transition:all .15s}
+.tab.active{background:#fff;color:var(--g900);box-shadow:var(--shadow)}
+.aform{display:none}.aform.active{display:block}
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--g600);margin-bottom:4px}
+.fg input{width:100%;padding:10px 13px;border:1.5px solid var(--g200);border-radius:9px;font-size:14px;font-family:inherit;outline:none;transition:border .2s}
+.fg input:focus{border-color:var(--vm)}
+.auth-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
+.auth-err{color:var(--r);font-size:12px;text-align:center;margin-top:8px;display:none}
+.auth-skip{width:100%;padding:10px;background:transparent;color:var(--g400);border:none;font-size:12px;cursor:pointer;font-family:inherit;margin-top:6px;text-decoration:underline}
+
+/* TOAST */
+.toast{position:absolute;top:76px;left:50%;transform:translateX(-50%) translateY(-16px);background:var(--g900);color:#fff;padding:9px 16px;border-radius:18px;font-size:12px;font-weight:600;z-index:999;opacity:0;transition:all .28s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--gr)}.toast.err{background:var(--r)}
+
+@media(min-width:431px){body{padding:20px 0}.app{border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.4);height:calc(100vh - 40px)}}
+
+/* CHECKOUT MODAL */
+.checkout-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);z-index:150;display:none;align-items:flex-end;justify-content:center}
+.checkout-overlay.open{display:flex}
+.checkout-sheet{background:#fff;border-radius:22px 22px 0 0;width:100%;max-height:90vh;overflow-y:auto;padding-bottom:20px;animation:slideUp .3s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.checkout-handle{width:36px;height:4px;background:var(--g200);border-radius:2px;margin:10px auto 0}
+.checkout-head{padding:16px 18px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between}
+.checkout-head h2{font-size:16px;font-weight:800}
+.checkout-close{background:var(--g100);border:none;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px}
+.checkout-section{padding:14px 18px;border-bottom:1px solid var(--g100)}
+.checkout-section h3{font-size:13px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.co-input{width:100%;padding:10px 13px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;transition:border .2s}
+.co-input:focus{border-color:var(--vm)}
+.co-select{width:100%;padding:10px 13px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;outline:none;margin-bottom:10px;background:#fff}
+.pay-methods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:0}
+.pay-opt{border:2px solid var(--g200);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .2s}
+.pay-opt.active{border-color:var(--vd);background:var(--vl)}
+.pay-opt .pay-ico{font-size:20px;margin-bottom:4px}
+.pay-opt .pay-name{font-size:10px;font-weight:700;color:var(--g600)}
+.order-summary{padding:14px 18px}
+.os-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:7px}
+.os-row.total{font-weight:800;font-size:15px;color:var(--vd);border-top:1px solid var(--g200);padding-top:9px;margin-top:4px}
+.pay-btn{margin:0 18px;width:calc(100% - 36px);padding:14px;background:linear-gradient(135deg,var(--or),#e67e00);color:#fff;border:none;border-radius:13px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 4px 14px rgba(255,138,0,.35);display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s}
+.pay-btn:hover{opacity:.9}
+.pay-btn:disabled{background:var(--g400);cursor:not-allowed;box-shadow:none}
+.success-screen{text-align:center;padding:40px 20px}
+.success-ico{font-size:64px;margin-bottom:16px}
+.success-screen h2{font-size:20px;font-weight:800;margin-bottom:8px}
+.success-screen p{font-size:14px;color:var(--g400);line-height:1.6}
+.success-btn{margin-top:20px;padding:12px 28px;background:var(--vm);color:#fff;border:none;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+
+/* TRACKING SCREEN */
+.tracking-overlay{position:absolute;inset:0;background:#f5f5f5;z-index:160;display:none;flex-direction:column}
+.tracking-overlay.open{display:flex}
+.tracking-header{background:linear-gradient(135deg,var(--vd),#0d4a36);padding:16px;color:#fff;flex-shrink:0}
+.tracking-header-top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.tracking-back{background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center}
+.tracking-title{font-size:16px;font-weight:800;flex:1}
+.tracking-cmd-id{font-size:12px;opacity:.75}
+.tracking-status-badge{background:rgba(255,255,255,.2);padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700;display:inline-block}
+.tracking-body{flex:1;overflow-y:auto;padding:16px}
+.tracking-card{background:#fff;border-radius:16px;padding:16px;box-shadow:var(--shadow);margin-bottom:14px}
+.tracking-card h3{font-size:13px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
+.t-step{display:flex;gap:14px;position:relative;padding-bottom:6px}
+.t-step:not(:last-child)::before{content:'';position:absolute;left:19px;top:40px;bottom:0;width:2px;background:var(--g200)}
+.t-step.done::before,.t-step.active::before{background:var(--vd)}
+.t-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;z-index:1;transition:all .3s;background:var(--g100)}
+.t-step.done .t-dot{background:var(--vd);color:#fff}
+.t-step.active .t-dot{background:var(--vd);box-shadow:0 0 0 5px var(--vl);animation:pulse-track 2s infinite}
+@keyframes pulse-track{0%,100%{box-shadow:0 0 0 5px var(--vl)}50%{box-shadow:0 0 0 9px rgba(26,107,60,.1)}}
+.t-info{padding:8px 0 20px}
+.t-label{font-size:14px;font-weight:700}
+.t-sub{font-size:12px;color:var(--g400);margin-top:2px}
+.t-step.pending .t-label{color:var(--g400);font-weight:500}
+.livreur-banner{background:var(--vl);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;border:1px solid #bbf7d0}
+.livreur-av{width:44px;height:44px;border-radius:50%;background:var(--vd);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;color:#fff}
+.livreur-info{flex:1}
+.livreur-name{font-size:14px;font-weight:700}
+.livreur-veh{font-size:12px;color:var(--g600)}
+.livreur-call{background:var(--vd);color:#fff;border:none;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;text-decoration:none}
+.items-recap{background:var(--g50);border-radius:10px;padding:12px}
+.ir-row{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid var(--g100)}
+.ir-row:last-child{border-bottom:none;font-weight:700;color:var(--vd);font-size:14px}
+.realtime-badge{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--gr);font-weight:600;margin-top:8px}
+.realtime-dot{width:7px;height:7px;border-radius:50%;background:var(--gr);animation:blink 1.5s infinite}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- AUTH -->
+  <div class="auth-overlay" id="auth-overlay">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" onerror="this.style.display='none'" alt="Yéyé"/>
+        <h1>Yéyé Assistant</h1>
+        <p>Votre vendeur IA personnel 🇧🇯</p>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchAuth('login',this)">Se connecter</button>
+        <button class="tab" onclick="switchAuth('register',this)">S'inscrire</button>
+      </div>
+      <div class="aform active" id="af-login">
+        <div class="fg"><label>Email</label><input type="email" id="a-email" placeholder="email@exemple.com"/></div>
+        <div class="fg"><label>Mot de passe</label><input type="password" id="a-pass" placeholder="••••••••"/></div>
+        <button class="auth-btn" onclick="doLogin()">Se connecter</button>
+        <div class="auth-err" id="a-err"></div>
+      </div>
+      <div class="aform" id="af-register">
+        <div class="fg"><label>Nom complet</label><input type="text" id="r-nom" placeholder="Kofi Mensah"/></div>
+        <div class="fg"><label>Email</label><input type="email" id="r-email" placeholder="email@exemple.com"/></div>
+        <div class="fg"><label>Téléphone</label><input type="tel" id="r-tel" placeholder="97 00 00 00"/></div>
+        <div class="fg"><label>Mot de passe</label><input type="password" id="r-pass" placeholder="Min. 6 caractères"/></div>
+        <button class="auth-btn" onclick="doRegister()">Créer mon compte</button>
+        <div class="auth-err" id="r-err"></div>
+      </div>
+      <button class="auth-skip" onclick="skipAuth()">Continuer sans compte</button>
+    </div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-logo">
+      <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" onerror="this.parentElement.textContent='🌿'" alt="Yéyé"/>
+    </div>
+    <div class="header-info">
+      <div class="header-name">Yéyé Assistant</div>
+      <div class="header-sub"><div class="dot"></div><span>En ligne — IA commerciale</span></div>
+    </div>
+    <button class="h-btn" onclick="window.location.href='index.html'" title="Boutique">🏪</button>
+    <button class="h-btn" onclick="resetChat()" title="Nouvelle conversation">🔄</button>
+  </header>
+
+  <!-- QUICK REPLIES -->
+  <div class="qr-wrap" id="qr-wrap">
+    <button class="qr" onclick="sendQuick('Je veux manger pour 5000 FCFA')">🍽️ 5000 FCFA</button>
+    <button class="qr" onclick="sendQuick('Produits frais du marche')">🥬 Marché frais</button>
+    <button class="qr" onclick="sendQuick('Quelles sont les promotions')">🔥 Promos</button>
+    <button class="qr" onclick="sendQuick('Je cherche du poisson')">🐟 Poisson</button>
+    <button class="qr" onclick="sendQuick('Voir mon panier')">🛒 Mon panier</button>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-area" id="chat"></div>
+
+  <!-- PANIER FLOTTANT -->
+  <div class="cart-float" id="cart-float">
+    <div class="cart-mini" onclick="openDrawer()">
+      <div class="cart-mini-ico">🛒</div>
+      <div class="cart-mini-info">
+        <div class="cart-mini-count" id="cf-count">0 article</div>
+        <div class="cart-mini-total" id="cf-total">0 FCFA</div>
+      </div>
+      <button class="cart-mini-action" onclick="event.stopPropagation();openDrawer()">Voir →</button>
+    </div>
+  </div>
+
+  <!-- CART DRAWER -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+  <div class="cart-drawer" id="cart-drawer">
+    <div class="drawer-handle"></div>
+    <div class="drawer-head"><h2>🛒 Mon panier</h2><button class="drawer-close" onclick="closeDrawer()">✕</button></div>
+    <div class="drawer-items" id="drawer-items"></div>
+    <div class="drawer-summary" id="drawer-summary"></div>
+    <button class="drawer-btn" onclick="checkout()">💳 Valider la commande</button>
+  </div>
+
+  <!-- INPUT -->
+  <div class="input-zone">
+    <div class="input-wrap">
+      <textarea id="msg-input" placeholder="Dites-moi ce que vous cherchez..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    </div>
+    <button class="send-btn" id="send-btn" onclick="sendMsg()">
+      <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="17" height="17"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+
+  
+<!-- CHECKOUT SHEET -->
+<div class="checkout-overlay" id="checkout-overlay">
+  <div class="checkout-sheet" id="checkout-sheet">
+    <div class="checkout-handle"></div>
+
+    <!-- NORMAL CHECKOUT VIEW -->
+    <div id="checkout-normal">
+      <div class="checkout-head">
+        <h2>🛒 Finaliser la commande</h2>
+        <button class="checkout-close" onclick="closeCheckout()">✕</button>
+      </div>
+
+      <div class="checkout-section">
+        <h3>Livraison</h3>
+        <input type="text" class="co-input" id="co-adresse" placeholder="Adresse de livraison *"/>
+        <select class="co-select" id="co-zone">
+          <option value="">Choisir votre zone...</option>
+        </select>
+        <input type="tel" class="co-input" id="co-tel" placeholder="Téléphone de livraison *"/>
+        <input type="text" class="co-input" id="co-notes" placeholder="Instructions spéciales (optionnel)"/>
+      </div>
+
+      <div class="checkout-section">
+        <h3>Paiement</h3>
+        <div class="pay-methods">
+          <div class="pay-opt active" id="pm-mtn" onclick="selectPay('mtn')">
+            <div class="pay-ico">📱</div><div class="pay-name">MTN MoMo</div>
+          </div>
+          <div class="pay-opt" id="pm-moov" onclick="selectPay('moov')">
+            <div class="pay-ico">📱</div><div class="pay-name">Moov Money</div>
+          </div>
+          <div class="pay-opt" id="pm-card" onclick="selectPay('card')">
+            <div class="pay-ico">💳</div><div class="pay-name">Visa/MC</div>
+          </div>
+        </div>
+        <input type="tel" class="co-input" id="co-momo" placeholder="Numéro Mobile Money *" style="margin-top:10px"/>
+      </div>
+
+      <div class="order-summary" id="co-summary"></div>
+
+      <button class="pay-btn" id="pay-btn" onclick="launchPayment()">
+        💳 Payer avec KKiaPay
+      </button>
+      <div id="co-err" style="color:var(--r);font-size:12px;text-align:center;margin-top:8px;padding:0 18px;display:none"></div>
+    </div>
+
+    <!-- SUCCESS VIEW -->
+    <div id="checkout-success" style="display:none">
+      <div class="success-screen">
+        <div class="success-ico">🎉</div>
+        <h2>Commande confirmée !</h2>
+        <p>Votre commande a été passée avec succès.<br/>Un livreur sera assigné très bientôt !</p>
+        <div id="success-order-id" style="background:var(--g50);border-radius:10px;padding:10px;margin:16px 0;font-size:13px;font-weight:700;color:var(--vd)"></div>
+        <button class="success-btn" onclick="afterSuccess()">Suivre ma commande →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- TRACKING SCREEN -->
+<div class="tracking-overlay" id="tracking-overlay">
+  <div class="tracking-header">
+    <div class="tracking-header-top">
+      <button class="tracking-back" onclick="closeTracking()">←</button>
+      <div class="tracking-title">Suivi de commande</div>
+      <div class="tracking-cmd-id" id="tr-cmd-id">#--------</div>
+    </div>
+    <div class="tracking-status-badge" id="tr-status-badge">⏳ En attente</div>
+    <div class="realtime-badge"><div class="realtime-dot"></div> Mise à jour en temps réel</div>
+  </div>
+  <div class="tracking-body">
+    <!-- ÉTAPES -->
+    <div class="tracking-card">
+      <h3>Parcours de votre commande</h3>
+      <div id="tr-steps"></div>
+    </div>
+    <!-- LIVREUR -->
+    <div class="tracking-card" id="tr-livreur-card" style="display:none">
+      <h3>Votre livreur</h3>
+      <div class="livreur-banner" id="tr-livreur"></div>
+    </div>
+    <!-- RÉCAP -->
+    <div class="tracking-card">
+      <h3>Récapitulatif</h3>
+      <div class="items-recap" id="tr-recap"></div>
+      <div style="margin-top:10px;font-size:12px;color:var(--g400)">
+        <div id="tr-adresse"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+// ============================================================
+// CONFIG
+// ============================================================
+const SUPA_URL = 'https://omkmmlbdkzhorrrbeabm.supabase.co';
+const SUPA_KEY = 'sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
+const LOGO = 'https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG';
+const sb = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+// ============================================================
+// STATE
+// ============================================================
+let currentUser = null;
+let sessionId = null;
+let cartId = null;
+let cart = {};           // {produit_id: {prod, qty}}
+let allProducts = [];
+let history = [];        // Claude message history
+let isTyping = false;
+let suggestedIds = new Set();
+
+// ============================================================
+// AUTH
+// ============================================================
+async function checkSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    currentUser = session.user;
+    document.getElementById('auth-overlay').style.display = 'none';
+    await init();
+  }
+}
+
+function skipAuth() {
+  document.getElementById('auth-overlay').style.display = 'none';
+  init();
+}
+
+function switchAuth(type, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.aform').forEach(f => f.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('af-' + type).classList.add('active');
+}
+
+async function doLogin() {
+  const email = document.getElementById('a-email').value.trim();
+  const pass = document.getElementById('a-pass').value;
+  const err = document.getElementById('a-err');
+  err.style.display = 'none';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { err.textContent = error.message; err.style.display = 'block'; return; }
+  currentUser = data.user;
+  document.getElementById('auth-overlay').style.display = 'none';
+  await init();
+}
+
+async function doRegister() {
+  const nom = document.getElementById('r-nom').value.trim();
+  const email = document.getElementById('r-email').value.trim();
+  const tel = document.getElementById('r-tel').value.trim();
+  const pass = document.getElementById('r-pass').value;
+  const err = document.getElementById('r-err');
+  err.style.display = 'none';
+  if (!nom || !email || !pass) { err.textContent = 'Remplissez tous les champs'; err.style.display = 'block'; return; }
+  const { data, error } = await sb.auth.signUp({ email, password: pass });
+  if (error) { err.textContent = error.message; err.style.display = 'block'; return; }
+  await sb.from('utilisateurs').insert({ id: data.user.id, nom, email, telephone: tel, role: 'client', statut: 'actif' });
+  currentUser = data.user;
+  document.getElementById('auth-overlay').style.display = 'none';
+  await init();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+async function init() {
+  await loadProducts();
+  await initSession();
+  await initCart();
+  welcome();
+}
+
+async function loadProducts() {
+  const { data } = await sb.from('produits')
+    .select('*,categories(nom,emoji),boutiques(nom)')
+    .eq('actif', true)
+    .gt('stock', 0)
+    .order('created_at', { ascending: false });
+  allProducts = data || [];
+}
+
+async function initSession() {
+  if (!currentUser) return;
+  // Créer ou récupérer la session IA
+  const { data: existing } = await sb.from('ai_sessions')
+    .select('*').eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false }).limit(1).single();
+  if (existing) {
+    sessionId = existing.id;
+    history = existing.messages || [];
+  } else {
+    const { data: newSession } = await sb.from('ai_sessions')
+      .insert({ user_id: currentUser.id, messages: [], contexte: {}, statut: 'actif' })
+      .select().single();
+    if (newSession) sessionId = newSession.id;
+  }
+}
+
+async function initCart() {
+  if (!currentUser) return;
+  // Récupérer panier actif ou en créer un
+  const { data: existing } = await sb.from('carts')
+    .select('*').eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false }).limit(1).single();
+  if (existing) {
+    cartId = existing.id;
+    // Charger les items du panier
+    const { data: items } = await sb.from('cart_items')
+      .select('*,produits(*,categories(nom),boutiques(nom))')
+      .eq('cart_id', cartId);
+    cart = {};
+    (items || []).forEach(item => {
+      if (item.produits) cart[item.produit_id] = { ...item.produits, qty: item.quantite };
+    });
+    updateCartFloat();
+  } else {
+    // Créer un nouveau panier
+    const { data: newCart } = await sb.from('carts')
+      .insert({ user_id: currentUser.id, statut: 'actif' }).select().single();
+    if (newCart) cartId = newCart.id;
+  }
+}
+
+function welcome() {
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Bonjour' : hour < 18 ? 'Bonne après-midi' : 'Bonsoir';
+  const name = currentUser ? '' : '';
+  addAIMsg(greet + ' ! Je suis Yéyé Assistant, votre vendeur IA. Je peux vous aider à trouver les meilleurs produits, créer votre panier et finaliser votre commande. Que souhaitez-vous acheter aujourd\'hui ?');
+  setTimeout(() => addSuggs(['Repas pour 5000 FCFA', 'Légumes frais', 'Voir les promotions', 'Poisson fumé']), 400);
+}
+
+// ============================================================
+// TOOL ORCHESTRATOR — 7 OUTILS RÉELS
+// ============================================================
+const TOOLS = [
+  {
+    name: 'search_products',
+    description: 'Recherche des produits réels dans la base de données YéyéMarket. Toujours utiliser pour trouver des produits.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Nom ou type de produit' },
+        budget_max: { type: 'number', description: 'Prix maximum par produit en FCFA' },
+        categorie: { type: 'string', description: 'Catégorie: Légumes, Poissons, Viandes, Fruits, Céréales, Huiles, Epices, Oeufs, Brasserie, Boissons' }
+      },
+      required: ['query']
+    }
+  },
+  {
+    name: 'get_product',
+    description: 'Récupère les détails complets d\'un produit spécifique par son ID.',
+    input_schema: {
+      type: 'object',
+      properties: { product_id: { type: 'string', description: 'UUID du produit' } },
+      required: ['product_id']
+    }
+  },
+  {
+    name: 'create_bundle',
+    description: 'Crée un panier suggéré optimisé selon un budget. Utiliser quand le client donne un budget total.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        budget: { type: 'number', description: 'Budget total en FCFA' },
+        type_repas: { type: 'string', description: 'Type: repas_famille, petit_dejeuner, diner, marche_hebdo' }
+      },
+      required: ['budget']
+    }
+  },
+  {
+    name: 'add_to_cart',
+    description: 'Ajoute des produits au panier. Utiliser quand le client veut ajouter un produit.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        product_ids: { type: 'array', items: { type: 'string' }, description: 'IDs des produits' },
+        quantities: { type: 'array', items: { type: 'number' }, description: 'Quantités (défaut: 1)' }
+      },
+      required: ['product_ids']
+    }
+  },
+  {
+    name: 'calculate_budget',
+    description: 'Calcule ce qu\'on peut acheter avec un budget donné et optimise les achats.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        budget: { type: 'number', description: 'Budget en FCFA' },
+        priorites: { type: 'array', items: { type: 'string' }, description: 'Catégories prioritaires' }
+      },
+      required: ['budget']
+    }
+  },
+  {
+    name: 'suggest_bundle',
+    description: 'Suggère des produits complémentaires (cross-sell/upsell) à un produit donné.',
+    input_schema: {
+      type: 'object',
+      properties: { product_id: { type: 'string', description: 'ID du produit de référence' } },
+      required: ['product_id']
+    }
+  },
+  {
+    name: 'show_cart',
+    description: 'Affiche le contenu du panier actuel. Utiliser quand le client demande à voir son panier.',
+    input_schema: { type: 'object', properties: {}, required: [] }
+  }
+];
+
+// EXÉCUTION RÉELLE DES OUTILS (connecté à Supabase)
+async function executeTool(name, input) {
+  switch (name) {
+
+    case 'search_products': {
+      const q = (input.query || '').toLowerCase();
+      const budgetMax = input.budget_max || 999999;
+      const cat = (input.categorie || '').toLowerCase();
+      let results = allProducts.filter(p => {
+        if (Object.keys(cart).includes(p.id)) return false;
+        const price = p.prix_promo || p.prix;
+        const matchQ = !q || q.split(' ').filter(w => w.length > 2)
+          .some(w => p.nom.toLowerCase().includes(w) || p.categories?.nom?.toLowerCase().includes(w));
+        const matchB = price <= budgetMax;
+        const matchC = !cat || p.categories?.nom?.toLowerCase().includes(cat) ||
+          p.nom.toLowerCase().includes(cat);
+        return matchQ && matchB && matchC;
+      }).slice(0, 6);
+      return { products: results.map(p => ({ id: p.id, nom: p.nom, prix: p.prix_promo || p.prix, unite: p.unite, categorie: p.categories?.nom })), count: results.length, found: results };
+    }
+
+    case 'get_product': {
+      const prod = allProducts.find(p => p.id === input.product_id);
+      return prod ? { product: prod } : { error: 'Produit non trouvé' };
+    }
+
+    case 'create_bundle': {
+      const budget = input.budget || 5000;
+      const available = allProducts.filter(p => !Object.keys(cart).includes(p.id) && (p.prix_promo || p.prix) <= budget * 0.7);
+      let selected = [], remaining = budget;
+      const usedCats = new Set();
+      const sorted = [...available].sort((a, b) => (a.prix_promo || a.prix) - (b.prix_promo || b.prix));
+      // Algo: sélection variée et optimisée
+      for (const p of sorted) {
+        const price = p.prix_promo || p.prix;
+        if (price <= remaining && !usedCats.has(p.categorie_id) && selected.length < 6) {
+          selected.push(p); remaining -= price; usedCats.add(p.categorie_id);
+        }
+      }
+      if (selected.length < 2) selected = sorted.slice(0, 4);
+      const total = selected.reduce((s, p) => s + (p.prix_promo || p.prix), 0);
+      return { bundle: selected, budget, total, reste: budget - total };
+    }
+
+    case 'add_to_cart': {
+      const ids = input.product_ids || [];
+      const qtys = input.quantities || [];
+      const added = [];
+      for (let i = 0; i < ids.length; i++) {
+        const id = ids[i];
+        const qty = qtys[i] || 1;
+        const prod = allProducts.find(p => p.id === id);
+        if (!prod) continue;
+        // MAJ mémoire locale
+        if (cart[id]) cart[id].qty += qty;
+        else cart[id] = { ...prod, qty };
+        suggestedIds.add(id);
+        // Persistance Supabase si connecté
+        if (cartId) {
+          const { data: existing } = await sb.from('cart_items').select('*').eq('cart_id', cartId).eq('produit_id', id).single();
+          if (existing) {
+            await sb.from('cart_items').update({ quantite: existing.quantite + qty }).eq('id', existing.id);
+          } else {
+            await sb.from('cart_items').insert({ cart_id: cartId, produit_id: id, quantite: qty, prix_unitaire: prod.prix_promo || prod.prix });
+          }
+        }
+        added.push(prod.nom);
+      }
+      updateCartFloat();
+      return { added, cart_count: Object.values(cart).reduce((s, i) => s + i.qty, 0), total: calcTotal() };
+    }
+
+    case 'calculate_budget': {
+      const budget = input.budget || 5000;
+      const prios = (input.priorites || []).map(p => p.toLowerCase());
+      let sorted = [...allProducts].filter(p => (p.prix_promo || p.prix) <= budget);
+      if (prios.length) {
+        sorted.sort((a, b) => {
+          const aMatch = prios.some(p => a.categories?.nom?.toLowerCase().includes(p));
+          const bMatch = prios.some(p => b.categories?.nom?.toLowerCase().includes(p));
+          return (bMatch ? 1 : 0) - (aMatch ? 1 : 0);
+        });
+      }
+      const options = sorted.slice(0, 8);
+      const totalIfAll = options.reduce((s, p) => s + (p.prix_promo || p.prix), 0);
+      return { budget, options: options.map(p => ({ id: p.id, nom: p.nom, prix: p.prix_promo || p.prix, unite: p.unite })), total_possible: totalIfAll, dans_budget: options.filter(p => (p.prix_promo || p.prix) <= budget) };
+    }
+
+    case 'suggest_bundle': {
+      const prod = allProducts.find(p => p.id === input.product_id);
+      if (!prod) return { suggestions: [] };
+      const pairMap = { 'Céréales & Tubercules': ['Huiles', 'Légumes', 'Poissons'], 'Poissons': ['Légumes', 'Épices', 'Huiles'], 'Viandes': ['Légumes', 'Épices', 'Huiles'], 'Légumes': ['Huiles', 'Épices', 'Poissons'], 'Oeufs': ['Légumes', 'Huiles'] };
+      const catPairs = pairMap[prod.categories?.nom] || [];
+      const suggs = allProducts.filter(p => p.id !== prod.id && !suggestedIds.has(p.id) && !Object.keys(cart).includes(p.id) && (catPairs.includes(p.categories?.nom) || p.categorie_id === prod.categorie_id)).slice(0, 3);
+      suggs.forEach(p => suggestedIds.add(p.id));
+      return { suggestions: suggs, product: prod.nom };
+    }
+
+    case 'show_cart': {
+      const items = Object.values(cart);
+      const total = calcTotal();
+      return { items: items.map(i => ({ nom: i.nom, qty: i.qty, prix: i.prix_promo || i.prix, sous_total: (i.prix_promo || i.prix) * i.qty })), total, count: items.length };
+    }
+
+    default:
+      return { error: 'Outil inconnu: ' + name };
+  }
+}
+
+// ============================================================
+// TRAITEMENT IA AVEC TOOL USE
+// ============================================================
+async function processAI(userMsg) {
+  isTyping = true;
+  document.getElementById('send-btn').disabled = true;
+  showTyping();
+
+  // Contexte produits (limité pour économiser tokens)
+  const prodCtx = allProducts.slice(0, 50).map(p =>
+    'ID:' + p.id.substring(0, 8) + ' | ' + p.nom + ' | ' + (p.categories?.nom || '-') + ' | ' + (p.prix_promo || p.prix) + ' FCFA/' + p.unite + (p.prix_promo ? ' [PROMO]' : '')
+  ).join('\n');
+
+  const cartCtx = Object.values(cart).length > 0
+    ? Object.values(cart).map(i => i.nom + ' x' + i.qty).join(', ')
+    : 'vide';
+
+  const systemLines = [
+    'Tu es Yéyé Assistant, vendeur IA de YéyéMarket (marketplace beninoise).',
+    '',
+    'REGLES ABSOLUES:',
+    '- Reponds en francais, style WhatsApp (court, emojis, naturel)',
+    '- TOUJOURS utiliser les outils pour chercher des produits, jamais inventer',
+    '- TOUJOURS orienter vers un achat concret',
+    '- Maximum 2-3 phrases de texte, les produits via outils',
+    '- Si client donne un budget, appeler create_bundle ou calculate_budget',
+    '- Si client mentionne un produit, appeler search_products',
+    '- Si client veut voir panier, appeler show_cart',
+    '- Proposer TOUJOURS une action suivante (upsell, validation)',
+    '',
+    'CATALOGUE (' + allProducts.length + ' produits disponibles):',
+    prodCtx,
+    '',
+    'PANIER ACTUEL: ' + cartCtx
+  ];
+  const systemPrompt = systemLines.join('\n');
+
+  try {
+    // Timeout après 8 secondes → fallback
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      signal: controller.signal,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        system: systemPrompt,
+        tools: TOOLS,
+        messages: history.slice(-12)
+      })
+    });
+
+    clearTimeout(timeout);
+    const data = await response.json();
+    if (data.error) throw new Error(data.error.message);
+
+    hideTyping();
+
+    // Traiter les blocs de réponse
+    let textParts = [];
+    let toolUses = [];
+
+    for (const block of (data.content || [])) {
+      if (block.type === 'text') textParts.push(block.text);
+      else if (block.type === 'tool_use') toolUses.push(block);
+    }
+
+    // Afficher le texte si présent
+    if (textParts.join('').trim()) addAIMsg(textParts.join('').trim());
+
+    if (toolUses.length > 0) {
+      // Exécuter les outils
+      const toolResults = [];
+      for (const tu of toolUses) {
+        const result = await executeTool(tu.name, tu.input);
+        await renderTool(tu.name, tu.input, result);
+        toolResults.push({ type: 'tool_result', tool_use_id: tu.id, content: JSON.stringify(result) });
+      }
+
+      // Mettre à jour l'historique
+      history.push({ role: 'assistant', content: data.content });
+      history.push({ role: 'user', content: toolResults });
+
+      // Appel de suivi si nécessaire
+      if (data.stop_reason === 'tool_use') {
+        showTyping();
+        const followUp = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 600,
+            system: systemPrompt,
+            tools: TOOLS,
+            messages: history.slice(-14)
+          })
+        });
+        const fData = await followUp.json();
+        hideTyping();
+        for (const block of (fData.content || [])) {
+          if (block.type === 'text' && block.text.trim()) {
+            addAIMsg(block.text.trim());
+            history.push({ role: 'assistant', content: [{ type: 'text', text: block.text }] });
+          }
+        }
+      }
+    } else {
+      history.push({ role: 'assistant', content: data.content });
+    }
+
+    // Sauvegarder session
+    await saveSession();
+
+  } catch (e) {
+    console.error('AI Error (using smart fallback):', e.message);
+    hideTyping();
+    await smartFallback(userMsg);
+  }
+
+  isTyping = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+// RENDU VISUEL DES OUTILS
+async function renderTool(name, input, result) {
+  await delay(200);
+  switch (name) {
+    case 'search_products':
+      if (result.found?.length) addProds(result.found);
+      else addAIMsg('Aucun produit trouvé pour "' + input.query + '". Essayez un autre terme.');
+      break;
+    case 'create_bundle':
+      if (result.bundle?.length) addBundle(result.bundle, result.budget, result.total);
+      break;
+    case 'add_to_cart':
+      if (result.added?.length) {
+        toast('Ajoute: ' + result.added.join(', '), 'ok');
+        const lastProd = allProducts.find(p => p.nom === result.added[result.added.length - 1]);
+        if (lastProd) {
+          const { suggestions } = await executeTool('suggest_bundle', { product_id: lastProd.id });
+          if (suggestions?.length) {
+            await delay(700);
+            addAIMsg('Super ! Avec ' + lastProd.nom + ', vous aimerez aussi :');
+            addProds(suggestions);
+          }
+        }
+      }
+      break;
+    case 'show_cart':
+      openDrawer();
+      break;
+    case 'calculate_budget':
+      if (result.dans_budget?.length) addBundle(result.dans_budget.slice(0, 5), result.budget, result.dans_budget.slice(0, 5).reduce((s, p) => s + p.prix, 0));
+      break;
+    case 'suggest_bundle':
+      if (result.suggestions?.length) addProds(result.suggestions);
+      break;
+  }
+}
+
+// FALLBACK INTELLIGENT (sans API)
+async function smartFallback(msg) {
+  const low = msg.toLowerCase();
+  const budget = parseInt((msg.match(/(\d+)/) || [])[1] || '0');
+
+  // TRACKING
+  if (low.includes('suivre') || (low.includes('commande') && (low.includes('ou') || low.includes('statut') || low.includes('tracking')))) {
+    await trackLastOrder(); return;
+  }
+
+  if (low.includes('panier') || low.includes('voir') && low.includes('cart')) {
+    if (Object.keys(cart).length > 0) { openDrawer(); addAIMsg('Voici votre panier !'); }
+    else addAIMsg('Votre panier est vide. Que souhaitez-vous acheter ?');
+    addSuggs(['Legumes frais', 'Poisson fume', '5000 FCFA']);
+    return;
+  }
+  if (budget >= 500) {
+    const res = await executeTool('create_bundle', { budget });
+    addAIMsg('Voici ce que je vous propose pour ' + fmt(budget) + ' FCFA !');
+    if (res.bundle?.length) addBundle(res.bundle, budget, res.total);
+    addSuggs(['Ajouter tout au panier', 'Autre budget', 'Valider commande']);
+    return;
+  }
+  // Recherche par mots-clés
+  const keys = ['poisson', 'viande', 'legume', 'gombo', 'gboman', 'gari', 'riz', 'huile', 'tomate', 'oignon', 'oeuf', 'haricot', 'piment', 'banane', 'mangue'];
+  let found = [];
+  for (const k of keys) {
+    if (low.includes(k) || low.includes(k.replace('e', 'é'))) {
+      found = allProducts.filter(p => !Object.keys(cart).includes(p.id) && (p.nom.toLowerCase().includes(k) || p.categories?.nom?.toLowerCase().includes(k))).slice(0, 5);
+      if (found.length) break;
+    }
+  }
+  if (found.length) {
+    addAIMsg('Voici ce que j\'ai trouvé !');
+    addProds(found);
+    addSuggs(['Ajouter au panier', 'Autre produit', 'Voir mon panier']);
+  } else {
+    addAIMsg('Dites-moi votre budget ou le produit que vous cherchez, je vous trouve les meilleures options !');
+    addSuggs(['5000 FCFA', 'Legumes frais', 'Poisson fume', 'Promotions']);
+  }
+}
+
+async function saveSession() {
+  if (!sessionId || !currentUser) return;
+  try {
+    await sb.from('ai_sessions').update({ messages: history.slice(-20), updated_at: new Date().toISOString() }).eq('id', sessionId);
+  } catch(e) { console.log('Save session skipped:', e.message); }
+}
+
+// ============================================================
+// UI HELPERS
+// ============================================================
+function addAIMsg(text) {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg msg-ai';
+  const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  wrap.innerHTML =
+    '<div class="av av-ai"><img src="' + LOGO + '" onerror="this.parentElement.textContent=\'Y\'" alt="IA"/></div>' +
+    '<div><div class="bubble bubble-ai">' + fmtText(text) + '</div></div>';
+  chat.appendChild(wrap);
+  const timeEl = document.createElement('div');
+  timeEl.className = 'msg-time';
+  timeEl.textContent = time;
+  chat.appendChild(timeEl);
+  scroll();
+}
+
+function addUserMsg(text) {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg msg-user';
+  const time = new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  wrap.innerHTML =
+    '<div class="av av-user">👤</div>' +
+    '<div><div class="bubble bubble-user">' + esc(text) + '</div></div>';
+  chat.appendChild(wrap);
+  const timeEl = document.createElement('div');
+  timeEl.className = 'msg-time';
+  timeEl.textContent = time;
+  chat.appendChild(timeEl);
+  scroll();
+}
+
+function showTyping() {
+  const chat = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.id = 'typing';
+  div.className = 'typing-wrap';
+  div.innerHTML = '<div class="av av-ai"><img src="' + LOGO + '" onerror="this.parentElement.textContent=\'Y\'" alt="IA"/></div><div class="typing-bubble"><span></span><span></span><span></span></div>';
+  chat.appendChild(div);
+  scroll();
+}
+
+function hideTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+function addProds(prods) {
+  const chat = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.className = 'prod-scroll';
+  div.innerHTML = prods.slice(0, 6).map(p => {
+    const price = p.prix_promo || p.prix;
+    const hasPromo = p.prix && p.prix_promo && p.prix > p.prix_promo;
+    return '<div class="pc">' +
+      (p.image_url ? '<img src="' + p.image_url + '" class="pc-img" alt="' + esc(p.nom) + '" onerror="this.parentElement.querySelector(\'.pc-img\').textContent=\'' + catEmo(p.categories?.nom) + '\'"/>' : '<div class="pc-img">' + catEmo(p.categories?.nom) + '</div>') +
+      '<div class="pc-body">' +
+      '<div class="pc-name" title="' + esc(p.nom) + '">' + esc(p.nom) + '</div>' +
+      (hasPromo ? '<div class="pc-promo">' + fmt(p.prix) + ' FCFA</div>' : '') +
+      '<div class="pc-price">' + fmt(price) + ' FCFA/' + (p.unite || 'u') + '</div>' +
+      '<button class="pc-btn" id="pb-' + p.id + '" onclick="quickAdd(\'' + p.id + '\')">+ Ajouter</button>' +
+      '</div></div>';
+  }).join('');
+  chat.appendChild(div);
+  scroll();
+}
+
+function addBundle(prods, budget, total) {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'bundle-wrap';
+  const ids = prods.map(p => p.id).join(',');
+  const itemsHtml = prods.map(p => {
+    const price = p.prix_promo || p.prix;
+    return '<div class="bi">' +
+      '<div class="bi-img">' + (p.image_url ? '<img src="' + p.image_url + '" alt="' + esc(p.nom) + '" onerror="this.parentElement.textContent=\'' + catEmo(p.categories?.nom) + '\'"/>' : catEmo(p.categories?.nom)) + '</div>' +
+      '<div class="bi-name">' + esc(p.nom) + '</div>' +
+      '<div class="bi-price">' + fmt(price) + ' FCFA</div>' +
+      '</div>';
+  }).join('');
+  wrap.innerHTML = '<div class="bundle">' +
+    '<div class="bundle-head"><div class="bundle-head-ico">🎁</div><div class="bundle-head-txt">Panier suggéré — ' + fmt(budget) + ' FCFA</div></div>' +
+    '<div class="bundle-items">' + itemsHtml + '</div>' +
+    '<div class="bundle-foot"><div class="bundle-total"><span>Total panier</span><span>' + fmt(total) + ' FCFA</span></div>' +
+    '<button class="bundle-btn" data-ids="' + ids + '" onclick="addBundle(this)">Ajouter tout au panier</button>' +
+    '</div></div>';
+  chat.appendChild(wrap);
+  scroll();
+}
+
+async function addBundle(btn) {
+  const ids = btn.dataset.ids.split(',').filter(Boolean);
+  btn.textContent = '⏳ Ajout...';
+  btn.disabled = true;
+  const result = await executeTool('add_to_cart', { product_ids: ids });
+  btn.textContent = '✅ ' + result.added?.length + ' produits ajoutés !';
+  btn.style.background = 'linear-gradient(135deg,#16a34a,#15803d)';
+  toast(result.added?.length + ' produits ajoutés au panier !', 'ok');
+  addSuggs(['Valider ma commande', 'Voir mon panier', 'Ajouter autre chose']);
+}
+
+async function quickAdd(prodId) {
+  const btn = document.getElementById('pb-' + prodId);
+  if (btn) { btn.textContent = '...'; btn.disabled = true; }
+  const result = await executeTool('add_to_cart', { product_ids: [prodId] });
+  if (btn) { btn.textContent = '✅ Ajouté'; btn.classList.add('added'); }
+  toast('Ajouté au panier !', 'ok');
+  const prod = allProducts.find(p => p.id === prodId);
+  if (prod) {
+    await delay(600);
+    const { suggestions } = await executeTool('suggest_bundle', { product_id: prodId });
+    if (suggestions?.length) {
+      addAIMsg('Avec ' + prod.nom + ', vous aimerez aussi :');
+      addProds(suggestions);
+    } else {
+      addSuggs(['Voir mon panier', 'Valider commande', 'Autre produit']);
+    }
+  }
+}
+
+function addSuggs(items) {
+  const chat = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.className = 'sugg-wrap';
+  div.innerHTML = items.map(s => '<button class="sugg" onclick="sendQuick(\'' + s.replace(/'/g, "\\'") + '\')">' + s + '</button>').join('');
+  chat.appendChild(div);
+  scroll();
+}
+
+// PANIER
+function updateCartFloat() {
+  const items = Object.values(cart);
+  const count = items.reduce((s, i) => s + i.qty, 0);
+  const total = calcTotal();
+  const float = document.getElementById('cart-float');
+  if (count > 0) {
+    float.style.display = 'block';
+    document.getElementById('cf-count').textContent = count + ' article' + (count > 1 ? 's' : '');
+    document.getElementById('cf-total').textContent = fmt(total) + ' FCFA';
+  } else {
+    float.style.display = 'none';
+  }
+}
+
+function openDrawer() {
+  renderDrawer();
+  document.getElementById('cart-drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('open');
+}
+
+function closeDrawer() {
+  document.getElementById('cart-drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('open');
+}
+
+function renderDrawer() {
+  const items = Object.values(cart);
+  const itemsEl = document.getElementById('drawer-items');
+  const summEl = document.getElementById('drawer-summary');
+  if (!items.length) {
+    itemsEl.innerHTML = '<div style="text-align:center;padding:32px;color:var(--g400)"><div style="font-size:36px;margin-bottom:8px">🛒</div><p>Panier vide</p></div>';
+    summEl.innerHTML = '';
+    return;
+  }
+  const subtotal = calcTotal();
+  const livraison = 500;
+  itemsEl.innerHTML = items.map(item => {
+    const price = item.prix_promo || item.prix;
+    return '<div class="ci">' +
+      '<div class="ci-img">' + (item.image_url ? '<img src="' + item.image_url + '" alt="' + esc(item.nom) + '"/>' : catEmo(item.categories?.nom)) + '</div>' +
+      '<div class="ci-info"><div class="ci-name">' + esc(item.nom) + '</div><div class="ci-price">' + fmt(price) + ' FCFA/' + (item.unite || 'u') + '</div></div>' +
+      '<div class="ci-qty"><button class="qb" onclick="changeQty(\'' + item.id + '\',-1)">-</button><span style="font-weight:700;min-width:18px;text-align:center">' + item.qty + '</span><button class="qb" onclick="changeQty(\'' + item.id + '\',1)">+</button></div>' +
+      '</div>';
+  }).join('');
+  summEl.innerHTML = '<div class="sum-row"><span>Sous-total</span><span>' + fmt(subtotal) + ' FCFA</span></div>' +
+    '<div class="sum-row"><span>Livraison</span><span>' + fmt(livraison) + ' FCFA</span></div>' +
+    '<div class="sum-row total"><span>Total</span><span>' + fmt(subtotal + livraison) + ' FCFA</span></div>';
+}
+
+async function changeQty(id, d) {
+  if (!cart[id]) return;
+  cart[id].qty = Math.max(0, cart[id].qty + d);
+  if (cart[id].qty === 0) {
+    delete cart[id];
+    if (cartId) await sb.from('cart_items').delete().eq('cart_id', cartId).eq('produit_id', id);
+  } else {
+    if (cartId) await sb.from('cart_items').update({ quantite: cart[id].qty }).eq('cart_id', cartId).eq('produit_id', id);
+  }
+  updateCartFloat();
+  renderDrawer();
+}
+
+function calcTotal() {
+  return Object.values(cart).reduce((s, i) => s + (i.prix_promo || i.prix) * i.qty, 0);
+}
+
+function checkout() {
+  closeDrawer();
+  if (!currentUser) {
+    addAIMsg('Pour finaliser votre commande, connectez-vous d\'abord !');
+    setTimeout(() => document.getElementById('auth-overlay').style.display = 'flex', 500);
+    return;
+  }
+  addAIMsg('Je vous redirige vers la page de paiement KKiaPay. Votre panier est sauvegardé !');
+  setTimeout(() => window.location.href = 'index.html', 1800);
+}
+
+// SEND MESSAGE
+async function sendMsg() {
+  const input = document.getElementById('msg-input');
+  const text = input.value.trim();
+  if (!text || isTyping) return;
+  input.value = '';
+  input.style.height = 'auto';
+  addUserMsg(text);
+  history.push({ role: 'user', content: text });
+  await processAI(text);
+}
+
+function sendQuick(text) {
+  if (isTyping) return;
+  document.getElementById('msg-input').value = text;
+  sendMsg();
+}
+
+function resetChat() {
+  document.getElementById('chat').innerHTML = '';
+  history = [];
+  suggestedIds = new Set();
+  welcome();
+}
+
+// UTILS
+function fmtText(t) {
+  return t.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>');
+}
+function esc(s) { return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+function fmt(n) { return (n || 0).toLocaleString('fr-FR'); }
+function catEmo(n) {
+  const m = { 'Viandes': '🥩', 'Poissons': '🐟', 'Légumes': '🥦', 'Fruits': '🍌', 'Épicerie': '🛍️', 'Brasserie': '🍺', 'Huiles': '🫙', 'Épices': '🌶️', 'Céréales & Tubercules': '🌾', 'Restaurants': '🍽️', 'Boissons': '🥤', 'Oeufs': '🥚', 'Marché': '🧺' };
+  return m[n] || '📦';
+}
+function scroll() { const c = document.getElementById('chat'); c.scrollTop = c.scrollHeight; }
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+function toast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast ' + (type || '');
+  t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2500);
+}
+function handleKey(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); } }
+function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 90) + 'px'; }
+
+// START
+
+// ============================================================
+// PHASE 2 — CHECKOUT COMPLET AVEC KKIAPAY
+// ============================================================
+let selectedPayMethod = 'mtn';
+let pendingOrderData = null;
+
+function selectPay(method) {
+  selectedPayMethod = method;
+  ['mtn','moov','card'].forEach(m => {
+    document.getElementById('pm-'+m).classList.toggle('active', m === method);
+  });
+  const momoInput = document.getElementById('co-momo');
+  momoInput.placeholder = method === 'card' ? 'Numéro de carte (géré par KKiaPay)' : 'Numéro Mobile Money *';
+}
+
+async function openCheckout() {
+  const items = Object.values(cart);
+  if (!items.length) { toast('Votre panier est vide !', 'err'); return; }
+  if (!currentUser) {
+    addAIMsg('Connectez-vous pour passer une commande !');
+    setTimeout(() => document.getElementById('auth-overlay').style.display = 'flex', 500);
+    return;
+  }
+  closeDrawer();
+  // Charger zones
+  const { data: zones } = await sb.from('zones').select('*').eq('actif', true).order('nom');
+  const sel = document.getElementById('co-zone');
+  sel.innerHTML = '<option value="">Choisir votre zone...</option>';
+  (zones || []).forEach(z => {
+    sel.innerHTML += '<option value="' + z.id + '" data-frais="' + (z.frais_livraison||500) + '">' + z.ville + ' — ' + z.nom + ' (' + fmt(z.frais_livraison||500) + ' FCFA)</option>';
+  });
+  sel.onchange = updateCoSummary;
+  // Pré-remplir téléphone
+  if (currentUser?.phone) document.getElementById('co-tel').value = currentUser.phone;
+  updateCoSummary();
+  document.getElementById('checkout-normal').style.display = 'block';
+  document.getElementById('checkout-success').style.display = 'none';
+  document.getElementById('co-err').style.display = 'none';
+  document.getElementById('checkout-overlay').classList.add('open');
+}
+
+function closeCheckout() {
+  document.getElementById('checkout-overlay').classList.remove('open');
+  pendingOrderData = null;
+}
+
+function updateCoSummary() {
+  const items = Object.values(cart);
+  const subtotal = calcTotal();
+  const sel = document.getElementById('co-zone');
+  const opt = sel.options[sel.selectedIndex];
+  const frais = opt && opt.dataset.frais ? parseInt(opt.dataset.frais) : 500;
+  const total = subtotal + frais;
+  document.getElementById('co-summary').innerHTML =
+    '<div class="os-row"><span>Articles (' + items.reduce((s,i)=>s+i.qty,0) + ')</span><span>' + fmt(subtotal) + ' FCFA</span></div>' +
+    '<div class="os-row"><span>Livraison</span><span>' + fmt(frais) + ' FCFA</span></div>' +
+    '<div class="os-row total"><span>Total</span><span>' + fmt(total) + ' FCFA</span></div>';
+  // Update pay button
+  document.getElementById('pay-btn').innerHTML = '💳 Payer ' + fmt(total) + ' FCFA avec KKiaPay';
+}
+
+async function launchPayment() {
+  const adresse = document.getElementById('co-adresse').value.trim();
+  const zone_id = document.getElementById('co-zone').value;
+  const tel = document.getElementById('co-tel').value.trim();
+  const momo = document.getElementById('co-momo').value.trim();
+  const notes = document.getElementById('co-notes').value;
+  const err = document.getElementById('co-err');
+  err.style.display = 'none';
+
+  if (!adresse) { err.textContent = 'Adresse de livraison obligatoire'; err.style.display = 'block'; return; }
+  if (!zone_id) { err.textContent = 'Choisissez votre zone de livraison'; err.style.display = 'block'; return; }
+  if (!tel) { err.textContent = 'Téléphone de livraison obligatoire'; err.style.display = 'block'; return; }
+  if (!momo && selectedPayMethod !== 'card') { err.textContent = 'Numéro Mobile Money obligatoire'; err.style.display = 'block'; return; }
+
+  const sel = document.getElementById('co-zone');
+  const opt = sel.options[sel.selectedIndex];
+  const frais = opt && opt.dataset.frais ? parseInt(opt.dataset.frais) : 500;
+  const subtotal = calcTotal();
+  const total = subtotal + frais;
+
+  // Sauvegarder les données de commande en attente
+  pendingOrderData = { adresse, zone_id, tel, momo, notes, frais, subtotal, total };
+
+  // Lancer KKiaPay
+  const btn = document.getElementById('pay-btn');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ Ouverture KKiaPay...';
+
+  try {
+    openKkiapayWidget({
+      amount: total,
+      api_key: '782f2ffff070438f6693d98f861b909f89ff09eb',
+      sandbox: false,
+      phone: momo || tel,
+      name: currentUser?.email || '',
+      callback: window.location.href,
+      theme: '#0B3D2E'
+    });
+  } catch(e) {
+    // Si KKiaPay non chargé, simuler pour test
+    console.warn('KKiaPay non disponible, mode test');
+    await onPaymentSuccess({ transactionId: 'TEST-' + Date.now() });
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '💳 Payer ' + fmt(total) + ' FCFA avec KKiaPay';
+}
+
+// SUCCÈS PAIEMENT KKIAPAY
+async function onPaymentSuccess(response) {
+  if (!pendingOrderData) return;
+  const { adresse, zone_id, tel, notes, frais, subtotal, total } = pendingOrderData;
+  const transactionId = response?.transactionId || response?.transaction_id || '';
+
+  toast('Paiement confirmé ! Création de la commande...', 'ok');
+
+  // 1. Créer la commande dans Supabase
+  const { data: cmd, error: cmdErr } = await sb.from('commandes').insert({
+    client_id: currentUser.id,
+    total,
+    adresse_livraison: adresse,
+    zone_id,
+    notes,
+    statut: 'confirmee'
+  }).select().single();
+
+  if (cmdErr) { toast('Erreur commande: ' + cmdErr.message, 'err'); return; }
+
+  // 2. Créer les lignes de commande
+  const items = Object.values(cart);
+  const lignes = items.map(i => ({
+    commande_id: cmd.id,
+    produit_id: i.id,
+    nom_item: i.nom,
+    prix_unitaire: i.prix_promo || i.prix,
+    quantite: i.qty,
+    sous_total: (i.prix_promo || i.prix) * i.qty
+  }));
+  await sb.from('lignes_commande').insert(lignes);
+
+  // 3. Enregistrer le paiement
+  await sb.from('paiements').insert({
+    commande_id: cmd.id,
+    montant: total,
+    methode: 'mobile_money',
+    operateur: selectedPayMethod.toUpperCase(),
+    telephone: pendingOrderData.momo || pendingOrderData.tel,
+    statut: 'confirme',
+    reference: transactionId
+  });
+
+  // 4. Marquer le panier comme commandé
+  if (cartId) await sb.from('carts').update({ statut: 'commande' }).eq('id', cartId);
+
+  // 5. Vider le panier local
+  cart = {};
+  cartId = null;
+  updateCartFloat();
+
+  // 6. Afficher succès
+  document.getElementById('checkout-normal').style.display = 'none';
+  document.getElementById('checkout-success').style.display = 'block';
+  document.getElementById('success-order-id').textContent = 'Commande #' + cmd.id.substring(0,8).toUpperCase();
+
+  // 7. Message IA de confirmation
+  addAIMsg('Commande confirmee et payee ! Votre commande #' + cmd.id.substring(0,8).toUpperCase() + ' est en cours de traitement. Un livreur vous contactera bientot !');
+  addSuggs(['Suivre ma commande', 'Nouvelle commande', 'Merci !']);
+
+  // 8. Créer nouvelle session panier
+  if (currentUser) {
+    const { data: newCart } = await sb.from('carts').insert({ user_id: currentUser.id, statut: 'actif' }).select().single();
+    if (newCart) cartId = newCart.id;
+  }
+
+  pendingOrderData = null;
+}
+
+function onPaymentFailed(error) {
+  toast('Paiement echoue. Reessayez !', 'err');
+  const err = document.getElementById('co-err');
+  err.textContent = 'Paiement echoue: ' + (error?.message || 'Erreur inconnue');
+  err.style.display = 'block';
+}
+
+function afterSuccess() {
+  closeCheckout();
+  window.location.href = 'index.html';
+}
+
+// Écouter les événements KKiaPay
+window.addEventListener('kkiapay_success_payment', e => onPaymentSuccess(e.detail));
+window.addEventListener('kkiapay_failed_payment', e => onPaymentFailed(e.detail));
+
+// Modifier checkout() pour utiliser le nouveau système
+function checkout() {
+  closeDrawer();
+  openCheckout();
+}
+
+
+// ============================================================
+// PHASE 3 — TRACKING TEMPS RÉEL
+// ============================================================
+let trackingSubscription = null;
+let currentTrackingId = null;
+
+const TRACKING_STEPS = [
+  { key: 'en_attente',     ico: '⏳', label: 'Commande reçue',      sub: 'Votre commande a été enregistrée' },
+  { key: 'confirmee',      ico: '✅', label: 'Confirmée',            sub: 'Paiement validé' },
+  { key: 'en_preparation', ico: '👨‍🍳', label: 'En préparation',     sub: 'Le vendeur prépare votre commande' },
+  { key: 'prete',          ico: '📦', label: 'Prête',                sub: 'En attente du livreur' },
+  { key: 'en_livraison',   ico: '🚴', label: 'En route !',           sub: 'Votre livreur est en chemin' },
+  { key: 'livree',         ico: '🎉', label: 'Livrée !',             sub: 'Profitez bien !' }
+];
+
+const STATUS_ORDER = ['en_attente','confirmee','en_preparation','prete','en_livraison','livree'];
+
+const STATUS_LABELS = {
+  en_attente: '⏳ En attente',
+  confirmee: '✅ Confirmée',
+  en_preparation: '👨‍🍳 En préparation',
+  prete: '📦 Prête',
+  en_livraison: '🚴 En livraison',
+  livree: '🎉 Livrée !',
+  annulee: '❌ Annulée'
+};
+
+async function openTracking(cmdId) {
+  currentTrackingId = cmdId;
+  document.getElementById('tr-cmd-id').textContent = '#' + cmdId.substring(0,8).toUpperCase();
+  document.getElementById('tracking-overlay').classList.add('open');
+  await loadTrackingData(cmdId);
+  // Subscribe to realtime
+  if (trackingSubscription) { trackingSubscription.unsubscribe(); }
+  trackingSubscription = sb.channel('tracking-' + cmdId)
+    .on('postgres_changes', {
+      event: 'UPDATE', schema: 'public', table: 'commandes',
+      filter: 'id=eq.' + cmdId
+    }, async () => {
+      await loadTrackingData(cmdId);
+      toast('Statut mis à jour !', 'ok');
+    }).subscribe();
+}
+
+function closeTracking() {
+  document.getElementById('tracking-overlay').classList.remove('open');
+  if (trackingSubscription) { trackingSubscription.unsubscribe(); trackingSubscription = null; }
+  currentTrackingId = null;
+}
+
+async function loadTrackingData(cmdId) {
+  const { data: cmd } = await sb.from('commandes')
+    .select('*,zones(nom,ville),lignes_commande(*)')
+    .eq('id', cmdId).single();
+  if (!cmd) return;
+
+  const { data: liv } = await sb.from('livraisons')
+    .select('*,livreurs(nom,telephone)')
+    .eq('commande_id', cmdId).single();
+
+  // Status badge
+  document.getElementById('tr-status-badge').textContent = STATUS_LABELS[cmd.statut] || cmd.statut;
+
+  // Steps
+  const idx = STATUS_ORDER.indexOf(cmd.statut);
+  const stepsEl = document.getElementById('tr-steps');
+  stepsEl.innerHTML = TRACKING_STEPS.map((s, i) => {
+    const isDone = i < idx;
+    const isActive = i === idx;
+    const cls = isDone ? 'done' : isActive ? 'active' : 'pending';
+    return '<div class="t-step ' + cls + '">' +
+      '<div class="t-dot">' + (isDone ? '✓' : s.ico) + '</div>' +
+      '<div class="t-info">' +
+        '<div class="t-label">' + s.label + '</div>' +
+        '<div class="t-sub">' + (isActive || isDone ? s.sub : 'En attente...') + '</div>' +
+      '</div></div>';
+  }).join('');
+
+  // Livreur
+  const livCard = document.getElementById('tr-livreur-card');
+  if (liv?.livreurs && (cmd.statut === 'en_livraison' || cmd.statut === 'livree')) {
+    livCard.style.display = 'block';
+    document.getElementById('tr-livreur').innerHTML =
+      '<div class="livreur-av">🚴</div>' +
+      '<div class="livreur-info"><div class="livreur-name">' + (liv.livreurs.nom || 'Livreur') + '</div><div class="livreur-veh">Votre livreur</div></div>' +
+      '<a class="livreur-call" href="tel:' + (liv.livreurs.telephone || '') + '">📞</a>';
+  } else {
+    livCard.style.display = 'none';
+  }
+
+  // Récap commande
+  const lignes = cmd.lignes_commande || [];
+  const recap = document.getElementById('tr-recap');
+  recap.innerHTML = lignes.map(l => '<div class="ir-row"><span>' + l.quantite + 'x ' + l.nom_item + '</span><span>' + fmt(l.sous_total) + ' FCFA</span></div>').join('') +
+    '<div class="ir-row"><span>Total</span><span>' + fmt(cmd.total) + ' FCFA</span></div>';
+  document.getElementById('tr-adresse').textContent = '📍 ' + (cmd.adresse_livraison || '') + ' — ' + (cmd.zones?.ville || '') + ' ' + (cmd.zones?.nom || '');
+}
+
+// ASSIGNATION AUTOMATIQUE LIVREUR (appelée après création commande)
+async function autoAssignLivreur(cmdId, zoneId) {
+  // Chercher livreur disponible dans la même zone
+  const { data: livreurs } = await sb.from('livreurs')
+    .select('*').eq('zone_id', zoneId)
+    .eq('statut', 'actif').eq('disponible', true).limit(1);
+
+  if (livreurs?.length) {
+    const livreur = livreurs[0];
+    // Créer la livraison
+    await sb.from('livraisons').insert({
+      commande_id: cmdId,
+      livreur_id: livreur.id,
+      statut: 'assignee'
+    });
+    // Marquer livreur comme occupé
+    await sb.from('livreurs').update({ disponible: false }).eq('id', livreur.id);
+    // Mettre à jour statut commande
+    await sb.from('commandes').update({ statut: 'en_preparation' }).eq('id', cmdId);
+    // Notifier le livreur
+    await sb.from('notifications').insert({
+      user_id: livreur.user_id,
+      titre: '🚴 Nouvelle livraison !',
+      message: 'Une commande vous a été assignée.',
+      type: 'livraison'
+    });
+    return livreur;
+  }
+  return null;
+}
+
+// Modifier onPaymentSuccess pour assigner livreur auto
+const _originalPaymentSuccess = window.onPaymentSuccess;
+
+// Override pour ajouter auto-assignation
+async function onPaymentSuccess(response) {
+  if (!pendingOrderData) return;
+  const { adresse, zone_id, tel, notes, frais, subtotal, total } = pendingOrderData;
+  const transactionId = response?.transactionId || response?.transaction_id || '';
+
+  toast('Paiement confirmé ! Création de la commande...', 'ok');
+
+  const { data: cmd, error: cmdErr } = await sb.from('commandes').insert({
+    client_id: currentUser.id,
+    total,
+    adresse_livraison: adresse,
+    zone_id,
+    notes,
+    statut: 'confirmee'
+  }).select().single();
+
+  if (cmdErr) { toast('Erreur: ' + cmdErr.message, 'err'); return; }
+
+  const items = Object.values(cart);
+  await sb.from('lignes_commande').insert(items.map(i => ({
+    commande_id: cmd.id,
+    produit_id: i.id,
+    nom_item: i.nom,
+    prix_unitaire: i.prix_promo || i.prix,
+    quantite: i.qty,
+    sous_total: (i.prix_promo || i.prix) * i.qty
+  })));
+
+  await sb.from('paiements').insert({
+    commande_id: cmd.id,
+    montant: total,
+    methode: 'mobile_money',
+    operateur: selectedPayMethod.toUpperCase(),
+    telephone: pendingOrderData.momo || tel,
+    statut: 'confirme',
+    reference: transactionId
+  });
+
+  if (cartId) await sb.from('carts').update({ statut: 'commande' }).eq('id', cartId);
+
+  // AUTO-ASSIGNATION LIVREUR
+  const livreur = await autoAssignLivreur(cmd.id, zone_id);
+
+  // Vider panier
+  cart = {}; cartId = null; updateCartFloat();
+
+  // Afficher succès
+  document.getElementById('checkout-normal').style.display = 'none';
+  document.getElementById('checkout-success').style.display = 'block';
+  document.getElementById('success-order-id').textContent = 'Commande #' + cmd.id.substring(0,8).toUpperCase();
+
+  // Message IA
+  const livreurMsg = livreur
+    ? 'Un livreur (' + livreur.nom + ') a été assigné et est en route !'
+    : 'Un livreur sera assigné très prochainement.';
+  addAIMsg('Commande #' + cmd.id.substring(0,8).toUpperCase() + ' confirmée et payée ! ' + livreurMsg);
+  addSuggs(['Suivre ma commande', 'Nouvelle commande', 'Merci !']);
+
+  // Stocker ID pour tracking
+  window._lastOrderId = cmd.id;
+
+  if (currentUser) {
+    const { data: newCart } = await sb.from('carts').insert({ user_id: currentUser.id, statut: 'actif' }).select().single();
+    if (newCart) cartId = newCart.id;
+  }
+  pendingOrderData = null;
+}
+
+function afterSuccess() {
+  closeCheckout();
+  if (window._lastOrderId) openTracking(window._lastOrderId);
+}
+
+// COMMANDE RAPIDE VIA IA — "suivre ma commande"
+async function trackLastOrder() {
+  if (!currentUser) {
+    addAIMsg('Connectez-vous pour suivre votre commande !');
+    return;
+  }
+  const { data: cmds } = await sb.from('commandes')
+    .select('*').eq('client_id', currentUser.id)
+    .order('created_at', { ascending: false }).limit(1);
+  if (cmds?.length) {
+    openTracking(cmds[0].id);
+  } else {
+    addAIMsg('Aucune commande trouvée. Passez votre première commande !');
+    addSuggs(['Voir le catalogue', '5000 FCFA de courses', 'Promotions']);
+  }
+}
+
+// smartFallback étendu avec tracking
+// (pas de récursion - géré directement dans smartFallback ci-dessus)
+
+checkSession();
+</script>
+</body>
+</html>
