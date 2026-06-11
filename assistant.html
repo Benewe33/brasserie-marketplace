@@ -797,8 +797,12 @@ async function processAI(userMsg) {
   const systemPrompt = systemLines.join('\n');
 
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    // Timeout après 8 secondes → fallback
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+    const response = await fetch('/api/chat', {
       method: 'POST',
+      signal: controller.signal,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
@@ -809,6 +813,7 @@ async function processAI(userMsg) {
       })
     });
 
+    clearTimeout(timeout);
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
 
@@ -842,7 +847,7 @@ async function processAI(userMsg) {
       // Appel de suivi si nécessaire
       if (data.stop_reason === 'tool_use') {
         showTyping();
-        const followUp = await fetch('https://api.anthropic.com/v1/messages', {
+        const followUp = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -870,9 +875,10 @@ async function processAI(userMsg) {
     await saveSession();
 
   } catch (e) {
-    console.error('AI Error:', e);
+    console.error('AI Error (using smart fallback):', e.message);
     hideTyping();
-    await smartFallback(userMsg);
+    const fallbackFn = window._smartFallbackOverride || smartFallback;
+    await fallbackFn(userMsg);
   }
 
   isTyping = false;
@@ -1641,13 +1647,15 @@ async function trackLastOrder() {
 
 // Intercepter "suivre ma commande" dans smartFallback
 const _origFallback = smartFallback;
-async function smartFallback(msg) {
+const smartFallbackWithTracking = async function(msg) {
   const low = msg.toLowerCase();
-  if (low.includes('suivre') || low.includes('tracking') || low.includes('commande') && low.includes('ou')) {
+  if (low.includes('suivre') || low.includes('tracking') || (low.includes('commande') && low.includes('ou'))) {
     await trackLastOrder(); return;
   }
   await _origFallback(msg);
-}
+};
+// Override processAI error handler to use new fallback
+window._smartFallbackOverride = smartFallbackWithTracking;
 
 checkSession();
 </script>
