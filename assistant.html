@@ -889,14 +889,29 @@ async function localFallback(msg) {
     else addAIMsg('Votre panier est vide !');
   } else if (budget >= 500) {
     const res = await executeTool('create_bundle', { budget });
-    addAIMsg('🎁 Voici pour ' + fmt(budget) + ' FCFA :');
+    addAIMsg('🎁 Voici ce que je vous propose pour ' + fmt(budget) + ' FCFA :');
     if (res.bundle?.length) addBundle(res.bundle, budget, res.total);
+    else addAIMsg('Pas assez de produits pour ce montant.');
+    addSuggs(['Ajouter tout au panier', 'Autre montant', 'Voir mon panier 🛒']);
+    return;
   } else {
-    const res = await executeTool('search_products', { query: msg });
-    if (res.found?.length) { addAIMsg('Voici ce que j\'ai trouvé 🛒'); addProds(res.found); }
-    else addAIMsg('Dites-moi votre budget ou le produit souhaité ! 😊');
+    const wantsOther = /autre|different|plus|encore|suite/.test(low);
+    const excluded = wantsOther ? suggestedIds : new Set();
+    const words = low.split(/\s+/).filter(w => w.length > 2);
+    let found = [];
+    for (const w of words) {
+      found = allProducts.filter(p =>
+        !excluded.has(p.id) &&
+        (p.nom.toLowerCase().includes(w) || p.categories?.nom?.toLowerCase().includes(w))
+      ).slice(0, 6);
+      if (found.length) break;
+    }
+    if (!found.length) found = allProducts.filter(p => !excluded.has(p.id)).slice(0, 6);
+    found.forEach(p => suggestedIds.add(p.id));
+    addAIMsg('Voici ce que j\'ai trouvé pour vous 🛒');
+    addProds(found);
   }
-  addSuggs(['Légumes frais 🌿', 'Poisson fumé 🐟', 'Promos 🔥', 'Voir mon panier 🛒']);
+  addSuggs(['Ajouter au panier', 'Autres produits', 'Mon panier 🛒']);
 }
 
 // RENDU VISUEL DES OUTILS
