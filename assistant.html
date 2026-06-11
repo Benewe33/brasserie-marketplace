@@ -760,129 +760,153 @@ async function executeTool(name, input) {
 }
 
 // ============================================================
-// TRAITEMENT IA AVEC TOOL USE
+// TRAITEMENT IA LOCAL (sans clé API — 100% gratuit)
 // ============================================================
 async function processAI(userMsg) {
   isTyping = true;
   document.getElementById('send-btn').disabled = true;
   showTyping();
-
-  // Contexte produits (limité pour économiser tokens)
-  const prodCtx = allProducts.slice(0, 50).map(p =>
-    'ID:' + p.id.substring(0, 8) + ' | ' + p.nom + ' | ' + (p.categories?.nom || '-') + ' | ' + (p.prix_promo || p.prix) + ' FCFA/' + p.unite + (p.prix_promo ? ' [PROMO]' : '')
-  ).join('\n');
-
-  const cartCtx = Object.values(cart).length > 0
-    ? Object.values(cart).map(i => i.nom + ' x' + i.qty).join(', ')
-    : 'vide';
-
-  const systemLines = [
-    'Tu es Yéyé Assistant, vendeur IA de YéyéMarket (marketplace beninoise).',
-    '',
-    'REGLES ABSOLUES:',
-    '- Reponds en francais, style WhatsApp (court, emojis, naturel)',
-    '- TOUJOURS utiliser les outils pour chercher des produits, jamais inventer',
-    '- TOUJOURS orienter vers un achat concret',
-    '- Maximum 2-3 phrases de texte, les produits via outils',
-    '- Si client donne un budget, appeler create_bundle ou calculate_budget',
-    '- Si client mentionne un produit, appeler search_products',
-    '- Si client veut voir panier, appeler show_cart',
-    '- Proposer TOUJOURS une action suivante (upsell, validation)',
-    '',
-    'CATALOGUE (' + allProducts.length + ' produits disponibles):',
-    prodCtx,
-    '',
-    'PANIER ACTUEL: ' + cartCtx
-  ];
-  const systemPrompt = systemLines.join('\n');
-
-  try {
-    // Timeout après 8 secondes → fallback
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 8000);
-    const response = await fetch('/api/chat', {
-      method: 'POST',
-      signal: controller.signal,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        system: systemPrompt,
-        tools: TOOLS,
-        messages: history.slice(-12)
-      })
-    });
-
-    clearTimeout(timeout);
-    const data = await response.json();
-    if (data.error) throw new Error(data.error.message);
-
-    hideTyping();
-
-    // Traiter les blocs de réponse
-    let textParts = [];
-    let toolUses = [];
-
-    for (const block of (data.content || [])) {
-      if (block.type === 'text') textParts.push(block.text);
-      else if (block.type === 'tool_use') toolUses.push(block);
-    }
-
-    // Afficher le texte si présent
-    if (textParts.join('').trim()) addAIMsg(textParts.join('').trim());
-
-    if (toolUses.length > 0) {
-      // Exécuter les outils
-      const toolResults = [];
-      for (const tu of toolUses) {
-        const result = await executeTool(tu.name, tu.input);
-        await renderTool(tu.name, tu.input, result);
-        toolResults.push({ type: 'tool_result', tool_use_id: tu.id, content: JSON.stringify(result) });
-      }
-
-      // Mettre à jour l'historique
-      history.push({ role: 'assistant', content: data.content });
-      history.push({ role: 'user', content: toolResults });
-
-      // Appel de suivi si nécessaire
-      if (data.stop_reason === 'tool_use') {
-        showTyping();
-        const followUp = await fetch('/api/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            model: 'claude-sonnet-4-20250514',
-            max_tokens: 600,
-            system: systemPrompt,
-            tools: TOOLS,
-            messages: history.slice(-14)
-          })
-        });
-        const fData = await followUp.json();
-        hideTyping();
-        for (const block of (fData.content || [])) {
-          if (block.type === 'text' && block.text.trim()) {
-            addAIMsg(block.text.trim());
-            history.push({ role: 'assistant', content: [{ type: 'text', text: block.text }] });
-          }
-        }
-      }
-    } else {
-      history.push({ role: 'assistant', content: data.content });
-    }
-
-    // Sauvegarder session
-    await saveSession();
-
-  } catch (e) {
-    console.error('AI Error (using smart fallback):', e.message);
-    hideTyping();
-    const fallbackFn = window._smartFallbackOverride || smartFallback;
-    await fallbackFn(userMsg);
-  }
-
+  await delay(600);
+  hideTyping();
+  await smartFallbackEnhanced(userMsg);
+  history.push({ role: 'user', content: userMsg });
+  await saveSession();
   isTyping = false;
   document.getElementById('send-btn').disabled = false;
+}
+
+async function smartFallbackEnhanced(msg) {
+  const low = msg.toLowerCase();
+  const budget = parseInt((msg.match(/(\d[\d\s]*\d|\d+)/) || [])[0]?.replace(/\s/g,'') || '0');
+
+  // SALUTATIONS
+  if (/^(bonjour|bonsoir|salut|hello|bj|bjr|cc|coucou|hi)/.test(low)) {
+    const h = new Date().getHours();
+    const sal = h < 12 ? 'Bonjour' : h < 18 ? 'Bonne après-midi' : 'Bonsoir';
+    addAIMsg(sal + ' ! 👋 Je suis Yéyé Assistant, votre vendeur IA. Comment puis-je vous aider aujourd\'hui ?');
+    addSuggs(['Voir les promos 🔥', 'Marché frais 🌿', 'Mon budget', 'Voir mon panier']);
+    return;
+  }
+
+  // MERCI / FIN
+  if (/merci|super|parfait|ok merci|bravo/.test(low)) {
+    addAIMsg('Avec plaisir ! 😊 N\'hésitez pas si vous avez besoin d\'autre chose.');
+    addSuggs(['Nouvelle commande', 'Voir mon panier', 'Promotions']);
+    return;
+  }
+
+  // PANIER
+  if (low.includes('panier') || low.includes('cart') || low.includes('voir commande')) {
+    if (Object.keys(cart).length > 0) {
+      openDrawer();
+      addAIMsg('Voici votre panier 🛒 — ' + Object.values(cart).reduce((s,i)=>s+i.qty,0) + ' article(s) pour ' + fmt(calcTotal()) + ' FCFA.');
+    } else {
+      addAIMsg('Votre panier est vide 🛒. Que souhaitez-vous acheter ?');
+    }
+    addSuggs(['Légumes frais', 'Poisson fumé', '5000 FCFA de courses']);
+    return;
+  }
+
+  // VALIDER / COMMANDER
+  if (/valider|commander|passer commande|checkout|finaliser/.test(low)) {
+    if (Object.keys(cart).length === 0) {
+      addAIMsg('Votre panier est vide ! Ajoutez des produits d\'abord. 😊');
+      addSuggs(['Légumes frais', 'Poisson fumé', '5000 FCFA']);
+    } else {
+      addAIMsg('Super ! 🎉 Je vous redirige vers le paiement. Total : ' + fmt(calcTotal()) + ' FCFA.');
+      setTimeout(() => checkout(), 1200);
+    }
+    return;
+  }
+
+  // SUIVRE COMMANDE
+  if (/suivre|tracking|où est|statut commande/.test(low)) {
+    await trackLastOrder();
+    return;
+  }
+
+  // PROMOTIONS
+  if (/promo|promotion|réduction|solde|offre/.test(low)) {
+    const promos = allProducts.filter(p => p.prix_promo && p.prix_promo < p.prix).slice(0, 6);
+    if (promos.length) {
+      addAIMsg('🔥 Voici nos meilleures promos du moment !');
+      addProds(promos);
+      addSuggs(['Ajouter au panier', 'Voir plus', 'Mon budget']);
+    } else {
+      addAIMsg('Pas de promotions en ce moment. Voici nos produits populaires :');
+      addProds(allProducts.slice(0, 5));
+    }
+    return;
+  }
+
+  // NOUVEAUTÉS
+  if (/nouveau|nouveauté|arrivage|récent/.test(low)) {
+    const news = [...allProducts].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0)).slice(0, 5);
+    addAIMsg('✨ Voici nos dernières arrivées !');
+    addProds(news);
+    addSuggs(['Ajouter au panier', 'Voir les promos', 'Mon budget']);
+    return;
+  }
+
+  // BUDGET
+  if (budget >= 500) {
+    const res = await executeTool('create_bundle', { budget });
+    addAIMsg('🎁 Voici ce que je vous propose pour ' + fmt(budget) + ' FCFA !');
+    if (res.bundle?.length) addBundle(res.bundle, budget, res.total);
+    else addAIMsg('Pas assez de produits disponibles pour ce budget. Essayez un montant plus élevé.');
+    addSuggs(['Ajouter tout au panier', 'Autre budget', 'Valider commande']);
+    return;
+  }
+
+  // CATEGORIES
+  const catMap = {
+    'légume|legume|verdure|haricot|gombo|gboman|épinard': 'légumes',
+    'poisson|sardine|maquereau|capitaine|fumé|fume': 'poisson',
+    'viande|bœuf|boeuf|poulet|agneau|mouton': 'viande',
+    'fruit|banane|mangue|ananas|orange|papaye': 'fruits',
+    'céréale|cereale|riz|gari|maïs|mais|farine|semoule': 'céréales',
+    'huile|graisse|beurre': 'huile',
+    'épice|epice|piment|poivre|sel|cube': 'épices',
+    'lait|yaourt|fromage|œuf|oeuf|crème|creme': 'laitier',
+  };
+
+  for (const [pattern, catName] of Object.entries(catMap)) {
+    if (new RegExp(pattern).test(low)) {
+      const found = allProducts.filter(p =>
+        p.nom.toLowerCase().match(new RegExp(pattern)) ||
+        p.categories?.nom?.toLowerCase().includes(catName)
+      ).slice(0, 6);
+      if (found.length) {
+        addAIMsg('Voici nos ' + catName + ' disponibles 🌿');
+        addProds(found);
+        addSuggs(['Ajouter au panier', 'Voir mon panier', 'Autre produit']);
+        return;
+      }
+    }
+  }
+
+  // RECHERCHE GÉNÉRALE par mots du message
+  const words = low.split(/\s+/).filter(w => w.length > 3);
+  let found = [];
+  for (const w of words) {
+    found = allProducts.filter(p =>
+      p.nom.toLowerCase().includes(w) ||
+      p.categories?.nom?.toLowerCase().includes(w) ||
+      (p.description || '').toLowerCase().includes(w)
+    ).slice(0, 5);
+    if (found.length) break;
+  }
+
+  if (found.length) {
+    addAIMsg('Voici ce que j\'ai trouvé pour vous ! 🛒');
+    addProds(found);
+    addSuggs(['Ajouter au panier', 'Voir mon panier', 'Autre produit']);
+    return;
+  }
+
+  // DÉFAUT
+  addAIMsg('Je n\'ai pas trouvé ce que vous cherchez. 🤔 Dites-moi votre budget ou le produit souhaité !');
+  addSuggs(['5000 FCFA de courses', 'Légumes frais 🌿', 'Poisson fumé 🐟', 'Promos 🔥']);
 }
 
 // RENDU VISUEL DES OUTILS
@@ -1645,17 +1669,7 @@ async function trackLastOrder() {
   }
 }
 
-// Intercepter "suivre ma commande" dans smartFallback
-const _origFallback = smartFallback;
-const smartFallbackWithTracking = async function(msg) {
-  const low = msg.toLowerCase();
-  if (low.includes('suivre') || low.includes('tracking') || (low.includes('commande') && low.includes('ou'))) {
-    await trackLastOrder(); return;
-  }
-  await _origFallback(msg);
-};
-// Override processAI error handler to use new fallback
-window._smartFallbackOverride = smartFallbackWithTracking;
+// Le tracking est déjà géré dans smartFallbackEnhanced
 
 checkSession();
 </script>
