@@ -443,7 +443,7 @@ function addBundleCard(products,budget){
         <div class="bundle-item-price">${fmt(p.prix_promo||p.prix)} FCFA</div>
       </div>`).join('')}
     <div class="bundle-total"><span>Total panier</span><span>${fmt(total)} FCFA</span></div>
-    <button class="bundle-btn" onclick="addBundleToCart(${JSON.stringify(products.map(p=>p.id))})">
+    <button class="bundle-btn" id="bundle-btn-${Date.now()}" data-ids="${products.map(p=>p.id).join(',')}" onclick="addBundleToCart(this.dataset.ids.split(','))">
       ✅ Ajouter tout au panier
     </button>`;
   document.getElementById('chat-area').appendChild(div);
@@ -607,39 +607,59 @@ async function fallbackResponse(msg){
 function addToCartAI(prodId){
   const prod=allProducts.find(p=>p.id===prodId);
   if(!prod)return;
-  if(cart[prodId])cart[prodId].qty++;
-  else cart[prodId]={...prod,qty:1};
+  if(cart[prodId]){cart[prodId].qty++;toast('✅ Quantité mise à jour !','ok');return;}
+  cart[prodId]={...prod,qty:1};
+  suggestedIds.add(prodId);
   updateCartFloat();
   const btn=document.getElementById('btn-'+prodId);
   if(btn){btn.textContent='✅ Ajouté !';btn.classList.add('added');setTimeout(()=>{btn.innerHTML='🛒 Ajouter';btn.classList.remove('added');},2000);}
   toast('✅ '+prod.nom+' ajouté !','ok');
-  // AI confirmation
+  // AI confirmation - seulement si nouveaux produits disponibles
   setTimeout(()=>{
     const suggestions=getSuggestions(prod);
     if(suggestions.length){
       addAIMessage(`Super choix ! 🎉 **${prod.nom}** est dans votre panier.\n\nVous aimerez aussi :`);
       addProductCards(suggestions);
+    } else {
+      addAIMessage(`**${prod.nom}** ajouté ! 🛒\n\nVoulez-vous valider votre commande ?`);
+      addSuggestions(['✅ Valider la commande','🛒 Voir mon panier','➕ Autre chose']);
     }
-  },500);
+  },600);
 }
 
 function addBundleToCart(ids){
+  if(!ids||!ids.length){toast('Erreur panier','err');return;}
+  let added=0;
   ids.forEach(id=>{
-    const prod=allProducts.find(p=>p.id===id);
+    const prod=allProducts.find(p=>p.id===String(id).trim());
     if(prod){
-      if(cart[id])cart[id].qty++;
-      else cart[id]={...prod,qty:1};
+      if(cart[prod.id])cart[prod.id].qty++;
+      else cart[prod.id]={...prod,qty:1};
+      suggestedIds.add(prod.id);
+      added++;
     }
   });
   updateCartFloat();
-  toast('🛒 Panier créé !','ok');
-  addAIMessage(`✅ Parfait ! J'ai ajouté tous les produits à votre panier.\n\nVoulez-vous valider votre commande maintenant ?`);
-  addSuggestions(['✅ Valider la commande','🛒 Voir mon panier','➕ Ajouter autre chose']);
+  if(added>0){
+    toast('🛒 '+added+' produits ajoutés !','ok');
+    addAIMessage('✅ Parfait ! **'+added+' produits** ajoutés à votre panier.\n\nVoulez-vous valider votre commande maintenant ?');
+    addSuggestions(['✅ Valider la commande','🛒 Voir mon panier','➕ Ajouter autre chose']);
+  } else {
+    toast('Produits introuvables','err');
+  }
 }
 
+let suggestedIds=new Set();
 function getSuggestions(prod){
   const catId=prod.categorie_id;
-  return allProducts.filter(p=>p.id!==prod.id&&(p.categorie_id===catId||suggestPairs[prod.categories?.nom]?.includes(p.categories?.nom))).slice(0,3);
+  const results=allProducts.filter(p=>
+    p.id!==prod.id&&
+    !suggestedIds.has(p.id)&&
+    !Object.keys(cart).includes(p.id)&&
+    (p.categorie_id===catId||suggestPairs[prod.categories?.nom]?.includes(p.categories?.nom))
+  ).slice(0,3);
+  results.forEach(p=>suggestedIds.add(p.id));
+  return results;
 }
 
 const suggestPairs={'Céréales':['Huiles','Légumes'],'Poissons':['Épices','Légumes'],'Viandes':['Épices','Légumes','Huiles'],'Légumes':['Huiles','Épices']};
@@ -720,6 +740,9 @@ function checkout(){
 function clearChat(){
   document.getElementById('chat-area').innerHTML='';
   conversationHistory=[];
+  suggestedIds=new Set();
+  cart={};
+  updateCartFloat();
   initChat();
 }
 
