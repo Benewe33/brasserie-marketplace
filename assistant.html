@@ -1082,6 +1082,7 @@ function addBundle(prods, budget, total) {
 }
 
 async function addBundle(btn) {
+  if (!btn || !btn.dataset || !btn.dataset.ids) return;
   const ids = btn.dataset.ids.split(',').filter(Boolean);
   btn.textContent = '⏳ Ajout...';
   btn.disabled = true;
