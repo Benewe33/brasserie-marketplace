@@ -555,6 +555,116 @@ tr:hover td{background:var(--g50)}
   </div>
 </div>
 
+
+<!-- MODAL DOSSIER PARTENAIRE -->
+<div class="overlay" id="m-partenaire">
+  <div class="modal" style="max-width:720px">
+    <div class="modal-head">
+      <h3 id="m-part-title">📋 Dossier Partenaire</h3>
+      <button class="modal-x" onclick="closeModal('m-partenaire')">✕</button>
+    </div>
+    <div class="modal-body" id="m-part-body">
+      <!-- Chargement -->
+      <div id="part-loading" style="text-align:center;padding:40px;color:var(--g400)">⏳ Chargement...</div>
+      <!-- Contenu -->
+      <div id="part-content" style="display:none">
+
+        <!-- EN-TÊTE partenaire -->
+        <div id="part-header" style="background:linear-gradient(135deg,var(--vd),#0d3d22);border-radius:12px;padding:20px;color:#fff;margin-bottom:20px;display:flex;align-items:center;gap:16px">
+          <div id="part-avatar" style="width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0">🏪</div>
+          <div style="flex:1">
+            <div style="font-size:20px;font-weight:800" id="part-nom">—</div>
+            <div style="font-size:13px;opacity:.8;margin-top:2px" id="part-email">—</div>
+            <div style="font-size:13px;opacity:.8" id="part-tel">—</div>
+          </div>
+          <div style="text-align:right">
+            <div id="part-statut-badge"></div>
+            <div style="font-size:11px;opacity:.7;margin-top:6px">Inscrit le</div>
+            <div style="font-size:13px;font-weight:600" id="part-date">—</div>
+          </div>
+        </div>
+
+        <!-- INFOS MODIFIABLES -->
+        <div style="background:var(--g50);border-radius:12px;padding:18px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+            <h4 style="font-size:14px;font-weight:700">✏️ Informations</h4>
+            <button class="btn btn-sm" style="background:var(--vd);color:#fff" onclick="toggleEdit()">Modifier</button>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <label style="font-size:11px;color:var(--g400);font-weight:600;display:block;margin-bottom:3px">NOM / ENSEIGNE</label>
+              <input id="edit-nom" style="width:100%;padding:8px 10px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;background:#fff" disabled/>
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--g400);font-weight:600;display:block;margin-bottom:3px">TÉLÉPHONE</label>
+              <input id="edit-tel" style="width:100%;padding:8px 10px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;background:#fff" disabled/>
+            </div>
+            <div>
+              <label style="font-size:11px;color:var(--g400);font-weight:600;display:block;margin-bottom:3px">ZONE</label>
+              <select id="edit-zone" style="width:100%;padding:8px 10px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;background:#fff" disabled></select>
+            </div>
+            <div id="edit-extra-wrap">
+              <!-- champ extra selon type (description, adresse...) -->
+            </div>
+          </div>
+          <div id="edit-btns" style="display:none;margin-top:14px;gap:10px;justify-content:flex-end;display:none">
+            <button class="btn btn-out" onclick="annulerEdit()">Annuler</button>
+            <button class="btn btn-p" onclick="sauvegarderEdit()">💾 Sauvegarder</button>
+          </div>
+        </div>
+
+        <!-- CONTRAT SIGNÉ -->
+        <div id="part-contrat" style="border:2px solid #1a6b3c;border-radius:12px;padding:18px;margin-bottom:16px;background:#f0faf4">
+          <h4 style="font-size:14px;font-weight:700;color:#0B3D2E;margin-bottom:14px">📋 Contrat signé</h4>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div style="background:#fff;border-radius:8px;padding:12px">
+              <div style="font-size:11px;color:var(--g400);font-weight:600">SIGNATAIRE</div>
+              <div style="font-size:14px;font-weight:700;color:#0B3D2E;margin-top:3px" id="part-sig-nom">—</div>
+            </div>
+            <div style="background:#fff;border-radius:8px;padding:12px">
+              <div style="font-size:11px;color:var(--g400);font-weight:600">DATE DE SIGNATURE</div>
+              <div style="font-size:13px;font-weight:600;margin-top:3px" id="part-sig-date">—</div>
+            </div>
+            <div style="background:#fff;border-radius:8px;padding:12px">
+              <div style="font-size:11px;color:var(--g400);font-weight:600">TYPE</div>
+              <div style="font-size:13px;font-weight:600;margin-top:3px" id="part-sig-type">—</div>
+            </div>
+            <div style="background:#fff;border-radius:8px;padding:12px">
+              <div style="font-size:11px;color:var(--g400);font-weight:600">COMMISSION ACCEPTÉE</div>
+              <div style="font-size:18px;font-weight:800;color:#1a6b3c;margin-top:3px" id="part-sig-commission">—</div>
+            </div>
+          </div>
+          <div id="part-no-contrat" style="display:none;text-align:center;padding:20px;color:var(--g400)">
+            ⚠️ Aucun contrat signé enregistré
+          </div>
+        </div>
+
+        <!-- DOCUMENTS -->
+        <div style="background:var(--g50);border-radius:12px;padding:18px;margin-bottom:16px">
+          <h4 style="font-size:14px;font-weight:700;margin-bottom:12px">📎 Documents fournis</h4>
+          <div id="part-docs" style="display:flex;flex-wrap:wrap;gap:10px">
+            <span style="color:var(--g400);font-size:13px">Aucun document</span>
+          </div>
+        </div>
+
+        <!-- ZONE DANGER -->
+        <div style="border:2px solid #fee2e2;border-radius:12px;padding:16px;background:#fff5f5">
+          <h4 style="font-size:13px;font-weight:700;color:#dc2626;margin-bottom:10px">⚠️ Zone dangereuse</h4>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn" style="background:#dc2626;color:#fff;font-size:12px" onclick="supprimerDepuisModal()">🗑️ Supprimer définitivement</button>
+            <button class="btn btn-out" style="font-size:12px;color:#dc2626;border-color:#dc2626" onclick="changerStatutDepuisModal('suspendu')">⛔ Suspendre</button>
+            <button class="btn btn-out" style="font-size:12px;color:#16a34a;border-color:#16a34a" onclick="changerStatutDepuisModal('actif')">✅ Valider / Réactiver</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-out" onclick="closeModal('m-partenaire')">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -932,9 +1042,10 @@ async function loadService(table,statut,btn){
     <td>${sbadge(item.statut)}</td>
     <td>${fdate(item.created_at)}</td>
     <td><div class="acts">
+      <button class="btn btn-sm" style="background:var(--vd);color:#fff" onclick="ouvrirDossier('${typeKey}','${item.id}','${item.user_id||item.id}')">📋 Dossier</button>
       ${statut==='en_attente'?`<button class="btn btn-sm btn-ok" onclick="valider('${typeKey}','${item.id}','actif')">✅ Valider</button><button class="btn btn-sm btn-del" onclick="valider('${typeKey}','${item.id}','suspendu')">❌ Refuser</button>`:''}
       ${statut==='actif'?`<button class="btn btn-sm btn-del" onclick="valider('${typeKey}','${item.id}','suspendu')">Suspendre</button>`:''}
-      ${statut==='suspendu'?`<button class="btn btn-sm btn-ok" onclick="valider('${typeKey}','${item.id}','actif')">Réactiver</button>`:''}
+      ${statut==='suspendu'?`<button class="btn btn-sm btn-ok" onclick="valider('${typeKey}','${item.id}','actif')">Réactiver</button><button class="btn btn-sm btn-del" onclick="supprimerPartenaire('${typeKey}','${item.id}','${item.user_id||item.id}')">🗑️</button>`:''}
     </div></td>
   </tr>`).join('');
 }
@@ -1224,6 +1335,193 @@ async function loadAdvancedStats(){
 }
 
 checkSession();
+
+// ============================================================
+// DOSSIER PARTENAIRE — VOIR / MODIFIER / SUPPRIMER
+// ============================================================
+let currentPartData = null; // { table, id, userId, item, user }
+
+async function ouvrirDossier(table, id, userId) {
+  currentPartData = { table, id, userId };
+  openModal('m-partenaire');
+  document.getElementById('part-loading').style.display = 'block';
+  document.getElementById('part-content').style.display = 'none';
+
+  // Charger les données du partenaire
+  const {data: item} = await sb.from(table).select('*,zones(nom)').eq('id', id).single();
+  const {data: { user }, error: uErr} = await sb.auth.admin?.getUserById?.(userId) || {data:{user:null}};
+
+  // Charger l'utilisateur via la table utilisateurs
+  const {data: userRow} = await sb.from('utilisateurs').select('*').eq('id', userId).single();
+
+  currentPartData.item = item;
+  currentPartData.userRow = userRow;
+
+  // Titre
+  const emoji = table === 'boutiques' ? '🏪' : table === 'restaurants' ? '🍽️' : '🚴';
+  const typeLabel = table === 'boutiques' ? 'Vendeur' : table === 'restaurants' ? 'Restaurant' : 'Livreur';
+  document.getElementById('m-part-title').textContent = `📋 Dossier ${typeLabel} — ${item?.nom || ''}`;
+  document.getElementById('part-avatar').textContent = emoji;
+  document.getElementById('part-nom').textContent = item?.nom || '—';
+  document.getElementById('part-email').textContent = userRow?.email || item?.email || '—';
+  document.getElementById('part-tel').textContent = item?.telephone || '—';
+  document.getElementById('part-date').textContent = fdate(item?.created_at);
+  document.getElementById('part-statut-badge').innerHTML = sbadge(item?.statut);
+
+  // Remplir les champs éditables
+  document.getElementById('edit-nom').value = item?.nom || '';
+  document.getElementById('edit-tel').value = item?.telephone || '';
+
+  // Charger les zones
+  const {data: zones} = await sb.from('zones').select('*').order('ville').order('nom');
+  const zoneSelect = document.getElementById('edit-zone');
+  zoneSelect.innerHTML = zones?.map(z =>
+    `<option value="${z.id}" ${z.id === item?.zone_id ? 'selected' : ''}>${z.ville} — ${z.nom}</option>`
+  ).join('') || '';
+
+  // Champ extra
+  const extraWrap = document.getElementById('edit-extra-wrap');
+  if (table === 'restaurants') {
+    extraWrap.innerHTML = `
+      <div>
+        <label style="font-size:11px;color:var(--g400);font-weight:600;display:block;margin-bottom:3px">ADRESSE</label>
+        <input id="edit-adresse" value="${item?.adresse||''}" style="width:100%;padding:8px 10px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;background:#fff" disabled/>
+      </div>`;
+  } else if (table === 'livreurs') {
+    extraWrap.innerHTML = `
+      <div>
+        <label style="font-size:11px;color:var(--g400);font-weight:600;display:block;margin-bottom:3px">VÉHICULE</label>
+        <input id="edit-vehicule" value="${userRow?.raw_user_meta_data?.vehicule||''}" style="width:100%;padding:8px 10px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;background:#fff" disabled/>
+      </div>`;
+  } else {
+    extraWrap.innerHTML = `
+      <div>
+        <label style="font-size:11px;color:var(--g400);font-weight:600;display:block;margin-bottom:3px">DESCRIPTION</label>
+        <input id="edit-desc" value="${item?.description||''}" style="width:100%;padding:8px 10px;border:1.5px solid var(--g200);border-radius:8px;font-size:13px;font-family:inherit;background:#fff" disabled/>
+      </div>`;
+  }
+
+  // Contrat signé
+  const meta = userRow?.raw_user_meta_data || {};
+  const contrat = meta.contrat || null;
+  if (contrat && contrat.nom_signataire) {
+    document.getElementById('part-contrat').style.display = 'block';
+    document.getElementById('part-no-contrat').style.display = 'none';
+    document.getElementById('part-sig-nom').textContent = contrat.nom_signataire || '—';
+    document.getElementById('part-sig-date').textContent = contrat.date_lisible || fdate(contrat.date_signature) || '—';
+    document.getElementById('part-sig-type').textContent = (contrat.type || typeLabel).toUpperCase();
+    document.getElementById('part-sig-commission').textContent = contrat.commission || '—';
+  } else if (meta.contrat_signature) {
+    // Fallback ancien format
+    document.getElementById('part-sig-nom').textContent = meta.contrat_signature;
+    document.getElementById('part-sig-date').textContent = fdate(meta.contrat_date);
+    document.getElementById('part-sig-type').textContent = typeLabel.toUpperCase();
+    document.getElementById('part-sig-commission').textContent = table === 'boutiques' ? '10%' : '8%';
+    document.getElementById('part-no-contrat').style.display = 'none';
+  } else {
+    document.getElementById('part-no-contrat').style.display = 'block';
+    document.getElementById('part-sig-nom').closest('.part-contrat')?.querySelector('div[style*="grid"]')?.style && (document.querySelector('#part-contrat > div[style*="grid"]').style.display = 'none');
+  }
+
+  // Documents
+  const docs = [];
+  if (meta.photo_local) docs.push({label: '🏪 Photo local', url: meta.photo_local});
+  if (meta.photo_cni) docs.push({label: '🪪 CNI', url: meta.photo_cni});
+  if (meta.photo_selfie) docs.push({label: '🤳 Selfie', url: meta.photo_selfie});
+  if (meta.photo_permis) docs.push({label: '📋 Permis', url: meta.photo_permis});
+  if (meta.photo_vehicule) docs.push({label: '🚗 Véhicule', url: meta.photo_vehicule});
+  if (meta.photo_resto) docs.push({label: '🍽️ Photo restaurant', url: meta.photo_resto});
+
+  const docsEl = document.getElementById('part-docs');
+  if (docs.length) {
+    docsEl.innerHTML = docs.map(d =>
+      `<a href="${d.url}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#fff;border:1.5px solid var(--g200);border-radius:8px;padding:8px 12px;font-size:12px;font-weight:600;color:var(--vd);text-decoration:none">
+        ${d.label} <span style="font-size:10px;opacity:.6">↗</span>
+      </a>`
+    ).join('');
+  } else {
+    docsEl.innerHTML = '<span style="color:var(--g400);font-size:13px">Aucun document fourni</span>';
+  }
+
+  document.getElementById('part-loading').style.display = 'none';
+  document.getElementById('part-content').style.display = 'block';
+}
+
+function toggleEdit() {
+  const inputs = ['edit-nom','edit-tel','edit-zone','edit-adresse','edit-desc','edit-vehicule'].map(id => document.getElementById(id)).filter(Boolean);
+  const isDisabled = inputs[0]?.disabled;
+  inputs.forEach(el => { el.disabled = !isDisabled; el.style.background = isDisabled ? '#f0faf4' : '#fff'; el.style.borderColor = isDisabled ? '#1a6b3c' : 'var(--g200)'; });
+  const btns = document.getElementById('edit-btns');
+  btns.style.display = isDisabled ? 'flex' : 'none';
+}
+
+function annulerEdit() {
+  const item = currentPartData?.item;
+  if (!item) return;
+  const nomEl = document.getElementById('edit-nom'); if (nomEl) { nomEl.value = item.nom || ''; }
+  const telEl = document.getElementById('edit-tel'); if (telEl) { telEl.value = item.telephone || ''; }
+  toggleEdit();
+}
+
+async function sauvegarderEdit() {
+  if (!currentPartData) return;
+  const {table, id} = currentPartData;
+  const nom = document.getElementById('edit-nom')?.value.trim();
+  const tel = document.getElementById('edit-tel')?.value.trim();
+  const zone_id = document.getElementById('edit-zone')?.value;
+
+  const payload = { nom, telephone: tel, zone_id };
+  if (table === 'restaurants') {
+    payload.adresse = document.getElementById('edit-adresse')?.value.trim();
+  }
+  if (table === 'boutiques') {
+    payload.description = document.getElementById('edit-desc')?.value.trim();
+  }
+
+  const {error} = await sb.from(table).update(payload).eq('id', id);
+  if (error) { toast('Erreur: ' + error.message, 'err'); return; }
+
+  // Mettre à jour aussi la table utilisateurs
+  const {userId} = currentPartData;
+  await sb.from('utilisateurs').update({nom, telephone: tel}).eq('id', userId);
+
+  toast('✅ Modifications sauvegardées', 'ok');
+  currentPartData.item = {...currentPartData.item, ...payload};
+  document.getElementById('part-nom').textContent = nom;
+  document.getElementById('part-tel').textContent = tel;
+  toggleEdit();
+}
+
+async function changerStatutDepuisModal(statut) {
+  if (!currentPartData) return;
+  const label = statut === 'actif' ? 'valider' : 'suspendre';
+  if (!confirm(`Voulez-vous ${label} ce partenaire ?`)) return;
+  const {table, id} = currentPartData;
+  const {error} = await sb.from(table).update({statut}).eq('id', id);
+  if (error) { toast('Erreur: ' + error.message, 'err'); return; }
+  toast(statut === 'actif' ? '✅ Compte validé / réactivé' : '⛔ Compte suspendu', statut === 'actif' ? 'ok' : 'err');
+  document.getElementById('part-statut-badge').innerHTML = sbadge(statut);
+  currentPartData.item.statut = statut;
+  closeModal('m-partenaire');
+  loadDashboard();
+}
+
+async function supprimerDepuisModal() {
+  if (!currentPartData) return;
+  if (!confirm('⚠️ Supprimer définitivement ce partenaire ? Cette action est irréversible.')) return;
+  await supprimerPartenaire(currentPartData.table, currentPartData.id, currentPartData.userId);
+  closeModal('m-partenaire');
+}
+
+async function supprimerPartenaire(table, id, userId) {
+  if (!confirm('⚠️ Supprimer définitivement ce partenaire ?')) return;
+  const {error} = await sb.from(table).delete().eq('id', id);
+  if (error) { toast('Erreur: ' + error.message, 'err'); return; }
+  await sb.from('utilisateurs').delete().eq('id', userId);
+  toast('🗑️ Partenaire supprimé', 'err');
+  loadDashboard();
+}
+
 </script>
 </body>
 </html>
