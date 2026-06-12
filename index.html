@@ -1120,7 +1120,7 @@ function escHtml(s){if(!s)return'—';return String(s).replace(/&/g,'&amp;').rep
 function sbadge(s){const m={en_attente:'<span class="s-badge s-attente">⏳ En attente</span>',confirmee:'<span class="s-badge s-confirmee">✅ Confirmée</span>',en_preparation:'<span class="s-badge s-preparation">👨‍🍳 Préparation</span>',prete:'<span class="s-badge s-confirmee">📦 Prête</span>',en_livraison:'<span class="s-badge s-livraison">🚴 En livraison</span>',livree:'<span class="s-badge s-livree">🎉 Livrée</span>',annulee:'<span class="s-badge s-annulee">❌ Annulée</span>'};return m[s]||`<span class="s-badge">${s}</span>`;}
 function fmt(n){return(n||0).toLocaleString('fr-FR');}
 function fdate(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
-function catEmoji(nom){const m={'Viandes':'🥩','Poissons':'🐟','Légumes':'🥦','Fruits':'🍌','Épicerie':'🛍️','Brasserie':'🍺','Huiles':'🫙','Épices':'🌶️','Céréales':'🌾','Restaurants':'🍽️','Boissons':'🥤','Oeufs':'🥚','Marché':'🧺'};return m[nom]||'📦';}
+function catEmoji(nom){const m={'Viandes':'🥩','Poissons':'🐟','Légumes':'🥦','Fruits':'🍌','Épicerie':'🛒','Brasserie':'🍺','Huiles':'🫙','Épices':'🌶️','Céréales':'🌾','Restaurants':'🍽️','Boissons':'🥤','Oeufs':'🥚','Marché':'🧺','Shopping':'🛍️','Plats cuisinés':'🍲','Produits naturels':'🌿','Légumineuses':'🫘'};return m[nom]||'📦';}
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);}
 
 // INIT
