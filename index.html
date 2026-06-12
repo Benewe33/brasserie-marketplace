@@ -504,7 +504,11 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     </div>
     <div id="profile-section" style="display:none">
       <div class="profile-hero">
-        <div class="profile-avatar">👤</div>
+        <!-- Avatar cliquable pour modifier -->
+        <div style="position:relative;width:80px;margin:0 auto 12px">
+          <div class="profile-avatar" id="profile-avatar" onclick="openEditProfile()" style="cursor:pointer">👤</div>
+          <div onclick="openEditProfile()" style="position:absolute;bottom:0;right:0;width:26px;height:26px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.2)">✏️</div>
+        </div>
         <div class="profile-name" id="profile-name">—</div>
         <div class="profile-email" id="profile-email">—</div>
         <div class="profile-stats">
@@ -521,7 +525,12 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
             <div class="profile-item-text"><div class="profile-item-title">Mes commandes</div><div class="profile-item-sub">Historique et suivi</div></div>
             <span style="color:var(--g400)">›</span>
           </div>
-          <div class="profile-item">
+          <div class="profile-item" onclick="openEditProfile()">
+            <div class="profile-item-ico" style="background:#f0fdf4">✏️</div>
+            <div class="profile-item-text"><div class="profile-item-title">Modifier mon profil</div><div class="profile-item-sub">Nom, téléphone, photo</div></div>
+            <span style="color:var(--g400)">›</span>
+          </div>
+          <div class="profile-item" onclick="openAdresses()">
             <div class="profile-item-ico" style="background:#eff6ff">📍</div>
             <div class="profile-item-text"><div class="profile-item-title">Mes adresses</div><div class="profile-item-sub">Gérer vos adresses</div></div>
             <span style="color:var(--g400)">›</span>
@@ -560,11 +569,11 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     </button>
     <button class="nav-btn nav-center-btn" onclick="openPartnerMenu()">
       <div class="nav-center-ico">
-        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px">
-          <path d="M20 6C13 6 8 12 8 19c0 4 2 7.5 5 9.5L20 34l7-5.5c3-2 5-5.5 5-9.5 0-7-5-13-12-13z" fill="rgba(255,255,255,0.25)"/>
-          <path d="M20 8c-1.5 4-1.5 8 0 12 1.5-4 1.5-8 0-12z" fill="#fff"/>
-          <path d="M14 14c3 2 5 5 6 9-3-2-5-5-6-9z" fill="#fff" opacity=".8"/>
-          <path d="M26 14c-3 2-5 5-6 9 3-2 5-5 6-9z" fill="#fff" opacity=".8"/>
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px">
+          <path d="M12 2C8 2 5 5 5 9c0 3 1.5 5.5 3.5 7L12 22l3.5-6C17.5 14.5 19 12 19 9c0-4-3-7-7-7z" fill="rgba(255,255,255,0.3)" stroke="#fff" stroke-width="1.5"/>
+          <path d="M12 4c0 3-1.5 6-3 8 1.5-2 3-5 3-8z" fill="#fff" opacity=".9"/>
+          <path d="M12 4c0 3 1.5 6 3 8-1.5-2-3-5-3-8z" fill="#fff" opacity=".7"/>
+          <circle cx="12" cy="9" r="2" fill="#fff" opacity=".6"/>
         </svg>
       </div>Yéyé
     </button>
@@ -1389,6 +1398,112 @@ window._splashReady = function() {
   setTimeout(hideSplash, 300);
 };
 
+
+// ============================================================
+// MODIFIER PROFIL CLIENT
+// ============================================================
+let epCurrentData = null;
+
+async function openEditProfile() {
+  const {data} = await sb.from('utilisateurs').select('*').eq('id', currentUser.id).single();
+  epCurrentData = data;
+  document.getElementById('ep-nom').value = data?.nom || '';
+  document.getElementById('ep-tel').value = data?.telephone || '';
+  document.getElementById('ep-adresse').value = data?.adresse || '';
+
+  // Avatar actuel
+  const avatarUrl = data?.avatar_url;
+  const epImg = document.getElementById('ep-avatar-img');
+  const epEmoji = document.getElementById('ep-avatar-emoji');
+  if (avatarUrl) {
+    epImg.src = avatarUrl; epImg.style.display = 'block'; epEmoji.style.display = 'none';
+  } else {
+    epImg.style.display = 'none'; epEmoji.style.display = 'flex';
+  }
+
+  document.getElementById('edit-profile-modal').style.display = 'block';
+  document.getElementById('edit-profile-bg').style.display = 'block';
+}
+
+function closeEditProfile() {
+  document.getElementById('edit-profile-modal').style.display = 'none';
+  document.getElementById('edit-profile-bg').style.display = 'none';
+}
+
+function previewEpAvatar(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('ep-avatar-img');
+    const emoji = document.getElementById('ep-avatar-emoji');
+    img.src = e.target.result; img.style.display = 'block'; emoji.style.display = 'none';
+    document.getElementById('ep-avatar-preview').style.border = '2.5px solid var(--vd)';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function saveEditProfile() {
+  const nom = document.getElementById('ep-nom').value.trim();
+  const tel = document.getElementById('ep-tel').value.trim();
+  const adresse = document.getElementById('ep-adresse').value.trim();
+  if (!nom) { toast('Le nom est obligatoire', 'err'); return; }
+
+  let avatarUrl = epCurrentData?.avatar_url || null;
+
+  // Upload nouvelle photo si choisie
+  const fileInput = document.getElementById('ep-avatar-input');
+  if (fileInput?.files?.[0]) {
+    const file = fileInput.files[0];
+    const ext = file.name.split('.').pop();
+    const path = 'avatars/client_' + currentUser.id + '.' + ext;
+    const {error: upErr} = await sb.storage.from('public').upload(path, file, {upsert: true});
+    if (!upErr) {
+      const {data: urlData} = sb.storage.from('public').getPublicUrl(path);
+      avatarUrl = urlData?.publicUrl || avatarUrl;
+    }
+  }
+
+  const {error} = await sb.from('utilisateurs').update({nom, telephone:tel, adresse, avatar_url:avatarUrl}).eq('id', currentUser.id);
+  if (error) { toast('❌ Erreur: ' + error.message, 'err'); return; }
+
+  // Mettre à jour l'affichage
+  document.getElementById('profile-name').textContent = nom;
+  const avatarEl = document.getElementById('profile-avatar');
+  if (avatarEl && avatarUrl) {
+    avatarEl.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.innerHTML='👤'"/>`;
+  }
+
+  toast('✅ Profil mis à jour !', 'ok');
+  closeEditProfile();
+}
+
+function openAdresses() {
+  openEditProfile(); // Pour l'instant, l'adresse est dans le profil
+  setTimeout(() => document.getElementById('ep-adresse').focus(), 300);
+}
+
 </script>
+
+<!-- MODAL MODIFIER PROFIL -->
+<div class="modal-overlay-bg" id="edit-profile-bg" onclick="closeEditProfile()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:400"></div>
+<div id="edit-profile-modal" style="display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#fff;border-radius:24px 24px 0 0;z-index:401;padding:24px;max-height:90vh;overflow-y:auto">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h2 style="font-size:18px;font-weight:800">✏️ Mon profil</h2>
+    <button onclick="closeEditProfile()" style="background:var(--g100);border:none;width:34px;height:34px;border-radius:50%;cursor:pointer;font-size:18px">✕</button>
+  </div>
+  <!-- Avatar -->
+  <div style="display:flex;flex-direction:column;align-items:center;margin-bottom:20px">
+    <div id="ep-avatar-preview" onclick="document.getElementById('ep-avatar-input').click()" style="width:90px;height:90px;border-radius:50%;background:var(--g100);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;border:2.5px dashed var(--g300);margin-bottom:8px">
+      <span id="ep-avatar-emoji" style="font-size:40px">👤</span>
+      <img id="ep-avatar-img" style="display:none;width:100%;height:100%;object-fit:cover" alt=""/>
+    </div>
+    <label style="font-size:12px;color:var(--vd);font-weight:600;cursor:pointer" onclick="document.getElementById('ep-avatar-input').click()">📷 Changer la photo</label>
+    <input type="file" id="ep-avatar-input" accept="image/*" style="display:none" onchange="previewEpAvatar(this)"/>
+  </div>
+  <div class="fg" style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:var(--g600);display:block;margin-bottom:4px">Nom complet *</label><input type="text" id="ep-nom" style="width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;outline:none" onfocus="this.style.borderColor='var(--vd)'" onblur="this.style.borderColor='var(--g200)'"/></div>
+  <div class="fg" style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:var(--g600);display:block;margin-bottom:4px">Téléphone</label><input type="tel" id="ep-tel" style="width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;outline:none" onfocus="this.style.borderColor='var(--vd)'" onblur="this.style.borderColor='var(--g200)'"/></div>
+  <div class="fg" style="margin-bottom:20px"><label style="font-size:12px;font-weight:600;color:var(--g600);display:block;margin-bottom:4px">Adresse principale</label><textarea id="ep-adresse" rows="2" style="width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;outline:none;resize:none" onfocus="this.style.borderColor='var(--vd)'" onblur="this.style.borderColor='var(--g200)'"></textarea></div>
+  <button onclick="saveEditProfile()" style="width:100%;padding:14px;background:var(--vd);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">💾 Enregistrer</button>
+</div>
 </body>
 </html>
