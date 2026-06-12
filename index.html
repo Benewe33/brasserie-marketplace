@@ -484,11 +484,21 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
           <button class="btn-main" onclick="doLogin()">🔐 Se connecter</button>
         </div>
         <div class="auth-form" id="form-register">
+          <!-- Photo de profil -->
+          <div class="fg" style="display:flex;flex-direction:column;align-items:center;margin-bottom:8px">
+            <div id="r-avatar-preview" onclick="document.getElementById('r-avatar-input').click()" style="width:80px;height:80px;border-radius:50%;background:var(--g100);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;border:2.5px dashed var(--g300);transition:border .2s;margin-bottom:8px" title="Ajouter une photo">
+              <span id="r-avatar-emoji" style="font-size:36px">👤</span>
+              <img id="r-avatar-img" style="display:none;width:100%;height:100%;object-fit:cover" alt=""/>
+            </div>
+            <label style="font-size:12px;color:var(--vd);font-weight:600;cursor:pointer" onclick="document.getElementById('r-avatar-input').click()">📷 Ajouter une photo</label>
+            <input type="file" id="r-avatar-input" accept="image/*" style="display:none" onchange="previewAvatar(this)"/>
+            <input type="hidden" id="r-avatar-url"/>
+          </div>
           <div class="fg"><label>Nom complet *</label><input type="text" id="r-nom" placeholder="Kofi Mensah"/></div>
           <div class="fg"><label>Email *</label><input type="email" id="r-email" placeholder="email@exemple.com" autocomplete="off"/></div>
           <div class="fg"><label>Téléphone *</label><input type="tel" id="r-tel" placeholder="97 00 00 00"/></div>
           <div class="fg"><label>Mot de passe *</label><input type="password" id="r-pass" autocomplete="new-password" placeholder="Min. 6 caractères"/></div>
-          <button class="btn-main" onclick="doRegister()">✅ Créer mon compte</button>
+          <button class="btn-main" id="r-btn" onclick="doRegister()">✅ Créer mon compte</button>
         </div>
       </div>
     </div>
@@ -550,8 +560,12 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     </button>
     <button class="nav-btn nav-center-btn" onclick="openPartnerMenu()">
       <div class="nav-center-ico">
-        <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display='flex';" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>
-        <span style="display:none;font-size:22px;align-items:center;justify-content:center">🌿</span>
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px">
+          <path d="M20 6C13 6 8 12 8 19c0 4 2 7.5 5 9.5L20 34l7-5.5c3-2 5-5.5 5-9.5 0-7-5-13-12-13z" fill="rgba(255,255,255,0.25)"/>
+          <path d="M20 8c-1.5 4-1.5 8 0 12 1.5-4 1.5-8 0-12z" fill="#fff"/>
+          <path d="M14 14c3 2 5 5 6 9-3-2-5-5-6-9z" fill="#fff" opacity=".8"/>
+          <path d="M26 14c-3 2-5 5-6 9 3-2 5-5 6-9z" fill="#fff" opacity=".8"/>
+        </svg>
       </div>Yéyé
     </button>
     <button class="nav-btn" id="nav-cart" onclick="goPage('cart')">
@@ -664,7 +678,12 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 
 <!-- YÉYÉ ASSISTANT FLOATING BUTTON -->
 <button class="ai-float-btn" onclick="openAssistantPopup()" id="ai-float" style="display:none" title="Yéyé Assistant">
-  <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" onerror="this.parentElement.textContent='🤖'" alt="Yéyé Assistant"/>
+  <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:28px;height:28px">
+    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="rgba(255,255,255,0.2)" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
+    <circle cx="9" cy="11" r="1" fill="#fff"/>
+    <circle cx="12" cy="11" r="1" fill="#fff"/>
+    <circle cx="15" cy="11" r="1" fill="#fff"/>
+  </svg>
   <span class="ai-float-badge">IA</span>
 </button>
 
@@ -749,11 +768,38 @@ async function doRegister(){
   const pass=document.getElementById('r-pass').value;
   if(!nom||!email||!pass){toast('Remplissez tous les champs','err');return;}
   if(pass.length<6){toast('Mot de passe min. 6 caractères','err');return;}
+
+  const btn=document.getElementById('r-btn');
+  btn.disabled=true;btn.textContent='⏳ Création...';
+
+  // Upload photo si présente
+  let avatarUrl=null;
+  const fileInput=document.getElementById('r-avatar-input');
+  if(fileInput?.files?.[0]){
+    const file=fileInput.files[0];
+    const ext=file.name.split('.').pop();
+    const path='avatars/client_'+Date.now()+'.'+ext;
+    const {data:up,error:upErr}=await sb.storage.from('public').upload(path,file,{upsert:true});
+    if(!upErr){
+      const {data:urlData}=sb.storage.from('public').getPublicUrl(path);
+      avatarUrl=urlData?.publicUrl||null;
+    }
+  }
+
   const {data,error}=await sb.auth.signUp({email,password:pass});
-  if(error){toast('❌ '+error.message,'err');return;}
-  await sb.from('utilisateurs').insert({id:data.user.id,nom,email,telephone:tel,role:'client',statut:'actif'});
+  if(error){toast('❌ '+error.message,'err');btn.disabled=false;btn.textContent='✅ Créer mon compte';return;}
+
+  await sb.from('utilisateurs').insert({
+    id:data.user.id,nom,email,telephone:tel,
+    role:'client',statut:'actif',
+    avatar_url:avatarUrl
+  });
+
+  if(avatarUrl) await sb.auth.updateUser({data:{avatar_url:avatarUrl}});
+
   currentUser=data.user;showProfile();
   toast('✅ Bienvenue '+nom+' !','ok');
+  btn.disabled=false;btn.textContent='✅ Créer mon compte';
 }
 
 async function doLogout(){
@@ -770,7 +816,31 @@ async function showProfile(){
   document.getElementById('notif-btn').style.display='flex';
   loadClientNotifs();subscribeClientNotifs();
   const {data}=await sb.from('utilisateurs').select('*').eq('id',currentUser.id).single();
-  if(data){document.getElementById('profile-name').textContent=data.nom||'—';document.getElementById('profile-email').textContent=data.email||currentUser.email;}
+  if(data){
+    document.getElementById('profile-name').textContent=data.nom||'—';
+    document.getElementById('profile-email').textContent=data.email||currentUser.email;
+    // Afficher avatar
+    const avatarEl=document.getElementById('profile-avatar');
+    const avatarUrl=data.avatar_url||currentUser.user_metadata?.avatar_url;
+    if(avatarEl&&avatarUrl){
+      avatarEl.innerHTML=`<img src="${avatarUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.textContent='👤'"/>`;
+    }
+  }
+}
+
+function previewAvatar(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const img=document.getElementById('r-avatar-img');
+    const emoji=document.getElementById('r-avatar-emoji');
+    img.src=e.target.result;
+    img.style.display='block';
+    if(emoji)emoji.style.display='none';
+    const preview=document.getElementById('r-avatar-preview');
+    if(preview){preview.style.border='2.5px solid var(--vd)';}
+  };
+  reader.readAsDataURL(file);
 }
 
 async function loadProfileStats(){
