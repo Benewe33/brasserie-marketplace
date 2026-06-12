@@ -65,7 +65,7 @@ export default async function handler(req, res) {
 
     if (groqTools.length > 0) {
       body.tools = groqTools;
-      body.tool_choice = 'auto';
+      body.tool_choice = 'required'; // Force l'appel d'outil
     }
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
