@@ -43,7 +43,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .nav-btn svg{width:22px;height:22px}
 .nav-btn .nb-badge{position:absolute;top:6px;right:calc(50% - 16px);background:var(--r);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center}
 .nav-center-btn{margin-top:-18px}
-.nav-center-ico{width:54px;height:54px;border-radius:50%;background:var(--vd);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(26,107,60,.4);border:3px solid #fff;overflow:hidden;margin-bottom:3px;transition:transform .2s}
+.nav-center-ico{width:54px;height:54px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px rgba(26,107,60,.4);border:3px solid #fff;overflow:hidden;margin-bottom:3px;transition:transform .2s}
 .nav-center-btn:hover .nav-center-ico{transform:scale(1.05)}
 .nav-center-btn{color:var(--vd);font-weight:700;font-size:11px}
 
@@ -295,7 +295,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 }
 
 /* YÉYÉ ASSISTANT BUTTON */
-.ai-float-btn{position:fixed;bottom:90px;right:16px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#0B3D2E,#1a6b3c);box-shadow:0 4px 20px rgba(11,61,46,.4);border:none;cursor:pointer;z-index:90;display:flex;align-items:center;justify-content:center;overflow:hidden;animation:float-bounce 3s ease-in-out infinite;transition:transform .2s}
+.ai-float-btn{position:fixed;bottom:90px;right:16px;width:56px;height:56px;border-radius:50%;background:#fff;box-shadow:0 4px 20px rgba(11,61,46,.4);border:2px solid var(--vd);cursor:pointer;z-index:90;display:flex;align-items:center;justify-content:center;overflow:hidden;animation:float-bounce 3s ease-in-out infinite;transition:transform .2s}
 .ai-float-btn:hover{transform:scale(1.1)}
 .ai-float-btn img{width:100%;height:100%;object-fit:cover;border-radius:50%}
 @keyframes float-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
@@ -570,7 +570,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     <button class="nav-btn nav-center-btn" onclick="openPartnerMenu()">
       <div class="nav-center-ico">
         <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png" 
-          style="width:90%;height:90%;object-fit:contain;filter:brightness(0) invert(1)" 
+          style="width:100%;height:100%;object-fit:cover" 
           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'" alt="Yéyé"/>
         <svg viewBox="0 0 24 24" fill="none" style="display:none;width:28px;height:28px">
           <path d="M12 2C8 2 5 5 5 9c0 3 1.5 5.5 3.5 7L12 22l3.5-6C17.5 14.5 19 12 19 9c0-4-3-7-7-7z" fill="rgba(255,255,255,0.3)" stroke="#fff" stroke-width="1.5"/>
@@ -689,7 +689,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 <!-- YÉYÉ ASSISTANT FLOATING BUTTON -->
 <button class="ai-float-btn" onclick="openAssistantPopup()" id="ai-float" style="display:none" title="Yéyé Assistant">
   <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png" 
-    style="width:85%;height:85%;object-fit:contain;filter:brightness(0) invert(1)"
+    style="width:100%;height:100%;object-fit:cover"
     onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="IA"/>
   <svg viewBox="0 0 24 24" fill="none" style="display:none;width:28px;height:28px">
     <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="rgba(255,255,255,0.2)" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
