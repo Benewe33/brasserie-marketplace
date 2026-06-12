@@ -325,7 +325,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
    ============================================================ */
 #splash{
   position:fixed;inset:0;z-index:99999;
-  background:#ffffff;
+  background:#fff;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   transition:opacity .6s ease, transform .6s ease;
@@ -336,7 +336,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
   pointer-events:none;
 }
 .splash-logo{
-  width:260px;max-width:75vw;
+  width:280px;max-width:80vw;
   animation:splashPop .6s cubic-bezier(.34,1.56,.64,1) both;
 }
 .splash-slogan{
@@ -386,7 +386,8 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 <body>
 <!-- SPLASH SCREEN -->
 <div id="splash">
-  <img class="splash-logo" src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png" alt="Yéyé Market" style="background:#fff" onerror="this.src='https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png'"/>
+  <img class="splash-logo" src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/2B5CEA10-702B-482E-A356-FDF38FC4A6A7.PNG" alt="Yéyé Market" onerror="this.src='https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG'"/>
+  <div class="splash-slogan">Le meilleur de chez nous,<br>livré chez vous.</div>
   <div class="splash-loader"></div>
 </div>
 
@@ -396,7 +397,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
   <header class="header">
     <div class="header-top">
       <div class="logo-wrap">
-        <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png" class="logo-img" onerror="this.style.display='none'" alt="Yéyé"/>
+        <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" class="logo-img" onerror="this.style.display='none'" alt="Yéyé"/>
         <div class="logo-text"><h1>Yéyé Market</h1><p>Bénin 🇧🇯</p></div>
       </div>
       <div class="header-actions">
@@ -470,7 +471,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     <div id="auth-section">
       <div class="auth-wrap">
         <div class="auth-logo">
-          <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png" onerror="this.style.display='none'" alt=""/>
+          <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" onerror="this.style.display='none'" alt=""/>
           <h2>Yéyé Market</h2>
           <p>Le meilleur de chez nous, livré chez vous.</p>
         </div>
@@ -550,7 +551,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     </button>
     <button class="nav-btn nav-center-btn" onclick="openPartnerMenu()">
       <div class="nav-center-ico">
-        <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png" onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display='flex';" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>
+        <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" onerror="this.style.display='none';var s=this.nextElementSibling;if(s)s.style.display='flex';" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>
         <span style="display:none;font-size:22px;align-items:center;justify-content:center">🌿</span>
       </div>Yéyé
     </button>
@@ -577,14 +578,31 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     <div class="carousel-dots" id="car-dots"></div>
   </div>
   <div class="prod-modal-body">
+    <!-- Tags + partage -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <div style="display:flex;gap:6px;flex-wrap:wrap" id="prod-modal-tags"></div>
+      <button onclick="shareProd()" style="background:var(--g100);border:none;width:36px;height:36px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center" title="Partager">🔗</button>
+    </div>
     <div id="prod-modal-name" class="prod-modal-name"></div>
-    <div id="prod-modal-vendor" class="prod-modal-vendor"></div>
+    <div id="prod-modal-vendor" class="prod-modal-vendor" style="cursor:pointer" onclick="openBoutiqueInfo()"></div>
     <div id="prod-modal-avg" style="display:none" class="note-avg">
       <span class="note-big" id="m-avg-num">0</span>
       <div><div class="stars-display" id="m-avg-stars"></div><div class="note-count" id="m-avg-count">0 avis</div></div>
     </div>
+    <!-- Prix avec promo -->
+    <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
+      <div id="prod-modal-price" class="prod-modal-price" style="margin-bottom:0"></div>
+      <div id="prod-modal-prix-barre" style="font-size:15px;color:var(--g400);text-decoration:line-through;display:none"></div>
+      <div id="prod-modal-promo-badge" style="background:#ef4444;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;display:none"></div>
+    </div>
+    <!-- Stock -->
+    <div id="prod-modal-stock" style="font-size:12px;margin-bottom:12px"></div>
     <div id="prod-modal-desc" class="prod-modal-desc"></div>
-    <div id="prod-modal-price" class="prod-modal-price"></div>
+    <!-- Infos produit -->
+    <div id="prod-modal-infos" style="background:var(--g50);border-radius:12px;padding:12px;margin-bottom:16px;display:none">
+      <div style="font-size:12px;font-weight:700;color:var(--g600);margin-bottom:8px">ℹ️ Informations</div>
+      <div id="prod-modal-infos-content" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:12px"></div>
+    </div>
     <div class="qty-control">
       <span class="qty-label">Quantité</span>
       <div class="qty-btns">
@@ -593,7 +611,12 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
         <button onclick="changeModalQty(1)">+</button>
       </div>
     </div>
-    <button class="btn-main" onclick="addToCartFromModal()">🛒 Ajouter au panier</button>
+    <button class="btn-main" id="prod-modal-add-btn" onclick="addToCartFromModal()">🛒 Ajouter au panier</button>
+    <!-- Produits similaires -->
+    <div id="prod-similar-wrap" style="margin-top:20px;border-top:1px solid var(--g100);padding-top:16px;display:none">
+      <h3 style="font-size:14px;font-weight:700;margin-bottom:12px">🛍️ Vous aimerez aussi</h3>
+      <div id="prod-similar-list" style="display:flex;gap:10px;overflow-x:auto;padding-bottom:4px"></div>
+    </div>
     <!-- AVIS -->
     <div style="margin-top:22px;border-top:1px solid var(--g100);padding-top:18px">
       <h3 style="font-size:15px;font-weight:700;margin-bottom:14px">⭐ Avis clients</h3>
@@ -642,7 +665,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 
 <!-- YÉYÉ ASSISTANT FLOATING BUTTON -->
 <button class="ai-float-btn" onclick="openAssistantPopup()" id="ai-float" style="display:none" title="Yéyé Assistant">
-  <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png" onerror="this.parentElement.textContent='🤖'" alt="Yéyé Assistant"/>
+  <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" onerror="this.parentElement.textContent='🤖'" alt="Yéyé Assistant"/>
   <span class="ai-float-badge">IA</span>
 </button>
 
@@ -652,7 +675,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     <div class="ai-popup-handle"></div>
     <div class="ai-popup-head">
       <div class="ai-popup-logo">
-        <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png" onerror="this.parentElement.textContent='🌿'" alt="Yéyé"/>
+        <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" onerror="this.parentElement.textContent='🌿'" alt="Yéyé"/>
       </div>
       <h2>Yéyé Assistant</h2>
       <p>Votre vendeur IA personnel.<br/>Achetez simplement en discutant !</p>
@@ -850,13 +873,84 @@ function openProdModal(p){
   if(p.image_url)carouselImages.push(p.image_url);
   if(p.image_url_2)carouselImages.push(p.image_url_2);
   carouselIndex=0;renderCarousel();
+
+  // Nom et vendeur
   document.getElementById('prod-modal-name').textContent=p.nom;
-  document.getElementById('prod-modal-vendor').textContent='🏪 '+(p.boutiques?.nom||'Yéyé Market');
+  document.getElementById('prod-modal-vendor').innerHTML='🏪 <strong>'+(p.boutiques?.nom||'Yéyé Market')+'</strong>';
   document.getElementById('prod-modal-desc').textContent=p.description||'';
+
+  // Prix + promo
+  const hasPrix = p.prix_promo && p.prix_promo < p.prix;
   document.getElementById('prod-modal-price').textContent=fmt(p.prix_promo||p.prix)+' FCFA/'+p.unite;
+  const barreEl=document.getElementById('prod-modal-prix-barre');
+  const promoEl=document.getElementById('prod-modal-promo-badge');
+  if(hasPrix){
+    barreEl.textContent=fmt(p.prix)+' FCFA';barreEl.style.display='block';
+    const pct=Math.round((1-p.prix_promo/p.prix)*100);
+    promoEl.textContent='-'+pct+'%';promoEl.style.display='inline-block';
+  } else {
+    barreEl.style.display='none';promoEl.style.display='none';
+  }
+
+  // Stock
+  const stockEl=document.getElementById('prod-modal-stock');
+  if(p.stock!=null){
+    if(p.stock===0){stockEl.innerHTML='<span style="color:#ef4444;font-weight:600">❌ Rupture de stock</span>';document.getElementById('prod-modal-add-btn').disabled=true;document.getElementById('prod-modal-add-btn').style.opacity='.5';}
+    else if(p.stock<=5){stockEl.innerHTML='<span style="color:#f59e0b;font-weight:600">⚠️ Plus que '+p.stock+' disponible'+( p.stock>1?'s':'')+'</span>';document.getElementById('prod-modal-add-btn').disabled=false;document.getElementById('prod-modal-add-btn').style.opacity='1';}
+    else{stockEl.innerHTML='<span style="color:#16a34a;font-weight:600">✅ En stock</span>';document.getElementById('prod-modal-add-btn').disabled=false;document.getElementById('prod-modal-add-btn').style.opacity='1';}
+  } else { stockEl.innerHTML=''; document.getElementById('prod-modal-add-btn').disabled=false;document.getElementById('prod-modal-add-btn').style.opacity='1'; }
+
+  // Tags
+  const tagsEl=document.getElementById('prod-modal-tags');
+  const tags=[];
+  if(p.categories?.nom)tags.push({label:p.categories.nom,color:'#e0f2fe',text:'#0369a1'});
+  if(p.prix_promo)tags.push({label:'🔥 Promo',color:'#fee2e2',text:'#dc2626'});
+  if(p.stock>0&&p.stock<=5)tags.push({label:'⏳ Limité',color:'#fef9c3',text:'#92400e'});
+  tagsEl.innerHTML=tags.map(t=>`<span style="background:${t.color};color:${t.text};font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px">${t.label}</span>`).join('');
+
+  // Infos produit
+  const infos=[];
+  if(p.unite)infos.push({label:'Unité',val:p.unite});
+  if(p.poids)infos.push({label:'Poids',val:p.poids});
+  if(p.origine)infos.push({label:'Origine',val:p.origine});
+  if(p.boutiques?.nom)infos.push({label:'Vendeur',val:p.boutiques.nom});
+  if(p.zones?.nom)infos.push({label:'Zone',val:p.zones.nom});
+  const infosWrap=document.getElementById('prod-modal-infos');
+  if(infos.length){
+    document.getElementById('prod-modal-infos-content').innerHTML=infos.map(i=>`<div><span style="color:var(--g400)">${i.label}</span><br><strong>${i.val}</strong></div>`).join('');
+    infosWrap.style.display='block';
+  } else { infosWrap.style.display='none'; }
+
+  // Produits similaires
+  const similar=allProducts.filter(x=>x.id!==p.id&&x.categories?.id===p.categories?.id).slice(0,6);
+  const simWrap=document.getElementById('prod-similar-wrap');
+  if(similar.length){
+    simWrap.style.display='block';
+    document.getElementById('prod-similar-list').innerHTML=similar.map(s=>`
+      <div onclick="openProdModal(${JSON.stringify(s).replace(/"/g,'&quot;')})" style="flex-shrink:0;width:120px;cursor:pointer">
+        <div style="width:120px;height:90px;border-radius:10px;overflow:hidden;background:var(--g100);margin-bottom:6px">
+          ${s.image_url?`<img src="${s.image_url}" style="width:100%;height:100%;object-fit:cover"/>`:`<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:32px">${catEmoji(s.categories?.nom||'')}</div>`}
+        </div>
+        <div style="font-size:12px;font-weight:600;line-height:1.3">${s.nom}</div>
+        <div style="font-size:12px;color:var(--vd);font-weight:700">${fmt(s.prix_promo||s.prix)} F</div>
+      </div>`).join('');
+  } else { simWrap.style.display='none'; }
+
   document.getElementById('prod-modal').classList.add('open');
   document.getElementById('modal-bg').classList.add('open');
   loadAvis(p.id);
+}
+
+function shareProd(){
+  const p=currentProduct;if(!p)return;
+  const url=window.location.origin+window.location.pathname+'?prod='+p.id;
+  if(navigator.share){navigator.share({title:p.nom,text:p.nom+' — '+fmt(p.prix_promo||p.prix)+' FCFA sur Yéyé Market',url});}
+  else{navigator.clipboard?.writeText(url);toast('🔗 Lien copié !','ok');}
+}
+
+function openBoutiqueInfo(){
+  const p=currentProduct;if(!p?.boutiques?.nom)return;
+  toast('🏪 '+p.boutiques.nom,'ok');
 }
 
 function closeProdModal(){
