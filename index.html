@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
 <title>Yéyé Market — Marketplace du Bénin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.kkiapay.me/k.js"></script>
@@ -318,9 +319,78 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .ai-popup-btn{display:block;margin:0 20px;padding:15px;background:linear-gradient(135deg,#0B3D2E,#1a6b3c);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;box-shadow:0 4px 16px rgba(11,61,46,.3);transition:opacity .2s}
 .ai-popup-btn:hover{opacity:.9}
 .ai-popup-close{display:block;text-align:center;margin-top:12px;color:var(--g400);font-size:13px;cursor:pointer;background:none;border:none;font-family:inherit;width:100%}
+
+/* ============================================================
+   SPLASH SCREEN
+   ============================================================ */
+#splash{
+  position:fixed;inset:0;z-index:99999;
+  background:#fff;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  transition:opacity .6s ease, transform .6s ease;
+}
+#splash.hide{
+  opacity:0;
+  transform:scale(1.05);
+  pointer-events:none;
+}
+.splash-logo{
+  width:280px;max-width:80vw;
+  animation:splashPop .6s cubic-bezier(.34,1.56,.64,1) both;
+}
+.splash-slogan{
+  margin-top:28px;
+  font-family:'Dancing Script','Caveat','Pacifico',cursive;
+  font-size:22px;
+  color:#1a1a1a;
+  text-align:center;
+  line-height:1.4;
+  animation:splashFade .8s ease .4s both;
+  position:relative;
+}
+.splash-slogan::after{
+  content:'';
+  display:block;
+  width:0;
+  height:2px;
+  background:#0B3D2E;
+  margin:6px auto 0;
+  border-radius:2px;
+  animation:splashLine .6s ease .8s forwards;
+}
+.splash-loader{
+  margin-top:48px;
+  width:36px;height:36px;
+  border:3px solid #f0f0f0;
+  border-top-color:#0B3D2E;
+  border-radius:50%;
+  animation:spin .8s linear infinite, splashFade .5s ease .6s both;
+}
+@keyframes splashPop{
+  0%{opacity:0;transform:scale(.8)}
+  100%{opacity:1;transform:scale(1)}
+}
+@keyframes splashFade{
+  0%{opacity:0;transform:translateY(12px)}
+  100%{opacity:1;transform:translateY(0)}
+}
+@keyframes splashLine{
+  to{width:140px}
+}
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
 </style>
 </head>
 <body>
+<!-- SPLASH SCREEN -->
+<div id="splash">
+  <img class="splash-logo" src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/2B5CEA10-702B-482E-A356-FDF38FC4A6A7.PNG" alt="Yéyé Market" onerror="this.src='https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG'"/>
+  <div class="splash-slogan">Le meilleur de chez nous,<br>livré chez vous.</div>
+  <div class="splash-loader"></div>
+</div>
+
 <div class="app-shell">
 
   <!-- HEADER -->
@@ -1120,7 +1190,7 @@ function escHtml(s){if(!s)return'—';return String(s).replace(/&/g,'&amp;').rep
 function sbadge(s){const m={en_attente:'<span class="s-badge s-attente">⏳ En attente</span>',confirmee:'<span class="s-badge s-confirmee">✅ Confirmée</span>',en_preparation:'<span class="s-badge s-preparation">👨‍🍳 Préparation</span>',prete:'<span class="s-badge s-confirmee">📦 Prête</span>',en_livraison:'<span class="s-badge s-livraison">🚴 En livraison</span>',livree:'<span class="s-badge s-livree">🎉 Livrée</span>',annulee:'<span class="s-badge s-annulee">❌ Annulée</span>'};return m[s]||`<span class="s-badge">${s}</span>`;}
 function fmt(n){return(n||0).toLocaleString('fr-FR');}
 function fdate(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
-function catEmoji(nom){const m={'Viandes':'🥩','Poissons':'🐟','Légumes':'🥦','Fruits':'🍌','Épicerie':'🛒','Brasserie':'🍺','Huiles':'🫙','Épices':'🌶️','Céréales':'🌾','Restaurants':'🍽️','Boissons':'🥤','Oeufs':'🥚','Marché':'🧺','Shopping':'🛍️','Plats cuisinés':'🍲','Produits naturels':'🌿','Légumineuses':'🫘'};return m[nom]||'📦';}
+function catEmoji(nom){const m={'Viandes':'🥩','Poissons':'🐟','Légumes':'🥦','Fruits':'🍌','Épicerie':'🛍️','Brasserie':'🍺','Huiles':'🫙','Épices':'🌶️','Céréales':'🌾','Restaurants':'🍽️','Boissons':'🥤','Oeufs':'🥚','Marché':'🧺'};return m[nom]||'📦';}
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);}
 
 // INIT
@@ -1139,6 +1209,24 @@ document.getElementById('ai-float').style.display='flex';
 checkSession();
 loadCategories();
 loadProducts();
+
+// ============================================================
+// SPLASH SCREEN
+// ============================================================
+function hideSplash() {
+  const splash = document.getElementById('splash');
+  if (!splash) return;
+  splash.classList.add('hide');
+  setTimeout(() => { splash.style.display = 'none'; }, 700);
+}
+
+// Hide after 2.5s OR when app is ready (whichever is later)
+let splashTimer = setTimeout(hideSplash, 2500);
+window._splashReady = function() {
+  clearTimeout(splashTimer);
+  setTimeout(hideSplash, 300);
+};
+
 </script>
 </body>
 </html>
