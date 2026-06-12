@@ -37,7 +37,19 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g900);min-
 
 /* APP */
 .app{display:none;min-height:100vh}
-.sidebar{width:248px;background:var(--vd);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;display:flex;flex-direction:column}
+.sidebar{width:248px;background:var(--vd);position:fixed;top:0;left:0;bottom:0;overflow-y:auto;z-index:100;display:flex;flex-direction:column;transition:width .25s ease,transform .25s ease}
+.sidebar.collapsed{width:60px}
+.sidebar.collapsed .sb-label{display:none}
+.sidebar.collapsed .sb-sec{display:none}
+.sidebar.collapsed .sb-head h2,.sidebar.collapsed .sb-head p{display:none}
+.sidebar.collapsed .sb-head{padding:16px 10px;justify-content:center;display:flex;align-items:center}
+.sidebar.collapsed .sb-btn{justify-content:center;padding:10px}
+.sidebar.collapsed .sb-foot .sb-btn span{display:none}
+.sidebar.collapsed .sb-badge{display:none}
+.sb-toggle{position:fixed;top:14px;left:210px;z-index:200;background:var(--vd);border:none;border-radius:50%;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:left .25s ease;box-shadow:0 2px 8px rgba(0,0,0,.2)}
+.sb-toggle.collapsed{left:14px}
+.sb-toggle svg{width:16px;height:16px;stroke:#fff;transition:transform .25s}
+.sb-toggle.collapsed svg{transform:rotate(180deg)}
 .sb-head{padding:22px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
 .sb-head .ico{font-size:28px}
 .sb-head h2{color:#fff;font-size:16px;font-weight:700;margin-top:6px}
@@ -50,9 +62,18 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g900);min-
 .sb-btn svg{width:17px;height:17px;flex-shrink:0}
 .sb-badge{margin-left:auto;background:var(--r);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
 .sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.1)}
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);width:248px!important}
+  .sidebar.mobile-open{transform:translateX(0)}
+  .sb-toggle{left:14px!important}
+  .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99}
+  .sb-overlay.show{display:block}
+}
 
 /* MAIN */
-.main{margin-left:248px;padding:28px;min-height:100vh}
+.main{margin-left:248px;padding:28px;min-height:100vh;transition:margin-left .25s ease}
+.main.collapsed{margin-left:60px}
+@media(max-width:768px){.main{margin-left:0!important}}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
 .topbar h1{font-size:22px;font-weight:700}
 .badge-role{background:var(--vl);color:var(--vd);font-size:12px;font-weight:600;padding:5px 12px;border-radius:20px}
@@ -206,29 +227,35 @@ tr:hover td{background:var(--g50)}
 
 <!-- APP -->
 <div class="app" id="app">
-  <aside class="sidebar">
-    <div class="sb-head"><div class="ico">🌿</div><h2>Yéyé Market</h2><p>Administration</p></div>
+  <!-- Overlay mobile -->
+  <div class="sb-overlay" id="sb-overlay" onclick="toggleSidebar()"></div>
+  <!-- Toggle button -->
+  <button class="sb-toggle" id="sb-toggle" onclick="toggleSidebar()" title="Réduire/Agrandir le menu">
+    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+  </button>
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head"><div class="ico">🌿</div><h2 class="sb-label">Yéyé Market</h2><p class="sb-label">Administration</p></div>
     <nav class="sb-nav">
       <div class="sb-sec">Vue d'ensemble</div>
       <button class="sb-btn active" onclick="go('dashboard',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Tableau de bord
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="sb-label">Tableau de bord</span>
       </button>
       <div class="sb-sec">Catalogue</div>
       <button class="sb-btn" onclick="go('categories',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg>Catégories
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h7"/></svg><span class="sb-label">Catégories</span>
       </button>
       <button class="sb-btn" onclick="go('produits',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>Produits
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 7H4a2 2 0 00-2 2v6a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg><span class="sb-label">Produits</span>
       </button>
       <button class="sb-btn" onclick="go('menus',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20M21 15V2a5 5 0 00-5 5v6h5zm0 0v7"/></svg>Menus restaurants
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20M21 15V2a5 5 0 00-5 5v6h5zm0 0v7"/></svg><span class="sb-label">Menus restaurants</span>
       </button>
       <div class="sb-sec">Commandes</div>
       <button class="sb-btn" onclick="go('commandes',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Commandes
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><span class="sb-label">Commandes</span>
       </button>
       <button class="sb-btn" onclick="go('livraisons',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>Livraisons
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg><span class="sb-label">Livraisons</span>
       </button>
       <div class="sb-sec">Validations</div>
       <button class="sb-btn" onclick="go('vendeurs',this)">
@@ -246,15 +273,15 @@ tr:hover td{background:var(--g50)}
       </button>
       <div class="sb-sec">Comptes</div>
       <button class="sb-btn" onclick="go('comptes',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Créer des comptes
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg><span class="sb-label">Créer des comptes</span>
       </button>
       <button class="sb-btn" onclick="go('zones',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>Zones
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span class="sb-label">Zones</span>
       </button>
     </nav>
     <div class="sb-foot">
       <button class="sb-btn" onclick="doLogout()" style="color:rgba(255,120,120,.9)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Déconnexion
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg><span class="sb-label">Déconnexion</span>
       </button>
     </div>
   </aside>
@@ -717,7 +744,8 @@ async function checkSession(){
 function showApp(){
   document.getElementById('loginWrap').style.display='none';
   document.getElementById('app').style.display='flex';
-  loadDashboard();loadZones();loadCatSelect();
+  loadDashboard();
+  initSidebar();loadZones();loadCatSelect();
   loadNotifs();
   // Subscribe to realtime
   sb.auth.getSession().then(({data:{session}})=>{
@@ -1055,6 +1083,7 @@ async function valider(table,id,statut){
   if(error){toast('Erreur: '+error.message,'err');return;}
   toast(statut==='actif'?'✅ Validé !':'❌ Refusé',statut==='actif'?'ok':'err');
   loadDashboard();
+  initSidebar();
 }
 
 // CRÉER COMPTES
@@ -1504,6 +1533,7 @@ async function changerStatutDepuisModal(statut) {
   currentPartData.item.statut = statut;
   closeModal('m-partenaire');
   loadDashboard();
+  initSidebar();
 }
 
 async function supprimerDepuisModal() {
@@ -1520,7 +1550,55 @@ async function supprimerPartenaire(table, id, userId) {
   await sb.from('utilisateurs').delete().eq('id', userId);
   toast('🗑️ Partenaire supprimé', 'err');
   loadDashboard();
+  initSidebar();
 }
+
+
+// ============================================================
+// SIDEBAR TOGGLE
+// ============================================================
+let sidebarCollapsed = localStorage.getItem('sb_collapsed') === '1';
+
+function initSidebar() {
+  const isMobile = window.innerWidth <= 768;
+  if (!isMobile && sidebarCollapsed) {
+    document.getElementById('sidebar').classList.add('collapsed');
+    document.getElementById('sb-toggle').classList.add('collapsed');
+    document.getElementById('main-content').classList.add('collapsed');
+  }
+}
+
+function toggleSidebar() {
+  const isMobile = window.innerWidth <= 768;
+  const sb = document.getElementById('sidebar');
+  const toggle = document.getElementById('sb-toggle');
+  const main = document.getElementById('main-content');
+  const overlay = document.getElementById('sb-overlay');
+
+  if (isMobile) {
+    sb.classList.toggle('mobile-open');
+    overlay.classList.toggle('show');
+  } else {
+    sidebarCollapsed = !sidebarCollapsed;
+    sb.classList.toggle('collapsed', sidebarCollapsed);
+    toggle.classList.toggle('collapsed', sidebarCollapsed);
+    main.classList.toggle('collapsed', sidebarCollapsed);
+    localStorage.setItem('sb_collapsed', sidebarCollapsed ? '1' : '0');
+  }
+}
+
+window.addEventListener('resize', () => {
+  const isMobile = window.innerWidth <= 768;
+  const sb = document.getElementById('sidebar');
+  if (!isMobile) {
+    sb.classList.remove('mobile-open');
+    document.getElementById('sb-overlay').classList.remove('show');
+    if (sidebarCollapsed) {
+      sb.classList.add('collapsed');
+      document.getElementById('sb-toggle').classList.add('collapsed');
+    }
+  }
+});
 
 </script>
 </body>
