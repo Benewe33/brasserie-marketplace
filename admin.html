@@ -278,6 +278,10 @@ tr:hover td{background:var(--g50)}
       <button class="sb-btn" onclick="go('zones',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span class="sb-label">Zones</span>
       </button>
+      <div class="sb-sec">Analytiques</div>
+      <button class="sb-btn" onclick="go('rapports',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg><span class="sb-label">Rapports & Ventes</span>
+      </button>
     </nav>
     <div class="sb-foot">
       <button class="sb-btn" onclick="doLogout()" style="color:rgba(255,120,120,.9)">
@@ -457,6 +461,68 @@ tr:hover td{background:var(--g50)}
         <div class="card-head"><h2>📍 Zones de livraison</h2><button class="btn btn-p" onclick="openZone()">+ Ajouter</button></div>
         <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Nom</th><th>Ville</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="zones-body"></tbody></table></div></div>
       </div>
+    </div>
+
+    <!-- RAPPORTS & VENTES -->
+    <div class="sec" id="sec-rapports">
+
+      <!-- Filtres période -->
+      <div style="background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:18px;margin-bottom:20px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+        <span style="font-weight:600;font-size:14px;color:var(--g600)">📅 Période :</span>
+        <button class="btn btn-sm rp-filter active" onclick="setRapportPeriod(7,this)">7 jours</button>
+        <button class="btn btn-sm rp-filter" onclick="setRapportPeriod(30,this)">30 jours</button>
+        <button class="btn btn-sm rp-filter" onclick="setRapportPeriod(90,this)">3 mois</button>
+        <button class="btn btn-sm rp-filter" onclick="setRapportPeriod(365,this)">1 an</button>
+        <button class="btn btn-p" style="margin-left:auto;font-size:12px" onclick="exportRapport()">⬇️ Exporter CSV</button>
+      </div>
+
+      <!-- KPIs rapports -->
+      <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px">
+        <div class="stat"><div class="stat-ico">💰</div><div class="stat-label">CA période</div><div class="stat-val" id="r-ca">—</div></div>
+        <div class="stat"><div class="stat-ico">🛒</div><div class="stat-label">Commandes</div><div class="stat-val" id="r-cmds">—</div></div>
+        <div class="stat"><div class="stat-ico">📦</div><div class="stat-label">Panier moyen</div><div class="stat-val" id="r-panier">—</div></div>
+        <div class="stat"><div class="stat-ico">🏪</div><div class="stat-label">Commission YM</div><div class="stat-val" id="r-commission">—</div></div>
+      </div>
+
+      <!-- Graphiques -->
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px">
+        <div class="chart-card">
+          <h3>📈 Chiffre d'affaires</h3>
+          <div class="chart-wrap"><canvas id="chart-rapport-ca"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <h3>🥧 Statuts commandes</h3>
+          <div class="chart-wrap"><canvas id="chart-rapport-statuts"></canvas></div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <div class="chart-card">
+          <h3>🏆 Top 10 produits vendus</h3>
+          <div id="r-top-prods" style="font-size:13px;max-height:300px;overflow-y:auto"></div>
+        </div>
+        <div class="chart-card">
+          <h3>🏪 Top vendeurs / CA</h3>
+          <div id="r-top-vendeurs" style="font-size:13px;max-height:300px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+      <!-- Tableau détaillé -->
+      <div class="card">
+        <div class="card-head">
+          <h2>📋 Détail des commandes</h2>
+          <span id="r-count" style="font-size:12px;color:var(--g400)"></span>
+        </div>
+        <div class="card-body">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Client</th><th>Total</th><th>Commission (10%)</th><th>Statut</th><th>Zone</th><th>Date</th></tr></thead>
+              <tbody id="r-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
 </div>
@@ -754,14 +820,14 @@ function showApp(){
 }
 
 // NAVIGATION
-const titles={dashboard:'Tableau de bord',categories:'Catégories',produits:'Produits',menus:'Menus restaurants',commandes:'Commandes',livraisons:'Livraisons',vendeurs:'Vendeurs',restaurants:'Restaurants',livreurs:'Livreurs',comptes:'Créer des comptes',zones:'Zones de livraison'};
+const titles={dashboard:'Tableau de bord',categories:'Catégories',produits:'Produits',menus:'Menus restaurants',commandes:'Commandes',livraisons:'Livraisons',vendeurs:'Vendeurs',restaurants:'Restaurants',livreurs:'Livreurs',comptes:'Créer des comptes',zones:'Zones de livraison',rapports:'Rapports & Ventes'};
 function go(name,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
   btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),zones:loadZonesTable,clients:loadClients};
+  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),zones:loadZonesTable,clients:loadClients,rapports:()=>loadRapports(currentRapportDays)};
   if(loaders[name])loaders[name]();
 }
 
@@ -1599,6 +1665,167 @@ window.addEventListener('resize', () => {
     }
   }
 });
+
+
+// ============================================================
+// RAPPORTS & VENTES
+// ============================================================
+let currentRapportDays = 7;
+let rapportData = null;
+
+function setRapportPeriod(days, btn) {
+  currentRapportDays = days;
+  document.querySelectorAll('.rp-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadRapports(days);
+}
+
+async function loadRapports(days = 7) {
+  const since = new Date();
+  since.setDate(since.getDate() - days);
+  const sinceStr = since.toISOString();
+
+  // Charger commandes de la période
+  const {data: cmds} = await sb.from('commandes')
+    .select('*,utilisateurs(nom),zones(nom)')
+    .gte('created_at', sinceStr)
+    .order('created_at', {ascending: false});
+
+  const {data: ligs} = await sb.from('lignes_commande')
+    .select('*,produits(nom,boutique_id,boutiques(nom))')
+    .gte('created_at', sinceStr);
+
+  rapportData = {cmds: cmds||[], ligs: ligs||[], days};
+
+  // KPIs
+  const livrees = (cmds||[]).filter(c => c.statut === 'livree');
+  const ca = livrees.reduce((s,c) => s + (c.total||0), 0);
+  const nbCmds = (cmds||[]).length;
+  const panier = nbCmds > 0 ? ca / Math.max(livrees.length, 1) : 0;
+  const commission = ca * 0.1;
+
+  document.getElementById('r-ca').textContent = fmt(ca) + ' FCFA';
+  document.getElementById('r-cmds').textContent = nbCmds;
+  document.getElementById('r-panier').textContent = fmt(Math.round(panier)) + ' FCFA';
+  document.getElementById('r-commission').textContent = fmt(Math.round(commission)) + ' FCFA';
+  document.getElementById('r-count').textContent = nbCmds + ' commande(s)';
+
+  // Graphique CA par jour
+  const labels = [], caData = [];
+  const step = days <= 30 ? 1 : days <= 90 ? 7 : 30;
+  for (let i = days; i >= 0; i -= step) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    const label = days <= 30
+      ? d.toLocaleDateString('fr-FR', {day:'numeric', month:'short'})
+      : d.toLocaleDateString('fr-FR', {month:'short', year:'2-digit'});
+    const dayStr = d.toISOString().split('T')[0];
+    const total = livrees.filter(c => c.created_at?.startsWith(dayStr)).reduce((s,c) => s+(c.total||0), 0);
+    labels.push(label); caData.push(total);
+  }
+
+  const ctxCA = document.getElementById('chart-rapport-ca')?.getContext('2d');
+  if (ctxCA) {
+    if (window._chartRapportCA) window._chartRapportCA.destroy();
+    window._chartRapportCA = new Chart(ctxCA, {
+      type: 'line',
+      data: {labels, datasets: [{label:'CA (FCFA)', data:caData, borderColor:'#0B3D2E', backgroundColor:'rgba(11,61,46,.1)', fill:true, tension:.4, pointRadius:3}]},
+      options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true, ticks:{callback:v=>fmt(v)}}}}
+    });
+  }
+
+  // Graphique statuts
+  const statutsMap = {};
+  (cmds||[]).forEach(c => { statutsMap[c.statut] = (statutsMap[c.statut]||0)+1; });
+  const sColors = {livree:'#16a34a', en_attente:'#f59e0b', confirmee:'#3b82f6', en_preparation:'#8b5cf6', en_livraison:'#06b6d4', annulee:'#ef4444'};
+  const ctxS = document.getElementById('chart-rapport-statuts')?.getContext('2d');
+  if (ctxS && Object.keys(statutsMap).length) {
+    if (window._chartRapportS) window._chartRapportS.destroy();
+    window._chartRapportS = new Chart(ctxS, {
+      type: 'doughnut',
+      data: {
+        labels: Object.keys(statutsMap).map(s => s.replace(/_/g,' ')),
+        datasets: [{data: Object.values(statutsMap), backgroundColor: Object.keys(statutsMap).map(s => sColors[s]||'#9ca3af'), borderWidth:2}]
+      },
+      options: {responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{font:{size:11}}}}}
+    });
+  }
+
+  // Top produits vendus
+  const prodVentes = {};
+  (ligs||[]).forEach(l => {
+    const nom = l.produits?.nom || l.nom_item || '—';
+    if (!prodVentes[nom]) prodVentes[nom] = {qty:0, ca:0, boutique: l.produits?.boutiques?.nom||'—'};
+    prodVentes[nom].qty += (l.quantite||1);
+    prodVentes[nom].ca += (l.sous_total||0);
+  });
+  const topProds = Object.entries(prodVentes).sort((a,b) => b[1].qty - a[1].qty).slice(0,10);
+  document.getElementById('r-top-prods').innerHTML = topProds.length
+    ? topProds.map(([nom,d],i) => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--g100)">
+        <span style="font-size:16px;width:24px">${['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'][i]}</span>
+        <div style="flex:1">
+          <div style="font-weight:600">${nom}</div>
+          <div style="font-size:11px;color:var(--g400)">${d.boutique} · ${d.qty} vente${d.qty>1?'s':''}</div>
+        </div>
+        <div style="font-weight:700;color:var(--vd)">${fmt(d.ca)} F</div>
+      </div>`).join('')
+    : '<p style="text-align:center;color:var(--g400);padding:20px">Aucune vente sur cette période</p>';
+
+  // Top vendeurs par CA
+  const vendeurCA = {};
+  (ligs||[]).forEach(l => {
+    const nom = l.produits?.boutiques?.nom || '—';
+    vendeurCA[nom] = (vendeurCA[nom]||0) + (l.sous_total||0);
+  });
+  const topVendeurs = Object.entries(vendeurCA).sort((a,b) => b[1]-a[1]).slice(0,10);
+  document.getElementById('r-top-vendeurs').innerHTML = topVendeurs.length
+    ? topVendeurs.map(([nom,ca],i) => `
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--g100)">
+        <span style="font-size:16px;width:24px">${['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟'][i]}</span>
+        <div style="flex:1"><div style="font-weight:600">${nom}</div></div>
+        <div>
+          <div style="font-weight:700;color:var(--vd)">${fmt(ca)} F</div>
+          <div style="font-size:11px;color:var(--g400)">comm. ${fmt(Math.round(ca*0.1))} F</div>
+        </div>
+      </div>`).join('')
+    : '<p style="text-align:center;color:var(--g400);padding:20px">Aucun vendeur actif</p>';
+
+  // Tableau détaillé
+  document.getElementById('r-table').innerHTML = (cmds||[]).length
+    ? (cmds||[]).map(c => `
+      <tr>
+        <td><code>#${c.id?.substring(0,8)}</code></td>
+        <td>${c.utilisateurs?.nom||'—'}</td>
+        <td><strong>${fmt(c.total||0)} FCFA</strong></td>
+        <td style="color:var(--vd);font-weight:600">${fmt(Math.round((c.total||0)*0.1))} FCFA</td>
+        <td>${sbadge(c.statut)}</td>
+        <td>${c.zones?.nom||'—'}</td>
+        <td>${fdate(c.created_at)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="7" style="text-align:center;color:var(--g400);padding:24px">Aucune commande sur cette période</td></tr>';
+}
+
+function exportRapport() {
+  if (!rapportData) return;
+  const rows = [['ID','Client','Total FCFA','Commission FCFA','Statut','Zone','Date']];
+  rapportData.cmds.forEach(c => {
+    rows.push([
+      c.id?.substring(0,8)||'',
+      c.utilisateurs?.nom||'',
+      c.total||0,
+      Math.round((c.total||0)*0.1),
+      c.statut||'',
+      c.zones?.nom||'',
+      fdate(c.created_at)
+    ]);
+  });
+  const csv = rows.map(r => r.map(v => '"'+String(v)+'"').join(',')).join('\n'); const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `yeye-rapport-${rapportData.days}j.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast('✅ Export CSV téléchargé', 'ok');
+}
 
 </script>
 </body>
