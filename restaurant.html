@@ -271,6 +271,21 @@ tr:hover td{background:var(--g50)}
           <label for="consent-check">J'ai lu et j'accepte le contrat de partenariat restaurant Yéyé Market.</label>
         </div>
         <p id="scroll-hint" style="font-size:11px;color:var(--or);margin-top:6px">⬇️ Lisez le contrat jusqu'à la fin pour pouvoir accepter</p>
+
+        <!-- BLOC SIGNATURE -->
+        <div id="signature-bloc" style="display:none;margin-top:14px;background:#f0faf4;border:1.5px solid #1a6b3c;border-radius:12px;padding:16px">
+          <p style="font-size:13px;font-weight:700;color:#0B3D2E;margin-bottom:6px">✍️ Signature électronique</p>
+          <p style="font-size:12px;color:#4b5563;margin-bottom:12px">Saisissez votre nom complet pour signer ce contrat. Il sera transmis avec votre dossier à l'équipe Yéyé Market.</p>
+          <label style="font-size:12px;font-weight:600;color:#0B3D2E;display:block;margin-bottom:4px">Nom complet *</label>
+          <input type="text" id="signature-nom" placeholder="Ex: Jean-Baptiste AHOUANDJINOU" oninput="checkSignature()"
+            style="width:100%;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:8px;font-size:13px;font-family:inherit;box-sizing:border-box;outline:none"
+            onfocus="this.style.borderColor='#0B3D2E'" onblur="this.style.borderColor='#e5e7eb'"/>
+          <div style="margin-top:10px;background:#fff;border:1px solid #e5e7eb;border-radius:8px;padding:10px">
+            <p id="sig-preview" style="font-style:italic;color:#9ca3af;font-size:12px;margin:0">Votre signature apparaîtra ici...</p>
+          </div>
+          <p id="sig-date" style="font-size:11px;color:#9ca3af;margin-top:6px"></p>
+        </div>
+
         <div class="btn-row" style="margin-top:16px">
           <button class="btn-back" onclick="goStep(2)">← Retour</button>
           <button class="btn-main" id="btn-submit" onclick="doRegister()" disabled style="opacity:.5">✅ Créer mon compte</button>
@@ -325,10 +340,21 @@ tr:hover td{background:var(--g50)}
 
     <!-- DASHBOARD -->
     <div class="sec active" id="sec-dashboard">
-      <div class="stats">
-        <div class="stat"><div class="stat-ico">🍽️</div><div class="stat-label">Menus</div><div class="stat-val" id="s-menus">—</div></div>
+      <div class="stats" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat"><div class="stat-ico">🍽️</div><div class="stat-label">Menus actifs</div><div class="stat-val" id="s-menus">—</div></div>
         <div class="stat"><div class="stat-ico">🛒</div><div class="stat-label">Commandes</div><div class="stat-val" id="s-cmds">—</div></div>
-        <div class="stat"><div class="stat-ico">💰</div><div class="stat-label">Chiffre d'affaires</div><div class="stat-val" id="s-ca">—</div></div>
+        <div class="stat"><div class="stat-ico">💰</div><div class="stat-label">CA total</div><div class="stat-val" id="s-ca">—</div></div>
+        <div class="stat"><div class="stat-ico">⭐</div><div class="stat-label">Note moyenne</div><div class="stat-val" id="s-note">—</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px">
+        <div class="card">
+          <div class="card-head"><h2>📈 Ventes des 7 derniers jours</h2></div>
+          <div class="card-body" style="padding:16px"><canvas id="chart-ventes" height="120"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h2>🏆 Top plats</h2></div>
+          <div class="card-body" style="padding:12px"><div id="top-menus-list" style="font-size:13px"></div></div>
+        </div>
       </div>
       <div class="card"><div class="card-head"><h2>🛒 Dernières commandes</h2></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Plats</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead><tbody id="dash-cmds"></tbody></table></div></div></div>
     </div>
@@ -447,10 +473,7 @@ function checkScroll(el){
     document.getElementById('scroll-hint').style.display='none';
   }
 }
-function checkConsent(){
-  const checked=document.getElementById('consent-check').checked;
-  const btn=document.getElementById('btn-submit');btn.disabled=!checked;btn.style.opacity=checked?'1':'0.5';
-}
+
 
 async function uploadDoc(input,bucket,urlId,prevId,progId,statusId){
   const file=input.files[0];if(!file)return;
@@ -500,7 +523,12 @@ async function doLogin(){
 }
 
 async function doRegister(){
-  if(!document.getElementById('consent-check').checked)return;
+  const sigNom = document.getElementById('signature-nom')?.value.trim() || '';
+  if(!document.getElementById('consent-check').checked || sigNom.length < 3){
+    document.getElementById('r-err-3').textContent='⚠️ Vous devez accepter le contrat et signer avec votre nom complet';
+    document.getElementById('r-err-3').style.display='block';return;
+  }
+  const sig = getSignatureData();
   const btn=document.getElementById('btn-submit');btn.disabled=true;btn.textContent='⏳ Création...';
   const nom=document.getElementById('r-nom').value.trim();
   const owner=document.getElementById('r-owner').value.trim();
@@ -515,7 +543,46 @@ async function doRegister(){
   if(error){document.getElementById('r-err-3').textContent='❌ '+error.message;document.getElementById('r-err-3').style.display='block';btn.disabled=false;btn.textContent='✅ Créer mon compte';return;}
   await sb.from('utilisateurs').insert({id:data.user.id,nom:owner,email,telephone:tel,role:'restaurant',statut:'actif'});
   await sb.from('restaurants').insert({user_id:data.user.id,nom,telephone:tel,description:desc,zone_id,adresse,cuisine_type,statut:'en_attente'});
-  await sb.auth.updateUser({data:{photo_resto:document.getElementById('doc-resto-url').value,photo_cni:document.getElementById('doc-cni-url').value,contrat_accepte:true,contrat_date:new Date().toISOString()}});
+
+  const contratData = {
+    type: 'restaurant', commission: '8%',
+    nom_signataire: sig.nom_signature, date_signature: sig.date_signature,
+    date_lisible: sig.date_lisible, email_signataire: email,
+    telephone: tel, restaurant: nom, cuisine_type
+  };
+  await sb.auth.updateUser({data:{
+    photo_resto:document.getElementById('doc-resto-url').value,
+    photo_cni:document.getElementById('doc-cni-url').value,
+    contrat_accepte:true, contrat_date:sig.date_signature,
+    contrat_signature:sig.nom_signature, contrat:contratData
+  }});
+
+  // Notification admin
+  await sb.from('notifications').insert({
+    user_id: data.user.id,
+    titre: '🆕 Nouvelle inscription Restaurant',
+    message: `Nouvelle inscription restaurant en attente de validation.
+
+` +
+      `👤 Propriétaire: ${owner}
+🍽️ Restaurant: ${nom}
+📧 Email: ${email}
+📱 Tél: ${tel}
+🍳 Cuisine: ${cuisine_type}
+📍 Adresse: ${adresse}
+
+` +
+      `📋 CONTRAT SIGNÉ:
+` +
+      `✍️ Signataire: ${sig.nom_signature}
+` +
+      `📅 Date: ${sig.date_lisible}
+` +
+      `💰 Commission acceptée: 8%`,
+    type: 'inscription',
+    metadata: contratData
+  });
+
   currentUser=data.user;
   document.getElementById('auth-page').style.display='none';
   document.getElementById('pending-page').style.display='flex';
@@ -549,21 +616,84 @@ function go(name,btn){
 }
 
 async function loadDashboard(){
-  const {count:mc}=await sb.from('menus').select('id',{count:'exact',head:true}).eq('restaurant_id',currentResto.id);
-  document.getElementById('s-menus').textContent=mc??0;
-  const {data:menus}=await sb.from('menus').select('id').eq('restaurant_id',currentResto.id);
+  if(!currentResto)return;
+  const {data:menus}=await sb.from('menus').select('*').eq('restaurant_id',currentResto.id);
   const menuIds=(menus||[]).map(m=>m.id);
-  if(!menuIds.length){document.getElementById('s-cmds').textContent='0';document.getElementById('s-ca').textContent='0 FCFA';document.getElementById('dash-cmds').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';return;}
-  const {data:ligs}=await sb.from('lignes_commande').select('*,commandes(id,statut,created_at)').in('menu_id',menuIds);
+  document.getElementById('s-menus').textContent=(menus||[]).filter(m=>m.disponible!==false).length;
+
+  if(!menuIds.length){
+    document.getElementById('s-cmds').textContent=0;document.getElementById('s-ca').textContent='0 FCFA';
+    const s=document.getElementById('s-note');if(s)s.textContent='—';
+    document.getElementById('dash-cmds').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';
+    return;
+  }
+
+  const {data:ligs}=await sb.from('lignes_commande').select('*,commandes(id,statut,created_at,utilisateurs(nom))').in('menu_id',menuIds);
   const cmdMap={};
-  (ligs||[]).forEach(l=>{if(!l.commandes)return;if(!cmdMap[l.commande_id])cmdMap[l.commande_id]={...l.commandes,items:[],total:0};cmdMap[l.commande_id].items.push(l.nom_item);cmdMap[l.commande_id].total+=l.sous_total;});
+  (ligs||[]).forEach(l=>{
+    if(!l.commandes)return;
+    if(!cmdMap[l.commande_id])cmdMap[l.commande_id]={...l.commandes,items:[],total:0,menuVentes:{}};
+    cmdMap[l.commande_id].items.push(l.nom_item||'—');
+    cmdMap[l.commande_id].total+=(l.sous_total||0);
+    cmdMap[l.commande_id].menuVentes[l.menu_id]=(cmdMap[l.commande_id].menuVentes[l.menu_id]||0)+(l.quantite||1);
+  });
   const cmds=Object.values(cmdMap).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-  const ca=cmds.filter(c=>c.statut==='livree').reduce((s,c)=>s+c.total,0);
-  document.getElementById('s-cmds').textContent=cmds.length;document.getElementById('s-ca').textContent=fmt(ca)+' FCFA';
+  const livrees=cmds.filter(c=>c.statut==='livree');
+  const ca=livrees.reduce((s,c)=>s+c.total,0);
+  document.getElementById('s-cmds').textContent=cmds.length;
+  document.getElementById('s-ca').textContent=fmt(ca)+' FCFA';
+
+  const {data:avis}=await sb.from('avis').select('note').eq('restaurant_id',currentResto.id);
+  const s_note=document.getElementById('s-note');
+  if(s_note)s_note.textContent=avis?.length?(avis.reduce((s,a)=>s+(a.note||0),0)/avis.length).toFixed(1)+' ⭐':'—';
+
   const pending=cmds.filter(c=>c.statut==='en_attente').length;
-  if(pending>0){document.getElementById('b-cmd').textContent=pending;document.getElementById('b-cmd').style.display='inline';}
+  if(pending>0){const b=document.getElementById('b-cmd');if(b){b.textContent=pending;b.style.display='inline';}}
+
   const tb=document.getElementById('dash-cmds');
-  tb.innerHTML=cmds.slice(0,8).map(c=>`<tr><td><code>#${c.id?.substring(0,8)}</code></td><td>${c.items?.join(', ')||'—'}</td><td><strong>${fmt(c.total)} FCFA</strong></td><td>${sbadge(c.statut)}</td><td>${fdate(c.created_at)}</td></tr>`).join('');
+  tb.innerHTML=cmds.length
+    ? cmds.slice(0,8).map(c=>`<tr>
+        <td><code>#${c.id?.substring(0,8)}</code></td>
+        <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.items?.slice(0,2).join(', ')+(c.items?.length>2?' +'+(c.items.length-2):'')}</td>
+        <td><strong>${fmt(c.total)} FCFA</strong></td>
+        <td>${sbadge(c.statut)}</td>
+        <td>${fdate(c.created_at)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';
+
+  // Top plats
+  const menuVentesTotal={};
+  cmds.forEach(c=>Object.entries(c.menuVentes||{}).forEach(([id,q])=>{menuVentesTotal[id]=(menuVentesTotal[id]||0)+q;}));
+  const topMenus=Object.entries(menuVentesTotal).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const topList=document.getElementById('top-menus-list');
+  if(topList)topList.innerHTML=topMenus.length
+    ? topMenus.map(([id,q],i)=>{
+        const m=menus.find(x=>x.id===id);
+        return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--g100)">
+          <span style="font-size:16px">${['🥇','🥈','🥉','4️⃣','5️⃣'][i]}</span>
+          <div style="flex:1"><div style="font-weight:600;font-size:13px">${m?.nom||'—'}</div>
+          <div style="font-size:11px;color:var(--g400)">${q} commande${q>1?'s':''}</div></div>
+        </div>`;
+      }).join('')
+    : '<p style="color:var(--g400);text-align:center;padding:20px;font-size:13px">Aucune vente</p>';
+
+  // Graphique 7 jours
+  const days=[],ventesData=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    days.push(d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'}));
+    const dayStr=d.toISOString().split('T')[0];
+    ventesData.push(livrees.filter(c=>c.created_at?.startsWith(dayStr)).reduce((s,c)=>s+c.total,0));
+  }
+  const ctx=document.getElementById('chart-ventes')?.getContext('2d');
+  if(ctx){
+    if(window._chartVentes)window._chartVentes.destroy();
+    window._chartVentes=new Chart(ctx,{
+      type:'bar',
+      data:{labels:days,datasets:[{label:'FCFA',data:ventesData,backgroundColor:'rgba(11,61,46,0.75)',borderRadius:5}]},
+      options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}
+    });
+  }
 }
 
 async function loadMenus(){
@@ -670,6 +800,64 @@ function toast(msg,type='info'){const t=document.getElementById('toast');t.textC
 function filterTbl(inp,tbId){const q=inp.value.toLowerCase();document.querySelectorAll('#'+tbId+' tr').forEach(tr=>{tr.style.display=tr.textContent.toLowerCase().includes(q)?'':'none';});}
 document.querySelectorAll('.overlay').forEach(m=>{m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');});});
 checkSession();
+
+// ============================================================
+// GESTION SIGNATURE ÉLECTRONIQUE
+// ============================================================
+function checkConsent() {
+  const checked = document.getElementById('consent-check').checked;
+  const sigBloc = document.getElementById('signature-bloc');
+  const btn = document.getElementById('btn-submit');
+  
+  if (checked) {
+    sigBloc.style.display = 'block';
+    // Mettre à jour la date
+    const now = new Date();
+    document.getElementById('sig-date').textContent = 
+      'Date de signature : ' + now.toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'}) + 
+      ' à ' + now.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+  } else {
+    sigBloc.style.display = 'none';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+  }
+}
+
+function checkSignature() {
+  const nom = document.getElementById('signature-nom').value.trim();
+  const btn = document.getElementById('btn-submit');
+  const preview = document.getElementById('sig-preview');
+  
+  if (nom.length >= 3) {
+    preview.textContent = nom;
+    preview.style.color = '#0B3D2E';
+    preview.style.fontWeight = '700';
+    preview.style.fontSize = '16px';
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  } else {
+    preview.textContent = 'Votre signature apparaîtra ici...';
+    preview.style.color = '#9ca3af';
+    preview.style.fontWeight = 'normal';
+    preview.style.fontSize = '12px';
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+  }
+}
+
+function getSignatureData() {
+  const nom = document.getElementById('signature-nom')?.value.trim() || '';
+  const now = new Date();
+  return {
+    nom_signature: nom,
+    date_signature: now.toISOString(),
+    date_lisible: now.toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'}) + ' à ' + now.toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'}),
+    ip: null
+  };
+}
+
 </script>
 </body>
 </html>
