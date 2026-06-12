@@ -325,7 +325,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
    ============================================================ */
 #splash{
   position:fixed;inset:0;z-index:99999;
-  background:#fff;
+  background:#ffffff;
   display:flex;flex-direction:column;
   align-items:center;justify-content:center;
   transition:opacity .6s ease, transform .6s ease;
@@ -338,6 +338,8 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .splash-logo{
   width:260px;max-width:75vw;
   mix-blend-mode:multiply;
+  filter:contrast(1.05);
+  background:#fff;
   animation:splashPop .6s cubic-bezier(.34,1.56,.64,1) both;
 }
 .splash-slogan{
@@ -387,7 +389,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 <body>
 <!-- SPLASH SCREEN -->
 <div id="splash">
-  <img class="splash-logo" src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/2B5CEA10-702B-482E-A356-FDF38FC4A6A7.PNG.PNG" alt="Yéyé Market" onerror="this.src='https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/2B5CEA10-702B-482E-A356-FDF38FC4A6A7.PNG.PNG'"/>
+  <img class="splash-logo" src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/2B5CEA10-702B-482E-A356-FDF38FC4A6A7.PNG.PNG" alt="Yéyé Market" style="background:#fff" onerror="this.src='https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/2B5CEA10-702B-482E-A356-FDF38FC4A6A7.PNG.PNG'"/>
   <div class="splash-loader"></div>
 </div>
 
