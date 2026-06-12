@@ -807,14 +807,16 @@ async function processAI(userMsg) {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 15000);
 
+      // On le premier tour, forcer l'outil. Sur le suivi, laisser l'IA répondre librement
+      const isFirstTurn = loopCount === 1;
       const response = await fetch('/api/chat', {
         method: 'POST',
         signal: controller.signal,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           system: systemPrompt,
-          tools: TOOLS,
-          max_tokens: 800,
+          tools: isFirstTurn ? TOOLS : undefined,
+          max_tokens: 500,
           messages: history.slice(-14)
         })
       });
