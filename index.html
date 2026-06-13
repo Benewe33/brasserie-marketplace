@@ -762,10 +762,10 @@ async function doRegister(){
   if(fileInput?.files?.[0]){
     const file=fileInput.files[0];
     const ext=file.name.split('.').pop();
-    const path='avatars/client_'+Date.now()+'.'+ext;
-    const {data:up,error:upErr}=await sb.storage.from('public').upload(path,file,{upsert:true});
+    const path='profiles/client_'+Date.now()+'.'+ext;
+    const {data:up,error:upErr}=await sb.storage.from('yeye-market').upload(path,file,{upsert:true});
     if(!upErr){
-      const {data:urlData}=sb.storage.from('public').getPublicUrl(path);
+      const {data:urlData}=sb.storage.from('yeye-market').getPublicUrl(path);
       avatarUrl=urlData?.publicUrl||null;
     }
   }
@@ -1527,10 +1527,10 @@ async function saveEditProfile() {
   if (fileInput?.files?.[0]) {
     const file = fileInput.files[0];
     const ext = file.name.split('.').pop();
-    const path = 'avatars/client_' + currentUser.id + '.' + ext;
-    const {error: upErr} = await sb.storage.from('public').upload(path, file, {upsert: true});
+    const path = 'profiles/client_' + currentUser.id + '.' + ext;
+    const {error: upErr} = await sb.storage.from('yeye-market').upload(path, file, {upsert: true});
     if (!upErr) {
-      const {data: urlData} = sb.storage.from('public').getPublicUrl(path);
+      const {data: urlData} = sb.storage.from('yeye-market').getPublicUrl(path);
       avatarUrl = urlData?.publicUrl || avatarUrl;
     }
   }
