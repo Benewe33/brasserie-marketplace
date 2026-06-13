@@ -62,6 +62,14 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g900);min-
 .sb-btn svg{width:17px;height:17px;flex-shrink:0}
 .sb-badge{margin-left:auto;background:var(--r);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
 .sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.1)}
+.sup-tab{background:var(--g100);color:var(--g600);border:none;padding:5px 10px;border-radius:8px;font-size:12px;cursor:pointer;font-family:inherit}
+.sup-tab.active{background:var(--vd);color:#fff}
+.sup-conv-item{padding:12px 16px;border-bottom:1px solid var(--g50);cursor:pointer;transition:background .15s}
+.sup-conv-item:hover{background:var(--g50)}
+.sup-conv-item.active{background:var(--vl);border-left:3px solid var(--vd)}
+.sup-msg-bubble{max-width:70%;padding:10px 14px;border-radius:16px;font-size:13.5px;line-height:1.5;word-break:break-word;margin-bottom:4px}
+.sup-msg-bubble.client{background:#fff;color:var(--g900);border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.sup-msg-bubble.agent{background:linear-gradient(135deg,var(--vd),var(--v));color:#fff;border-bottom-right-radius:4px}
 @media(max-width:768px){
   .sidebar{transform:translateX(-100%);width:248px!important}
   .sidebar.mobile-open{transform:translateX(0)}
@@ -275,6 +283,10 @@ tr:hover td{background:var(--g50)}
       <button class="sb-btn" onclick="go('comptes',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg><span class="sb-label">Créer des comptes</span>
       </button>
+      <button class="sb-btn" onclick="go('support',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg><span class="sb-label">Support & Agents</span>
+        <span class="sb-badge" id="sb-support-badge" style="display:none">0</span>
+      </button>
       <button class="sb-btn" onclick="go('zones',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg><span class="sb-label">Zones</span>
       </button>
@@ -452,6 +464,75 @@ tr:hover td{background:var(--g50)}
           <div class="fgm"><label>Zone *</label><select id="cl-zone"><option value="">Choisir...</option></select></div>
           <button class="btn btn-p" style="width:100%;margin-top:4px" onclick="creerCompte('livreur')">Créer le compte livreur</button>
         </div></div>
+      </div>
+
+      <!-- AGENTS SUPPORT -->
+      <div class="card" style="margin-top:20px">
+        <div class="card-head">
+          <h2>💬 Agents Support</h2>
+          <button class="btn btn-p" onclick="creerAgent()">+ Nouvel agent</button>
+        </div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--g400);margin-bottom:16px">Les agents reçoivent un email avec leurs identifiants pour se connecter sur <strong>support.html</strong></p>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Nom</th><th>Email</th><th>Créé le</th><th>Actions</th></tr></thead>
+              <tbody id="agents-body"><tr><td colspan="4" style="text-align:center;color:var(--g400);padding:20px">Chargement...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUPPORT — conversations en direct -->
+    <div class="sec" id="sec-support">
+      <div style="display:grid;grid-template-columns:320px 1fr;gap:0;background:#fff;border-radius:16px;box-shadow:var(--shadow-lg);overflow:hidden;min-height:600px">
+
+        <!-- Liste conversations -->
+        <div style="border-right:1px solid var(--g200);display:flex;flex-direction:column">
+          <div style="padding:16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-weight:700;font-size:14px">💬 Conversations</span>
+            <span id="sup-count" style="background:var(--r);color:#fff;font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;display:none">0</span>
+          </div>
+          <div style="padding:8px">
+            <div style="display:flex;gap:4px;margin-bottom:8px">
+              <button class="btn btn-sm sup-tab active" onclick="filterConvs('ouvert',this)">En attente</button>
+              <button class="btn btn-sm sup-tab" onclick="filterConvs('en_cours',this)">En cours</button>
+              <button class="btn btn-sm sup-tab" onclick="filterConvs('ferme',this)">Fermées</button>
+              <button class="btn btn-sm sup-tab" onclick="filterConvs('all',this)">Toutes</button>
+            </div>
+          </div>
+          <div id="sup-conv-list" style="overflow-y:auto;flex:1"></div>
+        </div>
+
+        <!-- Zone chat -->
+        <div style="display:flex;flex-direction:column" id="sup-chat-zone">
+          <div id="sup-placeholder" style="flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--g400)">
+            <span style="font-size:48px">💬</span>
+            <span style="font-size:14px">Sélectionnez une conversation</span>
+          </div>
+
+          <div id="sup-chat-head" style="display:none;padding:14px 18px;border-bottom:1px solid var(--g200);display:none;align-items:center;gap:12px">
+            <div style="width:38px;height:38px;border-radius:50%;background:var(--vd);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0">👤</div>
+            <div style="flex:1">
+              <div style="font-size:14px;font-weight:700" id="sup-client-name">Client</div>
+              <div style="font-size:12px;color:var(--g400)" id="sup-client-sub">En attente</div>
+            </div>
+            <button class="btn btn-sm" style="background:var(--vl);color:var(--vd)" onclick="supSetStatus('en_cours')">✅ Prendre en charge</button>
+            <button class="btn btn-sm" style="background:var(--rl);color:var(--r)" onclick="supSetStatus('ferme')">🔒 Fermer</button>
+          </div>
+
+          <div id="sup-msgs" style="display:none;flex:1;overflow-y:auto;padding:16px;background:var(--g50);flex-direction:column;gap:10px"></div>
+
+          <div id="sup-input" style="display:none;padding:12px 16px;background:#fff;border-top:1px solid var(--g200);gap:10px;align-items:flex-end">
+            <textarea id="sup-msg-input" placeholder="Répondre au client..." rows="1" style="flex:1;border:1.5px solid var(--g200);border-radius:12px;padding:10px 14px;font-size:14px;font-family:inherit;outline:none;resize:none;max-height:100px;line-height:1.5"
+              onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();supSendMsg()}"
+              oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+            <button onclick="supSendMsg()" style="width:42px;height:42px;border-radius:50%;background:var(--vd);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+              <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="17" height="17"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -820,14 +901,14 @@ function showApp(){
 }
 
 // NAVIGATION
-const titles={dashboard:'Tableau de bord',categories:'Catégories',produits:'Produits',menus:'Menus restaurants',commandes:'Commandes',livraisons:'Livraisons',vendeurs:'Vendeurs',restaurants:'Restaurants',livreurs:'Livreurs',comptes:'Créer des comptes',zones:'Zones de livraison',rapports:'Rapports & Ventes'};
+const titles={dashboard:'Tableau de bord',categories:'Catégories',produits:'Produits',menus:'Menus restaurants',commandes:'Commandes',livraisons:'Livraisons',vendeurs:'Vendeurs',restaurants:'Restaurants',livreurs:'Livreurs',comptes:'Créer des comptes',support:'Support & Messagerie',zones:'Zones de livraison',rapports:'Rapports & Ventes'};
 function go(name,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
   btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),zones:loadZonesTable,clients:loadClients,rapports:()=>loadRapports(currentRapportDays)};
+  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),zones:loadZonesTable,clients:loadClients,rapports:()=>loadRapports(currentRapportDays),comptes:()=>{loadZonesSelect('cv-zone');loadZonesSelect('cr-zone');loadZonesSelect('cl-zone');loadAgents();},support:()=>{loadSupConvs();subscribeSupport();}};
   if(loaders[name])loaders[name]();
 }
 
@@ -1825,6 +1906,208 @@ function exportRapport() {
   a.href = url; a.download = `yeye-rapport-${rapportData.days}j.csv`; a.click();
   URL.revokeObjectURL(url);
   toast('✅ Export CSV téléchargé', 'ok');
+}
+
+
+// ============================================================
+// SUPPORT — AGENTS & MESSAGERIE
+// ============================================================
+let supConvId = null;
+let supMsgSub = null;
+let supConvSub = null;
+let supConvFilter = 'ouvert';
+
+async function loadAgents() {
+  const { data } = await sb.from('utilisateurs').select('*').eq('role', 'agent').order('created_at', { ascending: false });
+  const tbody = document.getElementById('agents-body');
+  if (!data?.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:20px">Aucun agent créé</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.map(a => `
+    <tr>
+      <td><strong>${a.nom || '—'}</strong></td>
+      <td>${a.email}</td>
+      <td>${new Date(a.created_at).toLocaleDateString('fr-FR')}</td>
+      <td>
+        <button class="btn btn-sm" style="background:var(--rl);color:var(--r)" onclick="supprimerAgent('${a.id}','${a.email}')">Supprimer</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function creerAgent() {
+  const nom = prompt('Nom de l\'agent :');
+  if (!nom) return;
+  const email = prompt('Email de l\'agent :');
+  if (!email) return;
+  const mdp = Math.random().toString(36).slice(-8) + 'A1!';
+  
+  // Créer le compte Supabase Auth
+  const { data, error } = await sb.auth.admin ? 
+    sb.auth.admin.createUser({ email, password: mdp, email_confirm: true }) :
+    sb.auth.signUp({ email, password: mdp });
+    
+  if (error) { toast('❌ ' + error.message, 'err'); return; }
+  
+  const userId = data.user?.id;
+  
+  // Enregistrer dans utilisateurs avec rôle agent
+  await sb.from('utilisateurs').insert({ id: userId, nom, email, role: 'agent', statut: 'actif' });
+  
+  toast('✅ Agent créé ! Email: ' + email + ' | Mot de passe: ' + mdp, 'ok');
+  
+  // Copier les infos dans le presse-papier
+  navigator.clipboard?.writeText('Email: ' + email + '\nMot de passe: ' + mdp + '\nURL: ' + window.location.origin + '/support.html');
+  
+  alert('✅ Compte agent créé !\n\nEmail: ' + email + '\nMot de passe: ' + mdp + '\n\nCopié dans le presse-papier. Transmettez ces identifiants à l\'agent.');
+  
+  loadAgents();
+}
+
+async function supprimerAgent(id, email) {
+  if (!confirm('Supprimer l\'agent ' + email + ' ?')) return;
+  await sb.from('utilisateurs').delete().eq('id', id);
+  toast('Agent supprimé', 'ok');
+  loadAgents();
+}
+
+// SUPPORT — Conversations
+async function loadSupConvs() {
+  let query = sb.from('conversations').select('*, messages_chat(contenu, created_at, expediteur, lu)').order('updated_at', { ascending: false });
+  if (supConvFilter !== 'all') query = query.eq('statut', supConvFilter);
+  const { data } = await query;
+  
+  const list = document.getElementById('sup-conv-list');
+  if (!data?.length) {
+    list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--g400);font-size:13px">Aucune conversation</div>';
+    return;
+  }
+  
+  const unreadTotal = data.filter(c => c.statut === 'ouvert').length;
+  const badge = document.getElementById('sup-count');
+  const sbBadge = document.getElementById('sb-support-badge');
+  if (unreadTotal > 0) {
+    badge.style.display = 'inline'; badge.textContent = unreadTotal;
+    if (sbBadge) { sbBadge.style.display = 'inline'; sbBadge.textContent = unreadTotal; }
+  } else {
+    badge.style.display = 'none';
+    if (sbBadge) sbBadge.style.display = 'none';
+  }
+  
+  list.innerHTML = data.map(c => {
+    const msgs = c.messages_chat || [];
+    const last = msgs[msgs.length - 1];
+    const preview = last ? last.contenu.substring(0, 40) + '...' : 'Nouvelle conversation';
+    const time = last ? new Date(last.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+    const unread = msgs.filter(m => !m.lu && m.expediteur === 'client').length;
+    const statusColor = c.statut === 'ouvert' ? '#f59e0b' : c.statut === 'en_cours' ? '#16a34a' : '#9ca3af';
+    return `<div class="sup-conv-item${c.id === supConvId ? ' active' : ''}" onclick="supOpenConv('${c.id}','${(c.client_nom||'Client').replace(/'/g,"\\'")}','${c.client_tel||''}','${c.statut}')">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:8px;height:8px;border-radius:50%;background:${statusColor};flex-shrink:0"></div>
+        <strong style="font-size:13px;flex:1">${c.client_nom || 'Client'}</strong>
+        <span style="font-size:10px;color:var(--g400)">${time}</span>
+        ${unread > 0 ? `<span style="background:var(--r);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center">${unread}</span>` : ''}
+      </div>
+      <div style="font-size:12px;color:var(--g400);margin-top:3px;margin-left:16px">${preview}</div>
+    </div>`;
+  }).join('');
+}
+
+function filterConvs(filter, btn) {
+  supConvFilter = filter;
+  document.querySelectorAll('.sup-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadSupConvs();
+}
+
+async function supOpenConv(id, nom, tel, statut) {
+  supConvId = id;
+  
+  // Afficher header + msgs + input
+  const head = document.getElementById('sup-chat-head');
+  const msgs = document.getElementById('sup-msgs');
+  const input = document.getElementById('sup-input');
+  const placeholder = document.getElementById('sup-placeholder');
+  
+  placeholder.style.display = 'none';
+  head.style.display = 'flex';
+  msgs.style.display = 'flex';
+  msgs.style.flexDirection = 'column';
+  input.style.display = 'flex';
+  
+  document.getElementById('sup-client-name').textContent = nom;
+  document.getElementById('sup-client-sub').textContent = (tel ? '📱 ' + tel + ' · ' : '') + 'Statut: ' + statut;
+  
+  // Charger messages
+  const { data } = await sb.from('messages_chat').select('*').eq('conversation_id', id).order('created_at');
+  msgs.innerHTML = '';
+  if (data?.length) {
+    data.forEach(m => supAddBubble(m));
+  } else {
+    msgs.innerHTML = '<div style="text-align:center;color:var(--g400);font-size:13px;padding:20px">Début de la conversation</div>';
+  }
+  supScrollMsgs();
+  
+  // Marquer comme lu
+  await sb.from('messages_chat').update({ lu: true }).eq('conversation_id', id).eq('expediteur', 'client');
+  
+  // Souscrire temps réel
+  if (supMsgSub) supMsgSub.unsubscribe();
+  supMsgSub = sb.channel('admin-msgs-' + id)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages_chat', filter: 'conversation_id=eq.' + id },
+      payload => { supAddBubble(payload.new); supScrollMsgs(); sb.from('messages_chat').update({ lu: true }).eq('id', payload.new.id); })
+    .subscribe();
+    
+  loadSupConvs(); // Refresh liste
+}
+
+function supAddBubble(m) {
+  const isAgent = m.expediteur === 'agent';
+  const msgs = document.getElementById('sup-msgs');
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'display:flex;flex-direction:column;align-items:' + (isAgent ? 'flex-end' : 'flex-start');
+  const b = document.createElement('div');
+  b.className = 'sup-msg-bubble ' + (isAgent ? 'agent' : 'client');
+  b.textContent = m.contenu;
+  const meta = document.createElement('div');
+  meta.style.cssText = 'font-size:10px;color:var(--g400);margin-top:3px' + (isAgent ? ';text-align:right' : '');
+  const d = new Date(m.created_at);
+  meta.textContent = (isAgent ? (m.expediteur_nom || 'Agent') + ' · ' : '') + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  wrap.appendChild(b); wrap.appendChild(meta);
+  msgs.appendChild(wrap);
+}
+
+async function supSendMsg() {
+  const ta = document.getElementById('sup-msg-input');
+  const txt = ta.value.trim();
+  if (!txt || !supConvId) return;
+  ta.value = ''; ta.style.height = 'auto';
+  await sb.from('messages_chat').insert({ conversation_id: supConvId, expediteur: 'agent', expediteur_nom: currentUser?.email?.split('@')[0] || 'Admin', contenu: txt, lu: true });
+  await sb.from('conversations').update({ statut: 'en_cours' }).eq('id', supConvId);
+}
+
+async function supSetStatus(statut) {
+  if (!supConvId) return;
+  await sb.from('conversations').update({ statut }).eq('id', supConvId);
+  toast(statut === 'ferme' ? '🔒 Conversation fermée' : '✅ Prise en charge', 'ok');
+  loadSupConvs();
+}
+
+function supScrollMsgs() {
+  const el = document.getElementById('sup-msgs');
+  if (el) el.scrollTop = el.scrollHeight;
+}
+
+function subscribeSupport() {
+  if (supConvSub) supConvSub.unsubscribe();
+  supConvSub = sb.channel('admin-all-convs')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations' }, () => loadSupConvs())
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages_chat' }, payload => {
+      if (payload.new.expediteur === 'client' && payload.new.conversation_id !== supConvId) {
+        toast('💬 Nouveau message client !', 'ok');
+      }
+      loadSupConvs();
+    }).subscribe();
 }
 
 </script>
