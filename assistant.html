@@ -788,10 +788,11 @@ async function processAI(userMsg) {
     : 'vide';
 
   const systemPrompt = [
-    'Tu es Yéyé Assistant, vendeur IA béninois. Réponds en français, court, avec emojis.',
-    'RÈGLES: Budget→create_bundle | Produit→search_products | Panier→show_cart | Ajouter→add_to_cart',
-    'JAMAIS lister les produits en texte. Utilise toujours les outils pour afficher les cartes.',
-    'CATALOGUE:',
+    'Tu es Yéyé Assistant, vendeur IA de Yéyé Market (Bénin). Réponds en français, court, avec emojis.',
+    'RÈGLE ABSOLUE : JAMAIS lister des produits en texte. Appelle TOUJOURS un outil :',
+    '- Budget (5000 FCFA...) → create_bundle | Produit/aliment → search_products',
+    '- "panier" → show_cart | "ajouter"/"je prends" → add_to_cart',
+    'CATALOGUE (id|nom|prix):',
     prodCtx,
     'PANIER: ' + cartCtx
   ].join('\n');
