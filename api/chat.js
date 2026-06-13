@@ -67,7 +67,7 @@ export default async function handler(req, res) {
     }));
 
     const body = {
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       max_tokens: max_tokens || 800,
       messages: filteredMessages,
       temperature: 0.2
