@@ -525,19 +525,27 @@ async function loadProducts() {
 }
 
 async function initSession() {
-  if (!currentUser) return;
-  // Créer ou récupérer la session IA
-  const { data: existing } = await sb.from('ai_sessions')
-    .select('*').eq('user_id', currentUser.id)
-    .eq('statut', 'actif').order('created_at', { ascending: false }).limit(1).single();
-  if (existing) {
-    sessionId = existing.id;
-    history = existing.messages || [];
-  } else {
-    const { data: newSession } = await sb.from('ai_sessions')
-      .insert({ user_id: currentUser.id, messages: [], contexte: {}, statut: 'actif' })
-      .select().single();
-    if (newSession) sessionId = newSession.id;
+  // Restaurer l'historique depuis localStorage (ai_sessions Supabase optionnel)
+  try {
+    const saved = localStorage.getItem('yeye_history');
+    if (saved) history = JSON.parse(saved);
+  } catch(_) {}
+  // Tentative silencieuse vers Supabase si la table existe
+  if (currentUser) {
+    try {
+      const { data: existing, error } = await sb.from('ai_sessions')
+        .select('id,messages').eq('user_id', currentUser.id)
+        .eq('statut', 'actif').order('created_at', { ascending: false }).limit(1).single();
+      if (!error && existing) {
+        sessionId = existing.id;
+        if (existing.messages?.length) history = existing.messages;
+      } else if (!existing) {
+        const { data: newS, error: insErr } = await sb.from('ai_sessions')
+          .insert({ user_id: currentUser.id, messages: [], contexte: {}, statut: 'actif' })
+          .select().single();
+        if (!insErr && newS) sessionId = newS.id;
+      }
+    } catch(_) {}  // Table absente → on continue sans
   }
 }
 
@@ -863,7 +871,7 @@ async function processAI(userMsg) {
   } catch (e) {
     console.error('AI Error:', e.message);
     hideTyping();
-    await localFallback(userMsg);
+    await smartFallbackEnhanced(userMsg);
   }
 
   isTyping = false;
@@ -1019,7 +1027,7 @@ async function renderTool(name, input, result) {
       break;
     case 'create_bundle':
       if (result.bundle?.length) {
-        renderBundle(result.bundle, result.budget, result.total);
+        addBundle(result.bundle, result.budget, result.total);
         addSuggs(['Ajouter tout au panier', 'Modifier le budget', 'Valider commande']);
       } else {
         addAIMsg('Pas assez de produits pour ce budget. Essayez un montant plus élevé.');
@@ -1047,7 +1055,7 @@ async function renderTool(name, input, result) {
       break;
     case 'calculate_budget':
       if (result.dans_budget?.length) {
-        renderBundle(result.dans_budget.slice(0, 5), result.budget, result.dans_budget.slice(0, 5).reduce((s, p) => s + p.prix, 0));
+        addBundle(result.dans_budget.slice(0, 5), result.budget, result.dans_budget.slice(0, 5).reduce((s, p) => s + p.prix, 0));
         addSuggs(['Ajouter tout au panier', 'Autre budget', 'Valider commande']);
       }
       break;
@@ -1098,8 +1106,16 @@ async function smartFallback(msg) {
 }
 
 async function saveSession() {
-  if (!sessionId || !currentUser) return;
-  await sb.from('ai_sessions').update({ messages: history.slice(-20), updated_at: new Date().toISOString() }).eq('id', sessionId);
+  // Sauvegarde locale (table ai_sessions optionnelle dans Supabase)
+  try {
+    if (sessionId && currentUser) {
+      sb.from('ai_sessions')
+        .update({ messages: history.slice(-20), updated_at: new Date().toISOString() })
+        .eq('id', sessionId)
+        .then(() => {}).catch(() => {});
+    }
+  } catch(_) {}
+  try { localStorage.setItem('yeye_history', JSON.stringify(history.slice(-20))); } catch(_) {}
 }
 
 // ============================================================
