@@ -713,6 +713,11 @@ async function loadDashboard(){
   document.getElementById('s-total').textContent=total;
   document.getElementById('s-gains').textContent=fmt(gains)+' FCFA';
   const enCours=(livs||[]).filter(l=>l.statut==='assignee'||l.statut==='en_cours');
+  // Reprend le GPS si une course est déjà "en_cours" (ex: page rechargée)
+  const activeCourse=(livs||[]).find(l=>l.statut==='en_cours');
+  if(activeCourse&&_gpsWatchId===null&&activeCourse.commande_id){
+    demarrerSuiviGPS(activeCourse.commande_id);
+  }
   if(enCours.length>0){document.getElementById('b-liv').textContent=enCours.length;document.getElementById('b-liv').style.display='inline';}
   const wrap=document.getElementById('current-livraisons');
   if(!enCours.length){wrap.innerHTML='<div style="text-align:center;padding:32px;color:var(--g400)"><div style="font-size:36px;margin-bottom:8px">✅</div><p>Aucune livraison en cours</p></div>';return;}
@@ -737,14 +742,45 @@ async function updateLivraison(id,statut){
   if(statut==='livree')update.heure_livraison=new Date().toISOString();
   const {error}=await sb.from('livraisons').update(update).eq('id',id);
   if(error){toast('Erreur: '+error.message,'err');return;}
-  if(statut==='livree'){
-    const {data:liv}=await sb.from('livraisons').select('commande_id').eq('id',id).single();
-    if(liv)await sb.from('commandes').update({statut:'livree'}).eq('id',liv.commande_id);
-    toast('🎉 Livraison confirmée ! +500 FCFA','ok');
-  } else {
+
+  // Récupère la commande liée pour synchroniser son statut + gérer le GPS
+  const {data:liv}=await sb.from('livraisons').select('commande_id').eq('id',id).single();
+
+  if(statut==='en_cours'){
+    // La commande passe "en route" => déclenche la carte côté client
+    if(liv)await sb.from('commandes').update({statut:'en_livraison'}).eq('id',liv.commande_id);
+    if(liv)demarrerSuiviGPS(liv.commande_id);
     toast('🚴 Livraison démarrée !','ok');
+  } else if(statut==='livree'){
+    if(liv)await sb.from('commandes').update({statut:'livree'}).eq('id',liv.commande_id);
+    arreterSuiviGPS();
+    toast('🎉 Livraison confirmée ! +500 FCFA','ok');
   }
   loadDashboard();
+}
+
+// ====== SUIVI GPS TEMPS RÉEL ======
+let _gpsWatchId=null;
+function demarrerSuiviGPS(commandeId){
+  if(!navigator.geolocation){toast('GPS non supporté sur cet appareil','err');return;}
+  arreterSuiviGPS(); // sécurité : pas de doublon
+  _gpsWatchId=navigator.geolocation.watchPosition(async (pos)=>{
+    const {latitude,longitude}=pos.coords;
+    const {error}=await sb.from('livreur_positions').upsert({
+      commande_id:commandeId,
+      livreur_id:currentLivreur.id,
+      lat:latitude,
+      lng:longitude,
+      updated_at:new Date().toISOString()
+    },{onConflict:'commande_id'});
+    if(error)console.error('Position non envoyée:',error.message);
+  },(err)=>{
+    console.error('Erreur GPS:',err.message);
+    if(err.code===1)toast('Active la localisation pour le suivi','err');
+  },{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
+}
+function arreterSuiviGPS(){
+  if(_gpsWatchId!==null){navigator.geolocation.clearWatch(_gpsWatchId);_gpsWatchId=null;}
 }
 
 async function loadLivraisons(){
@@ -944,8 +980,8 @@ async function accepterCommande(commandeId) {
 
   if (livErr) { toast('❌ Erreur: ' + livErr.message, 'err'); loadDispoCommandes(); return; }
 
-  // Mettre à jour la commande
-  await sb.from('commandes').update({ livreur_id: currentLivreur.id, statut: 'en_livraison' }).eq('id', commandeId);
+  // Mettre à jour la commande : assignée à ce livreur, en attente de démarrage
+  await sb.from('commandes').update({ livreur_id: currentLivreur.id, statut: 'prete' }).eq('id', commandeId);
 
   toast('✅ Commande acceptée ! Bonne livraison 🚴', 'ok');
 
