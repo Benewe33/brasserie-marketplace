@@ -1,0 +1,22 @@
+{
+  "name": "Yéyé Market",
+  "short_name": "YéyéMarket",
+  "description": "La marketplace béninoise — Le meilleur de chez nous, livré chez vous",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0B3D2E",
+  "theme_color": "#0B3D2E",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
