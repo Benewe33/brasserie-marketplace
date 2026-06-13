@@ -21,7 +21,6 @@ export default async function handler(req, res) {
         continue;
       }
       if (Array.isArray(m.content)) {
-        // Group tool_use blocks with their text
         const textBlocks = m.content.filter(b => b.type === 'text');
         const toolUseBlocks = m.content.filter(b => b.type === 'tool_use');
         const toolResultBlocks = m.content.filter(b => b.type === 'tool_result');
@@ -29,7 +28,7 @@ export default async function handler(req, res) {
         if (textBlocks.length > 0 && toolUseBlocks.length === 0 && toolResultBlocks.length === 0) {
           groqMessages.push({ role: m.role, content: textBlocks.map(b => b.text).join('\n') });
         }
-        
+
         for (const block of toolUseBlocks) {
           groqMessages.push({
             role: 'assistant',
@@ -52,8 +51,7 @@ export default async function handler(req, res) {
       }
     }
 
-    // Filter out empty messages
-    const filteredMessages = groqMessages.filter(m => 
+    const filteredMessages = groqMessages.filter(m =>
       m.content !== '' && (m.content !== null || m.tool_calls)
     );
 
@@ -66,17 +64,18 @@ export default async function handler(req, res) {
       }
     }));
 
+    // Limiter l'historique pour réduire les tokens
+    const recentMessages = filteredMessages.slice(0, 1).concat(filteredMessages.slice(-6));
+
     const body = {
-      model: 'llama-3.1-8b-instant',
-      max_tokens: max_tokens || 800,
-      messages: filteredMessages,
+      model: 'gemma2-9b-it',   // 15 000 TPM — limite la plus haute sur free tier
+      max_tokens: Math.min(max_tokens || 400, 400),  // réduit pour économiser les tokens
+      messages: recentMessages,
       temperature: 0.2
     };
 
-    // Only add tools if we have them
     if (groqTools.length > 0) {
       body.tools = groqTools;
-      // Use required on first turn (no tool results yet), auto otherwise
       const hasToolResult = filteredMessages.some(m => m.role === 'tool');
       body.tool_choice = hasToolResult ? 'auto' : 'required';
     }
