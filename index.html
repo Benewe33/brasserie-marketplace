@@ -683,12 +683,19 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 
 <!-- NOTIF PANEL -->
 <div class="notif-panel" id="notif-panel">
-  <div style="padding:16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff">
+  <div style="padding:16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1">
     <h2 style="font-size:16px;font-weight:700">🔔 Notifications</h2>
-    <div style="display:flex;gap:10px;align-items:center">
-      <button onclick="markAllReadClient()" style="font-size:12px;color:var(--vd);background:none;border:none;cursor:pointer;font-weight:600">Tout lire</button>
+    <div style="display:flex;gap:8px;align-items:center">
+      <button onclick="markAllReadClient()" style="font-size:11px;color:var(--vd);background:var(--g50);border:1px solid var(--g200);border-radius:16px;padding:4px 10px;cursor:pointer;font-weight:600;font-family:inherit">✅ Tout lire</button>
       <button onclick="closeNotifPanel()" style="background:var(--g100);border:none;cursor:pointer;width:32px;height:32px;border-radius:50%;font-size:18px">✕</button>
     </div>
+  </div>
+  <!-- Filtres -->
+  <div style="display:flex;gap:6px;padding:10px 12px;border-bottom:1px solid var(--g100);overflow-x:auto;scrollbar-width:none">
+    <button class="nf-btn active" onclick="filterNotifs('all',this)" style="flex-shrink:0;padding:5px 12px;border-radius:16px;border:1.5px solid var(--vd);background:var(--vd);color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Toutes</button>
+    <button class="nf-btn" onclick="filterNotifs('commande',this)" style="flex-shrink:0;padding:5px 12px;border-radius:16px;border:1.5px solid var(--g200);background:#fff;color:var(--g600);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">🛒 Commandes</button>
+    <button class="nf-btn" onclick="filterNotifs('livraison',this)" style="flex-shrink:0;padding:5px 12px;border-radius:16px;border:1.5px solid var(--g200);background:#fff;color:var(--g600);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">🚴 Livraisons</button>
+    <button class="nf-btn" onclick="filterNotifs('paiement',this)" style="flex-shrink:0;padding:5px 12px;border-radius:16px;border:1.5px solid var(--g200);background:#fff;color:var(--g600);font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">💰 Paiements</button>
   </div>
   <div id="client-notif-list" style="padding:8px"></div>
 </div>
@@ -1376,27 +1383,93 @@ async function submitAvis(){
 }
 
 // NOTIFICATIONS
+let allNotifsData = [];
+
 async function loadClientNotifs(){
   if(!currentUser)return;
-  const {data}=await sb.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(30);
-  const unread=(data||[]).filter(n=>!n.lu).length;
+  const {data}=await sb.from('notifications').select('*').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(50);
+  allNotifsData = data || [];
+  const unread=allNotifsData.filter(n=>!n.lu).length;
   const badge=document.getElementById('notif-badge');
-  if(unread>0){badge.textContent=unread;badge.style.display='flex';}else badge.style.display='none';
-  const list=document.getElementById('client-notif-list');
-  if(!data?.length){list.innerHTML='<div style="text-align:center;padding:48px;color:var(--g400)"><div style="font-size:40px;margin-bottom:12px">🔔</div><p>Aucune notification</p></div>';return;}
-  const icons={commande:'🛒',inscription:'👤',paiement:'💰',livraison:'🚴',info:'ℹ️'};
-  list.innerHTML=data.map(n=>`<div class="notif-item ${n.lu?'':'unread'}" onclick="readNotif('${n.id}')"><div class="notif-ico">${icons[n.type]||'🔔'}</div><div style="flex:1"><div class="notif-titre">${n.titre}</div><div class="notif-msg">${n.message}</div><div class="notif-time">${fdate(n.created_at)}</div></div>${!n.lu?'<div style="width:8px;height:8px;border-radius:50%;background:var(--vd);flex-shrink:0;margin-top:6px"></div>':''}</div>`).join('');
+  if(unread>0){badge.textContent=unread>9?'9+':unread;badge.style.display='flex';}
+  else badge.style.display='none';
+  renderNotifs(allNotifsData);
 }
 
-async function readNotif(id){await sb.from('notifications').update({lu:true}).eq('id',id);loadClientNotifs();}
-async function markAllReadClient(){if(!currentUser)return;await sb.from('notifications').update({lu:true}).eq('user_id',currentUser.id).eq('lu',false);loadClientNotifs();toast('✅ Tout lu','ok');}
+function filterNotifs(type, btn) {
+  document.querySelectorAll('.nf-btn').forEach(b=>{
+    b.style.background='#fff';b.style.color='var(--g600)';b.style.borderColor='var(--g200)';
+  });
+  btn.style.background='var(--vd)';btn.style.color='#fff';btn.style.borderColor='var(--vd)';
+  const filtered = type==='all' ? allNotifsData : allNotifsData.filter(n=>n.type===type);
+  renderNotifs(filtered);
+}
 
-function openNotifPanel(){document.getElementById('notif-panel').classList.add('open');document.getElementById('notif-overlay').classList.add('open');loadClientNotifs();}
-function closeNotifPanel(){document.getElementById('notif-panel').classList.remove('open');document.getElementById('notif-overlay').classList.remove('open');}
+function renderNotifs(data) {
+  const list=document.getElementById('client-notif-list');
+  if(!data?.length){
+    list.innerHTML='<div style="text-align:center;padding:48px;color:var(--g400)"><div style="font-size:48px;margin-bottom:12px">🔔</div><p style="font-weight:600">Aucune notification</p></div>';
+    return;
+  }
+  const icons={commande:'🛒',inscription:'👤',paiement:'💰',livraison:'🚴',info:'ℹ️',promo:'🔥'};
+  const colors={commande:'#f0fdf4',livraison:'#eff6ff',paiement:'#fefce8',info:'#f9fafb',promo:'#fff7ed'};
+  list.innerHTML=data.map(n=>`
+    <div class="notif-item ${n.lu?'':'unread'}" onclick="readNotif('${n.id}','${n.type}',${JSON.stringify(n.metadata||{}).replace(/"/g,"'")})">
+      <div class="notif-ico" style="background:${colors[n.type]||'#f9fafb'};width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0">${icons[n.type]||'🔔'}</div>
+      <div style="flex:1;min-width:0">
+        <div class="notif-titre" style="font-size:13px;font-weight:${n.lu?'600':'800'}">${n.titre}</div>
+        <div class="notif-msg" style="font-size:12px;color:var(--g500);line-height:1.4;margin-top:2px;white-space:pre-line">${n.message?.substring(0,100)+(n.message?.length>100?'...':'')}</div>
+        <div class="notif-time" style="font-size:11px;color:var(--g400);margin-top:4px">${fdateTime(n.created_at)}</div>
+      </div>
+      ${!n.lu?'<div style="width:9px;height:9px;border-radius:50%;background:var(--vd);flex-shrink:0;margin-top:4px"></div>':''}
+    </div>`).join('');
+}
+
+async function readNotif(id, type, meta){
+  await sb.from('notifications').update({lu:true}).eq('id',id);
+  loadClientNotifs();
+  // Navigation selon le type
+  if(type==='commande'||type==='livraison'){closeNotifPanel();goPage('orders');}
+}
+
+async function markAllReadClient(){
+  if(!currentUser)return;
+  await sb.from('notifications').update({lu:true}).eq('user_id',currentUser.id).eq('lu',false);
+  loadClientNotifs();toast('✅ Tout lu','ok');
+}
+
+function openNotifPanel(){
+  document.getElementById('notif-panel').classList.add('open');
+  document.getElementById('notif-overlay').classList.add('open');
+  loadClientNotifs();
+}
+function closeNotifPanel(){
+  document.getElementById('notif-panel').classList.remove('open');
+  document.getElementById('notif-overlay').classList.remove('open');
+}
 
 function subscribeClientNotifs(){
   if(!currentUser)return;
-  sb.channel('notifs-'+currentUser.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:`user_id=eq.${currentUser.id}`},(payload)=>{toast('🔔 '+payload.new.titre,'ok');loadClientNotifs();}).subscribe();
+  sb.channel('notifs-'+currentUser.id)
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:`user_id=eq.${currentUser.id}`},(payload)=>{
+      const n=payload.new;
+      const icons={commande:'🛒',livraison:'🚴',paiement:'💰',info:'ℹ️',promo:'🔥'};
+      // Toast enrichi
+      toast((icons[n.type]||'🔔')+' '+n.titre,'ok');
+      // Son de notification
+      try{const ctx=new AudioContext();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.setValueAtTime(0.3,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);o.start();o.stop(ctx.currentTime+0.3);}catch(e){}
+      loadClientNotifs();
+    }).subscribe();
+}
+
+function fdateTime(d){
+  if(!d)return'—';
+  const now=new Date();const dt=new Date(d);
+  const diff=Math.floor((now-dt)/1000);
+  if(diff<60)return'À l\'instant';
+  if(diff<3600)return Math.floor(diff/60)+' min';
+  if(diff<86400)return Math.floor(diff/3600)+'h';
+  return dt.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
 }
 
 // PARTNER MENU
