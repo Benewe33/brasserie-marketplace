@@ -3,6 +3,15 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0"/>
+<link rel="manifest" href="/manifest.json"/>
+<meta name="theme-color" content="#0B3D2E"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Yéyé Market"/>
+<link rel="apple-touch-icon" href="/icon-192.png"/>
+<link rel="apple-touch-icon" sizes="152x152" href="/icon-192.png"/>
+<link rel="apple-touch-icon" sizes="180x180" href="/icon-192.png"/>
+<link rel="apple-touch-icon" sizes="167x167" href="/icon-192.png"/>
 <title>Yéyé Market — Marketplace du Bénin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
@@ -1606,6 +1615,64 @@ function openAdresses() {
   setTimeout(() => document.getElementById('ep-adresse').focus(), 300);
 }
 
+
+// ============================================================
+// PWA — Service Worker + Install
+// ============================================================
+let deferredPrompt = null;
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW error:', err));
+  });
+}
+
+// Capture install prompt
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // Show banner after 3 seconds if not already installed
+  setTimeout(() => {
+    if (!localStorage.getItem('pwa_dismissed')) {
+      document.getElementById('pwa-banner').style.display = 'block';
+    }
+  }, 3000);
+});
+
+async function installPWA() {
+  if (!deferredPrompt) {
+    // iOS instructions
+    toast("Sur iPhone : Partager → Sur l'ecran d'accueil", "ok");
+    hidePWABanner();
+    return;
+  }
+  deferredPrompt.prompt();
+  const {outcome} = await deferredPrompt.userChoice;
+  if (outcome === 'accepted') {
+    toast('🎉 Yéyé Market installé !', 'ok');
+  }
+  deferredPrompt = null;
+  hidePWABanner();
+}
+
+function hidePWABanner() {
+  document.getElementById('pwa-banner').style.display = 'none';
+  localStorage.setItem('pwa_dismissed', '1');
+}
+
+// Hide banner if already installed
+window.addEventListener('appinstalled', () => {
+  hidePWABanner();
+  toast('🎉 Application installée avec succès !', 'ok');
+});
+
+// Handle URL shortcuts (?page=...)
+const urlPage = new URLSearchParams(window.location.search).get('page');
+if (urlPage) setTimeout(() => goPage(urlPage), 500);
+
 </script>
 
 <!-- MODAL MODIFIER PROFIL -->
@@ -1628,6 +1695,22 @@ function openAdresses() {
   <div class="fg" style="margin-bottom:12px"><label style="font-size:12px;font-weight:600;color:var(--g600);display:block;margin-bottom:4px">Téléphone</label><input type="tel" id="ep-tel" style="width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;outline:none" onfocus="this.style.borderColor='var(--vd)'" onblur="this.style.borderColor='var(--g200)'"/></div>
   <div class="fg" style="margin-bottom:20px"><label style="font-size:12px;font-weight:600;color:var(--g600);display:block;margin-bottom:4px">Adresse principale</label><textarea id="ep-adresse" rows="2" style="width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;outline:none;resize:none" onfocus="this.style.borderColor='var(--vd)'" onblur="this.style.borderColor='var(--g200)'"></textarea></div>
   <button onclick="saveEditProfile()" style="width:100%;padding:14px;background:var(--vd);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">💾 Enregistrer</button>
+</div>
+
+<!-- PWA INSTALL BANNER -->
+<div id="pwa-banner" style="display:none;position:fixed;bottom:80px;left:50%;transform:translateX(-50%);width:calc(100% - 32px);max-width:398px;background:#0B3D2E;color:#fff;border-radius:16px;padding:14px 16px;z-index:200;box-shadow:0 8px 32px rgba(11,61,46,.4);animation:slideUp .3s ease">
+  <div style="display:flex;align-items:center;gap:12px">
+    <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png" style="width:44px;height:44px;border-radius:10px;background:#fff;object-fit:cover;flex-shrink:0"/>
+    <div style="flex:1">
+      <div style="font-weight:800;font-size:14px">Installer Yéyé Market</div>
+      <div style="font-size:12px;opacity:.8;margin-top:2px">Accès rapide depuis votre écran d'accueil</div>
+    </div>
+    <button onclick="hidePWABanner()" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;flex-shrink:0">✕</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-top:12px">
+    <button onclick="installPWA()" style="flex:1;padding:10px;background:#fff;color:#0B3D2E;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;font-family:inherit">📲 Installer</button>
+    <button onclick="hidePWABanner()" style="padding:10px 16px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-family:inherit">Plus tard</button>
+  </div>
 </div>
 </body>
 </html>
