@@ -778,9 +778,9 @@ async function processAI(userMsg) {
   document.getElementById('send-btn').disabled = true;
   showTyping();
 
-  // Limité à 20 produits pour économiser les tokens Groq
-  const prodCtx = allProducts.slice(0, 20).map(p =>
-    p.id.substring(0,8) + '|' + p.nom + '|' + (p.prix_promo||p.prix) + 'F/' + (p.unite||'u')
+  // 10 produits max — économise les tokens (search_products trouve les autres)
+  const prodCtx = allProducts.slice(0, 10).map(p =>
+    p.id.substring(0,8) + '|' + p.nom + '|' + (p.prix_promo||p.prix) + 'F'
   ).join('\n');
 
   const cartCtx = Object.values(cart).length > 0
