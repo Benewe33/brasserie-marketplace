@@ -12,7 +12,6 @@ export default async function handler(req, res) {
   try {
     const { messages, system, tools, max_tokens } = req.body;
 
-    // Construire les messages Groq
     const groqMessages = [];
     if (system) groqMessages.push({ role: 'system', content: system });
 
@@ -22,31 +21,42 @@ export default async function handler(req, res) {
         continue;
       }
       if (Array.isArray(m.content)) {
-        for (const block of m.content) {
-          if (block.type === 'text') {
-            groqMessages.push({ role: m.role, content: block.text });
-          } else if (block.type === 'tool_use') {
-            groqMessages.push({
-              role: 'assistant',
-              content: null,
-              tool_calls: [{
-                id: block.id,
-                type: 'function',
-                function: { name: block.name, arguments: JSON.stringify(block.input) }
-              }]
-            });
-          } else if (block.type === 'tool_result') {
-            groqMessages.push({
-              role: 'tool',
-              tool_call_id: block.tool_use_id,
-              content: typeof block.content === 'string' ? block.content : JSON.stringify(block.content)
-            });
-          }
+        // Group tool_use blocks with their text
+        const textBlocks = m.content.filter(b => b.type === 'text');
+        const toolUseBlocks = m.content.filter(b => b.type === 'tool_use');
+        const toolResultBlocks = m.content.filter(b => b.type === 'tool_result');
+
+        if (textBlocks.length > 0 && toolUseBlocks.length === 0 && toolResultBlocks.length === 0) {
+          groqMessages.push({ role: m.role, content: textBlocks.map(b => b.text).join('\n') });
+        }
+        
+        for (const block of toolUseBlocks) {
+          groqMessages.push({
+            role: 'assistant',
+            content: null,
+            tool_calls: [{
+              id: block.id,
+              type: 'function',
+              function: { name: block.name, arguments: JSON.stringify(block.input) }
+            }]
+          });
+        }
+
+        for (const block of toolResultBlocks) {
+          groqMessages.push({
+            role: 'tool',
+            tool_call_id: block.tool_use_id,
+            content: typeof block.content === 'string' ? block.content : JSON.stringify(block.content)
+          });
         }
       }
     }
 
-    // Convertir tools Anthropic → format Groq (OpenAI)
+    // Filter out empty messages
+    const filteredMessages = groqMessages.filter(m => 
+      m.content !== '' && (m.content !== null || m.tool_calls)
+    );
+
     const groqTools = (tools || []).map(t => ({
       type: 'function',
       function: {
@@ -57,15 +67,18 @@ export default async function handler(req, res) {
     }));
 
     const body = {
-      model: 'llama-3.3-70b-versatile', // Groq — supporte tool calling
-      max_tokens: max_tokens || 1000,
-      messages: groqMessages,
-      temperature: 0.3
+      model: 'llama-3.3-70b-versatile',
+      max_tokens: max_tokens || 800,
+      messages: filteredMessages,
+      temperature: 0.2
     };
 
+    // Only add tools if we have them
     if (groqTools.length > 0) {
       body.tools = groqTools;
-      body.tool_choice = 'required'; // Force l'appel d'outil
+      // Use required on first turn (no tool results yet), auto otherwise
+      const hasToolResult = filteredMessages.some(m => m.role === 'tool');
+      body.tool_choice = hasToolResult ? 'auto' : 'required';
     }
 
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -83,11 +96,8 @@ export default async function handler(req, res) {
     const choice = data.choices?.[0];
     const msg = choice?.message;
 
-    // Convertir réponse Groq → format Anthropic
     const content = [];
-    if (msg?.content) {
-      content.push({ type: 'text', text: msg.content });
-    }
+    if (msg?.content) content.push({ type: 'text', text: msg.content });
     if (msg?.tool_calls?.length > 0) {
       for (const tc of msg.tool_calls) {
         content.push({
