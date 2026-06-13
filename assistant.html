@@ -525,12 +525,6 @@ async function loadProducts() {
   allProducts = data || [];
 }
 
-async function initSession() {
-  // Restaurer l'historique depuis localStorage (ai_sessions Supabase optionnel)
-  try {
-    const saved = localStorage.getItem('yeye_history');
-    if (saved) history = JSON.parse(saved);
-  } catch(_) {}
   // Tentative silencieuse vers Supabase si la table existe
   if (currentUser) {
     try {
@@ -583,83 +577,6 @@ function welcome() {
   setTimeout(() => addSuggs(['Repas pour 5000 FCFA', 'Légumes frais', 'Voir les promotions', 'Poisson fumé']), 400);
 }
 
-// ============================================================
-// TOOL ORCHESTRATOR — 7 OUTILS RÉELS
-// ============================================================
-const TOOLS = [
-  {
-    name: 'search_products',
-    description: 'Recherche des produits réels dans la base de données YéyéMarket. Toujours utiliser pour trouver des produits.',
-    input_schema: {
-      type: 'object',
-      properties: {
-        query: { type: 'string', description: 'Nom ou type de produit' },
-        budget_max: { type: 'number', description: 'Prix maximum par produit en FCFA' },
-        categorie: { type: 'string', description: 'Catégorie: Légumes, Poissons, Viandes, Fruits, Céréales, Huiles, Epices, Oeufs, Brasserie, Boissons' }
-      },
-      required: ['query']
-    }
-  },
-  {
-    name: 'get_product',
-    description: 'Récupère les détails complets d\'un produit spécifique par son ID.',
-    input_schema: {
-      type: 'object',
-      properties: { product_id: { type: 'string', description: 'UUID du produit' } },
-      required: ['product_id']
-    }
-  },
-  {
-    name: 'create_bundle',
-    description: 'Crée un panier suggéré optimisé selon un budget. Utiliser quand le client donne un budget total.',
-    input_schema: {
-      type: 'object',
-      properties: {
-        budget: { type: 'number', description: 'Budget total en FCFA' },
-        type_repas: { type: 'string', description: 'Type: repas_famille, petit_dejeuner, diner, marche_hebdo' }
-      },
-      required: ['budget']
-    }
-  },
-  {
-    name: 'add_to_cart',
-    description: 'Ajoute des produits au panier. Utiliser quand le client veut ajouter un produit.',
-    input_schema: {
-      type: 'object',
-      properties: {
-        product_ids: { type: 'array', items: { type: 'string' }, description: 'IDs des produits' },
-        quantities: { type: 'array', items: { type: 'number' }, description: 'Quantités (défaut: 1)' }
-      },
-      required: ['product_ids']
-    }
-  },
-  {
-    name: 'calculate_budget',
-    description: 'Calcule ce qu\'on peut acheter avec un budget donné et optimise les achats.',
-    input_schema: {
-      type: 'object',
-      properties: {
-        budget: { type: 'number', description: 'Budget en FCFA' },
-        priorites: { type: 'array', items: { type: 'string' }, description: 'Catégories prioritaires' }
-      },
-      required: ['budget']
-    }
-  },
-  {
-    name: 'suggest_bundle',
-    description: 'Suggère des produits complémentaires (cross-sell/upsell) à un produit donné.',
-    input_schema: {
-      type: 'object',
-      properties: { product_id: { type: 'string', description: 'ID du produit de référence' } },
-      required: ['product_id']
-    }
-  },
-  {
-    name: 'show_cart',
-    description: 'Affiche le contenu du panier actuel. Utiliser quand le client demande à voir son panier.',
-    input_schema: { type: 'object', properties: {}, required: [] }
-  }
-];
 
 // EXÉCUTION RÉELLE DES OUTILS (connecté à Supabase)
 async function executeTool(name, input) {
@@ -777,95 +694,10 @@ async function processAI(userMsg) {
   isTyping = true;
   document.getElementById('send-btn').disabled = true;
   showTyping();
-
-  // 10 produits max — économise les tokens (search_products trouve les autres)
-  const prodCtx = allProducts.slice(0, 10).map(p =>
-    p.id.substring(0,8) + '|' + p.nom + '|' + (p.prix_promo||p.prix) + 'F'
-  ).join('\n');
-
-  const cartCtx = Object.values(cart).length > 0
-    ? Object.values(cart).map(i => i.nom + ' x' + i.qty).join(', ')
-    : 'vide';
-
-  const systemPrompt = [
-    'Tu es Yéyé Assistant, vendeur IA de Yéyé Market (Bénin). Réponds en français, court, avec emojis.',
-    'RÈGLE ABSOLUE : JAMAIS lister des produits en texte. Appelle TOUJOURS un outil :',
-    '- Budget (5000 FCFA...) → create_bundle | Produit/aliment → search_products',
-    '- "panier" → show_cart | "ajouter"/"je prends" → add_to_cart',
-    'CATALOGUE (id|nom|prix):',
-    prodCtx,
-    'PANIER: ' + cartCtx
-  ].join('\n');
-
   history.push({ role: 'user', content: userMsg });
-
-  try {
-    let continueLoop = true;
-    let loopCount = 0;
-
-    while (continueLoop && loopCount < 4) {
-      loopCount++;
-
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000);
-
-      // On le premier tour, forcer l'outil. Sur le suivi, laisser l'IA répondre librement
-      const isFirstTurn = loopCount === 1;
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        signal: controller.signal,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system: systemPrompt,
-          tools: isFirstTurn ? TOOLS : undefined,
-          max_tokens: 500,
-          messages: history.slice(-6)
-        })
-      });
-
-      clearTimeout(timeout);
-      const data = await response.json();
-      if (data.error) throw new Error(data.error);
-
-      hideTyping();
-
-      const textBlocks = (data.content||[]).filter(b => b.type === 'text');
-      const toolBlocks = (data.content||[]).filter(b => b.type === 'tool_use');
-
-      const aiText = textBlocks.map(b => b.text).join('').trim();
-      if (aiText) addAIMsg(aiText);
-
-      if (toolBlocks.length > 0 && data.stop_reason === 'tool_use') {
-        history.push({ role: 'assistant', content: data.content });
-
-        const toolResults = [];
-        for (const tb of toolBlocks) {
-          const result = await executeTool(tb.name, tb.input);
-          await renderTool(tb.name, tb.input, result);
-          toolResults.push({
-            type: 'tool_result',
-            tool_use_id: tb.id,
-            content: JSON.stringify(result)
-          });
-        }
-
-        history.push({ role: 'user', content: toolResults });
-        showTyping();
-
-      } else {
-        history.push({ role: 'assistant', content: data.content });
-        continueLoop = false;
-      }
-    }
-
-    await saveSession();
-
-  } catch (e) {
-    console.error('AI Error:', e.message);
-    hideTyping();
-    await smartFallbackEnhanced(userMsg);
-  }
-
+  await delay(400);
+  hideTyping();
+  await smartFallbackEnhanced(userMsg);
   isTyping = false;
   document.getElementById('send-btn').disabled = false;
 }
@@ -1004,61 +836,6 @@ async function smartFallbackEnhanced(msg) {
   addSuggs(['5000 FCFA de courses', 'Légumes frais 🌿', 'Poisson fumé 🐟', 'Promos 🔥']);
 }
 
-// RENDU VISUEL DES OUTILS
-async function renderTool(name, input, result) {
-  await delay(200);
-  switch (name) {
-    case 'search_products':
-      if (result.found?.length) {
-        addProds(result.found);
-        addSuggs(['Ajouter au panier', 'Voir mon panier 🛒', 'Autres produits']);
-      } else {
-        addAIMsg('Aucun produit trouvé 😕 Essayez un autre terme.');
-        addSuggs(['Légumes frais 🌿', 'Poisson fumé 🐟', 'Promos 🔥']);
-      }
-      break;
-    case 'create_bundle':
-      if (result.bundle?.length) {
-        addBundle(result.bundle, result.budget, result.total);
-        addSuggs(['Ajouter tout au panier', 'Modifier le budget', 'Valider commande']);
-      } else {
-        addAIMsg('Pas assez de produits pour ce budget. Essayez un montant plus élevé.');
-      }
-      break;
-    case 'add_to_cart':
-      if (result.added?.length) {
-        toast('✅ ' + result.added.join(', ') + ' ajouté(s) !', 'ok');
-        updateCartBadge?.();
-        const lastProd = allProducts.find(p => p.nom === result.added[result.added.length - 1]);
-        if (lastProd) {
-          const res2 = await executeTool('suggest_bundle', { product_id: lastProd.id });
-          if (res2.suggestions?.length) {
-            await delay(600);
-            addAIMsg('Avec ' + lastProd.nom + ', vous aimerez aussi :');
-            addProds(res2.suggestions);
-          }
-        }
-        addSuggs(['Voir mon panier 🛒', 'Valider commande', 'Continuer mes achats']);
-      }
-      break;
-    case 'show_cart':
-      openDrawer();
-      addSuggs(['Valider commande', 'Continuer mes achats', 'Vider le panier']);
-      break;
-    case 'calculate_budget':
-      if (result.dans_budget?.length) {
-        addBundle(result.dans_budget.slice(0, 5), result.budget, result.dans_budget.slice(0, 5).reduce((s, p) => s + p.prix, 0));
-        addSuggs(['Ajouter tout au panier', 'Autre budget', 'Valider commande']);
-      }
-      break;
-    case 'suggest_bundle':
-      if (result.suggestions?.length) {
-        addProds(result.suggestions);
-        addSuggs(['Ajouter au panier', 'Voir mon panier 🛒', 'Autres produits']);
-      }
-      break;
-  }
-}
 
 // FALLBACK INTELLIGENT (sans API)
 async function smartFallback(msg) {
@@ -1097,15 +874,6 @@ async function smartFallback(msg) {
   }
 }
 
-async function saveSession() {
-  // Sauvegarde locale (table ai_sessions optionnelle dans Supabase)
-  try {
-    if (sessionId && currentUser) {
-      sb.from('ai_sessions')
-        .update({ messages: history.slice(-20), updated_at: new Date().toISOString() })
-        .eq('id', sessionId)
-        .then(() => {}).catch(() => {});
-    }
   } catch(_) {}
   try { localStorage.setItem('yeye_history', JSON.stringify(history.slice(-20))); } catch(_) {}
 }
