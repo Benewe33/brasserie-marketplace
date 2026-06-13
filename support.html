@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Yéyé Market — Dashboard Support</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --vd:#0B3D2E;--vm:#1a6b3c;--vl:#e8f5e9;
+  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g400:#9ca3af;--g600:#4b5563;--g900:#111827;
+  --r:#dc2626;--gr:#16a34a;--or:#d97706;
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--g100);min-height:100vh;display:flex;flex-direction:column}
+
+/* LOGIN */
+.login-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-card{background:#fff;border-radius:20px;padding:32px;width:100%;max-width:360px;box-shadow:0 4px 24px rgba(0,0,0,.1)}
+.login-logo{text-align:center;margin-bottom:24px}
+.login-logo h1{font-size:22px;font-weight:800;color:var(--vd);margin-top:8px}
+.login-logo p{font-size:13px;color:var(--g400);margin-top:4px}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:12px;font-weight:600;color:var(--g600);margin-bottom:5px}
+.fg input{width:100%;padding:11px 14px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border .2s}
+.fg input:focus{border-color:var(--vm)}
+.login-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px}
+.login-err{color:var(--r);font-size:12px;text-align:center;margin-top:8px;display:none}
+
+/* DASHBOARD */
+.dash{display:none;flex:1;flex-direction:column;height:100vh}
+.dash-header{background:linear-gradient(135deg,var(--vd),#0d4a36);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.dash-header h1{font-size:16px;font-weight:800;color:#fff;flex:1}
+.agent-badge{background:rgba(255,255,255,.15);color:#fff;padding:5px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.logout-btn{background:rgba(255,255,255,.15);border:none;color:#fff;padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;font-family:inherit}
+
+.dash-body{display:flex;flex:1;overflow:hidden}
+
+/* LISTE CONVERSATIONS */
+.conv-list{width:300px;flex-shrink:0;background:#fff;border-right:1px solid var(--g200);display:flex;flex-direction:column;overflow:hidden}
+.conv-list-head{padding:16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.conv-list-head h2{font-size:14px;font-weight:700}
+.conv-count{background:var(--r);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.conv-items{overflow-y:auto;flex:1}
+.conv-item{padding:13px 16px;border-bottom:1px solid var(--g50);cursor:pointer;transition:background .15s;display:flex;align-items:flex-start;gap:10px}
+.conv-item:hover{background:var(--g50)}
+.conv-item.active{background:var(--vl);border-right:3px solid var(--vm)}
+.conv-av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--vd),var(--vm));display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;flex-shrink:0}
+.conv-meta{flex:1;min-width:0}
+.conv-name{font-size:13px;font-weight:700;color:var(--g900)}
+.conv-preview{font-size:12px;color:var(--g400);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-time{font-size:10px;color:var(--g400);flex-shrink:0}
+.conv-unread{background:var(--r);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center;margin-top:2px}
+.conv-status{display:inline-block;padding:2px 7px;border-radius:8px;font-size:10px;font-weight:600;margin-top:3px}
+.conv-status.ouvert{background:#fef3c7;color:#92400e}
+.conv-status.en_cours{background:var(--vl);color:var(--vm)}
+.conv-status.ferme{background:var(--g100);color:var(--g400)}
+.conv-empty{padding:40px 20px;text-align:center;color:var(--g400);font-size:13px}
+
+/* ZONE CHAT AGENT */
+.chat-zone{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--g50)}
+.chat-placeholder{flex:1;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:var(--g400)}
+.chat-placeholder span{font-size:48px}
+.chat-placeholder p{font-size:14px}
+
+.chat-head{background:#fff;padding:14px 20px;border-bottom:1px solid var(--g200);display:flex;align-items:center;gap:12px;flex-shrink:0}
+.chat-head-info{flex:1}
+.chat-head-name{font-size:15px;font-weight:700}
+.chat-head-sub{font-size:12px;color:var(--g400);margin-top:2px}
+.chat-actions{display:flex;gap:8px}
+.act-btn{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:all .15s}
+.act-btn.green{background:var(--vl);color:var(--vm)}
+.act-btn.red{background:#fef2f2;color:var(--r)}
+
+.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+.chat-msgs::-webkit-scrollbar{width:4px}
+.chat-msgs::-webkit-scrollbar-thumb{background:var(--g200);border-radius:2px}
+
+.msg-wrap{display:flex;flex-direction:column}
+.msg-wrap.right{align-items:flex-end}
+.msg-bubble{max-width:70%;padding:10px 14px;border-radius:16px;font-size:13.5px;line-height:1.5;word-break:break-word}
+.msg-bubble.client{background:#fff;color:var(--g900);border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.msg-bubble.agent{background:linear-gradient(135deg,var(--vd),var(--vm));color:#fff;border-bottom-right-radius:4px}
+.msg-meta{font-size:10px;color:var(--g400);margin-top:3px}
+
+.chat-input{background:#fff;padding:12px 16px;border-top:1px solid var(--g200);display:flex;gap:10px;align-items:flex-end;flex-shrink:0}
+.chat-input textarea{flex:1;border:1.5px solid var(--g200);border-radius:12px;padding:10px 14px;font-size:14px;font-family:inherit;outline:none;resize:none;max-height:100px;line-height:1.5;transition:border .2s}
+.chat-input textarea:focus{border-color:var(--vm)}
+.chat-send{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--vd),var(--vm));border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 3px 10px rgba(11,61,46,.3)}
+
+/* TOAST */
+.toast{position:fixed;top:16px;left:50%;transform:translateX(-50%);background:var(--g900);color:#fff;padding:10px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none}
+.toast.show{opacity:1}
+.toast.ok{background:var(--gr)}
+
+@media(max-width:640px){
+  .conv-list{width:100%;display:none}
+  .conv-list.mobile-show{display:flex}
+  .chat-zone .back-btn{display:flex}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="login-wrap">
+  <div class="login-card">
+    <div class="login-logo">
+      <div style="font-size:40px">🌿</div>
+      <h1>Yéyé Market</h1>
+      <p>Dashboard Support Agents</p>
+    </div>
+    <div class="fg"><label>Email agent</label><input type="email" id="ag-email" placeholder="agent@yeyemarket.bj"/></div>
+    <div class="fg"><label>Mot de passe</label><input type="password" id="ag-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+    <button class="login-btn" onclick="doLogin()">Se connecter →</button>
+    <div class="login-err" id="login-err"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dash" id="dash">
+  <div class="dash-header">
+    <h1>💬 Support Yéyé Market</h1>
+    <span class="agent-badge" id="agent-name">Agent</span>
+    <button class="logout-btn" onclick="doLogout()">Déconnexion</button>
+  </div>
+  <div class="dash-body">
+
+    <!-- Liste conversations -->
+    <div class="conv-list" id="conv-list">
+      <div class="conv-list-head">
+        <h2>Conversations</h2>
+        <span class="conv-count" id="conv-count" style="display:none">0</span>
+      </div>
+      <div class="conv-items" id="conv-items">
+        <div class="conv-empty">Aucune conversation pour l'instant</div>
+      </div>
+    </div>
+
+    <!-- Zone chat -->
+    <div class="chat-zone" id="chat-zone">
+      <div class="chat-placeholder" id="chat-placeholder">
+        <span>💬</span>
+        <p>Sélectionnez une conversation</p>
+      </div>
+
+      <!-- Header conversation active (caché par défaut) -->
+      <div class="chat-head" id="chat-head" style="display:none">
+        <div class="conv-av" id="ch-av">👤</div>
+        <div class="chat-head-info">
+          <div class="chat-head-name" id="ch-name">Client</div>
+          <div class="chat-head-sub" id="ch-sub">En attente</div>
+        </div>
+        <div class="chat-actions">
+          <button class="act-btn green" onclick="setStatus('en_cours')">✅ Prendre en charge</button>
+          <button class="act-btn red" onclick="setStatus('ferme')">🔒 Fermer</button>
+        </div>
+      </div>
+
+      <div class="chat-msgs" id="chat-msgs" style="display:none"></div>
+
+      <div class="chat-input" id="chat-input" style="display:none">
+        <textarea id="agent-msg" placeholder="Répondre au client..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAgentMsg()}"
+          oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+        <button class="chat-send" onclick="sendAgentMsg()">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="17" height="17"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL = 'https://omkmmlbdkzhorrrbeabm.supabase.co';
+const SB_KEY = 'sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
+const sb = supabase.createClient(SB_URL, SB_KEY);
+
+let currentAgent = null;
+let activeConvId = null;
+let msgSub = null;
+let convSub = null;
+let conversations = [];
+
+// ===================== AUTH =====================
+async function doLogin() {
+  const email = document.getElementById('ag-email').value.trim();
+  const pass = document.getElementById('ag-pass').value;
+  const err = document.getElementById('login-err');
+  err.style.display = 'none';
+  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) { err.textContent = error.message; err.style.display = 'block'; return; }
+  currentAgent = data.user;
+  showDash();
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  currentAgent = null;
+  document.getElementById('dash').style.display = 'none';
+  document.getElementById('login-wrap').style.display = 'flex';
+}
+
+async function checkAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) { currentAgent = session.user; showDash(); }
+}
+
+// ===================== DASHBOARD =====================
+async function showDash() {
+  document.getElementById('login-wrap').style.display = 'none';
+  const dash = document.getElementById('dash');
+  dash.style.display = 'flex';
+  // Nom agent
+  const email = currentAgent.email || '';
+  document.getElementById('agent-name').textContent = '👤 ' + (email.split('@')[0] || 'Agent');
+  await loadConversations();
+  subscribeConversations();
+}
+
+async function loadConversations() {
+  const { data } = await sb.from('conversations')
+    .select('*, messages_chat(contenu, created_at, lu, expediteur)')
+    .neq('statut', 'ferme')
+    .order('updated_at', { ascending: false });
+
+  conversations = data || [];
+  renderConvList();
+}
+
+function renderConvList() {
+  const el = document.getElementById('conv-items');
+  const count = document.getElementById('conv-count');
+
+  if (!conversations.length) {
+    el.innerHTML = '<div class="conv-empty">Aucune conversation ouverte 🎉</div>';
+    count.style.display = 'none';
+    return;
+  }
+
+  const unread = conversations.filter(c => c.statut === 'ouvert').length;
+  if (unread > 0) { count.style.display = 'inline'; count.textContent = unread; }
+  else count.style.display = 'none';
+
+  el.innerHTML = conversations.map(c => {
+    const msgs = c.messages_chat || [];
+    const last = msgs[msgs.length - 1];
+    const preview = last ? last.contenu.substring(0, 45) + (last.contenu.length > 45 ? '...' : '') : 'Nouvelle conversation';
+    const time = last ? new Date(last.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '';
+    const unreadMsgs = msgs.filter(m => !m.lu && m.expediteur === 'client').length;
+    return `<div class="conv-item${c.id === activeConvId ? ' active' : ''}" onclick="openConv('${c.id}')">
+      <div class="conv-av">👤</div>
+      <div class="conv-meta">
+        <div class="conv-name">${escHtml(c.client_nom || 'Client')}</div>
+        <div class="conv-preview">${escHtml(preview)}</div>
+        <span class="conv-status ${c.statut}">${c.statut === 'ouvert' ? '🟡 En attente' : c.statut === 'en_cours' ? '🟢 En cours' : '⚫ Fermé'}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+        <span class="conv-time">${time}</span>
+        ${unreadMsgs > 0 ? `<span class="conv-unread" style="display:flex">${unreadMsgs}</span>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function subscribeConversations() {
+  if (convSub) convSub.unsubscribe();
+  convSub = sb.channel('all-convs')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations' }, () => loadConversations())
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages_chat' }, payload => {
+      // Notif si pas la conv active
+      const m = payload.new;
+      if (m.conversation_id !== activeConvId && m.expediteur === 'client') {
+        showToast('💬 Nouveau message de ' + (conversations.find(c => c.id === m.conversation_id)?.client_nom || 'Client'), '');
+      }
+      loadConversations();
+    })
+    .subscribe();
+}
+
+// ===================== CONVERSATION =====================
+async function openConv(id) {
+  activeConvId = id;
+  const conv = conversations.find(c => c.id === id);
+  if (!conv) return;
+
+  // Mettre à jour UI liste
+  document.querySelectorAll('.conv-item').forEach(el => el.classList.remove('active'));
+  event?.currentTarget?.classList?.add('active');
+  renderConvList();
+
+  // Header
+  document.getElementById('chat-placeholder').style.display = 'none';
+  document.getElementById('chat-head').style.display = 'flex';
+  document.getElementById('chat-msgs').style.display = 'flex';
+  document.getElementById('chat-input').style.display = 'flex';
+  document.getElementById('ch-name').textContent = conv.client_nom || 'Client';
+  document.getElementById('ch-sub').textContent = (conv.client_tel ? '📱 ' + conv.client_tel + ' · ' : '') + 'Statut : ' + conv.statut;
+
+  // Charger messages
+  await loadMessages(id);
+
+  // Marquer comme lu
+  await sb.from('messages_chat').update({ lu: true }).eq('conversation_id', id).eq('expediteur', 'client');
+
+  // Souscrire temps réel
+  if (msgSub) msgSub.unsubscribe();
+  msgSub = sb.channel('msgs-' + id)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages_chat', filter: 'conversation_id=eq.' + id },
+      payload => {
+        addMsgBubble(payload.new);
+        scrollMsgs();
+        sb.from('messages_chat').update({ lu: true }).eq('id', payload.new.id);
+      })
+    .subscribe();
+}
+
+async function loadMessages(convId) {
+  const { data } = await sb.from('messages_chat').select('*').eq('conversation_id', convId).order('created_at');
+  const el = document.getElementById('chat-msgs');
+  el.innerHTML = '';
+  if (data?.length) data.forEach(m => addMsgBubble(m));
+  else el.innerHTML = '<div style="text-align:center;color:#9ca3af;font-size:13px;padding:20px">Début de la conversation</div>';
+  scrollMsgs();
+}
+
+function addMsgBubble(m) {
+  const isAgent = m.expediteur === 'agent';
+  const el = document.getElementById('chat-msgs');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap' + (isAgent ? ' right' : '');
+  const b = document.createElement('div');
+  b.className = 'msg-bubble ' + (isAgent ? 'agent' : 'client');
+  b.textContent = m.contenu;
+  const meta = document.createElement('div');
+  meta.className = 'msg-meta';
+  const d = new Date(m.created_at);
+  meta.textContent = (isAgent ? (m.expediteur_nom || 'Agent') + ' · ' : '') + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  wrap.appendChild(b);
+  wrap.appendChild(meta);
+  el.appendChild(wrap);
+}
+
+async function sendAgentMsg() {
+  const ta = document.getElementById('agent-msg');
+  const txt = ta.value.trim();
+  if (!txt || !activeConvId) return;
+  ta.value = ''; ta.style.height = 'auto';
+  const agentNom = currentAgent?.email?.split('@')[0] || 'Agent';
+  await sb.from('messages_chat').insert({ conversation_id: activeConvId, expediteur: 'agent', expediteur_nom: agentNom, contenu: txt, lu: true });
+  await sb.from('conversations').update({ statut: 'en_cours', agent_id: currentAgent.id }).eq('id', activeConvId);
+}
+
+async function setStatus(statut) {
+  if (!activeConvId) return;
+  await sb.from('conversations').update({ statut }).eq('id', activeConvId);
+  showToast(statut === 'ferme' ? '🔒 Conversation fermée' : '✅ Conversation prise en charge', 'ok');
+  await loadConversations();
+}
+
+// ===================== UTILS =====================
+function scrollMsgs() {
+  const el = document.getElementById('chat-msgs');
+  el.scrollTop = el.scrollHeight;
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// Init
+checkAuth();
+</script>
+</body>
+</html>
