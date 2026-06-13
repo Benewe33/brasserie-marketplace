@@ -1007,34 +1007,53 @@ async function renderTool(name, input, result) {
   await delay(200);
   switch (name) {
     case 'search_products':
-      if (result.found?.length) addProds(result.found);
-      else addAIMsg('Aucun produit trouvé pour "' + input.query + '". Essayez un autre terme.');
+      if (result.found?.length) {
+        addProds(result.found);
+        addSuggs(['Ajouter au panier', 'Voir mon panier 🛒', 'Autres produits']);
+      } else {
+        addAIMsg('Aucun produit trouvé 😕 Essayez un autre terme.');
+        addSuggs(['Légumes frais 🌿', 'Poisson fumé 🐟', 'Promos 🔥']);
+      }
       break;
     case 'create_bundle':
-      if (result.bundle?.length) addBundle(result.bundle, result.budget, result.total);
+      if (result.bundle?.length) {
+        renderBundle(result.bundle, result.budget, result.total);
+        addSuggs(['Ajouter tout au panier', 'Modifier le budget', 'Valider commande']);
+      } else {
+        addAIMsg('Pas assez de produits pour ce budget. Essayez un montant plus élevé.');
+      }
       break;
     case 'add_to_cart':
       if (result.added?.length) {
-        toast('Ajoute: ' + result.added.join(', '), 'ok');
+        toast('✅ ' + result.added.join(', ') + ' ajouté(s) !', 'ok');
+        updateCartBadge?.();
         const lastProd = allProducts.find(p => p.nom === result.added[result.added.length - 1]);
         if (lastProd) {
-          const { suggestions } = await executeTool('suggest_bundle', { product_id: lastProd.id });
-          if (suggestions?.length) {
-            await delay(700);
-            addAIMsg('Super ! Avec ' + lastProd.nom + ', vous aimerez aussi :');
-            addProds(suggestions);
+          const res2 = await executeTool('suggest_bundle', { product_id: lastProd.id });
+          if (res2.suggestions?.length) {
+            await delay(600);
+            addAIMsg('Avec ' + lastProd.nom + ', vous aimerez aussi :');
+            addProds(res2.suggestions);
           }
         }
+        addSuggs(['Voir mon panier 🛒', 'Valider commande', 'Continuer mes achats']);
       }
       break;
     case 'show_cart':
       openDrawer();
+      addSuggs(['Valider commande', 'Continuer mes achats', 'Vider le panier']);
       break;
     case 'calculate_budget':
-      if (result.dans_budget?.length) addBundle(result.dans_budget.slice(0, 5), result.budget, result.dans_budget.slice(0, 5).reduce((s, p) => s + p.prix, 0));
+      if (result.dans_budget?.length) {
+        renderBundle(result.dans_budget.slice(0, 5), result.budget, result.dans_budget.slice(0, 5).reduce((s, p) => s + p.prix, 0));
+        addSuggs(['Ajouter tout au panier', 'Autre budget', 'Valider commande']);
+      }
       break;
     case 'suggest_bundle':
-      if (result.suggestions?.length) addProds(result.suggestions);
+      if (result.suggestions?.length) {
+        addProds(result.suggestions);
+        addSuggs(['Ajouter au panier', 'Voir mon panier 🛒', 'Autres produits']);
+      }
       break;
   }
 }
