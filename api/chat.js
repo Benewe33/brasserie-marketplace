@@ -1,4 +1,4 @@
-// api/chat.js — Proxy Groq avec Tool Calling
+// api/chat.js — Proxy Groq avec Tool Calling + interception fallback
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -12,6 +12,7 @@ export default async function handler(req, res) {
   try {
     const { messages, system, tools, max_tokens } = req.body;
 
+    // Convertir messages format Anthropic → Groq
     const groqMessages = [];
     if (system) groqMessages.push({ role: 'system', content: system });
 
@@ -53,46 +54,66 @@ export default async function handler(req, res) {
       function: { name: t.name, description: t.description, parameters: t.input_schema }
     }));
 
-    // Détecter si c'est le premier tour (pas encore de résultat d'outil)
     const hasToolResult = filteredMessages.some(m => m.role === 'tool');
     const isFirstTurn = !hasToolResult && groqTools.length > 0;
 
-    const body = {
-      model: 'llama-3.3-70b-versatile', // 70B respecte bien tool_choice:required
-      max_tokens: Math.min(max_tokens || 350, 350),
-      messages: trimmedMessages,
-      temperature: 0.1
-    };
+    // Récupérer le dernier message utilisateur pour l'interception
+    const lastUserMsg = [...filteredMessages].reverse().find(m => m.role === 'user')?.content || '';
 
-    if (groqTools.length > 0) {
-      body.tools = groqTools;
-      body.tool_choice = isFirstTurn ? 'required' : 'auto';
-    }
-
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
-      body: JSON.stringify(body)
-    });
-
-    const data = await response.json();
-
-    // Si rate limit → fallback sur llama-3.1-8b-instant
-    if (data.error?.code === 'rate_limit_exceeded') {
-      body.model = 'llama-3.1-8b-instant';
-      body.tool_choice = 'auto'; // 8b gère mal required
-      const res2 = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const callGroq = async (model, tool_choice) => {
+      const body = {
+        model,
+        max_tokens: Math.min(max_tokens || 350, 350),
+        messages: trimmedMessages,
+        temperature: 0.1
+      };
+      if (groqTools.length > 0) {
+        body.tools = groqTools;
+        body.tool_choice = tool_choice;
+      }
+      const r = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + API_KEY },
         body: JSON.stringify(body)
       });
-      const data2 = await res2.json();
-      if (data2.error) return res.status(500).json({ error: data2.error.message });
-      return res.status(200).json(formatResponse(data2));
+      return r.json();
+    };
+
+    let data = await callGroq('llama-3.3-70b-versatile', isFirstTurn ? 'required' : 'auto');
+
+    // Fallback si rate limit
+    if (data.error?.type === 'tokens' || data.error?.code === 'rate_limit_exceeded' || (data.error && data.error.message?.includes('rate'))) {
+      data = await callGroq('llama-3.1-8b-instant', 'auto');
     }
 
     if (data.error) return res.status(500).json({ error: data.error.message || JSON.stringify(data.error) });
-    return res.status(200).json(formatResponse(data));
+
+    const msg = data.choices?.[0]?.message;
+    const content = [];
+
+    if (msg?.tool_calls?.length > 0) {
+      // Réponse normale avec outil
+      if (msg?.content) content.push({ type: 'text', text: msg.content });
+      for (const tc of msg.tool_calls) {
+        content.push({
+          type: 'tool_use', id: tc.id, name: tc.function.name,
+          input: JSON.parse(tc.function.arguments || '{}')
+        });
+      }
+    } else if (isFirstTurn && msg?.content) {
+      // Le modèle a répondu en texte malgré tool_choice:required → on force l'outil
+      const forced = forceToolFromText(lastUserMsg, msg.content, groqTools);
+      if (forced) {
+        content.push(forced);
+      } else {
+        content.push({ type: 'text', text: msg.content });
+      }
+    } else {
+      if (msg?.content) content.push({ type: 'text', text: msg.content });
+    }
+
+    const stop_reason = content.some(b => b.type === 'tool_use') ? 'tool_use' : 'end_turn';
+    return res.status(200).json({ content, stop_reason });
 
   } catch (error) {
     console.error('Proxy error:', error);
@@ -100,17 +121,32 @@ export default async function handler(req, res) {
   }
 }
 
-function formatResponse(data) {
-  const msg = data.choices?.[0]?.message;
-  const content = [];
-  if (msg?.content) content.push({ type: 'text', text: msg.content });
-  if (msg?.tool_calls?.length > 0) {
-    for (const tc of msg.tool_calls) {
-      content.push({
-        type: 'tool_use', id: tc.id, name: tc.function.name,
-        input: JSON.parse(tc.function.arguments || '{}')
-      });
+// Forcer l'appel d'outil quand le modèle répond en texte
+function forceToolFromText(userMsg, aiText, tools) {
+  const low = userMsg.toLowerCase();
+  const budgetMatch = userMsg.match(/(\d[\d\s]*)/);
+  const budget = budgetMatch ? parseInt(budgetMatch[1].replace(/\s/g, '')) : 0;
+
+  // Budget → create_bundle
+  if (budget >= 500) {
+    return { type: 'tool_use', id: 'forced_' + Date.now(), name: 'create_bundle', input: { budget } };
+  }
+  // Panier
+  if (/panier|cart|commande/.test(low)) {
+    return { type: 'tool_use', id: 'forced_' + Date.now(), name: 'show_cart', input: {} };
+  }
+  // Recherche produit
+  const prodKeywords = ['poisson','viande','légume','legume','gombo','gboman','gari','riz','huile',
+    'tomate','oignon','oeuf','haricot','piment','banane','mangue','promo','fruit','épice'];
+  for (const kw of prodKeywords) {
+    if (low.includes(kw)) {
+      return { type: 'tool_use', id: 'forced_' + Date.now(), name: 'search_products', input: { query: kw } };
     }
   }
-  return { content, stop_reason: msg?.tool_calls?.length > 0 ? 'tool_use' : 'end_turn' };
+  // Recherche générique
+  const words = low.split(/\s+/).filter(w => w.length > 3);
+  if (words.length > 0) {
+    return { type: 'tool_use', id: 'forced_' + Date.now(), name: 'search_products', input: { query: words[0] } };
+  }
+  return null;
 }
