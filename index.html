@@ -302,30 +302,13 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 }
 
 /* YÉYÉ ASSISTANT BUTTON */
-.ai-float-btn{position:fixed;bottom:90px;right:16px;width:56px;height:56px;border-radius:50%;background:#fff;box-shadow:0 4px 20px rgba(11,61,46,.4);border:2px solid var(--vd);cursor:pointer;z-index:90;display:flex;align-items:center;justify-content:center;overflow:hidden;animation:float-bounce 3s ease-in-out infinite;transition:transform .2s}
-.ai-float-btn:hover{transform:scale(1.1)}
-.ai-float-btn img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-@keyframes float-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.ai-float-badge{position:absolute;top:-2px;right:-2px;background:var(--or);color:#fff;font-size:9px;font-weight:800;padding:2px 5px;border-radius:10px;white-space:nowrap}
+50%{transform:translateY(-6px)}}
 
 /* ASSISTANT POPUP */
-.ai-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:198;display:none;align-items:flex-end;justify-content:center}
-.ai-popup-overlay.open{display:flex}
-.ai-popup{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;padding:0 0 32px;box-shadow:0 -10px 40px rgba(0,0,0,.2);animation:slide-up .3s ease}
 @keyframes slide-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
-.ai-popup-handle{width:40px;height:4px;background:var(--g200);border-radius:2px;margin:12px auto 0}
-.ai-popup-head{padding:20px 20px 0;text-align:center}
-.ai-popup-logo{width:72px;height:72px;border-radius:50%;margin:0 auto 12px;overflow:hidden;border:3px solid var(--vl);box-shadow:0 4px 16px rgba(26,107,60,.2)}
-.ai-popup-logo img{width:100%;height:100%;object-fit:cover}
-.ai-popup-head h2{font-size:20px;font-weight:800;color:var(--g900)}
-.ai-popup-head p{font-size:13px;color:var(--g400);margin-top:4px;line-height:1.5}
-.ai-popup-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px 20px}
 .ai-feat{background:var(--g50);border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px}
 .ai-feat-ico{font-size:22px;flex-shrink:0}
 .ai-feat-txt{font-size:12px;font-weight:600;color:var(--g600);line-height:1.3}
-.ai-popup-btn{display:block;margin:0 20px;padding:15px;background:linear-gradient(135deg,#0B3D2E,#1a6b3c);color:#fff;border:none;border-radius:14px;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;text-align:center;text-decoration:none;box-shadow:0 4px 16px rgba(11,61,46,.3);transition:opacity .2s}
-.ai-popup-btn:hover{opacity:.9}
-.ai-popup-close{display:block;text-align:center;margin-top:12px;color:var(--g400);font-size:13px;cursor:pointer;background:none;border:none;font-family:inherit;width:100%}
 
 /* ============================================================
    SPLASH SCREEN
@@ -708,41 +691,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 </div>
 
 
-<!-- YÉYÉ ASSISTANT FLOATING BUTTON -->
-<button class="ai-float-btn" onclick="openAssistantPopup()" id="ai-float" style="display:none" title="Yéyé Assistant">
-  <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png" 
-    style="width:100%;height:100%;object-fit:cover"
-    onerror="this.style.display='none';this.nextElementSibling.style.display='block'" alt="IA"/>
-  <svg viewBox="0 0 24 24" fill="none" style="display:none;width:28px;height:28px">
-    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" fill="rgba(255,255,255,0.2)" stroke="#fff" stroke-width="1.5" stroke-linejoin="round"/>
-    <circle cx="9" cy="11" r="1" fill="#fff"/>
-    <circle cx="12" cy="11" r="1" fill="#fff"/>
-    <circle cx="15" cy="11" r="1" fill="#fff"/>
-  </svg>
-  <span class="ai-float-badge">IA</span>
-</button>
 
-<!-- ASSISTANT POPUP -->
-<div class="ai-popup-overlay" id="ai-popup-overlay" onclick="closeAssistantPopup()">
-  <div class="ai-popup" onclick="event.stopPropagation()">
-    <div class="ai-popup-handle"></div>
-    <div class="ai-popup-head">
-      <div class="ai-popup-logo">
-        <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" onerror="this.parentElement.textContent='🌿'" alt="Yéyé"/>
-      </div>
-      <h2>Yéyé Assistant</h2>
-      <p>Votre vendeur IA personnel.<br/>Achetez simplement en discutant !</p>
-    </div>
-    <div class="ai-popup-features">
-      <div class="ai-feat"><div class="ai-feat-ico">💬</div><div class="ai-feat-txt">Commandez en discutant</div></div>
-      <div class="ai-feat"><div class="ai-feat-ico">🛒</div><div class="ai-feat-txt">Panier automatique</div></div>
-      <div class="ai-feat"><div class="ai-feat-ico">💰</div><div class="ai-feat-txt">Optimise votre budget</div></div>
-      <div class="ai-feat"><div class="ai-feat-ico">⚡</div><div class="ai-feat-txt">Réponse instantanée</div></div>
-    </div>
-    <a href="assistant.html" class="ai-popup-btn">🤖 Ouvrir Yéyé Assistant →</a>
-    <button class="ai-popup-close" onclick="closeAssistantPopup()">Pas maintenant</button>
-  </div>
-</div>
 
 <div class="toast" id="toast"></div>
 
@@ -1498,15 +1447,7 @@ function toast(msg,type='info'){const t=document.getElementById('toast');t.textC
 // INIT
 
 // ASSISTANT POPUP
-function openAssistantPopup(){
-  document.getElementById('ai-popup-overlay').classList.add('open');
-}
-function closeAssistantPopup(){
-  document.getElementById('ai-popup-overlay').classList.remove('open');
-}
 
-// Show assistant button always (even without login)
-document.getElementById('ai-float').style.display='flex';
 
 checkSession();
 loadCategories();
@@ -1710,5 +1651,174 @@ if (urlPage) setTimeout(() => goPage(urlPage), 500);
     <button onclick="hidePWABanner()" style="padding:10px 16px;background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:10px;font-size:13px;cursor:pointer;font-family:inherit">Plus tard</button>
   </div>
 </div>
+
+<!-- ================================================
+  YÉYÉ MARKET — WIDGET CHAT CLIENT
+  ================================================ -->
+<style>
+#yeye-chat-btn{position:fixed;bottom:90px;right:16px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1a6b3c,#0B3D2E);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 20px rgba(11,61,46,.4);z-index:500;transition:transform .2s}
+#yeye-chat-btn:hover{transform:scale(1.08)}
+#yeye-chat-badge{position:absolute;top:-3px;right:-3px;background:#dc2626;color:#fff;font-size:9px;font-weight:700;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center}
+#yeye-chat-win{position:fixed;bottom:160px;right:16px;width:320px;max-width:calc(100vw - 32px);height:420px;background:#fff;border-radius:18px;box-shadow:0 8px 40px rgba(0,0,0,.18);z-index:501;display:none;flex-direction:column;overflow:hidden;animation:chatUp .25s ease}
+@keyframes chatUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+#yeye-chat-win.open{display:flex}
+.cw-head{background:linear-gradient(135deg,#1a6b3c,#0B3D2E);padding:13px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.cw-av{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.cw-info{flex:1}
+.cw-title{font-size:14px;font-weight:700;color:#fff}
+.cw-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:1px}
+.cw-close{background:rgba(255,255,255,.15);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center}
+.cw-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;background:#f5f5f5}
+.cw-msgs::-webkit-scrollbar{width:3px}
+.cw-msgs::-webkit-scrollbar-thumb{background:#ddd;border-radius:2px}
+.cw-bubble{max-width:82%;padding:8px 12px;border-radius:14px;font-size:13px;line-height:1.45;word-break:break-word}
+.cw-bubble.agent{background:#fff;color:#111;border-bottom-left-radius:4px;align-self:flex-start;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.cw-bubble.client{background:linear-gradient(135deg,#1a6b3c,#0B3D2E);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.cw-time{font-size:10px;color:#9ca3af;margin-top:2px}
+.cw-time.right{text-align:right}
+.cw-form{display:none;flex-direction:column;gap:8px;padding:12px;border-top:1px solid #e5e7eb;flex-shrink:0}
+.cw-form.visible{display:flex}
+.cw-form input{padding:9px 12px;border:1.5px solid #e5e7eb;border-radius:10px;font-size:13px;font-family:inherit;outline:none;transition:border .2s}
+.cw-form input:focus{border-color:#1a6b3c}
+.cw-form button{padding:10px;background:linear-gradient(135deg,#1a6b3c,#0B3D2E);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+.cw-input-zone{display:none;padding:10px 12px;background:#fff;border-top:1px solid #e5e7eb;flex-shrink:0;gap:8px;align-items:flex-end}
+.cw-input-zone.visible{display:flex}
+.cw-input-zone textarea{flex:1;border:1.5px solid #e5e7eb;border-radius:10px;padding:8px 11px;font-size:13px;font-family:inherit;outline:none;resize:none;max-height:80px;line-height:1.4;transition:border .2s}
+.cw-input-zone textarea:focus{border-color:#1a6b3c}
+.cw-send{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1a6b3c,#0B3D2E);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+</style>
+
+<button id="yeye-chat-btn" onclick="toggleChat()" title="Contacter le support">
+  💬<span id="yeye-chat-badge"></span>
+</button>
+
+<div id="yeye-chat-win">
+  <div class="cw-head">
+    <div class="cw-av" style="background:none;padding:0;overflow:hidden"><img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png" style="width:100%;height:100%;object-fit:cover;border-radius:50%" onerror="this.parentElement.textContent='🌿'"/></div>
+    <div class="cw-info">
+      <div class="cw-title">Support Yéyé Market</div>
+      <div class="cw-sub">● En ligne — Réponse rapide</div>
+    </div>
+    <button class="cw-close" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="cw-msgs" id="cw-msgs"></div>
+  <div class="cw-form" id="cw-form">
+    <input type="text" id="cw-nom" placeholder="Votre nom *"/>
+    <input type="tel" id="cw-tel" placeholder="Téléphone (optionnel)"/>
+    <button onclick="startConv()">Démarrer la conversation →</button>
+  </div>
+  <div class="cw-input-zone" id="cw-input-zone">
+    <textarea id="cw-msg" placeholder="Votre message..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendClientMsg()}"
+      oninput="this.style.height='auto';this.style.height=this.scrollHeight+'px'"></textarea>
+    <button class="cw-send" onclick="sendClientMsg()">
+      <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="16" height="16"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const sb2 = window.sb || sb; // Réutiliser l'instance Supabase existante
+
+  let convId = localStorage.getItem('yeye_conv_id') || null;
+  let clientNom = localStorage.getItem('yeye_conv_nom') || 'Client';
+  let sub = null;
+
+  window.toggleChat = function() {
+    const win = document.getElementById('yeye-chat-win');
+    win.classList.toggle('open');
+    if (win.classList.contains('open')) {
+      document.getElementById('yeye-chat-badge').style.display = 'none';
+      if (convId) {
+        loadMessages();
+        subscribeMessages();
+        document.getElementById('cw-input-zone').classList.add('visible');
+      } else {
+        addBubble('agent', '👋 Bonjour ! Bienvenue sur Yéyé Market. Comment pouvons-nous vous aider ?');
+        document.getElementById('cw-form').classList.add('visible');
+      }
+    }
+  };
+
+  window.startConv = async function() {
+    const nom = document.getElementById('cw-nom').value.trim() || 'Client';
+    const tel = document.getElementById('cw-tel').value.trim();
+    clientNom = nom;
+    const { data, error } = await sb2.from('conversations').insert({ client_nom: nom, client_tel: tel }).select().single();
+    if (error || !data) { alert('Erreur connexion. Réessayez.'); return; }
+    convId = data.id;
+    localStorage.setItem('yeye_conv_id', convId);
+    localStorage.setItem('yeye_conv_nom', nom);
+    document.getElementById('cw-form').classList.remove('visible');
+    document.getElementById('cw-input-zone').classList.add('visible');
+    document.getElementById('cw-msgs').innerHTML = '';
+    addBubble('agent', 'Merci ' + nom + ' ! Un agent va vous répondre très bientôt. 😊');
+    subscribeMessages();
+  };
+
+  window.sendClientMsg = async function() {
+    const ta = document.getElementById('cw-msg');
+    const txt = ta.value.trim();
+    if (!txt || !convId) return;
+    ta.value = ''; ta.style.height = 'auto';
+    await sb2.from('messages_chat').insert({ conversation_id: convId, expediteur: 'client', expediteur_nom: clientNom, contenu: txt });
+    await sb2.from('conversations').update({ updated_at: new Date().toISOString() }).eq('id', convId);
+  };
+
+  async function loadMessages() {
+    const { data } = await sb2.from('messages_chat').select('*').eq('conversation_id', convId).order('created_at');
+    document.getElementById('cw-msgs').innerHTML = '';
+    if (!data?.length) {
+      addBubble('agent', 'Bonjour ' + clientNom + ' ! Comment pouvons-nous vous aider ?');
+    } else {
+      data.forEach(m => addBubble(m.expediteur, m.contenu, m.expediteur_nom, m.created_at));
+    }
+    scrollMsgs();
+  }
+
+  function subscribeMessages() {
+    if (sub) sub.unsubscribe();
+    sub = sb2.channel('chat-client-' + convId)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages_chat', filter: 'conversation_id=eq.' + convId },
+        payload => {
+          const m = payload.new;
+          if (m.expediteur === 'agent') {
+            addBubble(m.expediteur, m.contenu, m.expediteur_nom, m.created_at);
+            scrollMsgs();
+            if (!document.getElementById('yeye-chat-win').classList.contains('open')) {
+              const badge = document.getElementById('yeye-chat-badge');
+              badge.style.display = 'flex';
+              badge.textContent = (parseInt(badge.textContent || '0') + 1).toString();
+            }
+          }
+        })
+      .subscribe();
+  }
+
+  function addBubble(exp, txt, nom, time) {
+    const isClient = exp === 'client';
+    const msgs = document.getElementById('cw-msgs');
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:' + (isClient ? 'flex-end' : 'flex-start');
+    const b = document.createElement('div');
+    b.className = 'cw-bubble ' + (isClient ? 'client' : 'agent');
+    b.textContent = txt;
+    const t = document.createElement('div');
+    t.className = 'cw-time' + (isClient ? ' right' : '');
+    const d = time ? new Date(time) : new Date();
+    t.textContent = (nom && !isClient ? nom + ' · ' : '') + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    wrap.appendChild(b); wrap.appendChild(t);
+    msgs.appendChild(wrap);
+    scrollMsgs();
+  }
+
+  function scrollMsgs() {
+    const m = document.getElementById('cw-msgs');
+    m.scrollTop = m.scrollHeight;
+  }
+})();
+</script>
+
 </body>
 </html>
