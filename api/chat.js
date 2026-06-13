@@ -28,7 +28,6 @@ export default async function handler(req, res) {
         if (textBlocks.length > 0 && toolUseBlocks.length === 0 && toolResultBlocks.length === 0) {
           groqMessages.push({ role: m.role, content: textBlocks.map(b => b.text).join('\n') });
         }
-
         for (const block of toolUseBlocks) {
           groqMessages.push({
             role: 'assistant',
@@ -40,7 +39,6 @@ export default async function handler(req, res) {
             }]
           });
         }
-
         for (const block of toolResultBlocks) {
           groqMessages.push({
             role: 'tool',
@@ -64,13 +62,15 @@ export default async function handler(req, res) {
       }
     }));
 
-    // Limiter l'historique pour réduire les tokens
-    const recentMessages = filteredMessages.slice(0, 1).concat(filteredMessages.slice(-6));
+    // Garder system + 4 derniers messages seulement → moins de tokens
+    const systemMsg = filteredMessages.find(m => m.role === 'system');
+    const convoMsgs = filteredMessages.filter(m => m.role !== 'system').slice(-4);
+    const trimmedMessages = systemMsg ? [systemMsg, ...convoMsgs] : convoMsgs;
 
     const body = {
-      model: 'gemma2-9b-it',   // 15 000 TPM — limite la plus haute sur free tier
-      max_tokens: Math.min(max_tokens || 400, 400),  // réduit pour économiser les tokens
-      messages: recentMessages,
+      model: 'llama-3.1-8b-instant',  // 30 000 TPM sur free tier
+      max_tokens: Math.min(max_tokens || 300, 300),
+      messages: trimmedMessages,
       temperature: 0.2
     };
 
