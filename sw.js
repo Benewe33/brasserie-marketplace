@@ -1,4 +1,4 @@
-const CACHE = 'yeye-v1';
+const CACHE = 'yeye-v2';
 const ASSETS = ['/', '/index.html'];
 
 self.addEventListener('install', e => {
@@ -16,7 +16,16 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  const req = e.request;
+
+  // Ne gérer que les requêtes GET de notre propre origine.
+  // Tout le reste (KKiaPay, Google Fonts, Leaflet, Supabase, API...) passe
+  // directement au réseau sans interception du Service Worker.
+  if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) {
+    return;
+  }
+
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
+    caches.match(req).then(cached => cached || fetch(req))
   );
 });
