@@ -1,7 +1,8 @@
-// Service Worker minimal — Yéyé Market
 const CACHE = 'yeye-v1';
+const ASSETS = ['/', '/index.html'];
 
 self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
   self.skipWaiting();
 });
 
@@ -15,6 +16,7 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // Passer toutes les requêtes réseau normalement (pas de cache offline)
-  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+  e.respondWith(
+    caches.match(e.request).then(r => r || fetch(e.request))
+  );
 });
