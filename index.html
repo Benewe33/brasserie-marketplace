@@ -1580,7 +1580,17 @@ function filterByCity(prods){
   });
 }
 
-// Détection automatique par GPS → ville la plus proche
+// Distance réelle entre 2 points GPS en km (formule de Haversine)
+function distanceKm(lat1,lng1,lat2,lng2){
+  const R=6371; // rayon Terre en km
+  const dLat=(lat2-lat1)*Math.PI/180;
+  const dLng=(lng2-lng1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+// Détection automatique par GPS → ville la plus proche (si dans la zone couverte)
+const RAYON_MAX_KM = 100; // au-delà, on considère l'utilisateur hors zone
 function detectCityByGPS(){
   const btn=document.getElementById('city-gps-btn');
   if(!navigator.geolocation){toast('GPS non disponible sur cet appareil','err');return;}
@@ -1588,20 +1598,25 @@ function detectCityByGPS(){
   navigator.geolocation.getCurrentPosition(
     pos=>{
       const {latitude,longitude}=pos.coords;
-      // Trouver la ville la plus proche (distance simple)
+      // Trouver la ville la plus proche avec une vraie distance en km
       let best=VILLES[0],bestD=Infinity;
       VILLES.forEach(v=>{
-        const d=Math.pow(v.lat-latitude,2)+Math.pow(v.lng-longitude,2);
+        const d=distanceKm(latitude,longitude,v.lat,v.lng);
         if(d<bestD){bestD=d;best=v;}
       });
       if(btn){btn.disabled=false;btn.textContent='🛰️ Me localiser automatiquement';}
+      // Si trop loin de toutes nos villes → hors zone, choix manuel
+      if(bestD>RAYON_MAX_KM){
+        toast('Vous semblez hors de nos villes. Choisissez manuellement.','err');
+        return;
+      }
       chooseCity(best.nom);
     },
     err=>{
       if(btn){btn.disabled=false;btn.textContent='🛰️ Me localiser automatiquement';}
       toast('Localisation refusée. Choisissez votre ville.','err');
     },
-    {enableHighAccuracy:false,timeout:8000,maximumAge:60000}
+    {enableHighAccuracy:true,timeout:8000,maximumAge:60000}
   );
 }
 
