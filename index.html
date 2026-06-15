@@ -9,7 +9,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Yéyé Market"/>
-<link rel="apple-touch-icon" href="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png"/>
+<link rel="apple-touch-icon" href="/yeye-icon-192.png"/>
 <title>Yéyé Market — Marketplace du Bénin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
@@ -40,6 +40,22 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .header-actions{display:flex;align-items:center;gap:8px}
 .hbtn{background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;position:relative;transition:background .2s}
 .hbtn:hover{background:rgba(255,255,255,.25)}
+.city-btn{background:rgba(255,255,255,.15);border:none;color:#fff;height:38px;padding:0 12px;border-radius:12px;display:flex;align-items:center;gap:4px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit;transition:background .2s;white-space:nowrap;max-width:140px}
+.city-btn:hover{background:rgba(255,255,255,.25)}
+.city-btn span{overflow:hidden;text-overflow:ellipsis}
+/* Modal ville */
+.city-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.city-overlay.show{display:flex}
+.city-box{background:#fff;border-radius:20px;max-width:380px;width:100%;padding:24px;box-shadow:0 20px 60px rgba(0,0,0,.3);animation:cityUp .3s ease}
+@keyframes cityUp{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.city-box h3{font-size:18px;font-weight:800;color:var(--g900);margin-bottom:4px}
+.city-box .city-sub{font-size:13px;color:var(--g400);margin-bottom:18px}
+.city-opt{display:flex;align-items:center;gap:10px;width:100%;padding:14px 16px;border:1.5px solid var(--g200);border-radius:14px;background:#fff;font-size:15px;font-weight:600;color:var(--g900);font-family:inherit;cursor:pointer;margin-bottom:10px;transition:all .15s}
+.city-opt:hover{border-color:var(--g600);background:var(--g50)}
+.city-opt.active{border-color:var(--g600);background:var(--g50)}
+.city-gps{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:13px;border:none;border-radius:14px;background:var(--g900);color:#fff;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;margin-top:6px;transition:opacity .2s}
+.city-gps:hover{opacity:.9}
+.city-gps:disabled{opacity:.6;cursor:wait}
 .hbadge{position:absolute;top:-3px;right:-3px;background:var(--r);color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;border-radius:50%;display:none;align-items:center;justify-content:center}
 .search-wrap{position:relative}
 .search-wrap input{width:100%;padding:10px 16px 10px 40px;border-radius:12px;border:none;font-size:14px;font-family:inherit;outline:none;background:rgba(255,255,255,.95);color:var(--g900)}
@@ -392,6 +408,9 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
         <div class="logo-text"><h1>Yéyé Market</h1><p>Bénin 🇧🇯</p></div>
       </div>
       <div class="header-actions">
+        <button class="city-btn" id="city-btn" onclick="openCityModal()" title="Changer de ville">
+          📍 <span id="city-btn-label">Ville</span> ▾
+        </button>
         <button class="hbtn" id="notif-btn" onclick="openNotifPanel()" style="display:none">
           🔔<span class="hbadge" id="notif-badge">0</span>
         </button>
@@ -870,24 +889,29 @@ async function loadCategories(){
 async function loadProducts(catId=null){
   const grid=document.getElementById('products-grid');
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Chargement...</div>';
-  let q=sb.from('produits').select('id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,boutique_id,categorie_id,categories(nom),boutiques(nom)').eq('actif',true).gt('stock',0);
+  let q=sb.from('produits').select('id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,boutique_id,categorie_id,categories(nom),boutiques(nom,ville)').eq('actif',true).gt('stock',0);
   if(catId)q=q.eq('categorie_id',catId);
   q=q.order('created_at',{ascending:false}).limit(20);
   const {data}=await q;
-  allProducts=data||[];
+  allProducts=filterByCity(data||[]);
   renderProducts(allProducts,'products-grid');
 }
 
 async function loadCatalogue(){
   const grid=document.getElementById('catalogue-grid');
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Chargement...</div>';
-  const {data}=await sb.from('produits').select('id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,boutique_id,categorie_id,categories(nom),boutiques(nom)').eq('actif',true).gt('stock',0).order('created_at',{ascending:false});
-  renderProducts(data||[],'catalogue-grid');
+  const {data}=await sb.from('produits').select('id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,boutique_id,categorie_id,categories(nom),boutiques(nom,ville)').eq('actif',true).gt('stock',0).order('created_at',{ascending:false});
+  renderProducts(filterByCity(data||[]),'catalogue-grid');
 }
 
 function renderProducts(prods,gridId){
   const grid=document.getElementById(gridId);
-  if(!prods.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--g400)"><div style="font-size:48px;margin-bottom:12px">🔍</div><p style="font-weight:600;font-size:15px">Aucun produit</p></div>`;return;}
+  if(!prods.length){
+    const msg = selectedCity
+      ? `<div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--g400)"><div style="font-size:48px;margin-bottom:12px">📍</div><p style="font-weight:600;font-size:15px">Aucun vendeur à ${selectedCity} pour le moment</p><p style="font-size:13px;margin-top:6px">Revenez bientôt, ou changez de ville en haut de l'écran.</p></div>`
+      : `<div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--g400)"><div style="font-size:48px;margin-bottom:12px">🔍</div><p style="font-weight:600;font-size:15px">Aucun produit</p></div>`;
+    grid.innerHTML=msg;return;
+  }
   grid.innerHTML=prods.map(p=>`
     <div class="prod-card" onclick="openProdModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">
       <div class="prod-img-wrap">
@@ -1509,6 +1533,78 @@ function fdate(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR
 function catEmoji(nom){const m={'Viandes':'🥩','Poissons':'🐟','Légumes':'🥦','Fruits':'🍌','Épicerie':'🛍️','Brasserie':'🍺','Huiles':'🫙','Épices':'🌶️','Céréales':'🌾','Restaurants':'🍽️','Boissons':'🥤','Oeufs':'🥚','Marché':'🧺'};return m[nom]||'📦';}
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);}
 
+// ============================================================
+// SÉLECTION DE VILLE (filtrage vendeurs/produits par ville)
+// ============================================================
+const VILLES = [
+  {nom:'Cotonou',    emoji:'🌆', lat:6.3703, lng:2.3912},
+  {nom:'Porto-Novo', emoji:'🏛️', lat:6.4969, lng:2.6283},
+  {nom:'Parakou',    emoji:'🌳', lat:9.3370, lng:2.6303}
+];
+let selectedCity = null; // ville choisie (en mémoire pour la session)
+
+function renderCityOptions(){
+  const box=document.getElementById('city-options');
+  if(!box)return;
+  box.innerHTML=VILLES.map(v=>`
+    <button class="city-opt ${selectedCity===v.nom?'active':''}" onclick="chooseCity('${v.nom}')">
+      <span style="font-size:20px">${v.emoji}</span> ${v.nom}
+    </button>`).join('');
+}
+
+function openCityModal(){
+  renderCityOptions();
+  document.getElementById('city-overlay').classList.add('show');
+}
+function closeCityModal(){
+  document.getElementById('city-overlay').classList.remove('show');
+}
+
+function chooseCity(ville){
+  selectedCity=ville;
+  const label=document.getElementById('city-btn-label');
+  if(label)label.textContent=ville;
+  closeCityModal();
+  // Recharger les produits filtrés par la nouvelle ville
+  loadProducts();
+  if(typeof loadCatalogue==='function' && document.getElementById('page-catalogue')?.classList.contains('active')){loadCatalogue();}
+  toast('📍 Ville : '+ville,'ok');
+}
+
+// Filtre une liste de produits selon la ville choisie (par la ville de leur boutique)
+function filterByCity(prods){
+  if(!selectedCity)return prods; // pas encore de ville → tout afficher
+  return prods.filter(p=>{
+    const v=p.boutiques?.ville;
+    return v===selectedCity;
+  });
+}
+
+// Détection automatique par GPS → ville la plus proche
+function detectCityByGPS(){
+  const btn=document.getElementById('city-gps-btn');
+  if(!navigator.geolocation){toast('GPS non disponible sur cet appareil','err');return;}
+  if(btn){btn.disabled=true;btn.textContent='🛰️ Localisation en cours...';}
+  navigator.geolocation.getCurrentPosition(
+    pos=>{
+      const {latitude,longitude}=pos.coords;
+      // Trouver la ville la plus proche (distance simple)
+      let best=VILLES[0],bestD=Infinity;
+      VILLES.forEach(v=>{
+        const d=Math.pow(v.lat-latitude,2)+Math.pow(v.lng-longitude,2);
+        if(d<bestD){bestD=d;best=v;}
+      });
+      if(btn){btn.disabled=false;btn.textContent='🛰️ Me localiser automatiquement';}
+      chooseCity(best.nom);
+    },
+    err=>{
+      if(btn){btn.disabled=false;btn.textContent='🛰️ Me localiser automatiquement';}
+      toast('Localisation refusée. Choisissez votre ville.','err');
+    },
+    {enableHighAccuracy:false,timeout:8000,maximumAge:60000}
+  );
+}
+
 // INIT
 
 // ASSISTANT POPUP
@@ -1517,6 +1613,8 @@ function toast(msg,type='info'){const t=document.getElementById('toast');t.textC
 checkSession();
 loadCategories();
 loadProducts();
+// Au 1er lancement : demander la ville si pas encore choisie
+if(!selectedCity){ setTimeout(openCityModal, 600); }
 
 // ============================================================
 // SPLASH SCREEN
@@ -1884,6 +1982,16 @@ if (urlPage) setTimeout(() => goPage(urlPage), 500);
   }
 })();
 </script>
+
+<!-- MODAL SÉLECTION VILLE -->
+<div class="city-overlay" id="city-overlay">
+  <div class="city-box">
+    <h3>📍 Votre ville</h3>
+    <div class="city-sub">Choisissez votre ville pour voir les vendeurs et livreurs proches de vous.</div>
+    <div id="city-options"></div>
+    <button class="city-gps" id="city-gps-btn" onclick="detectCityByGPS()">🛰️ Me localiser automatiquement</button>
+  </div>
+</div>
 
 <!-- Vercel Web Analytics -->
 <script>
