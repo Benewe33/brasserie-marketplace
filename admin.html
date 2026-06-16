@@ -643,6 +643,26 @@ tr:hover td{background:var(--g50)}
         <div class="fgm"><label>Prix promo</label><input type="number" id="prod-promo" placeholder="Optionnel"/></div>
         <div class="fgm"><label>Unité</label><select id="prod-unite"><option value="kg">kg</option><option value="g">g</option><option value="litre">litre</option><option value="pièce">pièce</option><option value="sachet">sachet</option><option value="boîte">boîte</option><option value="panier">panier</option><option value="plateau">plateau</option><option value="tas">tas</option><option value="botte">botte</option><option value="sac">sac</option></select></div>
         <div class="fgm"><label>Stock *</label><input type="number" id="prod-stock"/></div>
+        <div class="fgm fcol">
+          <label>Boutique</label>
+          <select id="prod-boutique" onchange="onBoutiqueChange()">
+            <option value="">— Aucune (géré par l'admin) —</option>
+            <option value="__new__">➕ Nouvelle boutique...</option>
+          </select>
+        </div>
+        <div class="fgm" id="prod-newshop-nom-wrap" style="display:none">
+          <label>Nom de la nouvelle boutique *</label>
+          <input type="text" id="prod-newshop-nom" placeholder="Ex: Marché de Maman Adjo"/>
+        </div>
+        <div class="fgm" id="prod-newshop-ville-wrap" style="display:none">
+          <label>Ville de la boutique *</label>
+          <select id="prod-newshop-ville">
+            <option value="Cotonou">Cotonou</option>
+            <option value="Calavi">Calavi</option>
+            <option value="Porto-Novo">Porto-Novo</option>
+            <option value="Parakou">Parakou</option>
+          </select>
+        </div>
         <div class="fgm fcol"><label>Description</label><textarea id="prod-desc"></textarea></div>
         <div class="fgm fcol">
           <label>Photo</label>
@@ -1047,7 +1067,7 @@ async function delCat(id){
 
 // PRODUITS
 async function loadProds(){
-  const {data}=await sb.from('produits').select('*,categories(nom),boutiques(nom)').order('created_at',{ascending:false});
+  const {data}=await sb.from('produits').select('*,categories(nom),boutiques(nom,ville)').order('created_at',{ascending:false});
   const {data:allAvis}=await sb.from('avis').select('produit_id,note');
   const tb=document.getElementById('prod-body');
   if(!data?.length){tb.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--g400);padding:32px">Aucun produit</td></tr>';return;}
@@ -1057,9 +1077,30 @@ async function loadProds(){
     <td>${p.categories?.nom||'—'}</td>
     <td>${fmt(p.prix)} FCFA/${p.unite}</td>
     <td>${p.stock}</td>
-    <td>${p.boutiques?.nom||'Admin'}</td>
+    <td>${p.boutiques?.nom?(p.boutiques.ville?p.boutiques.nom+' — '+p.boutiques.ville:p.boutiques.nom):'Admin'}</td>
     <td><div class="acts"><button class="btn btn-sm btn-ed" onclick='editProd(${JSON.stringify(p)})'>✏️</button><button class="btn btn-sm btn-del" onclick="delProd('${p.id}')">🗑️</button></div></td>
   </tr>`).join('');
+}
+
+// BOUTIQUES dans le formulaire produit
+async function loadBoutiqueSelect(selectedId){
+  const sel=document.getElementById('prod-boutique');
+  if(!sel)return;
+  const {data}=await sb.from('boutiques').select('id,nom,ville').order('nom');
+  sel.innerHTML='<option value="">— Aucune (géré par l\'admin) —</option>';
+  (data||[]).forEach(b=>{
+    const lab=b.ville?`${b.nom} — ${b.ville}`:b.nom;
+    sel.innerHTML+=`<option value="${b.id}" ${selectedId===b.id?'selected':''}>${lab}</option>`;
+  });
+  sel.innerHTML+='<option value="__new__">➕ Nouvelle boutique...</option>';
+  onBoutiqueChange();
+}
+
+function onBoutiqueChange(){
+  const v=document.getElementById('prod-boutique').value;
+  const show=v==='__new__';
+  document.getElementById('prod-newshop-nom-wrap').style.display=show?'':'none';
+  document.getElementById('prod-newshop-ville-wrap').style.display=show?'':'none';
 }
 
 function openProd(){
@@ -1074,7 +1115,8 @@ function openProd(){
   document.getElementById('m-prod-title').textContent='Ajouter un produit';
   document.getElementById('prod-save-btn').textContent='Ajouter';
   document.getElementById('prod-save-btn').dataset.label='Ajouter';
-  loadCatSelect();openModal('m-prod');
+  document.getElementById('prod-newshop-nom').value='';
+  loadCatSelect();loadBoutiqueSelect();openModal('m-prod');
 }
 
 function editProd(p){
@@ -1097,7 +1139,8 @@ function editProd(p){
   document.getElementById('m-prod-title').textContent='Modifier : '+p.nom;
   document.getElementById('prod-save-btn').textContent='Enregistrer';
   document.getElementById('prod-save-btn').dataset.label='Enregistrer';
-  loadCatSelect(p.categorie_id);openModal('m-prod');
+  document.getElementById('prod-newshop-nom').value='';
+  loadCatSelect(p.categorie_id);loadBoutiqueSelect(p.boutique_id);openModal('m-prod');
 }
 
 async function saveProd(){
@@ -1107,6 +1150,18 @@ async function saveProd(){
   const prix=parseFloat(document.getElementById('prod-prix').value);
   const stock=parseInt(document.getElementById('prod-stock').value);
   if(!nom||!prix||isNaN(stock)){toast('Nom, prix et stock obligatoires','err');return;}
+
+  // Gestion de la boutique
+  let boutique_id=document.getElementById('prod-boutique').value;
+  if(boutique_id==='__new__'){
+    const bnom=document.getElementById('prod-newshop-nom').value.trim();
+    const bville=document.getElementById('prod-newshop-ville').value;
+    if(!bnom){toast('Nom de la nouvelle boutique obligatoire','err');return;}
+    const {data:newShop,error:shopErr}=await sb.from('boutiques').insert({nom:bnom,ville:bville,statut:'actif'}).select('id').single();
+    if(shopErr){toast('Erreur boutique: '+shopErr.message,'err');return;}
+    boutique_id=newShop.id;
+  }
+
   const payload={
     nom,prix,stock,
     categorie_id:document.getElementById('prod-cat').value||null,
@@ -1115,6 +1170,7 @@ async function saveProd(){
     prix_promo:parseFloat(document.getElementById('prod-promo').value)||null,
     image_url:document.getElementById('prod-url').value||null,
     image_url_2:document.getElementById('prod-url-2').value||null,
+    boutique_id:boutique_id||null,
     actif:true
   };
   const {error}=id?await sb.from('produits').update(payload).eq('id',id):await sb.from('produits').insert(payload);
