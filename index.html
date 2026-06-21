@@ -405,6 +405,11 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .rcard .rc-tag{display:inline-block;background:var(--vl);color:var(--vd);font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px;margin-top:8px}
 .hrow-empty{flex:0 0 100%;text-align:center;padding:24px;color:var(--g400);font-size:13px}
 .hrow-load{flex:0 0 100%;text-align:center;padding:24px;color:var(--g400);font-size:13px}
+/* Bouton favori (cœur) */
+.fav-heart{position:absolute;top:7px;right:7px;width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.92);border:none;cursor:pointer;font-size:16px;line-height:1;color:#cbd5d1;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.12);transition:transform .15s,color .15s;z-index:2;padding:0}
+.fav-heart:active{transform:scale(.85)}
+.fav-heart.on{color:var(--r)}
+.fav-badge-pulse{animation:none}
 </style>
 </head>
 <body>
@@ -424,6 +429,12 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
         <div class="logo-text"><h1>Yéyé Market</h1><p>Bénin 🇧🇯</p></div>
       </div>
       <div class="header-actions">
+        <button class="hbtn" onclick="goPage('favoris')" title="Favoris">
+          ❤️<span class="hbadge" id="fav-badge">0</span>
+        </button>
+        <button class="hbtn" onclick="openSuivi()" title="Suivi de commande">
+          📍
+        </button>
         <button class="hbtn" id="notif-btn" onclick="openNotifPanel()" style="display:none">
           🔔<span class="hbadge" id="notif-badge">0</span>
         </button>
@@ -515,6 +526,14 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
       <h2>📍 Suivi de commande</h2>
     </div>
     <div id="tracking-content" style="padding:4px"></div>
+  </div>
+
+  <!-- PAGE FAVORIS -->
+  <div class="page" id="page-favoris">
+    <div class="page-header"><h2>❤️ Mes favoris</h2></div>
+    <div class="products-grid" id="favoris-grid" style="margin-top:8px">
+      <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Chargement...</div>
+    </div>
   </div>
 
   <!-- PAGE PROFIL -->
@@ -756,6 +775,60 @@ const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
 let cart={},allProducts=[],currentProduct=null,currentUser=null;
 let _catFilter=null;
+
+// ============================================================
+// FAVORIS (persistés dans localStorage)
+// ============================================================
+let _favs=new Set();
+try{_favs=new Set(JSON.parse(localStorage.getItem('yeye_favoris')||'[]'));}catch(e){_favs=new Set();}
+function saveFavs(){try{localStorage.setItem('yeye_favoris',JSON.stringify([..._favs]));}catch(e){}updateFavBadge();}
+function isFav(id){return _favs.has(String(id));}
+function toggleFav(id,ev){
+  if(ev){ev.stopPropagation();}
+  id=String(id);
+  if(_favs.has(id)){_favs.delete(id);toast('Retiré des favoris','info');}
+  else{_favs.add(id);toast('❤️ Ajouté aux favoris','ok');}
+  saveFavs();
+  // rafraîchit l'état visuel des cœurs visibles
+  document.querySelectorAll('.fav-heart[data-id="'+id+'"]').forEach(b=>b.classList.toggle('on',_favs.has(id)));
+  // si on est sur la page favoris, recharge la liste
+  if(document.getElementById('page-favoris').classList.contains('active'))loadFavoris();
+}
+function updateFavBadge(){
+  const b=document.getElementById('fav-badge');if(!b)return;
+  const n=_favs.size;b.textContent=n;b.style.display=n>0?'flex':'none';
+}
+function favHeart(id){return `<button class="fav-heart${isFav(id)?' on':''}" data-id="${id}" onclick="toggleFav('${id}',event)" aria-label="Favori">♥</button>`;}
+
+async function loadFavoris(){
+  const grid=document.getElementById('favoris-grid');
+  if(!grid)return;
+  const ids=[..._favs];
+  if(!ids.length){grid.innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:56px 20px;color:var(--g400)"><div style="font-size:52px;margin-bottom:14px">💚</div><p style="font-weight:700;font-size:16px;color:var(--g900)">Aucun favori</p><p style="font-size:13px;margin-top:6px">Touchez le cœur sur un produit pour l'ajouter ici.</p><button class="btn-main" style="width:auto;padding:12px 26px;margin-top:22px" onclick="goPage('home')">Découvrir des produits</button></div>`;return;}
+  grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Chargement...</div>';
+  try{
+    const {data}=await sb.from('produits').select('id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,origine,boutique_id,categorie_id,categories(nom),boutiques(nom)').in('id',ids);
+    const prods=data||[];
+    // nettoie les favoris dont le produit n'existe plus
+    const found=new Set(prods.map(p=>String(p.id)));
+    let changed=false;ids.forEach(id=>{if(!found.has(String(id))){_favs.delete(String(id));changed=true;}});
+    if(changed)saveFavs();
+    renderProducts(prods,'favoris-grid');
+  }catch(e){grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--r)">Erreur de chargement</div>';}
+}
+
+// ============================================================
+// SUIVI rapide : ouvre la dernière commande active, sinon la liste
+// ============================================================
+async function openSuivi(){
+  if(!currentUser){toast('Connectez-vous pour suivre vos commandes','info');goPage('profile');return;}
+  try{
+    const {data}=await sb.from('commandes').select('id,statut').eq('client_id',currentUser.id).in('statut',['confirmee','en_preparation','prete','en_livraison']).order('created_at',{ascending:false}).limit(1);
+    if(data&&data.length){goPage('tracking');loadTracking(data[0].id);}
+    else{toast('Aucune commande en cours','info');goPage('orders');}
+  }catch(e){goPage('orders');}
+}
+
 let carouselImages=[],carouselIndex=0;
 let currentNote=0;
 let loginAttempts=0,loginBlocked=false;
@@ -778,6 +851,7 @@ function goPage(name){
   if(name==='cart')renderCart();
   if(name==='catalogue')loadCatalogue();
   if(name==='profile')loadProfileStats();
+  if(name==='favoris')loadFavoris();
   window.scrollTo(0,0);
 }
 
@@ -949,6 +1023,7 @@ function renderProducts(prods,gridId){
       <div class="prod-img-wrap">
         ${p.image_url?`<img src="${p.image_url}" alt="${p.nom}" loading="lazy"/>`:`<div class="prod-emoji">${catEmoji(p.categories?.nom||'')}</div>`}
         ${p.prix_promo?'<span class="prod-promo-tag">PROMO</span>':''}
+        ${favHeart(p.id)}
       </div>
       <div class="prod-body">
         <div class="prod-name">${p.nom}</div>
@@ -985,7 +1060,7 @@ function hCard(p){
   else if(promo){const pct=Math.round((1-p.prix_promo/p.prix)*100);tag=`<span class="hc-tag promo">-${pct}%</span>`;}
   const img=p.image_url?`<img src="${p.image_url}" alt="${p.nom}" loading="lazy"/>`:`<div class="hc-emoji">${catEmoji(p.categories?.nom||'')}</div>`;
   return `<div class="hcard" onclick="openProdModal(${JSON.stringify(p).replace(/"/g,'&quot;')})">
-    <div class="hc-img">${img}${tag}</div>
+    <div class="hc-img">${img}${tag}${favHeart(p.id)}</div>
     <div class="hc-body">
       <div class="hc-name">${p.nom}</div>
       <div class="hc-meta">🏪 ${p.boutiques?.nom||(p.origine?('🌍 '+p.origine):'Yéyé Market')}</div>
@@ -1658,6 +1733,7 @@ function toast(msg,type='info'){const t=document.getElementById('toast');t.textC
 checkSession();
 loadCategories();
 loadHomeSections();
+updateFavBadge();
 
 // ============================================================
 // SPLASH SCREEN
