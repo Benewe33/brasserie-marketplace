@@ -1050,7 +1050,7 @@ function filterByCat(catId,chip){
 // ============================================================
 // ACCUEIL RÉORGANISÉ — 6 sections horizontales (Supabase)
 // ============================================================
-const PROD_COLS='id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,origine,boutique_id,categorie_id,categories(nom),boutiques(nom)';
+const PROD_COLS='id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,origine,sections,boutique_id,categorie_id,categories(nom),boutiques(nom)';
 
 function hCard(p){
   const promo=p.prix_promo&&p.prix_promo<p.prix;
@@ -1090,42 +1090,57 @@ function rCard(r){
   </div>`;
 }
 async function loadHomeSections(){
-  // S1 Populaires : produits en stock, plus récents (proxy de popularité)
+  const base=()=>sb.from('produits').select(PROD_COLS).eq('actif',true).gt('stock',0);
+
+  // Récupère les produits attribués manuellement à une section (colonne sections text[])
+  async function manuels(cle){
+    try{
+      const {data,error}=await base().contains('sections',[cle]).order('created_at',{ascending:false}).limit(12);
+      if(error)return null; // colonne absente → on bascule en auto
+      return data||[];
+    }catch(e){return null;}
+  }
+
+  // S1 — Les plus populaires (manuel sinon récents)
   try{
-    const {data}=await sb.from('produits').select(PROD_COLS).eq('actif',true).gt('stock',0).order('created_at',{ascending:false}).limit(10);
-    fillRow('row-populaires',data,'Aucun produit pour le moment');
+    let d=await manuels('populaires');
+    if(!d||!d.length){const r=await base().order('created_at',{ascending:false}).limit(10);d=r.data||[];}
+    fillRow('row-populaires',d,'Aucun produit pour le moment');
   }catch(e){fillRow('row-populaires',[],'Indisponible');}
 
-  // S2 Promotions : prix_promo renseigné
+  // S2 — Promotions (manuel sinon prix_promo)
   try{
-    const {data}=await sb.from('produits').select(PROD_COLS).eq('actif',true).gt('stock',0).not('prix_promo','is',null).order('created_at',{ascending:false}).limit(10);
-    fillRow('row-promos',data,'Aucune promo aujourd\'hui');
+    let d=await manuels('promos');
+    if(!d||!d.length){const r=await base().not('prix_promo','is',null).order('created_at',{ascending:false}).limit(10);d=r.data||[];}
+    fillRow('row-promos',d,'Aucune promo aujourd\'hui');
   }catch(e){fillRow('row-promos',[],'Indisponible');}
 
-  // S3 Restaurants populaires : table restaurants actifs
+  // S3 — Restaurants populaires : table restaurants actifs
   try{
     const {data}=await sb.from('restaurants').select('id,nom,cuisine_type,adresse,image_url,statut').eq('statut','actif').limit(10);
     const row=document.getElementById('row-restos');
     if(row){ if(data&&data.length){row.innerHTML=data.map(rCard).join('');} else {row.innerHTML='<div class="hrow-empty">Aucun restaurant actif</div>';} }
   }catch(e){const row=document.getElementById('row-restos');if(row)row.innerHTML='<div class="hrow-empty">Indisponible</div>';}
 
-  // S4 Produits locaux : champ origine renseigné
+  // S4 — Produits locaux (manuel sinon champ origine)
   try{
-    const {data}=await sb.from('produits').select(PROD_COLS).eq('actif',true).gt('stock',0).not('origine','is',null).neq('origine','').order('created_at',{ascending:false}).limit(10);
-    fillRow('row-locaux',(data||[]).map(p=>({...p,_tag:'local'})),'Produits locaux à venir');
+    let d=await manuels('locaux');
+    if(!d||!d.length){const r=await base().not('origine','is',null).neq('origine','').order('created_at',{ascending:false}).limit(10);d=r.data||[];}
+    fillRow('row-locaux',(d||[]).map(p=>({...p,_tag:'local'})),'Produits locaux à venir');
   }catch(e){fillRow('row-locaux',[],'Indisponible');}
 
-  // S5 Nouveautés : 10 derniers créés
+  // S5 — Nouveautés (manuel sinon 10 derniers créés)
   try{
-    const {data}=await sb.from('produits').select(PROD_COLS).eq('actif',true).gt('stock',0).order('created_at',{ascending:false}).limit(10);
-    fillRow('row-nouveautes',(data||[]).map(p=>({...p,_tag:'new'})),'Aucune nouveauté');
+    let d=await manuels('nouveautes');
+    if(!d||!d.length){const r=await base().order('created_at',{ascending:false}).limit(10);d=r.data||[];}
+    fillRow('row-nouveautes',(d||[]).map(p=>({...p,_tag:'new'})),'Aucune nouveauté');
   }catch(e){fillRow('row-nouveautes',[],'Indisponible');}
 
-  // S6 Recommandé pour vous : sélection aléatoire en stock
+  // S6 — Recommandé (manuel sinon sélection aléatoire)
   try{
-    const {data}=await sb.from('produits').select(PROD_COLS).eq('actif',true).gt('stock',0).limit(30);
-    const shuffled=(data||[]).sort(()=>Math.random()-0.5).slice(0,10);
-    fillRow('row-recommande',shuffled,'Bientôt des recommandations');
+    let d=await manuels('recommande');
+    if(!d||!d.length){const r=await base().limit(30);d=(r.data||[]).sort(()=>Math.random()-0.5).slice(0,10);}
+    fillRow('row-recommande',d,'Bientôt des recommandations');
   }catch(e){fillRow('row-recommande',[],'Indisponible');}
 }
 

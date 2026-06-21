@@ -235,6 +235,11 @@ tr:hover td{background:var(--g50)}
 .btn-primary{background:var(--vd);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .2s}
 .btn-primary:hover{background:var(--v2)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.sec-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.sec-chk{display:flex;align-items:center;gap:8px;padding:9px 11px;border:1.5px solid var(--g200);border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--g600);transition:all .15s;user-select:none}
+.sec-chk:hover{border-color:var(--v)}
+.sec-chk input{width:17px;height:17px;accent-color:var(--vd);cursor:pointer;flex-shrink:0}
+.sec-chk:has(input:checked){border-color:var(--vd);background:var(--vl);color:var(--vd);font-weight:600}
 .carte-pin{font-size:22px;line-height:1;text-align:center;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
 .stat-neg{color:var(--r)!important}
 </style>
@@ -798,6 +803,18 @@ tr:hover td{background:var(--g50)}
         <div class="fgm"><label>Unité</label><select id="prod-unite"><option value="kg">kg</option><option value="g">g</option><option value="litre">litre</option><option value="pièce">pièce</option><option value="sachet">sachet</option><option value="boîte">boîte</option><option value="panier">panier</option><option value="plateau">plateau</option><option value="tas">tas</option><option value="botte">botte</option><option value="sac">sac</option></select></div>
         <div class="fgm"><label>Stock *</label><input type="number" id="prod-stock"/></div>
         <div class="fgm fcol"><label>Description</label><textarea id="prod-desc"></textarea></div>
+        <div class="fgm"><label>Origine / Provenance <span style="font-weight:400;color:var(--g400)">(pour « Produits locaux »)</span></label><input type="text" id="prod-origine" placeholder="Ex : Abomey, Parakou, Producteur local..."/></div>
+        <div class="fgm fcol">
+          <label>📌 Mise en avant — sections de l'accueil</label>
+          <div class="sec-checks">
+            <label class="sec-chk"><input type="checkbox" class="prod-section" value="populaires"/> <span>🔥 Les plus populaires</span></label>
+            <label class="sec-chk"><input type="checkbox" class="prod-section" value="promos"/> <span>🏷️ Promotions du jour</span></label>
+            <label class="sec-chk"><input type="checkbox" class="prod-section" value="locaux"/> <span>🌍 Produits locaux</span></label>
+            <label class="sec-chk"><input type="checkbox" class="prod-section" value="nouveautes"/> <span>✨ Nouveautés</span></label>
+            <label class="sec-chk"><input type="checkbox" class="prod-section" value="recommande"/> <span>❤️ Recommandé pour vous</span></label>
+          </div>
+          <p style="font-size:11px;color:var(--g400);margin-top:6px">Si aucune case n'est cochée, le produit reste classé automatiquement (promo, nouveauté, etc.).</p>
+        </div>
         <div class="fgm fcol">
           <label>Photo</label>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -1219,6 +1236,8 @@ async function loadProds(){
 function openProd(){
   document.getElementById('prod-id').value='';
   ['prod-nom','prod-prix','prod-promo','prod-stock','prod-desc'].forEach(id=>document.getElementById(id).value='');
+  const og=document.getElementById('prod-origine');if(og)og.value='';
+  document.querySelectorAll('.prod-section').forEach(c=>c.checked=false);
   document.getElementById('prod-url').value='';
   document.getElementById('prod-prev').style.display='none';
   document.getElementById('prod-cur').style.display='none';
@@ -1238,6 +1257,9 @@ function editProd(p){
   document.getElementById('prod-promo').value=p.prix_promo||'';
   document.getElementById('prod-stock').value=p.stock||'';
   document.getElementById('prod-desc').value=p.description||'';
+  const og=document.getElementById('prod-origine');if(og)og.value=p.origine||'';
+  const secs=Array.isArray(p.sections)?p.sections:[];
+  document.querySelectorAll('.prod-section').forEach(c=>c.checked=secs.includes(c.value));
   document.getElementById('prod-url').value=p.image_url||'';
   document.getElementById('prod-prev').style.display='none';
   const cur=document.getElementById('prod-cur');
@@ -1267,6 +1289,8 @@ async function saveProd(){
     description:document.getElementById('prod-desc').value,
     unite:document.getElementById('prod-unite').value,
     prix_promo:parseFloat(document.getElementById('prod-promo').value)||null,
+    origine:(document.getElementById('prod-origine')?.value||'').trim()||null,
+    sections:[...document.querySelectorAll('.prod-section:checked')].map(c=>c.value),
     image_url:document.getElementById('prod-url').value||null,
     image_url_2:document.getElementById('prod-url-2').value||null,
     actif:true
