@@ -723,6 +723,38 @@ tr:hover td{background:var(--g50)}
 
     <!-- ============ PARAMÈTRES ============ -->
     <div class="sec" id="sec-parametres">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-head"><h2>🖼️ Bannière d'accueil (client)</h2></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1.1fr .9fr;gap:18px">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div><label class="set-lbl">Titre</label><input class="set-inp" id="ban-titre" placeholder="Le meilleur de chez nous, livré chez vous"/></div>
+              <div><label class="set-lbl">Sous-titre</label><input class="set-inp" id="ban-sous" placeholder="🛒 Courses · 🍽️ Restaurants · 🚚 Livraison rapide"/></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                <div><label class="set-lbl">Texte du bouton</label><input class="set-inp" id="ban-btn-txt" placeholder="Voir le catalogue →"/></div>
+                <div><label class="set-lbl">Lien du bouton</label>
+                  <select class="set-inp" id="ban-btn-lien">
+                    <option value="catalogue">Catalogue</option>
+                    <option value="home">Accueil</option>
+                    <option value="favoris">Favoris</option>
+                    <option value="cart">Panier</option>
+                  </select>
+                </div>
+              </div>
+              <div><label class="set-lbl">Petit badge (en haut du banner)</label><input class="set-inp" id="ban-tag" placeholder="⚡ Commandez en quelques clics"/></div>
+            </div>
+            <div>
+              <label class="set-lbl">Image de fond</label>
+              <div class="cur-img" id="ban-cur" style="display:none"><p>Actuelle</p><img id="ban-cur-img" src="" alt=""/></div>
+              <div class="upzone"><input type="file" accept="image/*" onchange="upload(this,'yeye-market','ban-url','ban-prev','ban-prog')"/><div class="upzone-ico">🖼️</div><p><strong>Choisir une image</strong></p><p style="font-size:11px;color:var(--g400)">JPG/PNG · max 5 Mo</p></div>
+              <div class="up-prog" id="ban-prog"><div class="up-prog-bar" id="ban-prog-bar"></div></div>
+              <img class="up-prev" id="ban-prev" alt=""/>
+              <input type="hidden" id="ban-url"/>
+              <p style="font-size:11px;color:var(--g400);margin-top:8px">Laissez vide pour garder le dégradé vert par défaut. Un voile sombre est appliqué automatiquement pour la lisibilité du texte.</p>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="stats-grid-2">
         <div class="card" style="margin-bottom:0">
           <div class="card-head"><h2>⚙️ Général</h2></div>
@@ -761,7 +793,7 @@ tr:hover td{background:var(--g50)}
           </div>
         </div>
       </div>
-      <div style="margin-top:18px"><button class="btn-primary" onclick="toast('✅ Paramètres enregistrés','ok')" style="padding:12px 28px">💾 Enregistrer les modifications</button></div>
+      <div style="margin-top:18px"><button class="btn-primary" id="set-save-btn" onclick="saveParametres()" style="padding:12px 28px">💾 Enregistrer les modifications</button></div>
     </div>
 
   </main>
@@ -1079,7 +1111,7 @@ function go(name,btn){
   document.getElementById('sec-'+name).classList.add('active');
   btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),zones:loadZonesTable,clients:loadClients,rapports:()=>loadRapports(currentRapportDays),comptes:()=>{loadZonesSelect('cv-zone');loadZonesSelect('cr-zone');loadZonesSelect('cl-zone');loadAgents();},support:()=>{loadSupConvs();subscribeSupport();},paiements:loadPaiements,avis:loadAvis,promotions:loadPromotions,carte:initCarte,parametres:()=>{}};
+  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),zones:loadZonesTable,clients:loadClients,rapports:()=>loadRapports(currentRapportDays),comptes:()=>{loadZonesSelect('cv-zone');loadZonesSelect('cr-zone');loadZonesSelect('cl-zone');loadAgents();},support:()=>{loadSupConvs();subscribeSupport();},paiements:loadPaiements,avis:loadAvis,promotions:loadPromotions,carte:initCarte,parametres:loadParametres};
   if(loaders[name])loaders[name]();
 }
 
@@ -1586,8 +1618,58 @@ async function loadPromotions(){
 }
 
 // ============================================================
-// CARTE TEMPS RÉEL (PREMIUM)
+// PARAMÈTRES (table clé/valeur "parametres")
 // ============================================================
+function setVal(id,v){const el=document.getElementById(id);if(el!=null&&v!=null)el.value=v;}
+async function loadParametres(){
+  try{
+    const {data,error}=await sb.from('parametres').select('cle,valeur');
+    if(error)return; // table absente → on garde les valeurs par défaut du HTML
+    const p={};(data||[]).forEach(r=>p[r.cle]=r.valeur);
+    // Général
+    setVal('set-nom',p.nom_plateforme);setVal('set-logo',p.logo_url);
+    setVal('set-contact',p.contact);setVal('set-email',p.email_support);
+    // Livraison
+    setVal('set-rayon',p.rayon_livraison);setVal('set-frais',p.frais_livraison);setVal('set-temps',p.temps_estime);
+    // Commissions
+    if(p.comm_resto!=null){const s=document.querySelector('#sec-parametres input[oninput*="cm-resto"]');if(s){s.value=p.comm_resto;document.getElementById('cm-resto').textContent=p.comm_resto+'%';}}
+    if(p.comm_vend!=null){const s=document.querySelector('#sec-parametres input[oninput*="cm-vend"]');if(s){s.value=p.comm_vend;document.getElementById('cm-vend').textContent=p.comm_vend+'%';}}
+    if(p.comm_liv!=null){const s=document.querySelector('#sec-parametres input[oninput*="cm-liv"]');if(s){s.value=p.comm_liv;document.getElementById('cm-liv').textContent=p.comm_liv+'%';}}
+    // Bannière
+    setVal('ban-titre',p.banner_titre);setVal('ban-sous',p.banner_sous);
+    setVal('ban-btn-txt',p.banner_btn_txt);setVal('ban-btn-lien',p.banner_btn_lien);
+    setVal('ban-tag',p.banner_tag);setVal('ban-url',p.banner_image);
+    if(p.banner_image){const c=document.getElementById('ban-cur');if(c){c.style.display='block';document.getElementById('ban-cur-img').src=p.banner_image;}}
+  }catch(e){}
+}
+async function saveParametres(){
+  if(uploading){toast('Attendez la fin de l\'upload','err');return;}
+  const v=id=>{const el=document.getElementById(id);return el?el.value:'';};
+  const rows=[
+    {cle:'nom_plateforme',valeur:v('set-nom')},
+    {cle:'logo_url',valeur:v('set-logo')},
+    {cle:'contact',valeur:v('set-contact')},
+    {cle:'email_support',valeur:v('set-email')},
+    {cle:'rayon_livraison',valeur:v('set-rayon')},
+    {cle:'frais_livraison',valeur:v('set-frais')},
+    {cle:'temps_estime',valeur:v('set-temps')},
+    {cle:'comm_resto',valeur:document.getElementById('cm-resto')?.textContent.replace('%','')||'10'},
+    {cle:'comm_vend',valeur:document.getElementById('cm-vend')?.textContent.replace('%','')||'10'},
+    {cle:'comm_liv',valeur:document.getElementById('cm-liv')?.textContent.replace('%','')||'8'},
+    {cle:'banner_titre',valeur:v('ban-titre')},
+    {cle:'banner_sous',valeur:v('ban-sous')},
+    {cle:'banner_btn_txt',valeur:v('ban-btn-txt')},
+    {cle:'banner_btn_lien',valeur:v('ban-btn-lien')},
+    {cle:'banner_tag',valeur:v('ban-tag')},
+    {cle:'banner_image',valeur:v('ban-url')}
+  ];
+  const btn=document.getElementById('set-save-btn');if(btn){btn.disabled=true;btn.textContent='⏳ Enregistrement...';}
+  const {error}=await sb.from('parametres').upsert(rows,{onConflict:'cle'});
+  if(btn){btn.disabled=false;btn.textContent='💾 Enregistrer les modifications';}
+  if(error){toast('Erreur: '+error.message,'err');return;}
+  toast('✅ Paramètres enregistrés','ok');
+}
+
 let _carteMap=null,_carteLayers={riders:null,orders:null,restos:null,vendors:null},_carteSub=null;
 const BENIN_CENTER=[6.4969,2.6289]; // Cotonou
 function carteIcon(emoji){return L.divIcon({html:`<div class="carte-pin">${emoji}</div>`,className:'',iconSize:[28,28],iconAnchor:[14,14]});}
