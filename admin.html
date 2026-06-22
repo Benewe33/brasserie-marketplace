@@ -770,7 +770,20 @@ tr:hover td{background:var(--g50)}
           <div class="card-head"><h2>⚙️ Général</h2></div>
           <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
             <div><label class="set-lbl">Nom de la plateforme</label><input class="set-inp" id="set-nom" value="Yéyé Market"/></div>
-            <div><label class="set-lbl">Logo (URL)</label><input class="set-inp" id="set-logo" value="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/yeye-logo-transparent.png"/></div>
+            <div>
+              <label class="set-lbl">Logo de la plateforme</label>
+              <div style="display:flex;align-items:center;gap:14px">
+                <div id="logo-preview" style="width:64px;height:64px;border-radius:12px;border:1.5px solid var(--g200);background:var(--g50);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden">
+                  <img id="logo-img" src="" alt="" style="max-width:100%;max-height:100%;object-fit:contain;display:none"/>
+                  <span id="logo-ph" style="font-size:24px">🖼️</span>
+                </div>
+                <div style="flex:1">
+                  <div class="upzone" style="padding:14px"><input type="file" accept="image/*" onchange="uploadLogo(this)"/><div class="upzone-ico" style="font-size:22px">⬆️</div><p style="font-size:12px"><strong>Choisir un logo</strong></p><p style="font-size:11px;color:var(--g400)">PNG transparent recommandé · max 5 Mo</p></div>
+                  <div class="up-prog" id="logo-prog"><div class="up-prog-bar" id="logo-prog-bar"></div></div>
+                </div>
+              </div>
+              <input type="hidden" id="set-logo"/>
+            </div>
             <div><label class="set-lbl">Contact</label><input class="set-inp" id="set-contact" value="+229 00 00 00 00"/></div>
             <div><label class="set-lbl">Email support</label><input class="set-inp" id="set-email" value="support@yeyemarket.bj"/></div>
           </div>
@@ -1696,7 +1709,7 @@ async function loadParametres(){
     if(error)return; // table absente → on garde les valeurs par défaut du HTML
     const p={};(data||[]).forEach(r=>p[r.cle]=r.valeur);
     // Général
-    setVal('set-nom',p.nom_plateforme);setVal('set-logo',p.logo_url);
+    setVal('set-nom',p.nom_plateforme);setVal('set-logo',p.logo_url);setLogoPreview(p.logo_url);
     setVal('set-contact',p.contact);setVal('set-email',p.email_support);
     // Livraison
     setVal('set-rayon',p.rayon_livraison);setVal('set-frais',p.frais_livraison);setVal('set-temps',p.temps_estime);
@@ -1757,6 +1770,30 @@ function refreshQR(){
   if(typeof QRCode==='undefined'){box.innerHTML='<span style="font-size:11px;color:var(--g400)">QR indisponible</span>';return;}
   try{new QRCode(box,{text:url,width:150,height:150,colorDark:'#111827',colorLight:'#ffffff'});}
   catch(e){box.innerHTML='<span style="font-size:11px;color:var(--r)">Erreur QR</span>';}
+}
+function setLogoPreview(url){
+  const img=document.getElementById('logo-img'),ph=document.getElementById('logo-ph');
+  if(!img)return;
+  if(url&&url.trim()){img.src=url;img.style.display='block';if(ph)ph.style.display='none';}
+  else{img.style.display='none';if(ph)ph.style.display='block';}
+}
+async function uploadLogo(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>5*1024*1024){toast('Image max 5MB','err');return;}
+  uploading=true;disableSaveBtns(true);
+  const prog=document.getElementById('logo-prog'),bar=document.getElementById('logo-prog-bar');
+  prog.style.display='block';bar.style.width='40%';
+  const ext=file.name.split('.').pop().toLowerCase();
+  const fname=`logo-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const {error}=await sb.storage.from('yeye-market').upload(fname,file,{cacheControl:'3600',upsert:false});
+  bar.style.width='100%';setTimeout(()=>prog.style.display='none',600);
+  uploading=false;disableSaveBtns(false);
+  input.value='';
+  if(error){toast('Erreur upload: '+error.message,'err');return;}
+  const {data:{publicUrl}}=sb.storage.from('yeye-market').getPublicUrl(fname);
+  document.getElementById('set-logo').value=publicUrl;
+  setLogoPreview(publicUrl);
+  toast('Logo ajouté ✅ — cliquez Enregistrer','ok');
 }
 async function uploadBannerImg(input){  const file=input.files[0];if(!file)return;
   if(file.size>5*1024*1024){toast('Image max 5MB','err');return;}
