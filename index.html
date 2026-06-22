@@ -416,6 +416,40 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .fav-heart:active{transform:scale(.85)}
 .fav-heart.on{color:var(--r)}
 .fav-badge-pulse{animation:none}
+
+/* Liste des restaurants (page client) */
+.resto-row{display:flex;gap:13px;align-items:center;background:#fff;border-radius:16px;padding:12px;box-shadow:var(--shadow);cursor:pointer;margin-bottom:12px;transition:transform .15s}
+.resto-row:active{transform:scale(.98)}
+.resto-row .rr-img{width:74px;height:74px;border-radius:12px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#fde9d6,#f7d3a8);display:flex;align-items:center;justify-content:center;font-size:34px}
+.resto-row .rr-img img{width:100%;height:100%;object-fit:cover}
+.resto-row .rr-body{flex:1;min-width:0}
+.resto-row .rr-name{font-size:15px;font-weight:700;color:var(--g900);margin-bottom:3px}
+.resto-row .rr-meta{font-size:12px;color:var(--g400);display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.resto-row .rr-cuisine{display:inline-block;background:var(--vl);color:var(--vd);font-size:11px;font-weight:600;padding:3px 9px;border-radius:6px;margin-top:7px}
+.resto-row .rr-chev{color:var(--g400);font-size:20px;flex-shrink:0}
+.resto-closed{opacity:.55}
+.resto-pill-closed{background:var(--rl);color:var(--r);font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px}
+
+/* Détail restaurant */
+.rd-cover{height:170px;position:relative;background:linear-gradient(135deg,#1a6b3c,#2d8653);overflow:hidden}
+.rd-cover img{width:100%;height:100%;object-fit:cover}
+.rd-cover::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),transparent 60%)}
+.rd-back{position:absolute;top:14px;left:14px;z-index:3;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.92);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow)}
+.rd-info{position:absolute;bottom:12px;left:16px;right:16px;z-index:2;color:#fff}
+.rd-info h2{font-size:22px;font-weight:800;margin-bottom:4px;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+.rd-info .rd-sub{font-size:12.5px;opacity:.92;display:flex;gap:12px;flex-wrap:wrap;text-shadow:0 1px 4px rgba(0,0,0,.4)}
+.rd-desc{padding:14px 16px;background:#fff;font-size:13px;color:var(--g600);line-height:1.5;border-bottom:8px solid var(--g100)}
+.rd-section-title{font-size:16px;font-weight:700;color:var(--g900);padding:16px 16px 4px}
+.dish{display:flex;gap:13px;align-items:center;background:#fff;padding:13px 16px;border-bottom:1px solid var(--g100)}
+.dish .d-body{flex:1;min-width:0}
+.dish .d-name{font-size:14.5px;font-weight:700;color:var(--g900);margin-bottom:3px}
+.dish .d-desc{font-size:12px;color:var(--g400);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px}
+.dish .d-price{font-size:15px;font-weight:800;color:var(--vd)}
+.dish .d-img{width:84px;height:84px;border-radius:12px;overflow:hidden;flex-shrink:0;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:34px;position:relative}
+.dish .d-img img{width:100%;height:100%;object-fit:cover}
+.dish .d-add{position:absolute;bottom:6px;right:6px;width:30px;height:30px;border-radius:9px;background:var(--vd);color:#fff;border:none;font-size:19px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2)}
+.dish.indispo{opacity:.5}
+.dish.indispo .d-add{display:none}
 </style>
 </head>
 <body>
@@ -474,7 +508,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     <div class="hrow" id="row-promos"><div class="hrow-load">Chargement...</div></div>
 
     <!-- Section 3 : Restaurants populaires -->
-    <div class="section-head section"><h2>🍽️ Restaurants populaires</h2><a onclick="openPartnerMenu()">Tout voir</a></div>
+    <div class="section-head section"><h2>🍽️ Restaurants populaires</h2><a onclick="goPage('restaurants')">Tout voir</a></div>
     <div class="hrow" id="row-restos"><div class="hrow-load">Chargement...</div></div>
 
     <!-- Section 4 : Produits locaux -->
@@ -540,6 +574,20 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     <div class="products-grid" id="favoris-grid" style="margin-top:8px">
       <div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Chargement...</div>
     </div>
+  </div>
+
+  <!-- PAGE LISTE DES RESTAURANTS -->
+  <div class="page" id="page-restaurants">
+    <div class="page-header"><h2>🍽️ Restaurants</h2></div>
+    <div style="padding:12px 16px 0"><input type="text" id="resto-search" placeholder="Rechercher un restaurant..." autocomplete="off" oninput="filterRestos(this.value)" style="width:100%;padding:11px 16px;border:1.5px solid var(--g200);border-radius:12px;font-size:14px;font-family:inherit;outline:none"/></div>
+    <div id="restos-list" style="padding:16px">
+      <div style="text-align:center;padding:32px;color:var(--g400)">Chargement...</div>
+    </div>
+  </div>
+
+  <!-- PAGE DÉTAIL RESTAURANT (plats) -->
+  <div class="page" id="page-resto-detail">
+    <div id="resto-detail-content"></div>
   </div>
 
   <!-- PAGE PROFIL -->
@@ -858,6 +906,7 @@ function goPage(name){
   if(name==='catalogue')loadCatalogue();
   if(name==='profile')loadProfileStats();
   if(name==='favoris')loadFavoris();
+  if(name==='restaurants')loadRestaurantsPage();
   window.scrollTo(0,0);
 }
 
@@ -1086,7 +1135,7 @@ function rCard(r){
   const cuisine=r.cuisine_type||'Cuisine locale';
   const img=r.image_url?`<img src="${r.image_url}" alt="${r.nom}" loading="lazy"/>`:`<div class="rc-emoji">🍽️</div>`;
   const note=r._note?r._note.toFixed(1):'Nouveau';
-  return `<div class="rcard" onclick="openPartnerMenu()">
+  return `<div class="rcard" onclick="openResto('${r.id}')">
     <div class="rc-cover">${img}<span class="rc-badge">🚚 Livraison rapide</span></div>
     <div class="rc-body">
       <div class="rc-name">${r.nom}</div>
@@ -1094,6 +1143,100 @@ function rCard(r){
       <span class="rc-tag">${cuisine}</span>
     </div>
   </div>`;
+}
+
+// ============================================================
+// RESTAURANTS CÔTÉ CLIENT (liste + plats)
+// ============================================================
+let _allRestos=[];
+async function loadRestaurantsPage(){
+  const el=document.getElementById('restos-list');
+  el.innerHTML='<div style="text-align:center;padding:32px;color:var(--g400)">Chargement...</div>';
+  try{
+    const {data}=await sb.from('restaurants').select('id,nom,cuisine_type,adresse,description,image_url,statut').eq('statut','actif').order('nom');
+    _allRestos=data||[];
+    renderRestos(_allRestos);
+  }catch(e){el.innerHTML='<div style="text-align:center;padding:32px;color:var(--r)">Erreur de chargement</div>';}
+}
+function renderRestos(list){
+  const el=document.getElementById('restos-list');
+  if(!list.length){el.innerHTML=`<div style="text-align:center;padding:56px 20px;color:var(--g400)"><div style="font-size:52px;margin-bottom:14px">🍽️</div><p style="font-weight:700;font-size:16px;color:var(--g900)">Aucun restaurant</p><p style="font-size:13px;margin-top:6px">Revenez bientôt, de nouveaux restaurants arrivent !</p></div>`;return;}
+  el.innerHTML=list.map(r=>{
+    const cuisine=r.cuisine_type||'Cuisine locale';
+    const img=r.image_url?`<img src="${r.image_url}" alt="${r.nom}"/>`:'🍽️';
+    return `<div class="resto-row" onclick="openResto('${r.id}')">
+      <div class="rr-img">${img}</div>
+      <div class="rr-body">
+        <div class="rr-name">${r.nom}</div>
+        <div class="rr-meta"><span>⭐ Nouveau</span><span>📍 ${r.adresse?r.adresse.split(',')[0]:'Cotonou'}</span></div>
+        <span class="rr-cuisine">${cuisine}</span>
+      </div>
+      <span class="rr-chev">›</span>
+    </div>`;
+  }).join('');
+}
+function filterRestos(q){
+  q=(q||'').toLowerCase().trim();
+  if(!q){renderRestos(_allRestos);return;}
+  renderRestos(_allRestos.filter(r=>(r.nom||'').toLowerCase().includes(q)||(r.cuisine_type||'').toLowerCase().includes(q)));
+}
+
+async function openResto(id){
+  goPage('resto-detail');
+  const c=document.getElementById('resto-detail-content');
+  c.innerHTML='<div style="text-align:center;padding:64px;color:var(--g400)"><div style="font-size:40px;margin-bottom:12px">⏳</div><p>Chargement du restaurant...</p></div>';
+  try{
+    const {data:r}=await sb.from('restaurants').select('*').eq('id',id).single();
+    if(!r){c.innerHTML='<div style="text-align:center;padding:64px;color:var(--g400)">Restaurant introuvable</div>';return;}
+    const {data:plats}=await sb.from('menus').select('*,categories(nom)').eq('restaurant_id',id).order('created_at',{ascending:false});
+    const cover=r.image_url?`<img src="${r.image_url}" alt="${r.nom}"/>`:'';
+    const cuisine=r.cuisine_type||'Cuisine locale';
+    let dishesHtml='';
+    if(!plats||!plats.length){
+      dishesHtml='<div style="text-align:center;padding:48px 20px;color:var(--g400)"><div style="font-size:44px;margin-bottom:10px">🍽️</div><p style="font-weight:600">Aucun plat disponible</p><p style="font-size:13px;margin-top:4px">Ce restaurant n\'a pas encore publié son menu.</p></div>';
+    }else{
+      dishesHtml=plats.map(m=>{
+        const dispo=m.disponible!==false;
+        const img=m.image_url?`<img src="${m.image_url}" alt="${m.nom}"/>`:'🍲';
+        const addBtn=dispo?`<button class="d-add" onclick="event.stopPropagation();addDishToCart('${m.id}')">+</button>`:'';
+        return `<div class="dish${dispo?'':' indispo'}">
+          <div class="d-body">
+            <div class="d-name">${m.nom}${dispo?'':' <span class="resto-pill-closed">Indisponible</span>'}</div>
+            ${m.description?`<div class="d-desc">${m.description}</div>`:''}
+            <div class="d-price">${fmt(m.prix)} FCFA</div>
+          </div>
+          <div class="d-img">${img}${addBtn}</div>
+        </div>`;
+      }).join('');
+    }
+    // mémorise les plats pour l'ajout panier
+    _restoPlats={};(plats||[]).forEach(m=>_restoPlats[m.id]={...m,_resto:r.nom});
+    c.innerHTML=`
+      <div class="rd-cover">
+        <button class="rd-back" onclick="goPage('restaurants')">
+          <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+        </button>
+        ${cover}
+        <div class="rd-info">
+          <h2>${r.nom}</h2>
+          <div class="rd-sub"><span>🍴 ${cuisine}</span><span>📍 ${r.adresse?r.adresse.split(',')[0]:'Cotonou'}</span><span>🚚 Livraison rapide</span></div>
+        </div>
+      </div>
+      ${r.description?`<div class="rd-desc">${r.description}</div>`:''}
+      <div class="rd-section-title">🍲 Menu</div>
+      ${dishesHtml}
+      <div style="height:24px"></div>`;
+    window.scrollTo(0,0);
+  }catch(e){c.innerHTML='<div style="text-align:center;padding:64px;color:var(--r)">Erreur de chargement</div>';}
+}
+
+let _restoPlats={};
+function addDishToCart(menuId){
+  const m=_restoPlats[menuId];if(!m)return;
+  // Un plat entre dans le même panier. id préfixé pour éviter toute collision avec un produit.
+  const cartId='menu_'+m.id;
+  const item={id:cartId,_isMenu:true,menu_id:m.id,nom:m.nom,prix:m.prix,prix_promo:null,unite:'plat',image_url:m.image_url||null,boutiques:{nom:m._resto||'Restaurant'}};
+  addToCart(cartId,1,item);
 }
 // ============================================================
 // BANNIÈRE D'ACCUEIL (lue depuis la table parametres)
@@ -1437,7 +1580,7 @@ async function onKKiapaySuccess(response){
   toast('💳 Paiement confirmé !','ok');
   const {data:cmd,error}=await sb.from('commandes').insert({client_id:currentUser.id,total:pendingOrder.total,adresse_livraison:pendingOrder.adresse,zone_id:pendingOrder.zone_id,notes:pendingOrder.notes,statut:'confirmee'}).select().single();
   if(error){toast('Erreur: '+error.message,'err');return;}
-  const lignes=pendingOrder.items.map(i=>({commande_id:cmd.id,produit_id:i.id,nom_item:i.nom,prix_unitaire:i.prix_promo||i.prix,quantite:i.qty,sous_total:(i.prix_promo||i.prix)*i.qty}));
+  const lignes=pendingOrder.items.map(i=>({commande_id:cmd.id,produit_id:i._isMenu?null:i.id,nom_item:i.nom,prix_unitaire:i.prix_promo||i.prix,quantite:i.qty,sous_total:(i.prix_promo||i.prix)*i.qty}));
   await sb.from('lignes_commande').insert(lignes);
   await sb.from('paiements').insert({commande_id:cmd.id,montant:pendingOrder.total,methode:'mobile_money',telephone:pendingOrder.momo,statut:'confirme',reference:response.transactionId||''});
   pendingOrder=null;cart={};updateCartBadge();
