@@ -26,7 +26,11 @@
   --r:#dc2626;--rl:#fef2f2;--or:#d97706;--orl:#fffbeb;
   --shadow:0 1px 3px rgba(0,0,0,.08);--shadow-md:0 4px 16px rgba(0,0,0,.1);
   --max:430px;--radius:16px;
+  --theme-dark:#0d3d22;
 }
+.social-links{display:flex;gap:10px;justify-content:center;margin:18px 0 4px}
+.social-btn{width:42px;height:42px;border-radius:12px;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:20px;text-decoration:none;transition:transform .15s}
+.social-btn:active{transform:scale(.9)}
 body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:flex;justify-content:center}
 .app-shell{width:100%;max-width:var(--max);background:#f0f2f5;min-height:100vh;position:relative}
 
@@ -61,7 +65,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .page.active{display:block}
 
 /* HERO BANNER */
-.hero{margin:16px;border-radius:20px;background:linear-gradient(135deg,#0d3d22 0%,#1a6b3c 50%,#2d8653 100%);padding:20px;position:relative;overflow:hidden}
+.hero{margin:16px;border-radius:20px;background:linear-gradient(135deg,var(--theme-dark,#0d3d22) 0%,var(--vd) 55%,var(--v) 100%);padding:20px;position:relative;overflow:hidden}
 .hero::after{content:'🌿';position:absolute;right:-15px;bottom:-15px;font-size:100px;opacity:.1;line-height:1}
 /* Quand une image de fond est définie : voile sombre pour lisibilité */
 .hero.has-img{background-size:cover;background-position:center;transition:background-image .6s ease-in-out}
@@ -679,6 +683,12 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
             <span style="color:var(--g400)">›</span>
           </a>
         </div>
+        <!-- Réseaux sociaux + téléchargement app -->
+        <div id="social-links" class="social-links" style="display:none"></div>
+        <div id="app-download" style="display:none;text-align:center;padding:4px 16px 16px">
+          <p style="font-size:13px;color:var(--g600);font-weight:600;margin-bottom:10px">📲 Télécharger l'application</p>
+          <div id="app-btns" style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"></div>
+        </div>
         <button onclick="doLogout()" class="btn-sec" style="margin:0 0 16px">Se déconnecter</button>
       </div>
     </div>
@@ -1243,6 +1253,68 @@ function addDishToCart(menuId){
 // ============================================================
 let _heroBtnTarget='catalogue';
 function heroBtnGo(){goPage(_heroBtnTarget||'catalogue');}
+// ============================================================
+// THÈME DYNAMIQUE (couleurs, police, réseaux, app) — lu depuis parametres
+// ============================================================
+let _social={},_appLinks={};
+function loadGoogleFont(name){
+  if(!name||name==='Inter')return; // Inter déjà chargée
+  const id='dynfont-'+name.replace(/\s+/g,'');
+  if(document.getElementById(id))return;
+  const l=document.createElement('link');
+  l.id=id;l.rel='stylesheet';
+  l.href='https://fonts.googleapis.com/css2?family='+name.replace(/\s+/g,'+')+':wght@400;500;600;700;800&display=swap';
+  document.head.appendChild(l);
+}
+// éclaircit/assombrit une couleur hex de -100..100
+function shade(hex,pct){
+  hex=(hex||'').replace('#','');if(hex.length!==6)return '#'+hex;
+  let r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+  const f=pct/100;
+  const adj=c=>Math.max(0,Math.min(255,Math.round(pct>0?c+(255-c)*f:c+c*f)));
+  return '#'+[adj(r),adj(g),adj(b)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+async function loadTheme(){
+  try{
+    const {data,error}=await sb.from('parametres').select('cle,valeur').in('cle',['theme_primary','theme_accent','theme_dark','theme_font','social_facebook','social_instagram','social_whatsapp','social_tiktok','app_ios','app_android']);
+    if(error)return;
+    const p={};(data||[]).forEach(r=>p[r.cle]=r.valeur);
+    const root=document.documentElement.style;
+    if(p.theme_primary&&p.theme_primary.trim()){
+      root.setProperty('--vd',p.theme_primary);
+      root.setProperty('--v',shade(p.theme_primary,12));
+      root.setProperty('--v2',shade(p.theme_primary,-12));
+      root.setProperty('--vl',shade(p.theme_primary,86));
+    }
+    if(p.theme_accent&&p.theme_accent.trim()){root.setProperty('--or',p.theme_accent);root.setProperty('--orl',shade(p.theme_accent,90));}
+    if(p.theme_dark&&p.theme_dark.trim())root.setProperty('--theme-dark',p.theme_dark);
+    if(p.theme_font&&p.theme_font.trim()&&p.theme_font!=='Inter'){
+      loadGoogleFont(p.theme_font);
+      document.body.style.fontFamily=`'${p.theme_font}',sans-serif`;
+    }
+    _social={facebook:p.social_facebook,instagram:p.social_instagram,whatsapp:p.social_whatsapp,tiktok:p.social_tiktok};
+    _appLinks={ios:p.app_ios,android:p.app_android};
+    renderSocialLinks();
+  }catch(e){}
+}
+function renderSocialLinks(){
+  const box=document.getElementById('social-links');
+  if(box){
+    const items=[['facebook','📘','Facebook'],['instagram','📷','Instagram'],['whatsapp','💬','WhatsApp'],['tiktok','🎵','TikTok']];
+    const links=items.filter(([k])=>_social[k]&&_social[k].trim());
+    if(!links.length){box.innerHTML='';box.style.display='none';}
+    else{box.style.display='flex';box.innerHTML=links.map(([k,emo,lbl])=>`<a href="${_social[k]}" target="_blank" rel="noopener" class="social-btn" title="${lbl}">${emo}</a>`).join('');}
+  }
+  // Boutons de téléchargement de l'app
+  const dl=document.getElementById('app-download'),btns=document.getElementById('app-btns');
+  if(dl&&btns){
+    let h='';
+    if(_appLinks.ios&&_appLinks.ios.trim())h+=`<a href="${_appLinks.ios}" target="_blank" rel="noopener" class="btn-sec" style="width:auto;padding:11px 18px;margin:0;display:inline-flex;align-items:center;gap:7px">🍎 App Store</a>`;
+    if(_appLinks.android&&_appLinks.android.trim())h+=`<a href="${_appLinks.android}" target="_blank" rel="noopener" class="btn-sec" style="width:auto;padding:11px 18px;margin:0;display:inline-flex;align-items:center;gap:7px">🤖 Google Play</a>`;
+    if(h){dl.style.display='block';btns.innerHTML=h;}else dl.style.display='none';
+  }
+}
+
 async function loadBanner(){
   try{
     const {data,error}=await sb.from('parametres').select('cle,valeur').in('cle',['banner_titre','banner_sous','banner_btn_txt','banner_btn_lien','banner_tag','banner_image','banner_images']);
@@ -1940,6 +2012,7 @@ function toast(msg,type='info'){const t=document.getElementById('toast');t.textC
 checkSession();
 loadCategories();
 loadHomeSections();
+loadTheme();
 loadBanner();
 updateFavBadge();
 

@@ -10,6 +10,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -245,6 +246,10 @@ tr:hover td{background:var(--g50)}
 .ban-thumb img{width:100%;height:100%;object-fit:cover}
 .ban-thumb .ban-x{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .ban-thumb .ban-main{position:absolute;bottom:0;left:0;right:0;background:var(--vd);color:#fff;font-size:8px;font-weight:700;text-align:center;padding:1px}
+.theme-color{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.color-pick{width:54px;height:38px;border:1.5px solid var(--g200);border-radius:10px;cursor:pointer;background:#fff;padding:3px;flex-shrink:0}
+.color-pick::-webkit-color-swatch{border:none;border-radius:6px}
+.color-pick::-webkit-color-swatch-wrapper{padding:0}
 .carte-pin{font-size:22px;line-height:1;text-align:center;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
 .stat-neg{color:var(--r)!important}
 </style>
@@ -795,6 +800,65 @@ tr:hover td{background:var(--g50)}
             <div><div style="display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin-bottom:8px"><span>🍽️ Restaurants</span><span id="cm-resto">10%</span></div><input type="range" class="set-range" min="0" max="25" value="10" oninput="document.getElementById('cm-resto').textContent=this.value+'%'"/></div>
             <div><div style="display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin-bottom:8px"><span>🏪 Vendeurs</span><span id="cm-vend">10%</span></div><input type="range" class="set-range" min="0" max="25" value="10" oninput="document.getElementById('cm-vend').textContent=this.value+'%'"/></div>
             <div><div style="display:flex;justify-content:space-between;font-weight:600;font-size:14px;margin-bottom:8px"><span>🛵 Livreurs</span><span id="cm-liv">8%</span></div><input type="range" class="set-range" min="0" max="25" value="8" oninput="document.getElementById('cm-liv').textContent=this.value+'%'"/></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid-2" style="margin-top:16px">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>🎨 Thème — Couleurs</h2></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:16px">
+            <div class="theme-color"><div><label class="set-lbl">Couleur principale</label><p style="font-size:11px;color:var(--g400)">En-têtes, boutons, navigation</p></div><input type="color" id="set-col-primary" value="#1a6b3c" class="color-pick"/></div>
+            <div class="theme-color"><div><label class="set-lbl">Couleur accent</label><p style="font-size:11px;color:var(--g400)">Promotions, badges, prix</p></div><input type="color" id="set-col-accent" value="#d97706" class="color-pick"/></div>
+            <div class="theme-color"><div><label class="set-lbl">Couleur foncée (dégradés)</label><p style="font-size:11px;color:var(--g400)">Bannière, fonds profonds</p></div><input type="color" id="set-col-dark" value="#0d3d22" class="color-pick"/></div>
+            <p style="font-size:11px;color:var(--g400)">Ces couleurs s'appliquent à toute l'app client après enregistrement.</p>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>🔤 Typographie</h2></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+            <div><label class="set-lbl">Police de l'application</label>
+              <select class="set-inp" id="set-font" onchange="previewFont(this.value)">
+                <option value="Inter">Inter (par défaut)</option>
+                <option value="Poppins">Poppins</option>
+                <option value="Montserrat">Montserrat</option>
+                <option value="Nunito">Nunito</option>
+                <option value="Work Sans">Work Sans</option>
+                <option value="Roboto">Roboto</option>
+                <option value="Lato">Lato</option>
+                <option value="DM Sans">DM Sans</option>
+              </select>
+            </div>
+            <div id="font-preview" style="border:1.5px solid var(--g200);border-radius:10px;padding:14px;background:var(--g50)">
+              <div style="font-size:20px;font-weight:800;color:var(--g900)">Yéyé Market</div>
+              <div style="font-size:13px;color:var(--g600);margin-top:4px">Le meilleur de chez nous, livré chez vous — 1 234 FCFA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid-2" style="margin-top:16px">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>📱 Réseaux sociaux</h2></div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:14px">
+            <div><label class="set-lbl">📘 Facebook</label><input class="set-inp" id="set-fb" placeholder="https://facebook.com/yeyemarket"/></div>
+            <div><label class="set-lbl">📷 Instagram</label><input class="set-inp" id="set-ig" placeholder="https://instagram.com/yeyemarket"/></div>
+            <div><label class="set-lbl">💬 WhatsApp</label><input class="set-inp" id="set-wa" placeholder="https://wa.me/22900000000"/></div>
+            <div><label class="set-lbl">🎵 TikTok</label><input class="set-inp" id="set-tk" placeholder="https://tiktok.com/@yeyemarket"/></div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>📲 Application mobile</h2></div>
+          <div class="card-body">
+            <div style="display:flex;flex-direction:column;gap:14px">
+              <div><label class="set-lbl">🍎 Lien App Store (iOS)</label><input class="set-inp" id="set-ios" placeholder="https://apps.apple.com/..." oninput="refreshQR()"/></div>
+              <div><label class="set-lbl">🤖 Lien Google Play (Android)</label><input class="set-inp" id="set-android" placeholder="https://play.google.com/..." oninput="refreshQR()"/></div>
+            </div>
+            <div style="margin-top:16px;text-align:center">
+              <label class="set-lbl" style="text-align:left">QR Code (généré automatiquement)</label>
+              <div id="qr-box" style="margin:10px auto 0;width:160px;height:160px;display:flex;align-items:center;justify-content:center;border:1.5px dashed var(--g200);border-radius:12px;background:#fff"></div>
+              <p style="font-size:11px;color:var(--g400);margin-top:8px">Pointe vers le lien Android, sinon iOS. Affiché côté client pour télécharger l'app.</p>
+            </div>
           </div>
         </div>
       </div>
@@ -1649,6 +1713,17 @@ async function loadParametres(){
     if(p.banner_images&&p.banner_images.trim())imgs=p.banner_images.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
     else if(p.banner_image&&p.banner_image.trim())imgs=[p.banner_image.trim()];
     _banImgs=imgs;renderBanGallery();
+    // Thème
+    setVal('set-col-primary',p.theme_primary||'#1a6b3c');
+    setVal('set-col-accent',p.theme_accent||'#d97706');
+    setVal('set-col-dark',p.theme_dark||'#0d3d22');
+    if(p.theme_font){setVal('set-font',p.theme_font);previewFont(p.theme_font);}
+    // Réseaux sociaux
+    setVal('set-fb',p.social_facebook);setVal('set-ig',p.social_instagram);
+    setVal('set-wa',p.social_whatsapp);setVal('set-tk',p.social_tiktok);
+    // Application
+    setVal('set-ios',p.app_ios);setVal('set-android',p.app_android);
+    refreshQR();
   }catch(e){}
 }
 // --- Galerie diaporama bannière ---
@@ -1658,8 +1733,32 @@ function renderBanGallery(){
   g.innerHTML=_banImgs.map((url,i)=>`<div class="ban-thumb"><img src="${url}" alt=""/><button class="ban-x" onclick="removeBanImg(${i})">✕</button>${i===0?'<div class="ban-main">PRINCIPALE</div>':''}</div>`).join('');
 }
 function removeBanImg(i){_banImgs.splice(i,1);renderBanGallery();}
-async function uploadBannerImg(input){
-  const file=input.files[0];if(!file)return;
+
+// --- Typographie : aperçu en direct ---
+const _loadedFonts=new Set(['Inter']);
+function loadGoogleFont(name){
+  if(!name||_loadedFonts.has(name))return;
+  const l=document.createElement('link');l.rel='stylesheet';
+  l.href='https://fonts.googleapis.com/css2?family='+name.replace(/ /g,'+')+':wght@400;500;600;700;800&display=swap';
+  document.head.appendChild(l);_loadedFonts.add(name);
+}
+function previewFont(name){
+  loadGoogleFont(name);
+  const box=document.getElementById('font-preview');
+  if(box)box.style.fontFamily=`'${name}',sans-serif`;
+}
+
+// --- QR Code de l'application ---
+function refreshQR(){
+  const box=document.getElementById('qr-box');if(!box)return;
+  const url=(document.getElementById('set-android')?.value||'').trim()||(document.getElementById('set-ios')?.value||'').trim();
+  box.innerHTML='';
+  if(!url){box.innerHTML='<span style="font-size:11px;color:var(--g400)">Ajoutez un lien</span>';return;}
+  if(typeof QRCode==='undefined'){box.innerHTML='<span style="font-size:11px;color:var(--g400)">QR indisponible</span>';return;}
+  try{new QRCode(box,{text:url,width:150,height:150,colorDark:'#111827',colorLight:'#ffffff'});}
+  catch(e){box.innerHTML='<span style="font-size:11px;color:var(--r)">Erreur QR</span>';}
+}
+async function uploadBannerImg(input){  const file=input.files[0];if(!file)return;
   if(file.size>5*1024*1024){toast('Image max 5MB','err');return;}
   uploading=true;disableSaveBtns(true);
   const prog=document.getElementById('ban-prog'),bar=document.getElementById('ban-prog-bar');
@@ -1695,7 +1794,17 @@ async function saveParametres(){
     {cle:'banner_btn_lien',valeur:v('ban-btn-lien')},
     {cle:'banner_tag',valeur:v('ban-tag')},
     {cle:'banner_image',valeur:_banImgs[0]||''},
-    {cle:'banner_images',valeur:_banImgs.join('\n')}
+    {cle:'banner_images',valeur:_banImgs.join('\n')},
+    {cle:'theme_primary',valeur:v('set-col-primary')},
+    {cle:'theme_accent',valeur:v('set-col-accent')},
+    {cle:'theme_dark',valeur:v('set-col-dark')},
+    {cle:'theme_font',valeur:v('set-font')},
+    {cle:'social_facebook',valeur:v('set-fb')},
+    {cle:'social_instagram',valeur:v('set-ig')},
+    {cle:'social_whatsapp',valeur:v('set-wa')},
+    {cle:'social_tiktok',valeur:v('set-tk')},
+    {cle:'app_ios',valeur:v('set-ios')},
+    {cle:'app_android',valeur:v('set-android')}
   ];
   const btn=document.getElementById('set-save-btn');if(btn){btn.disabled=true;btn.textContent='⏳ Enregistrement...';}
   const {error}=await sb.from('parametres').upsert(rows,{onConflict:'cle'});
