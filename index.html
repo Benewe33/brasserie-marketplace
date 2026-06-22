@@ -64,7 +64,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .hero{margin:16px;border-radius:20px;background:linear-gradient(135deg,#0d3d22 0%,#1a6b3c 50%,#2d8653 100%);padding:20px;position:relative;overflow:hidden}
 .hero::after{content:'🌿';position:absolute;right:-15px;bottom:-15px;font-size:100px;opacity:.1;line-height:1}
 /* Quand une image de fond est définie : voile sombre pour lisibilité */
-.hero.has-img{background-size:cover;background-position:center}
+.hero.has-img{background-size:cover;background-position:center;transition:background-image .6s ease-in-out}
 .hero.has-img::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(13,61,34,.78),rgba(26,107,60,.55));z-index:0}
 .hero.has-img::after{display:none}
 .hero.has-img > *{position:relative;z-index:1}
@@ -1245,18 +1245,41 @@ let _heroBtnTarget='catalogue';
 function heroBtnGo(){goPage(_heroBtnTarget||'catalogue');}
 async function loadBanner(){
   try{
-    const {data,error}=await sb.from('parametres').select('cle,valeur').in('cle',['banner_titre','banner_sous','banner_btn_txt','banner_btn_lien','banner_tag','banner_image']);
+    const {data,error}=await sb.from('parametres').select('cle,valeur').in('cle',['banner_titre','banner_sous','banner_btn_txt','banner_btn_lien','banner_tag','banner_image','banner_images']);
     if(error)return; // table absente → on garde le banner par défaut
     const p={};(data||[]).forEach(r=>p[r.cle]=r.valeur);
-    const set=(id,v)=>{if(v&&v.trim()){const el=document.getElementById(id);if(el)el.textContent=v;}};
+    // Applique la valeur si la clé existe en base — même vide (permet de masquer un texte).
+    const set=(id,v)=>{if(v===undefined||v===null)return;const el=document.getElementById(id);if(el)el.textContent=v;};
     set('hero-tag',p.banner_tag);set('hero-titre',p.banner_titre);set('hero-sous',p.banner_sous);
-    if(p.banner_btn_txt&&p.banner_btn_txt.trim()){const b=document.getElementById('hero-btn');if(b)b.textContent=p.banner_btn_txt;}
+    // Masque les éléments devenus vides pour un rendu propre
+    [['hero-tag',p.banner_tag],['hero-titre',p.banner_titre],['hero-sous',p.banner_sous]].forEach(([id,v])=>{
+      if(v!==undefined&&v!==null){const el=document.getElementById(id);if(el)el.style.display=(v.trim()==='')?'none':'';}
+    });
+    if(p.banner_btn_txt!==undefined&&p.banner_btn_txt!==null){const b=document.getElementById('hero-btn');if(b){b.textContent=p.banner_btn_txt;b.style.display=(p.banner_btn_txt.trim()==='')?'none':'';}}
     if(p.banner_btn_lien)_heroBtnTarget=p.banner_btn_lien;
-    if(p.banner_image&&p.banner_image.trim()){
-      const h=document.getElementById('hero-banner');
-      if(h){h.classList.add('has-img');h.style.backgroundImage=`url("${p.banner_image}")`;}
+
+    // Diaporama : liste d'images séparées par des sauts de ligne ou des virgules
+    let imgs=[];
+    if(p.banner_images&&p.banner_images.trim()){
+      imgs=p.banner_images.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
+    }
+    if(!imgs.length&&p.banner_image&&p.banner_image.trim()){imgs=[p.banner_image.trim()];}
+    const h=document.getElementById('hero-banner');
+    if(h&&imgs.length){
+      h.classList.add('has-img');
+      h.style.backgroundImage=`url("${imgs[0]}")`;
+      if(imgs.length>1)startBannerSlideshow(h,imgs);
     }
   }catch(e){}
+}
+let _bannerTimer=null;
+function startBannerSlideshow(h,imgs){
+  if(_bannerTimer)clearInterval(_bannerTimer);
+  let i=0;
+  _bannerTimer=setInterval(()=>{
+    i=(i+1)%imgs.length;
+    h.style.backgroundImage=`url("${imgs[i]}")`;
+  },4000); // change d'image toutes les 4 s
 }
 
 async function loadHomeSections(){  const base=()=>sb.from('produits').select(PROD_COLS).eq('actif',true).gt('stock',0);
