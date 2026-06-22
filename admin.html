@@ -246,6 +246,14 @@ tr:hover td{background:var(--g50)}
 .ban-thumb img{width:100%;height:100%;object-fit:cover}
 .ban-thumb .ban-x{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:11px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
 .ban-thumb .ban-main{position:absolute;bottom:0;left:0;right:0;background:var(--vd);color:#fff;font-size:8px;font-weight:700;text-align:center;padding:1px}
+.var-list{display:flex;flex-direction:column;gap:8px;margin-bottom:8px}
+.var-row{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:6px;align-items:center;background:var(--g50);border:1px solid var(--g200);border-radius:10px;padding:8px}
+.var-row input{padding:7px 9px;border:1px solid var(--g200);border-radius:8px;font-size:12px;font-family:inherit;outline:none;width:100%;background:#fff}
+.var-row input:focus{border-color:var(--vd)}
+.var-row .var-del{width:30px;height:30px;border:none;background:var(--rl);color:var(--r);border-radius:8px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;padding:0}
+.var-add-btn{background:var(--vl);color:var(--vd);border:1px dashed var(--vd);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;width:100%}
+.var-add-btn:hover{background:#dcefe1}
+.var-head{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:6px;font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.3px;padding:0 8px}
 .theme-color{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .color-pick{width:54px;height:38px;border:1.5px solid var(--g200);border-radius:10px;cursor:pointer;background:#fff;padding:3px;flex-shrink:0}
 .color-pick::-webkit-color-swatch{border:none;border-radius:6px}
@@ -930,6 +938,12 @@ tr:hover td{background:var(--g50)}
           <p style="font-size:11px;color:var(--g400);margin-top:6px">Si aucune case n'est cochée, le produit reste classé automatiquement (promo, nouveauté, etc.).</p>
         </div>
         <div class="fgm fcol">
+          <label>🎨 Variantes <span style="font-weight:400;color:var(--g400)">(tailles, couleurs, poids — prix &amp; stock par déclinaison)</span></label>
+          <div id="var-list" class="var-list"></div>
+          <button type="button" class="var-add-btn" onclick="addVariantRow()">＋ Ajouter une variante</button>
+          <p style="font-size:11px;color:var(--g400);margin-top:6px">Laissez vide pour un produit simple. Si vous ajoutez des variantes, le client choisira une combinaison et c'est le prix/stock de la variante qui s'applique.</p>
+        </div>
+        <div class="fgm fcol">
           <label>Photo</label>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
             <div>
@@ -1352,6 +1366,7 @@ function openProd(){
   ['prod-nom','prod-prix','prod-promo','prod-stock','prod-desc'].forEach(id=>document.getElementById(id).value='');
   const og=document.getElementById('prod-origine');if(og)og.value='';
   document.querySelectorAll('.prod-section').forEach(c=>c.checked=false);
+  renderVariantRows([]);
   document.getElementById('prod-url').value='';
   document.getElementById('prod-prev').style.display='none';
   document.getElementById('prod-cur').style.display='none';
@@ -1374,6 +1389,7 @@ function editProd(p){
   const og=document.getElementById('prod-origine');if(og)og.value=p.origine||'';
   const secs=Array.isArray(p.sections)?p.sections:[];
   document.querySelectorAll('.prod-section').forEach(c=>c.checked=secs.includes(c.value));
+  loadVariantsForEdit(p.id);
   document.getElementById('prod-url').value=p.image_url||'';
   document.getElementById('prod-prev').style.display='none';
   const cur=document.getElementById('prod-cur');
@@ -1409,10 +1425,75 @@ async function saveProd(){
     image_url_2:document.getElementById('prod-url-2').value||null,
     actif:true
   };
-  const {error}=id?await sb.from('produits').update(payload).eq('id',id):await sb.from('produits').insert(payload);
+  const {data:saved,error}=id
+    ?await sb.from('produits').update(payload).eq('id',id).select('id').single()
+    :await sb.from('produits').insert(payload).select('id').single();
   if(error){toast('Erreur: '+error.message,'err');return;}
+  const prodId=saved?.id||id;
+  await syncVariants(prodId);
   toast(id?'✅ Produit modifié !':'✅ Produit ajouté !','ok');
   closeModal('m-prod');loadProds();
+}
+
+// ============================================================
+// VARIANTES (tailles, couleurs, poids — prix & stock par déclinaison)
+// ============================================================
+function variantRowHTML(v={}){
+  return `<div class="var-row">
+    <input type="text" class="v-taille" placeholder="Taille" value="${v.taille||''}"/>
+    <input type="text" class="v-couleur" placeholder="Couleur" value="${v.couleur||''}"/>
+    <input type="text" class="v-poids" placeholder="Poids" value="${v.poids||''}"/>
+    <input type="number" class="v-prix" placeholder="Prix" value="${v.prix??''}"/>
+    <input type="number" class="v-stock" placeholder="Stock" value="${v.stock??''}"/>
+    <button type="button" class="var-del" onclick="this.closest('.var-row').remove()">✕</button>
+  </div>`;
+}
+function renderVariantRows(list){
+  const box=document.getElementById('var-list');if(!box)return;
+  const head='<div class="var-head"><span>Taille</span><span>Couleur</span><span>Poids</span><span>Prix</span><span>Stock</span><span></span></div>';
+  if(!list||!list.length){box.innerHTML='';return;}
+  box.innerHTML=head+list.map(variantRowHTML).join('');
+}
+function addVariantRow(){
+  const box=document.getElementById('var-list');if(!box)return;
+  if(!box.querySelector('.var-head'))box.innerHTML='<div class="var-head"><span>Taille</span><span>Couleur</span><span>Poids</span><span>Prix</span><span>Stock</span><span></span></div>';
+  box.insertAdjacentHTML('beforeend',variantRowHTML());
+}
+async function loadVariantsForEdit(prodId){
+  renderVariantRows([]);
+  try{
+    const {data}=await sb.from('variantes').select('*').eq('produit_id',prodId).order('created_at',{ascending:true});
+    if(data&&data.length)renderVariantRows(data);
+  }catch(e){}
+}
+function collectVariants(){
+  const rows=[...document.querySelectorAll('#var-list .var-row')];
+  const out=[];
+  rows.forEach(r=>{
+    const taille=r.querySelector('.v-taille').value.trim();
+    const couleur=r.querySelector('.v-couleur').value.trim();
+    const poids=r.querySelector('.v-poids').value.trim();
+    const prix=parseFloat(r.querySelector('.v-prix').value);
+    const stock=parseInt(r.querySelector('.v-stock').value);
+    // une variante doit avoir au moins un attribut + un prix valide
+    if((taille||couleur||poids)&&!isNaN(prix)){
+      const nom=[taille,couleur,poids].filter(Boolean).join(' · ');
+      out.push({taille:taille||null,couleur:couleur||null,poids:poids||null,nom,prix,stock:isNaN(stock)?0:stock,actif:true});
+    }
+  });
+  return out;
+}
+async function syncVariants(prodId){
+  if(!prodId)return;
+  const variants=collectVariants();
+  // Remplacement simple : on efface les anciennes, on insère les nouvelles
+  try{
+    await sb.from('variantes').delete().eq('produit_id',prodId);
+    if(variants.length){
+      const rows=variants.map(v=>({...v,produit_id:prodId}));
+      await sb.from('variantes').insert(rows);
+    }
+  }catch(e){console.error('Variantes:',e.message);}
 }
 
 async function delProd(id){

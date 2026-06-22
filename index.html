@@ -31,6 +31,13 @@
 .social-links{display:flex;gap:10px;justify-content:center;margin:18px 0 4px}
 .social-btn{width:42px;height:42px;border-radius:12px;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:20px;text-decoration:none;transition:transform .15s}
 .social-btn:active{transform:scale(.9)}
+.var-group{margin-bottom:12px}
+.var-group-label{font-size:12px;font-weight:700;color:var(--g600);margin-bottom:7px}
+.var-chips{display:flex;flex-wrap:wrap;gap:8px}
+.var-chip{padding:8px 14px;border:1.5px solid var(--g200);border-radius:10px;background:#fff;font-size:13px;font-weight:600;color:var(--g600);cursor:pointer;transition:all .15s}
+.var-chip:active{transform:scale(.95)}
+.var-chip.sel{border-color:var(--vd);background:var(--vl);color:var(--vd)}
+.var-chip.disabled{opacity:.35;cursor:not-allowed;text-decoration:line-through}
 body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:flex;justify-content:center}
 .app-shell{width:100%;max-width:var(--max);background:#f0f2f5;min-height:100vh;position:relative}
 
@@ -755,6 +762,8 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     </div>
     <!-- Stock -->
     <div id="prod-modal-stock" style="font-size:12px;margin-bottom:12px"></div>
+    <!-- Variantes (tailles/couleurs/poids) -->
+    <div id="prod-modal-variants" style="display:none;margin-bottom:14px"></div>
     <div id="prod-modal-desc" class="prod-modal-desc"></div>
     <!-- Infos produit -->
     <div id="prod-modal-infos" style="background:var(--g50);border-radius:12px;padding:12px;margin-bottom:16px;display:none">
@@ -838,6 +847,7 @@ const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
 let cart={},allProducts=[],currentProduct=null,currentUser=null;
+let _prodVariants=[],_selVariant=null,_selAttrs={taille:null,couleur:null,poids:null};
 let _catFilter=null;
 
 // ============================================================
@@ -1423,6 +1433,8 @@ function doSearchCat(q){
 // MODAL PRODUIT
 function openProdModal(p){
   currentProduct=p;
+  _prodVariants=[];_selVariant=null;_selAttrs={taille:null,couleur:null,poids:null};
+  document.getElementById('prod-modal-variants').style.display='none';
   document.getElementById('modal-qty').textContent='1';
   carouselImages=[];
   if(p.image_url)carouselImages.push(p.image_url);
@@ -1494,6 +1506,76 @@ function openProdModal(p){
   document.getElementById('prod-modal').classList.add('open');
   document.getElementById('modal-bg').classList.add('open');
   loadAvis(p.id);
+  loadProdVariants(p.id);
+}
+
+// ============================================================
+// VARIANTES côté client (sélection taille/couleur/poids)
+// ============================================================
+async function loadProdVariants(prodId){
+  try{
+    const {data}=await sb.from('variantes').select('*').eq('produit_id',prodId).eq('actif',true).order('created_at',{ascending:true});
+    _prodVariants=data||[];
+  }catch(e){_prodVariants=[];}
+  renderProdVariants();
+}
+function _uniq(arr){return [...new Set(arr.filter(Boolean))];}
+function renderProdVariants(){
+  const wrap=document.getElementById('prod-modal-variants');
+  if(!wrap)return;
+  if(!_prodVariants.length){wrap.style.display='none';return;}
+  wrap.style.display='block';
+  const tailles=_uniq(_prodVariants.map(v=>v.taille));
+  const couleurs=_uniq(_prodVariants.map(v=>v.couleur));
+  const poids=_uniq(_prodVariants.map(v=>v.poids));
+  let html='';
+  const group=(label,attr,values)=>{
+    if(!values.length)return '';
+    let h=`<div class="var-group"><div class="var-group-label">${label}</div><div class="var-chips">`;
+    h+=values.map(val=>{
+      const sel=_selAttrs[attr]===val?' sel':'';
+      // une option est possible s'il existe au moins une variante compatible avec les autres choix
+      const possible=_prodVariants.some(v=>v[attr]===val
+        && (_selAttrs.taille===null||attr==='taille'||v.taille===_selAttrs.taille)
+        && (_selAttrs.couleur===null||attr==='couleur'||v.couleur===_selAttrs.couleur)
+        && (_selAttrs.poids===null||attr==='poids'||v.poids===_selAttrs.poids));
+      const dis=possible?'':' disabled';
+      return `<button class="var-chip${sel}${dis}" onclick="selectVariantAttr('${attr}','${(val+'').replace(/'/g,"\\'")}')">${val}</button>`;
+    }).join('');
+    h+='</div></div>';return h;
+  };
+  html+=group('Taille','taille',tailles);
+  html+=group('Couleur','couleur',couleurs);
+  html+=group('Poids','poids',poids);
+  wrap.innerHTML=html;
+  resolveSelectedVariant();
+}
+function selectVariantAttr(attr,val){
+  _selAttrs[attr]=(_selAttrs[attr]===val)?null:val;
+  renderProdVariants();
+}
+function resolveSelectedVariant(){
+  // Trouve la variante correspondant exactement aux attributs présents
+  const match=_prodVariants.find(v=>
+    (!_prodVariants.some(x=>x.taille)||v.taille===_selAttrs.taille)&&
+    (!_prodVariants.some(x=>x.couleur)||v.couleur===_selAttrs.couleur)&&
+    (!_prodVariants.some(x=>x.poids)||v.poids===_selAttrs.poids)
+  );
+  _selVariant=match||null;
+  const addBtn=document.getElementById('prod-modal-add-btn');
+  const priceEl=document.getElementById('prod-modal-price');
+  const stockEl=document.getElementById('prod-modal-stock');
+  if(_selVariant){
+    const pr=_selVariant.prix_promo||_selVariant.prix;
+    priceEl.textContent=fmt(pr)+' FCFA';
+    if(_selVariant.stock<=0){stockEl.innerHTML='<span style="color:#ef4444;font-weight:600">❌ Variante en rupture</span>';addBtn.disabled=true;addBtn.style.opacity='.5';}
+    else if(_selVariant.stock<=5){stockEl.innerHTML='<span style="color:#f59e0b;font-weight:600">⚠️ Plus que '+_selVariant.stock+' disponible'+(_selVariant.stock>1?'s':'')+'</span>';addBtn.disabled=false;addBtn.style.opacity='1';}
+    else{stockEl.innerHTML='<span style="color:#16a34a;font-weight:600">✅ En stock</span>';addBtn.disabled=false;addBtn.style.opacity='1';}
+  } else {
+    // combinaison incomplète : on invite à choisir
+    stockEl.innerHTML='<span style="color:var(--g400);font-weight:600">Choisissez une combinaison</span>';
+    addBtn.disabled=true;addBtn.style.opacity='.5';
+  }
 }
 
 function shareProd(){
@@ -1554,6 +1636,22 @@ function addToCart(id,qty,prod=null){
 
 function addToCartFromModal(){
   const qty=parseInt(document.getElementById('modal-qty').textContent);
+  const p=currentProduct;
+  if(_prodVariants.length){
+    if(!_selVariant){toast('Choisissez une variante','err');return;}
+    const cartId=p.id+'::'+_selVariant.id;
+    const item={
+      id:cartId,_variantId:_selVariant.id,produit_id:p.id,
+      nom:p.nom+' ('+(_selVariant.nom||'variante')+')',
+      variante_nom:_selVariant.nom||null,
+      prix:_selVariant.prix,prix_promo:_selVariant.prix_promo||null,
+      unite:p.unite,image_url:p.image_url||null,
+      boutiques:p.boutiques||null,_stock:_selVariant.stock
+    };
+    if(cart[cartId])cart[cartId].qty+=qty;else cart[cartId]={...item,qty};
+    updateCartBadge();toast('✅ Ajouté au panier','ok');closeProdModal();
+    return;
+  }
   addToCart(currentProduct.id,qty,currentProduct);
   closeProdModal();
 }
@@ -1675,8 +1773,17 @@ async function onKKiapaySuccess(response){
   toast('💳 Paiement confirmé !','ok');
   const {data:cmd,error}=await sb.from('commandes').insert({client_id:currentUser.id,total:pendingOrder.total,adresse_livraison:pendingOrder.adresse,zone_id:pendingOrder.zone_id,notes:pendingOrder.notes,statut:'confirmee'}).select().single();
   if(error){toast('Erreur: '+error.message,'err');return;}
-  const lignes=pendingOrder.items.map(i=>({commande_id:cmd.id,produit_id:i._isMenu?null:i.id,nom_item:i.nom,prix_unitaire:i.prix_promo||i.prix,quantite:i.qty,sous_total:(i.prix_promo||i.prix)*i.qty}));
+  const lignes=pendingOrder.items.map(i=>({commande_id:cmd.id,produit_id:i._isMenu?null:(i.produit_id||i.id),variante_id:i._variantId||null,variante_nom:i.variante_nom||null,nom_item:i.nom,prix_unitaire:i.prix_promo||i.prix,quantite:i.qty,sous_total:(i.prix_promo||i.prix)*i.qty}));
   await sb.from('lignes_commande').insert(lignes);
+  // Décrémenter le stock des variantes commandées
+  for(const i of pendingOrder.items){
+    if(i._variantId){
+      try{
+        const newStock=Math.max(0,(i._stock||0)-i.qty);
+        await sb.from('variantes').update({stock:newStock}).eq('id',i._variantId);
+      }catch(e){}
+    }
+  }
   await sb.from('paiements').insert({commande_id:cmd.id,montant:pendingOrder.total,methode:'mobile_money',telephone:pendingOrder.momo,statut:'confirme',reference:response.transactionId||''});
   pendingOrder=null;cart={};updateCartBadge();
   toast('🎉 Commande confirmée !','ok');goPage('orders');
