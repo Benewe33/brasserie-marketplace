@@ -912,6 +912,7 @@ let _deliveryFee=500;
 
 // NAVIGATION
 function goPage(name){
+  if(typeof _trackPage!=='undefined'){_trackPage=name;if(typeof trackPing==='function')trackPing();}
   // Quitte le suivi : on coupe la carte et l'abonnement position
   if(name!=='tracking'){
     if(typeof fermerMapSuivi==='function')fermerMapSuivi();
@@ -1422,6 +1423,8 @@ function doSearch(q){
   if(!q.trim()){renderProducts(allProducts,'products-grid');return;}
   const f=allProducts.filter(p=>p.nom.toLowerCase().includes(q.toLowerCase())||(p.description||'').toLowerCase().includes(q.toLowerCase()));
   renderProducts(f,'products-grid');
+  clearTimeout(window._searchTrackT);
+  window._searchTrackT=setTimeout(()=>{if(q.trim().length>=2&&typeof trackEvent==='function')trackEvent('recherche',{valeur:q.trim().slice(0,80)});},1200);
 }
 
 function doSearchCat(q){
@@ -1507,6 +1510,7 @@ function openProdModal(p){
   document.getElementById('modal-bg').classList.add('open');
   loadAvis(p.id);
   loadProdVariants(p.id);
+  if(typeof trackEvent==='function')trackEvent('vue_produit',{produit_id:p.id,produit_nom:p.nom});
 }
 
 // ============================================================
@@ -1632,6 +1636,7 @@ function addToCart(id,qty,prod=null){
   if(!prod)return;
   if(cart[id])cart[id].qty+=qty;else cart[id]={...prod,qty};
   updateCartBadge();toast('✅ Ajouté au panier','ok');
+  if(typeof trackEvent==='function')trackEvent('ajout_panier',{produit_id:prod.id,produit_nom:prod.nom});
 }
 
 function addToCartFromModal(){
@@ -2122,6 +2127,42 @@ loadHomeSections();
 loadTheme();
 loadBanner();
 updateFavBadge();
+
+// ============================================================
+// ANALYTIQUE — tracking visiteur + comportement (discret)
+// ============================================================
+const _sessionId=(()=>{
+  try{let s=sessionStorage.getItem('yeye_sid');if(!s){s='s_'+Date.now()+'_'+Math.random().toString(36).slice(2,9);sessionStorage.setItem('yeye_sid',s);}return s;}
+  catch(e){return 's_'+Date.now()+'_'+Math.random().toString(36).slice(2,9);}
+})();
+let _trackPage='home';
+async function trackPing(){
+  try{
+    await sb.from('visites').upsert({
+      session_id:_sessionId,
+      user_id:currentUser?.id||null,
+      page:_trackPage,
+      user_agent:(navigator.userAgent||'').slice(0,180),
+      last_seen:new Date().toISOString()
+    },{onConflict:'session_id'});
+  }catch(e){}
+}
+async function trackEvent(type,extra={}){
+  try{
+    await sb.from('evenements').insert({
+      session_id:_sessionId,
+      user_id:currentUser?.id||null,
+      type,
+      produit_id:extra.produit_id||null,
+      produit_nom:extra.produit_nom||null,
+      valeur:extra.valeur||null
+    });
+  }catch(e){}
+}
+// Ping initial + toutes les 30 s tant que l'onglet est visible
+trackPing();
+setInterval(()=>{if(document.visibilityState==='visible')trackPing();},30000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')trackPing();});
 
 // ============================================================
 // SPLASH SCREEN

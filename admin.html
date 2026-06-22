@@ -355,6 +355,9 @@ tr:hover td{background:var(--g50)}
       <button class="sb-btn" onclick="go('carte',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg><span class="sb-label">Carte temps réel</span> <span class="sb-badge" style="background:linear-gradient(90deg,#e9a23b,#d97706);color:#fff">PRO</span>
       </button>
+      <button class="sb-btn" onclick="go('live',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M16.24 7.76a6 6 0 010 8.49M7.76 16.24a6 6 0 010-8.49M19.07 4.93a10 10 0 010 14.14M4.93 19.07a10 10 0 010-14.14"/></svg><span class="sb-label">Temps réel</span> <span class="sb-badge" id="b-live" style="background:#dc2626;color:#fff;display:none">0</span>
+      </button>
       <div class="sb-sec">Système</div>
       <button class="sb-btn" onclick="go('parametres',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg><span class="sb-label">Paramètres</span>
@@ -886,6 +889,33 @@ tr:hover td{background:var(--g50)}
       <div style="margin-top:18px"><button class="btn-primary" id="set-save-btn" onclick="saveParametres()" style="padding:12px 28px">💾 Enregistrer les modifications</button></div>
     </div>
 
+    <!-- ============ TEMPS RÉEL (visiteurs + comportement) ============ -->
+    <div class="sec" id="sec-live">
+      <div class="kpi-grid">
+        <div class="kpi" style="border-color:#dc2626"><div class="kpi-ico">🟢</div><div class="kpi-val" id="live-online">—</div><div class="kpi-label">Visiteurs en ligne (5 min)</div></div>
+        <div class="kpi" style="border-color:var(--vd)"><div class="kpi-ico">👥</div><div class="kpi-val" id="live-today">—</div><div class="kpi-label">Visiteurs aujourd'hui</div></div>
+        <div class="kpi" style="border-color:#2563eb"><div class="kpi-ico">👀</div><div class="kpi-val" id="live-views">—</div><div class="kpi-label">Vues produits (aujourd'hui)</div></div>
+        <div class="kpi" style="border-color:#d97706"><div class="kpi-ico">🔎</div><div class="kpi-val" id="live-search">—</div><div class="kpi-label">Recherches (aujourd'hui)</div></div>
+      </div>
+      <div class="stats-grid-2">
+        <div class="panel" style="background:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow)">
+          <h3 style="font-size:15px;color:var(--g900);margin-bottom:14px;display:flex;align-items:center;gap:8px">🔥 Produits les plus consultés <span style="font-size:11px;color:var(--g400);font-weight:500">· 7 derniers jours</span></h3>
+          <div id="live-top-prods" style="font-size:13px">Chargement...</div>
+        </div>
+        <div class="panel" style="background:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow)">
+          <h3 style="font-size:15px;color:var(--g900);margin-bottom:14px">🔎 Recherches fréquentes</h3>
+          <div id="live-top-search" style="font-size:13px">Chargement...</div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-head"><h2>📡 Activité en direct</h2><span id="live-refresh" style="font-size:12px;color:var(--g400)">actualisé en continu</span></div>
+        <div class="card-body"><div class="tbl-wrap">
+          <table><thead><tr><th>Quand</th><th>Visiteur</th><th>Action</th><th>Détail</th></tr></thead>
+          <tbody id="live-feed"><tr><td colspan="4" style="text-align:center;color:var(--g400);padding:24px">Chargement...</td></tr></tbody></table>
+        </div></div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -1200,14 +1230,14 @@ function showApp(){
 }
 
 // NAVIGATION
-const titles={dashboard:'Tableau de bord',categories:'Catégories',produits:'Produits',menus:'Menus restaurants',commandes:'Commandes',livraisons:'Livraisons',vendeurs:'Vendeurs',restaurants:'Restaurants',livreurs:'Livreurs',comptes:'Créer des comptes',support:'Support & Messagerie',zones:'Zones de livraison',rapports:'Rapports & Ventes',paiements:'Paiements',avis:'Avis & Signalements',promotions:'Promotions',carte:'Carte temps réel',parametres:'Paramètres'};
+const titles={dashboard:'Tableau de bord',categories:'Catégories',produits:'Produits',menus:'Menus restaurants',commandes:'Commandes',livraisons:'Livraisons',vendeurs:'Vendeurs',restaurants:'Restaurants',livreurs:'Livreurs',comptes:'Créer des comptes',support:'Support & Messagerie',zones:'Zones de livraison',rapports:'Rapports & Ventes',paiements:'Paiements',avis:'Avis & Signalements',promotions:'Promotions',carte:'Carte temps réel',parametres:'Paramètres',live:'Temps réel'};
 function go(name,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
   btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),zones:loadZonesTable,clients:loadClients,rapports:()=>loadRapports(currentRapportDays),comptes:()=>{loadZonesSelect('cv-zone');loadZonesSelect('cr-zone');loadZonesSelect('cl-zone');loadAgents();},support:()=>{loadSupConvs();subscribeSupport();},paiements:loadPaiements,avis:loadAvis,promotions:loadPromotions,carte:initCarte,parametres:loadParametres};
+  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),zones:loadZonesTable,clients:loadClients,rapports:()=>loadRapports(currentRapportDays),comptes:()=>{loadZonesSelect('cv-zone');loadZonesSelect('cr-zone');loadZonesSelect('cl-zone');loadAgents();},support:()=>{loadSupConvs();subscribeSupport();},paiements:loadPaiements,avis:loadAvis,promotions:loadPromotions,carte:initCarte,parametres:loadParametres,live:initLive};
   if(loaders[name])loaders[name]();
 }
 
@@ -1784,8 +1814,84 @@ async function loadPromotions(){
 // PARAMÈTRES (table clé/valeur "parametres")
 // ============================================================
 function setVal(id,v){const el=document.getElementById(id);if(el!=null&&v!=null)el.value=v;}
-async function loadParametres(){
+// ============================================================
+// TEMPS RÉEL — visiteurs en ligne + comportement
+// ============================================================
+let _liveTimer=null,_liveSub=null;
+function timeAgo(d){
+  const s=Math.floor((Date.now()-new Date(d).getTime())/1000);
+  if(s<60)return 'il y a '+s+'s';
+  if(s<3600)return 'il y a '+Math.floor(s/60)+' min';
+  if(s<86400)return 'il y a '+Math.floor(s/3600)+' h';
+  return new Date(d).toLocaleDateString('fr-FR');
+}
+function eventLabel(t){return {vue_produit:'👀 a vu un produit',recherche:'🔎 a recherché',ajout_panier:'🛒 a ajouté au panier',page:'📄 navigue'}[t]||t;}
+async function refreshLive(){
+  const now=Date.now();
+  const since5=new Date(now-5*60*1000).toISOString();
+  const startDay=new Date();startDay.setHours(0,0,0,0);const dayISO=startDay.toISOString();
+  // Visiteurs en ligne (5 min)
   try{
+    const {data}=await sb.from('visites').select('session_id,last_seen').gte('last_seen',since5);
+    const n=(data||[]).length;
+    document.getElementById('live-online').textContent=n;
+    const badge=document.getElementById('b-live');if(badge){badge.textContent=n;badge.style.display=n>0?'inline-block':'none';}
+  }catch(e){}
+  // Visiteurs aujourd'hui (sessions distinctes)
+  try{
+    const {data}=await sb.from('visites').select('session_id').gte('last_seen',dayISO);
+    document.getElementById('live-today').textContent=new Set((data||[]).map(v=>v.session_id)).size;
+  }catch(e){}
+  // Vues produits + recherches aujourd'hui
+  try{
+    const {data}=await sb.from('evenements').select('type,produit_nom,valeur,created_at,session_id,user_id').gte('created_at',dayISO).order('created_at',{ascending:false}).limit(500);
+    const evs=data||[];
+    document.getElementById('live-views').textContent=evs.filter(e=>e.type==='vue_produit').length;
+    document.getElementById('live-search').textContent=evs.filter(e=>e.type==='recherche').length;
+    // Activité en direct (20 derniers)
+    const feed=document.getElementById('live-feed');
+    if(feed){
+      if(!evs.length){feed.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:24px">Aucune activité aujourd\'hui</td></tr>';}
+      else feed.innerHTML=evs.slice(0,20).map(e=>`<tr>
+        <td style="color:var(--g400)">${timeAgo(e.created_at)}</td>
+        <td>${e.user_id?'👤 Client':'👁️ Visiteur'}</td>
+        <td>${eventLabel(e.type)}</td>
+        <td><strong>${e.produit_nom||e.valeur||'—'}</strong></td></tr>`).join('');
+    }
+  }catch(e){}
+  // Produits les plus consultés (7 jours)
+  try{
+    const since7=new Date(now-7*86400*1000).toISOString();
+    const {data}=await sb.from('evenements').select('produit_nom').eq('type','vue_produit').gte('created_at',since7).limit(2000);
+    const counts={};(data||[]).forEach(e=>{if(e.produit_nom)counts[e.produit_nom]=(counts[e.produit_nom]||0)+1;});
+    const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const box=document.getElementById('live-top-prods');
+    box.innerHTML=top.length?top.map(([nom,n],i)=>`<div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g100)"><span style="font-weight:700;color:var(--g400);width:20px">${i+1}</span><span style="flex:1">${nom}</span><span style="font-weight:700;color:var(--vd)">${n} vues</span></div>`).join(''):'<p style="color:var(--g400)">Pas encore de données</p>';
+  }catch(e){}
+  // Recherches fréquentes (7 jours)
+  try{
+    const since7=new Date(now-7*86400*1000).toISOString();
+    const {data}=await sb.from('evenements').select('valeur').eq('type','recherche').gte('created_at',since7).limit(2000);
+    const counts={};(data||[]).forEach(e=>{const v=(e.valeur||'').toLowerCase().trim();if(v)counts[v]=(counts[v]||0)+1;});
+    const top=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const box=document.getElementById('live-top-search');
+    box.innerHTML=top.length?top.map(([q,n])=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--g100)"><span>🔎 ${q}</span><span style="font-weight:700;color:var(--or)">${n}×</span></div>`).join(''):'<p style="color:var(--g400)">Pas encore de recherches</p>';
+  }catch(e){}
+}
+function initLive(){
+  refreshLive();
+  if(_liveTimer)clearInterval(_liveTimer);
+  _liveTimer=setInterval(refreshLive,15000); // rafraîchit toutes les 15 s
+  // Realtime : rafraîchir dès qu'un événement arrive
+  if(_liveSub){try{_liveSub.unsubscribe();}catch(e){}}
+  try{
+    _liveSub=sb.channel('live-feed')
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'evenements'},()=>refreshLive())
+      .subscribe();
+  }catch(e){}
+}
+
+async function loadParametres(){  try{
     const {data,error}=await sb.from('parametres').select('cle,valeur');
     if(error)return; // table absente → on garde les valeurs par défaut du HTML
     const p={};(data||[]).forEach(r=>p[r.cle]=r.valeur);
