@@ -608,7 +608,7 @@ tr:hover td{background:var(--g50)}
     <div class="sec" id="sec-zones">
       <div class="card">
         <div class="card-head"><h2>📍 Zones de livraison</h2><button class="btn btn-p" onclick="openZone()">+ Ajouter</button></div>
-        <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Nom</th><th>Ville</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="zones-body"></tbody></table></div></div>
+        <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Nom</th><th>Ville</th><th>Frais (FCFA)</th><th>Délai estimé</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="zones-body"></tbody></table></div></div>
       </div>
     </div>
 
@@ -1007,6 +1007,8 @@ tr:hover td{background:var(--g50)}
     <div class="modal-body">
       <div class="fgm"><label>Nom *</label><input type="text" id="zone-nom" placeholder="ex: Akpakpa"/></div>
       <div class="fgm"><label>Ville *</label><input type="text" id="zone-ville" placeholder="Cotonou" value="Cotonou"/></div>
+      <div class="fgm"><label>Frais de livraison (FCFA) *</label><input type="number" id="zone-frais" min="0" step="100" value="1000"/></div>
+      <div class="fgm"><label>Délai estimé</label><input type="text" id="zone-delai" placeholder="ex: 30-45 min"/></div>
     </div>
     <div class="modal-foot"><button class="btn btn-out" onclick="closeModal('m-zone')">Annuler</button><button class="btn btn-p" onclick="saveZone()">Ajouter</button></div>
   </div>
@@ -1679,21 +1681,41 @@ async function loadZones(){
 async function loadZonesTable(){
   const {data}=await sb.from('zones').select('*').order('ville').order('nom');
   const tb=document.getElementById('zones-body');
-  if(!data?.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:32px">Aucune zone</td></tr>';return;}
+  if(!data?.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--g400);padding:32px">Aucune zone</td></tr>';return;}
   tb.innerHTML=data.map(z=>`<tr>
     <td><strong>${z.nom}</strong></td><td>${z.ville}</td>
-    <td>${z.actif?'<span class="badge bg">Actif</span>':'<span class="badge br">Inactif</span>'}</td>
+    <td><input type="number" value="${z.frais_livraison??500}" min="0" step="100" style="width:90px;padding:6px 8px;border:1.5px solid var(--g200);border-radius:8px;font-family:inherit;font-size:13px;font-weight:700;color:var(--vd)" onchange="updZoneField('${z.id}','frais_livraison',parseInt(this.value)||0,this)"/></td>
+    <td><input type="text" value="${z.delai_estime||''}" placeholder="ex: 30-45 min" style="width:110px;padding:6px 8px;border:1.5px solid var(--g200);border-radius:8px;font-family:inherit;font-size:12px" onchange="updZoneField('${z.id}','delai_estime',this.value.trim(),this)"/></td>
+    <td><button class="badge ${z.actif?'bg':'br'}" style="border:none;cursor:pointer;font-family:inherit" onclick="toggleZone('${z.id}',${!z.actif})" title="Cliquer pour ${z.actif?'désactiver':'activer'}">${z.actif?'Actif':'Inactif'}</button></td>
     <td><button class="btn btn-sm btn-del" onclick="delZone('${z.id}')">🗑️</button></td>
   </tr>`).join('');
 }
 
-function openZone(){document.getElementById('zone-nom').value='';document.getElementById('zone-ville').value='Cotonou';openModal('m-zone');}
+async function updZoneField(id,field,val,inp){
+  const {error}=await sb.from('zones').update({[field]:val}).eq('id',id);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  if(inp){inp.style.borderColor='var(--vd)';setTimeout(()=>inp.style.borderColor='var(--g200)',900);}
+  toast(field==='frais_livraison'?'Frais mis à jour ✅ ('+val+' F)':'Zone mise à jour ✅','ok');
+  loadZones();
+}
+
+async function toggleZone(id,actif){
+  const {error}=await sb.from('zones').update({actif}).eq('id',id);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  toast(actif?'Zone activée ✅':'Zone désactivée','ok');
+  loadZonesTable();loadZones();
+}
+
+function openZone(){document.getElementById('zone-nom').value='';document.getElementById('zone-ville').value='Cotonou';document.getElementById('zone-frais').value='1000';document.getElementById('zone-delai').value='';openModal('m-zone');}
 
 async function saveZone(){
   const nom=document.getElementById('zone-nom').value.trim();
   const ville=document.getElementById('zone-ville').value.trim()||'Cotonou';
+  const frais=parseInt(document.getElementById('zone-frais').value)||500;
+  const delai=document.getElementById('zone-delai').value.trim()||null;
   if(!nom){toast('Entrez un nom','err');return;}
-  await sb.from('zones').insert({nom,ville});
+  const {error}=await sb.from('zones').insert({nom,ville,frais_livraison:frais,delai_estime:delai});
+  if(error){toast('Erreur : '+error.message,'err');return;}
   toast('Zone ajoutée ✅','ok');closeModal('m-zone');loadZonesTable();loadZones();
 }
 
