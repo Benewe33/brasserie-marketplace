@@ -140,6 +140,14 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g900);min-
 .ms-info .ms-val{font-size:17px;font-weight:800;color:var(--g900)}
 .rev-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--g100);font-size:13px}
 .rev-row:last-child{border-bottom:none}
+.freq-opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1.5px solid var(--g200);border-radius:10px;margin-bottom:7px;cursor:pointer;transition:.15s}
+.freq-opt:has(input:checked){border-color:var(--vd);background:var(--vl)}
+.freq-opt input{margin-top:3px;accent-color:var(--vd)}
+.freq-opt .fo-t{font-size:12.5px;font-weight:700}
+.freq-opt .fo-s{font-size:11px;color:var(--g600)}
+.fo-reco{background:var(--vl);color:var(--vd);font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;border:1px solid var(--v);margin-left:4px}
+.see-all{font-size:12px;font-weight:700;color:var(--vd);cursor:pointer;background:none;border:none;font-family:inherit}
+.see-all:hover{text-decoration:underline}
 .rev-row strong{font-weight:800}
 @media(max-width:900px){.mini-stats{grid-template-columns:repeat(2,1fr)}}
 .stat-ico{font-size:30px;margin-bottom:8px}
@@ -464,13 +472,13 @@ tr:hover td{background:var(--g50)}
       <!-- Graphique + Top produits -->
       <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px">
         <div class="card">
-          <div class="card-head"><h2>📈 Ventes des 7 derniers jours</h2></div>
+          <div class="card-head"><h2>📈 Ventes</h2><select id="chart-period" onchange="renderVentesChart()" style="padding:6px 10px;border:1.5px solid var(--g200);border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;color:var(--g600)"><option value="7">7 jours</option><option value="14">14 jours</option><option value="30">30 jours</option></select></div>
           <div class="card-body" style="padding:16px">
             <canvas id="chart-ventes" height="120"></canvas>
           </div>
         </div>
         <div class="card">
-          <div class="card-head"><h2>🏆 Top produits</h2></div>
+          <div class="card-head"><h2>🏆 Top produits</h2><button class="see-all" onclick="go('produits',document.querySelectorAll('.sb-btn')[1])">Voir tout</button></div>
           <div class="card-body" style="padding:12px">
             <div id="top-prods-list" style="font-size:13px"></div>
           </div>
@@ -480,7 +488,7 @@ tr:hover td{background:var(--g50)}
       <!-- Commandes récentes + colonne droite -->
       <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
         <div class="card">
-          <div class="card-head"><h2>🛒 Dernières commandes</h2></div>
+          <div class="card-head"><h2>🛒 Dernières commandes</h2><button class="see-all" onclick="go('commandes',document.querySelectorAll('.sb-btn')[2])">Voir toutes</button></div>
           <div class="card-body">
             <div class="tbl-wrap">
               <table><thead><tr><th>ID</th><th>Client</th><th>Produits</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead>
@@ -496,12 +504,37 @@ tr:hover td{background:var(--g50)}
             </div>
           </div>
           <div class="card" style="margin-bottom:0">
-            <div class="card-head"><h2>🏦 Mes revenus</h2></div>
+            <div class="card-head"><h2>🏦 Paramètres de paiement</h2></div>
             <div class="card-body" style="padding:14px 16px">
-              <div class="rev-row"><span>CA livré</span><strong id="rev-ca">—</strong></div>
-              <div class="rev-row"><span>Commission YéyéMarket (<span id="rev-txcom">—</span>)</span><strong id="rev-com" style="color:var(--r)">—</strong></div>
-              <div class="rev-row" style="font-size:14px"><span><strong>Net estimé</strong></span><strong id="rev-net" style="color:var(--vd)">—</strong></div>
-              <p style="font-size:11px;color:var(--g400);margin-top:10px">💡 Les versements sont effectués par YéyéMarket après déduction des commissions.</p>
+              <p style="font-size:12px;color:var(--g600);margin-bottom:12px">Configurez la fréquence à laquelle vous souhaitez recevoir vos paiements.</p>
+
+              <div style="font-size:13px;font-weight:700;margin-bottom:8px">Fréquence des paiements</div>
+              <label class="freq-opt"><input type="radio" name="freq" value="2jours" onchange="saveFreqPaiement(this.value)"/><div><div class="fo-t">Option A : Chaque 2 jours <span class="fo-reco">Recommandé</span></div><div class="fo-s">Recevez vos paiements tous les 2 jours.</div></div></label>
+              <label class="freq-opt"><input type="radio" name="freq" value="semaine" onchange="saveFreqPaiement(this.value)"/><div><div class="fo-t">Option B : Chaque semaine</div><div class="fo-s">Recevez vos paiements chaque semaine.</div></div></label>
+              <label class="freq-opt"><input type="radio" name="freq" value="mois" onchange="saveFreqPaiement(this.value)"/><div><div class="fo-t">Option C : Chaque mois</div><div class="fo-s">Recevez vos paiements chaque mois.</div></div></label>
+
+              <div style="font-size:13px;font-weight:700;margin:16px 0 4px">Informations de paiement</div>
+              <div class="rev-row"><span>CA livré (net de commission <span id="rev-txcom">—</span>)</span><strong id="rev-net">—</strong></div>
+              <div class="rev-row"><span>Solde disponible</span><strong id="pay-dispo" style="color:var(--vd)">—</strong></div>
+              <div class="rev-row"><span>Solde en attente</span><strong id="pay-attente" style="color:var(--or)">—</strong></div>
+              <div class="rev-row"><span>Dernier paiement</span><span id="pay-dernier" style="text-align:right;font-size:12px">—</span></div>
+              <div class="rev-row"><span>Prochain paiement prévu</span><span id="pay-prochain" style="text-align:right;font-size:12px;font-weight:700">—</span></div>
+              <div class="rev-row" style="align-items:center"><span>Méthode de paiement</span>
+                <span style="display:flex;align-items:center;gap:6px">
+                  <span id="pay-methode" style="font-size:12px;font-weight:600">—</span>
+                  <button class="btn btn-sm btn-ed" onclick="openPaiementModal()" title="Modifier">✏️</button>
+                </span>
+              </div>
+
+              <div style="background:var(--orl);border-radius:10px;padding:12px 14px;margin-top:12px">
+                <div style="font-size:12px;font-weight:800;color:var(--or);margin-bottom:6px">⚠️ Informations importantes</div>
+                <ul style="font-size:11.5px;color:var(--g600);margin-left:16px;display:flex;flex-direction:column;gap:4px">
+                  <li>Les paiements sont effectués selon la fréquence choisie.</li>
+                  <li>Délai minimum de 48h après livraison avant disponibilité.</li>
+                  <li>Seuil minimum de retrait : 10 000 FCFA.</li>
+                  <li>Les commissions de YéyéMarket sont déduites avant virement.</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -560,6 +593,18 @@ tr:hover td{background:var(--g50)}
 </div>
 
 <!-- MODAL PRODUIT -->
+<div class="overlay" id="m-paiement">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head"><h3>💳 Méthode de paiement</h3><button class="modal-x" onclick="closeModal('m-paiement')">✕</button></div>
+    <div class="modal-body">
+      <div class="fgm"><label>Opérateur *</label><select id="pm-operateur"><option value="MTN">MTN MoMo</option><option value="Moov">Moov Money</option><option value="Celtiis">Celtiis Cash</option></select></div>
+      <div class="fgm" style="margin-top:10px"><label>Numéro Mobile Money *</label><input type="tel" id="pm-numero" placeholder="+229 97 00 00 00"/></div>
+      <p style="font-size:11px;color:var(--g400);margin-top:8px">C'est sur ce numéro que YéyéMarket effectuera vos versements.</p>
+      <button class="btn btn-p" style="margin-top:14px;width:100%" onclick="savePaiementMethode()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="m-prod">
   <div class="modal">
     <div class="modal-head"><h3 id="m-prod-title">Ajouter un produit</h3><button class="modal-x" onclick="closeModal('m-prod')">✕</button></div>
@@ -944,17 +989,47 @@ async function loadDashboard(){
   const tNote=document.getElementById('t-note');
   if(tNote&&avis?.length){tNote.className='trend up';tNote.textContent='↗ '+avis.length+' avis';}
 
-  // Revenus nets estimés (commission depuis les paramètres plateforme)
+  // Revenus & paiements
   let txCom=10;
   try{
     const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_vend').single();
     if(pc&&pc.valeur!=null&&pc.valeur!=='')txCom=parseFloat(pc.valeur)||10;
   }catch(e){}
-  const com=Math.round(ca*txCom/100);
-  const elCa=document.getElementById('rev-ca');if(elCa)elCa.textContent=fmt(ca)+' FCFA';
+  const net=t=>Math.round(t*(100-txCom)/100);
   const elTx=document.getElementById('rev-txcom');if(elTx)elTx.textContent=txCom+'%';
-  const elCom=document.getElementById('rev-com');if(elCom)elCom.textContent='− '+fmt(com)+' FCFA';
-  const elNet=document.getElementById('rev-net');if(elNet)elNet.textContent=fmt(ca-com)+' FCFA';
+  const elNet=document.getElementById('rev-net');if(elNet)elNet.textContent=fmt(net(ca))+' FCFA';
+
+  // Soldes : disponible (livré > 48h − versements) / en attente (livré < 48h)
+  const h48=new Date(Date.now()-48*3600*1000);
+  const netMur=net(livrees.filter(c=>new Date(c.created_at)<h48).reduce((s,c)=>s+c.total,0));
+  const netAttente=net(livrees.filter(c=>new Date(c.created_at)>=h48).reduce((s,c)=>s+c.total,0));
+  let totalVerse=0,dernierVersement=null;
+  try{
+    const {data:vers,error:vErr}=await sb.from('versements').select('montant,created_at').eq('beneficiaire_type','boutique').eq('beneficiaire_id',currentBoutique.id).order('created_at',{ascending:false});
+    if(!vErr&&vers){totalVerse=vers.reduce((s,v)=>s+(v.montant||0),0);dernierVersement=vers[0]||null;}
+  }catch(e){}
+  const dispo=Math.max(0,netMur-totalVerse);
+  const elDispo=document.getElementById('pay-dispo');if(elDispo)elDispo.textContent=fmt(dispo)+' FCFA';
+  const elAtt=document.getElementById('pay-attente');if(elAtt)elAtt.textContent=fmt(netAttente)+' FCFA';
+  const elDer=document.getElementById('pay-dernier');
+  if(elDer)elDer.innerHTML=dernierVersement?`${fdate(dernierVersement.created_at)}<br><strong>${fmt(dernierVersement.montant)} FCFA</strong>`:'Aucun pour l\'instant';
+
+  // Prochain paiement selon la fréquence choisie
+  const freqJours={'2jours':2,'semaine':7,'mois':30};
+  const freq=currentBoutique.freq_paiement||'2jours';
+  const radio=document.querySelector(`input[name="freq"][value="${freq}"]`);if(radio)radio.checked=true;
+  const elProch=document.getElementById('pay-prochain');
+  if(elProch){
+    if(dispo<10000){elProch.textContent='Dès 10 000 F de solde';}
+    else{
+      const base=dernierVersement?new Date(dernierVersement.created_at):new Date();
+      const next=new Date(base.getTime()+(freqJours[freq]||2)*24*3600*1000);
+      const dj=Math.max(0,Math.ceil((next-new Date())/(24*3600*1000)));
+      elProch.innerHTML=fdate(next)+` <span style="background:var(--bll);color:var(--bl);font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px">${dj===0?'Aujourd\'hui':'Dans '+dj+' jour'+(dj>1?'s':'')}</span>`;
+    }
+  }
+  const elMeth=document.getElementById('pay-methode');
+  if(elMeth)elMeth.textContent=currentBoutique.paiement_numero?`${currentBoutique.paiement_operateur||'MTN'} · ${currentBoutique.paiement_numero}`:'Non configurée';
 
   // Stats du jour
   const msCmds=document.getElementById('ms-cmds');if(msCmds)msCmds.textContent=cmdsToday.length;
@@ -1002,11 +1077,18 @@ async function loadDashboard(){
       }).join('')
     : '<p style="color:var(--g400);text-align:center;padding:20px;font-size:13px">Aucune vente</p>';
 
-  // Graphique 7 jours — courbe façon maquette
+  // Graphique à période variable (7/14/30 jours)
+  window._dashLivrees=livrees;
+  renderVentesChart();
+}
+
+function renderVentesChart(){
+  const livrees=window._dashLivrees||[];
+  const nb=parseInt(document.getElementById('chart-period')?.value)||7;
   const days=[],ventesData=[];
-  for(let i=6;i>=0;i--){
+  for(let i=nb-1;i>=0;i--){
     const d=new Date();d.setDate(d.getDate()-i);
-    days.push(d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'}));
+    days.push(nb>14?d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'}));
     const dayStr=d.toISOString().split('T')[0];
     ventesData.push(livrees.filter(c=>c.created_at?.startsWith(dayStr)).reduce((s,c)=>s+c.total,0));
   }
@@ -1015,10 +1097,35 @@ async function loadDashboard(){
     if(window._chartVentes)window._chartVentes.destroy();
     window._chartVentes=new Chart(ctx,{
       type:'line',
-      data:{labels:days,datasets:[{label:'FCFA',data:ventesData,borderColor:'#1a6b3c',backgroundColor:'rgba(26,107,60,0.08)',fill:true,tension:0.4,borderWidth:2.5,pointBackgroundColor:'#fff',pointBorderColor:'#1a6b3c',pointBorderWidth:2,pointRadius:4,pointHoverRadius:6}]},
+      data:{labels:days,datasets:[{label:'FCFA',data:ventesData,borderColor:'#1a6b3c',backgroundColor:'rgba(26,107,60,0.08)',fill:true,tension:0.4,borderWidth:2.5,pointBackgroundColor:'#fff',pointBorderColor:'#1a6b3c',pointBorderWidth:2,pointRadius:nb>14?2:4,pointHoverRadius:6}]},
       options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.y)+' FCFA'}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>fmt(v)}},x:{grid:{display:false}}}}
     });
   }
+}
+
+function openPaiementModal(){
+  document.getElementById('pm-numero').value=currentBoutique.paiement_numero||'';
+  document.getElementById('pm-operateur').value=currentBoutique.paiement_operateur||'MTN';
+  openModal('m-paiement');
+}
+
+async function saveFreqPaiement(v){
+  const {error}=await sb.from('boutiques').update({freq_paiement:v}).eq('id',currentBoutique.id);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  currentBoutique.freq_paiement=v;
+  toast('✅ Fréquence de paiement enregistrée','ok');
+  loadDashboard();
+}
+
+async function savePaiementMethode(){
+  const numero=document.getElementById('pm-numero').value.trim();
+  const operateur=document.getElementById('pm-operateur').value;
+  if(!numero){toast('Entrez votre numéro Mobile Money','err');return;}
+  const {error}=await sb.from('boutiques').update({paiement_numero:numero,paiement_operateur:operateur}).eq('id',currentBoutique.id);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  currentBoutique.paiement_numero=numero;currentBoutique.paiement_operateur=operateur;
+  toast('✅ Méthode de paiement enregistrée','ok');
+  closeModal('m-paiement');loadDashboard();
 }
 
 // PRODUITS
