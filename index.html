@@ -48,6 +48,21 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .logo-img{width:36px;height:36px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,.2)}
 .logo-text h1{font-size:17px;font-weight:800;color:#fff;letter-spacing:-.3px}
 .logo-text p{font-size:10px;color:rgba(255,255,255,.6);margin-top:1px}
+.ville-btn{cursor:pointer;font-size:11px!important;color:rgba(255,255,255,.9)!important;font-weight:700;display:inline-flex;align-items:center;gap:3px;user-select:none;-webkit-tap-highlight-color:transparent}
+.ville-btn:active{opacity:.7}
+.ville-sheet{position:fixed;left:50%;transform:translateX(-50%) translateY(110%);bottom:0;width:100%;max-width:var(--max);background:#fff;border-radius:22px 22px 0 0;z-index:400;transition:transform .3s cubic-bezier(.32,.72,.35,1);padding:10px 0 24px;box-shadow:0 -8px 40px rgba(0,0,0,.18)}
+.ville-sheet.open{transform:translateX(-50%) translateY(0)}
+.ville-sheet .vs-drag{width:40px;height:4px;background:#e5e7eb;border-radius:99px;margin:4px auto 12px}
+.ville-sheet h3{font-size:16px;font-weight:800;color:var(--g900,#111);padding:0 20px 4px}
+.ville-sheet .vs-sub{font-size:12px;color:var(--g400,#9ca3af);padding:0 20px 12px}
+.vs-list{max-height:52vh;overflow-y:auto}
+.vs-item{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;font-size:14px;font-weight:600;color:var(--g900,#111);cursor:pointer;border-bottom:1px solid #f3f4f6}
+.vs-item:active{background:#f7faf8}
+.vs-item .vs-check{color:var(--vd);font-weight:800;display:none}
+.vs-item.on{color:var(--vd)}
+.vs-item.on .vs-check{display:inline}
+.ville-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:399;display:none;backdrop-filter:blur(2px)}
+.ville-overlay.open{display:block}
 .header-actions{display:flex;align-items:center;gap:8px}
 .hbtn{background:rgba(255,255,255,.15);border:none;color:#fff;width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;position:relative;transition:background .2s}
 .hbtn:hover{background:rgba(255,255,255,.25)}
@@ -477,7 +492,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
     <div class="header-top">
       <div class="logo-wrap">
         <img src="https://omkmmlbdkzhorrrbeabm.supabase.co/storage/v1/object/public/avatars/AF7B3561-29FF-4B02-90D6-C94B558EDA89.PNG" class="logo-img" onerror="this.style.display='none'" alt="Yéyé"/>
-        <div class="logo-text"><h1>Yéyé Market</h1><p>Bénin 🇧🇯</p></div>
+        <div class="logo-text"><h1>Yéyé Market</h1><p class="ville-btn" onclick="openVilleSheet()">📍 <span id="ville-label">Cotonou</span> ▾</p></div>
       </div>
       <div class="header-actions">
         <button class="hbtn" onclick="goPage('favoris')" title="Favoris">
@@ -733,6 +748,15 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 <!-- OVERLAYS -->
 <div class="modal-overlay-bg" id="modal-bg" onclick="closeProdModal()"></div>
 <div class="notif-overlay" id="notif-overlay" onclick="closeNotifPanel()"></div>
+
+<!-- SÉLECTEUR DE VILLE -->
+<div class="ville-overlay" id="ville-overlay" onclick="closeVilleSheet()"></div>
+<div class="ville-sheet" id="ville-sheet">
+  <div class="vs-drag"></div>
+  <h3>📍 Choisissez votre ville</h3>
+  <p class="vs-sub">Nous affichons les boutiques et restaurants qui livrent dans votre zone.</p>
+  <div class="vs-list" id="vs-list"></div>
+</div>
 
 <!-- MODAL PRODUIT -->
 <div class="prod-modal" id="prod-modal">
@@ -1074,7 +1098,9 @@ async function loadProducts(catId=null){
   const grid=document.getElementById('products-grid');
   if(!grid)return; // accueil réorganisé : plus de grille unique ici
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Chargement...</div>';
+  const _vIds=await villeIds();
   let q=sb.from('produits').select('id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,boutique_id,categorie_id,categories(nom),boutiques(nom)').eq('actif',true).gt('stock',0);
+  q=applyVilleFilter(q,_vIds);
   if(catId)q=q.eq('categorie_id',catId);
   q=q.order('created_at',{ascending:false}).limit(20);
   const {data}=await q;
@@ -1085,7 +1111,9 @@ async function loadProducts(catId=null){
 async function loadCatalogue(){
   const grid=document.getElementById('catalogue-grid');
   grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Chargement...</div>';
+  const _vIds=await villeIds();
   let q=sb.from('produits').select('id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,boutique_id,categorie_id,categories(nom),boutiques(nom)').eq('actif',true).gt('stock',0);
+  q=applyVilleFilter(q,_vIds);
   if(_catFilter)q=q.eq('categorie_id',_catFilter);
   const {data}=await q.order('created_at',{ascending:false});
   renderProducts(data||[],'catalogue-grid');
@@ -1174,7 +1202,7 @@ async function loadRestaurantsPage(){
   const el=document.getElementById('restos-list');
   el.innerHTML='<div style="text-align:center;padding:32px;color:var(--g400)">Chargement...</div>';
   try{
-    const {data}=await sb.from('restaurants').select('id,nom,cuisine_type,adresse,description,image_url,statut').eq('statut','actif').order('nom');
+    const data=await restosVille('id,nom,cuisine_type,adresse,description,image_url,statut');
     _allRestos=data||[];
     renderRestos(_allRestos);
   }catch(e){el.innerHTML='<div style="text-align:center;padding:32px;color:var(--r)">Erreur de chargement</div>';}
@@ -1365,7 +1393,9 @@ function startBannerSlideshow(h,imgs){
   },4000); // change d'image toutes les 4 s
 }
 
-async function loadHomeSections(){  const base=()=>sb.from('produits').select(PROD_COLS).eq('actif',true).gt('stock',0);
+async function loadHomeSections(){
+  const _vIds=await villeIds();
+  const base=()=>applyVilleFilter(sb.from('produits').select(PROD_COLS).eq('actif',true).gt('stock',0),_vIds);
 
   // Récupère les produits attribués manuellement à une section (colonne sections text[])
   async function manuels(cle){
@@ -1392,7 +1422,7 @@ async function loadHomeSections(){  const base=()=>sb.from('produits').select(PR
 
   // S3 — Restaurants populaires : table restaurants actifs
   try{
-    const {data}=await sb.from('restaurants').select('id,nom,cuisine_type,adresse,image_url,statut').eq('statut','actif').limit(10);
+    const data=await restosVille('id,nom,cuisine_type,adresse,image_url,statut',10);
     const row=document.getElementById('row-restos');
     if(row){ if(data&&data.length){row.innerHTML=data.map(rCard).join('');} else {row.innerHTML='<div class="hrow-empty">Aucun restaurant actif</div>';} }
   }catch(e){const row=document.getElementById('row-restos');if(row)row.innerHTML='<div class="hrow-empty">Indisponible</div>';}
@@ -2115,6 +2145,72 @@ function fmt(n){return(n||0).toLocaleString('fr-FR');}
 function fdate(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
 function catEmoji(nom){const m={'Viandes':'🥩','Poissons':'🐟','Légumes':'🥦','Fruits':'🍌','Épicerie':'🛍️','Brasserie':'🍺','Huiles':'🫙','Épices':'🌶️','Céréales':'🌾','Restaurants':'🍽️','Boissons':'🥤','Oeufs':'🥚','Marché':'🧺'};return m[nom]||'📦';}
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);}
+
+// ============================================================
+// VILLE — sélecteur façon Meituan + filtrage des contenus
+// ============================================================
+const VILLES=['Cotonou','Abomey-Calavi','Porto-Novo','Ouidah','Bohicon','Parakou','Lokossa','Natitingou'];
+const VILLE_ALL='__all__';
+let _ville=localStorage.getItem('yeye_ville')||'Cotonou';
+let _villeBIds=null; // cache des ids de boutiques de la ville ('all' = pas de filtre)
+
+function villeLabel(){return _ville===VILLE_ALL?'Tout le Bénin':_ville;}
+function updateVilleLabel(){const l=document.getElementById('ville-label');if(l)l.textContent=villeLabel();}
+
+// Ids des boutiques servant la ville choisie (avec repli si la colonne n'existe pas encore)
+async function villeIds(){
+  if(_ville===VILLE_ALL)return 'all';
+  if(_villeBIds)return _villeBIds;
+  try{
+    const {data,error}=await sb.from('boutiques').select('id').contains('villes',[_ville]);
+    if(error){_villeBIds='all';} // colonne absente → aucun filtre (rétrocompatible)
+    else{_villeBIds=(data||[]).map(b=>b.id);}
+  }catch(e){_villeBIds='all';}
+  return _villeBIds;
+}
+function applyVilleFilter(q,ids){
+  if(ids!=='all'&&Array.isArray(ids))q=q.in('boutique_id',ids);
+  return q;
+}
+// Requête restaurants filtrée par ville, avec repli si colonne absente
+async function restosVille(sel,limit){
+  let q=sb.from('restaurants').select(sel).eq('statut','actif');
+  if(_ville!==VILLE_ALL)q=q.contains('villes',[_ville]);
+  let res=await (limit?q.limit(limit):q.order('nom'));
+  if(res.error){
+    let q2=sb.from('restaurants').select(sel).eq('statut','actif');
+    res=await (limit?q2.limit(limit):q2.order('nom'));
+  }
+  return res.data||[];
+}
+
+function openVilleSheet(){
+  const list=document.getElementById('vs-list');
+  const items=VILLES.map(v=>`<div class="vs-item ${_ville===v?'on':''}" onclick="setVille('${v}')"><span>📍 ${v}</span><span class="vs-check">✓</span></div>`).join('');
+  list.innerHTML=items+`<div class="vs-item ${_ville===VILLE_ALL?'on':''}" onclick="setVille('${VILLE_ALL}')"><span>🇧🇯 Tout le Bénin</span><span class="vs-check">✓</span></div>`;
+  document.getElementById('ville-overlay').classList.add('open');
+  document.getElementById('ville-sheet').classList.add('open');
+}
+function closeVilleSheet(){
+  document.getElementById('ville-overlay').classList.remove('open');
+  document.getElementById('ville-sheet').classList.remove('open');
+}
+function setVille(v){
+  if(v===_ville){closeVilleSheet();return;}
+  _ville=v;_villeBIds=null;
+  try{localStorage.setItem('yeye_ville',v);}catch(e){}
+  updateVilleLabel();
+  closeVilleSheet();
+  toast('📍 '+villeLabel(),'ok');
+  // Recharge les contenus dépendants de la ville
+  loadHomeSections();
+  const cat=document.getElementById('page-catalogue');
+  if(cat&&cat.classList.contains('active'))loadCatalogue();
+  const rest=document.getElementById('page-restaurants');
+  if(rest&&rest.classList.contains('active'))loadRestaurantsPage();
+  if(typeof loadProducts==='function')loadProducts(_catFilter||null);
+}
+updateVilleLabel();
 
 // INIT
 
