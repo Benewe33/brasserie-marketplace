@@ -117,6 +117,31 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g900);min-
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:24px}
 .stats-4{grid-template-columns:repeat(4,1fr)}
 .stat{background:#fff;border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);border-top:3px solid var(--vd)}
+/* — Vue d'ensemble façon maquette — */
+.welcome-bar{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.welcome-bar h1{font-size:22px;font-weight:800;color:var(--g900)}
+.welcome-bar .wb-sub{font-size:13px;color:var(--g600);margin-top:2px}
+.wb-right{display:flex;align-items:center;gap:10px}
+.badge-live{display:inline-flex;align-items:center;gap:6px;background:var(--vl);color:var(--vd);font-size:12px;font-weight:700;padding:6px 12px;border-radius:99px}
+.badge-live::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--vd);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.wb-date{font-size:12px;color:var(--g600);background:#fff;border:1px solid var(--g200);padding:6px 12px;border-radius:10px;font-weight:600}
+.stat{display:flex;flex-direction:column;gap:2px;position:relative}
+.stat-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:8px}
+.si-g{background:var(--vl)}.si-o{background:var(--orl)}.si-b{background:var(--bll)}.si-y{background:#fef9c3}
+.trend{font-size:11.5px;font-weight:700;margin-top:4px;display:inline-flex;align-items:center;gap:3px}
+.trend.up{color:var(--vd)}.trend.down{color:var(--r)}.trend.flat{color:var(--g400)}
+.rank-chip{width:22px;height:22px;border-radius:6px;background:var(--orl);color:var(--or);font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.tp-thumb{width:34px;height:34px;border-radius:8px;object-fit:cover;background:var(--g100);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
+.mini-stat{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.ms-ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ms-info .ms-label{font-size:11px;color:var(--g600);font-weight:600}
+.ms-info .ms-val{font-size:17px;font-weight:800;color:var(--g900)}
+.rev-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--g100);font-size:13px}
+.rev-row:last-child{border-bottom:none}
+.rev-row strong{font-weight:800}
+@media(max-width:900px){.mini-stats{grid-template-columns:repeat(2,1fr)}}
 .stat-ico{font-size:30px;margin-bottom:8px}
 .stat-label{font-size:12px;color:var(--g400)}
 .stat-val{font-size:28px;font-weight:700;margin-top:2px}
@@ -416,15 +441,27 @@ tr:hover td{background:var(--g50)}
 
     <!-- DASHBOARD -->
     <div class="sec active" id="sec-dashboard">
-      <!-- KPIs -->
-      <div class="stats stats-4">
-        <div class="stat"><div class="stat-ico">📦</div><div class="stat-label">Produits actifs</div><div class="stat-val" id="s-prods">—</div></div>
-        <div class="stat"><div class="stat-ico">🛒</div><div class="stat-label">Commandes</div><div class="stat-val" id="s-cmds">—</div></div>
-        <div class="stat"><div class="stat-ico">💰</div><div class="stat-label">CA total</div><div class="stat-val" id="s-ca">—</div></div>
-        <div class="stat"><div class="stat-ico">⭐</div><div class="stat-label">Note moyenne</div><div class="stat-val" id="s-note">—</div></div>
+      <!-- Bandeau de bienvenue -->
+      <div class="welcome-bar">
+        <div>
+          <h1>Vue d'ensemble</h1>
+          <p class="wb-sub">Bienvenue, <strong id="wb-nom">—</strong> 👋</p>
+        </div>
+        <div class="wb-right">
+          <span class="badge-live">Actif</span>
+          <span class="wb-date" id="wb-date">—</span>
+        </div>
       </div>
 
-      <!-- Graphiques -->
+      <!-- KPIs -->
+      <div class="stats stats-4">
+        <div class="stat"><div class="stat-ico si-o">📦</div><div class="stat-label">Produits actifs</div><div class="stat-val" id="s-prods">—</div><span class="trend flat" id="t-prods"></span></div>
+        <div class="stat"><div class="stat-ico si-g">🛒</div><div class="stat-label">Commandes</div><div class="stat-val" id="s-cmds">—</div><span class="trend flat" id="t-cmds"></span></div>
+        <div class="stat"><div class="stat-ico si-y">💰</div><div class="stat-label">CA total</div><div class="stat-val" id="s-ca">—</div><span class="trend flat" id="t-ca"></span></div>
+        <div class="stat"><div class="stat-ico si-b">⭐</div><div class="stat-label">Note moyenne</div><div class="stat-val" id="s-note">—</div><span class="trend flat" id="t-note"></span></div>
+      </div>
+
+      <!-- Graphique + Top produits -->
       <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px">
         <div class="card">
           <div class="card-head"><h2>📈 Ventes des 7 derniers jours</h2></div>
@@ -440,23 +477,42 @@ tr:hover td{background:var(--g50)}
         </div>
       </div>
 
-      <!-- Commandes récentes + alertes stock -->
+      <!-- Commandes récentes + colonne droite -->
       <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px">
         <div class="card">
           <div class="card-head"><h2>🛒 Dernières commandes</h2></div>
           <div class="card-body">
             <div class="tbl-wrap">
-              <table><thead><tr><th>ID</th><th>Produits</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead>
+              <table><thead><tr><th>ID</th><th>Client</th><th>Produits</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead>
               <tbody id="dash-cmds"></tbody></table>
             </div>
           </div>
         </div>
-        <div class="card">
-          <div class="card-head"><h2>⚠️ Stock faible</h2></div>
-          <div class="card-body" style="padding:12px">
-            <div id="stock-alert-list" style="font-size:13px"></div>
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card" style="margin-bottom:0">
+            <div class="card-head"><h2>⚠️ Stock faible</h2></div>
+            <div class="card-body" style="padding:12px">
+              <div id="stock-alert-list" style="font-size:13px"></div>
+            </div>
+          </div>
+          <div class="card" style="margin-bottom:0">
+            <div class="card-head"><h2>🏦 Mes revenus</h2></div>
+            <div class="card-body" style="padding:14px 16px">
+              <div class="rev-row"><span>CA livré</span><strong id="rev-ca">—</strong></div>
+              <div class="rev-row"><span>Commission YéyéMarket (<span id="rev-txcom">—</span>)</span><strong id="rev-com" style="color:var(--r)">—</strong></div>
+              <div class="rev-row" style="font-size:14px"><span><strong>Net estimé</strong></span><strong id="rev-net" style="color:var(--vd)">—</strong></div>
+              <p style="font-size:11px;color:var(--g400);margin-top:10px">💡 Les versements sont effectués par YéyéMarket après déduction des commissions.</p>
+            </div>
           </div>
         </div>
+      </div>
+
+      <!-- Stats du jour -->
+      <div class="mini-stats">
+        <div class="mini-stat"><div class="ms-ico" style="background:var(--orl)">🛒</div><div class="ms-info"><div class="ms-label">Commandes aujourd'hui</div><div class="ms-val" id="ms-cmds">—</div></div></div>
+        <div class="mini-stat"><div class="ms-ico" style="background:var(--vl)">💵</div><div class="ms-info"><div class="ms-label">Revenus aujourd'hui</div><div class="ms-val" id="ms-rev">—</div></div></div>
+        <div class="mini-stat"><div class="ms-ico" style="background:var(--bll)">👥</div><div class="ms-info"><div class="ms-label">Clients uniques</div><div class="ms-val" id="ms-clients">—</div></div></div>
+        <div class="mini-stat"><div class="ms-ico" style="background:#f3e8ff">🧺</div><div class="ms-info"><div class="ms-label">Panier moyen</div><div class="ms-val" id="ms-panier">—</div></div></div>
       </div>
     </div>
 
@@ -810,13 +866,34 @@ function closeSidebar(){
 }
 
 // DASHBOARD
+function pctTrend(today,yesterday){
+  if(!yesterday&&!today)return null;
+  if(!yesterday)return{pct:100,up:true};
+  const pct=Math.round((today-yesterday)/yesterday*100);
+  return{pct:Math.abs(pct),up:pct>=0};
+}
+function setTrend(id,tr,suffix){
+  const el=document.getElementById(id);if(!el)return;
+  if(!tr){el.textContent='';return;}
+  el.className='trend '+(tr.up?'up':'down');
+  el.innerHTML=(tr.up?'↗':'↘')+' '+tr.pct+'% '+(suffix||'vs hier');
+}
+
 async function loadDashboard(){
   if(!currentBoutique)return;
+
+  // Bandeau
+  const wbNom=document.getElementById('wb-nom');if(wbNom)wbNom.textContent=currentBoutique.nom||'—';
+  const wbDate=document.getElementById('wb-date');if(wbDate)wbDate.textContent='📅 '+new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
 
   // Produits
   const {data:prods}=await sb.from('produits').select('*').eq('boutique_id',currentBoutique.id);
   const prodIds=(prods||[]).map(p=>p.id);
   document.getElementById('s-prods').textContent=(prods||[]).filter(p=>p.actif!==false).length;
+  const moisDebut=new Date();moisDebut.setDate(1);moisDebut.setHours(0,0,0,0);
+  const nouveauxMois=(prods||[]).filter(p=>p.created_at&&new Date(p.created_at)>=moisDebut).length;
+  const tProds=document.getElementById('t-prods');
+  if(tProds){tProds.className='trend up';tProds.textContent=nouveauxMois?`+${nouveauxMois} ce mois`:'';}
 
   // Alertes stock faible
   const stockAlerts=(prods||[]).filter(p=>p.stock!=null && p.stock<=5);
@@ -829,7 +906,7 @@ async function loadDashboard(){
     document.getElementById('s-cmds').textContent='0';
     document.getElementById('s-ca').textContent='0 FCFA';
     document.getElementById('s-note').textContent='—';
-    document.getElementById('dash-cmds').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';
+    document.getElementById('dash-cmds').innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';
     return;
   }
 
@@ -849,10 +926,43 @@ async function loadDashboard(){
   document.getElementById('s-cmds').textContent=cmds.length;
   document.getElementById('s-ca').textContent=fmt(ca)+' FCFA';
 
+  // Tendances vs hier
+  const todayStr=new Date().toISOString().split('T')[0];
+  const yest=new Date();yest.setDate(yest.getDate()-1);
+  const yestStr=yest.toISOString().split('T')[0];
+  const cmdsToday=cmds.filter(c=>c.created_at?.startsWith(todayStr));
+  const cmdsYest=cmds.filter(c=>c.created_at?.startsWith(yestStr));
+  setTrend('t-cmds',pctTrend(cmdsToday.length,cmdsYest.length));
+  const caToday=cmdsToday.filter(c=>c.statut==='livree').reduce((s,c)=>s+c.total,0);
+  const caYest=cmdsYest.filter(c=>c.statut==='livree').reduce((s,c)=>s+c.total,0);
+  setTrend('t-ca',pctTrend(caToday,caYest));
+
   // Note moyenne
   const {data:avis}=await sb.from('avis').select('note').eq('boutique_id',currentBoutique.id);
   const s_note=document.getElementById('s-note');
-  if(s_note) s_note.textContent=avis?.length?(avis.reduce((s,a)=>s+(a.note||0),0)/avis.length).toFixed(1)+' ⭐':'—';
+  if(s_note) s_note.textContent=avis?.length?(avis.reduce((s,a)=>s+(a.note||0),0)/avis.length).toFixed(1)+' / 5':'—';
+  const tNote=document.getElementById('t-note');
+  if(tNote&&avis?.length){tNote.className='trend up';tNote.textContent='↗ '+avis.length+' avis';}
+
+  // Revenus nets estimés (commission depuis les paramètres plateforme)
+  let txCom=10;
+  try{
+    const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_vend').single();
+    if(pc&&pc.valeur!=null&&pc.valeur!=='')txCom=parseFloat(pc.valeur)||10;
+  }catch(e){}
+  const com=Math.round(ca*txCom/100);
+  const elCa=document.getElementById('rev-ca');if(elCa)elCa.textContent=fmt(ca)+' FCFA';
+  const elTx=document.getElementById('rev-txcom');if(elTx)elTx.textContent=txCom+'%';
+  const elCom=document.getElementById('rev-com');if(elCom)elCom.textContent='− '+fmt(com)+' FCFA';
+  const elNet=document.getElementById('rev-net');if(elNet)elNet.textContent=fmt(ca-com)+' FCFA';
+
+  // Stats du jour
+  const msCmds=document.getElementById('ms-cmds');if(msCmds)msCmds.textContent=cmdsToday.length;
+  const msRev=document.getElementById('ms-rev');if(msRev)msRev.textContent=fmt(caToday)+' F';
+  const clientsUniq=new Set(cmds.map(c=>c.utilisateurs?.nom).filter(Boolean)).size;
+  const msCl=document.getElementById('ms-clients');if(msCl)msCl.textContent=clientsUniq;
+  const panier=cmds.length?Math.round(cmds.reduce((s,c)=>s+c.total,0)/cmds.length):0;
+  const msPan=document.getElementById('ms-panier');if(msPan)msPan.textContent=fmt(panier)+' F';
 
   // Badge commandes en attente
   const pending=cmds.filter(c=>c.statut==='en_attente').length;
@@ -862,19 +972,20 @@ async function loadDashboard(){
     toast(pending+' commande(s) en attente !','ok');
   }
 
-  // Tableau commandes récentes
+  // Tableau commandes récentes (avec client)
   const tb=document.getElementById('dash-cmds');
   tb.innerHTML=cmds.length
     ? cmds.slice(0,8).map(c=>`<tr>
         <td><code>#${c.id?.substring(0,8)}</code></td>
+        <td>${c.utilisateurs?.nom||'—'}</td>
         <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.items?.slice(0,2).join(', ')+(c.items?.length>2?' +'+( c.items.length-2):'')}</td>
         <td><strong>${fmt(c.total)} FCFA</strong></td>
         <td>${sbadge(c.statut)}</td>
         <td>${fdate(c.created_at)}</td>
       </tr>`).join('')
-    : '<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';
+    : '<tr><td colspan="6" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';
 
-  // Top produits vendus
+  // Top produits vendus (avec photo et rang)
   const prodVentesTotal={};
   cmds.forEach(c=>Object.entries(c.prodVentes||{}).forEach(([id,q])=>{prodVentesTotal[id]=(prodVentesTotal[id]||0)+q;}));
   const topProds=Object.entries(prodVentesTotal).sort((a,b)=>b[1]-a[1]).slice(0,5);
@@ -882,15 +993,16 @@ async function loadDashboard(){
   if(topList) topList.innerHTML=topProds.length
     ? topProds.map(([id,q],i)=>{
         const p=prods.find(x=>x.id===id);
-        return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--g100)">
-          <span style="font-size:16px">${['🥇','🥈','🥉','4️⃣','5️⃣'][i]}</span>
-          <div style="flex:1"><div style="font-weight:600;font-size:13px">${p?.nom||id.substring(0,8)}</div>
-          <div style="font-size:11px;color:var(--g400)">${q} vente${q>1?'s':''}</div></div>
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--g100)">
+          ${p?.image_url?`<img class="tp-thumb" src="${p.image_url}"/>`:'<span class="tp-thumb">📦</span>'}
+          <span class="rank-chip">${i+1}</span>
+          <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p?.nom||id.substring(0,8)}</div>
+          <div style="font-size:11px;color:var(--g400)">${q} commande${q>1?'s':''}</div></div>
         </div>`;
       }).join('')
     : '<p style="color:var(--g400);text-align:center;padding:20px;font-size:13px">Aucune vente</p>';
 
-  // Graphique 7 jours
+  // Graphique 7 jours — courbe façon maquette
   const days=[],ventesData=[];
   for(let i=6;i>=0;i--){
     const d=new Date();d.setDate(d.getDate()-i);
@@ -902,9 +1014,9 @@ async function loadDashboard(){
   if(ctx){
     if(window._chartVentes)window._chartVentes.destroy();
     window._chartVentes=new Chart(ctx,{
-      type:'bar',
-      data:{labels:days,datasets:[{label:'FCFA',data:ventesData,backgroundColor:'rgba(11,61,46,0.75)',borderRadius:5}]},
-      options:{responsive:true,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{callback:v=>fmt(v)}}}}
+      type:'line',
+      data:{labels:days,datasets:[{label:'FCFA',data:ventesData,borderColor:'#1a6b3c',backgroundColor:'rgba(26,107,60,0.08)',fill:true,tension:0.4,borderWidth:2.5,pointBackgroundColor:'#fff',pointBorderColor:'#1a6b3c',pointBorderWidth:2,pointRadius:4,pointHoverRadius:6}]},
+      options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.y)+' FCFA'}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>fmt(v)}},x:{grid:{display:false}}}}
     });
   }
 }
