@@ -104,6 +104,17 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g900);min-
 .sb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
 .sb-btn.active{background:rgba(255,255,255,.18);color:#fff}
 .sb-btn svg{width:17px;height:17px;flex-shrink:0}
+.rev-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--g100);font-size:13px}
+.rev-row:last-child{border-bottom:none}
+.freq-opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1.5px solid var(--g200);border-radius:10px;margin-bottom:7px;cursor:pointer;transition:.15s}
+.freq-opt:has(input:checked){border-color:var(--vd);background:var(--vl)}
+.freq-opt input{margin-top:3px;accent-color:var(--vd)}
+.freq-opt .fo-t{font-size:12.5px;font-weight:700}
+.freq-opt .fo-s{font-size:11px;color:var(--g600)}
+.fo-reco{background:var(--vl);color:var(--vd);font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;border:1px solid var(--v);margin-left:4px}
+.see-all{font-size:12px;font-weight:700;color:var(--vd);cursor:pointer;background:none;border:none;font-family:inherit}
+.see-all:hover{text-decoration:underline}
+.avatar-lg{width:84px;height:84px;border-radius:50%;object-fit:cover;background:var(--g100);border:3px solid var(--g200);display:flex;align-items:center;justify-content:center;font-size:34px}
 .sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.1)}
 .main{margin-left:240px;padding:28px;min-height:100vh}
 .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
@@ -397,7 +408,9 @@ tr:hover td{background:var(--g50)}
       </button>
       <div class="sb-sec">Paramètres</div>
       <button class="sb-btn" onclick="go('profil',this)">
-        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mon profil
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mon profil</button>
+      <button class="sb-btn" onclick="go('paiements',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Paiements
       </button>
     </nav>
     <div class="sb-foot">
@@ -456,6 +469,40 @@ tr:hover td{background:var(--g50)}
     <!-- PROFIL -->
     <div class="sec" id="sec-profil">
       <div class="card"><div class="card-head"><h2>👤 Mon profil</h2></div><div class="card-body" id="profil-content"></div></div>
+    </div>
+
+    <!-- PAIEMENTS -->
+    <div class="sec" id="sec-paiements">
+      <div style="max-width:640px">
+        <div class="card">
+          <div class="card-head"><h2>🏦 Paramètres de paiement</h2></div>
+          <div class="card-body" style="padding:14px 16px">
+            <p style="font-size:12px;color:var(--g600,#4b5563);margin-bottom:12px">Configurez la fréquence à laquelle vous souhaitez recevoir vos gains.</p>
+            <div style="font-size:13px;font-weight:700;margin-bottom:8px">Fréquence des paiements</div>
+            <label class="freq-opt"><input type="radio" name="freq" value="2jours" onchange="saveFreqPaiement(this.value)"/><div><div class="fo-t">Option A : Chaque 2 jours <span class="fo-reco">Recommandé</span></div><div class="fo-s">Recevez vos gains tous les 2 jours.</div></div></label>
+            <label class="freq-opt"><input type="radio" name="freq" value="semaine" onchange="saveFreqPaiement(this.value)"/><div><div class="fo-t">Option B : Chaque semaine</div><div class="fo-s">Recevez vos gains chaque semaine.</div></div></label>
+            <label class="freq-opt"><input type="radio" name="freq" value="mois" onchange="saveFreqPaiement(this.value)"/><div><div class="fo-t">Option C : Chaque mois</div><div class="fo-s">Recevez vos gains chaque mois.</div></div></label>
+            <div style="font-size:13px;font-weight:700;margin:16px 0 4px">Informations de paiement</div>
+            <div class="rev-row"><span>Gains totaux (net de commission <span id="rev-txcom">—</span>)</span><strong id="rev-net">—</strong></div>
+            <div class="rev-row"><span>Solde disponible</span><strong id="pay-dispo" style="color:var(--vd,#1a6b3c)">—</strong></div>
+            <div class="rev-row"><span>Solde en attente</span><strong id="pay-attente" style="color:#d97706">—</strong></div>
+            <div class="rev-row"><span>Dernier paiement</span><span id="pay-dernier" style="text-align:right;font-size:12px">—</span></div>
+            <div class="rev-row"><span>Prochain paiement prévu</span><span id="pay-prochain" style="text-align:right;font-size:12px;font-weight:700">—</span></div>
+            <div class="rev-row" style="align-items:center"><span>Méthode de paiement</span>
+              <span style="display:flex;align-items:center;gap:6px"><span id="pay-methode" style="font-size:12px;font-weight:600">—</span><button class="btn btn-sm" onclick="openPaiementModal()" title="Modifier">✏️</button></span>
+            </div>
+            <div style="background:#fffbeb;border-radius:10px;padding:12px 14px;margin-top:12px">
+              <div style="font-size:12px;font-weight:800;color:#d97706;margin-bottom:6px">⚠️ Informations importantes</div>
+              <ul style="font-size:11.5px;color:var(--g600,#4b5563);margin-left:16px;display:flex;flex-direction:column;gap:4px">
+                <li>Les gains sont versés selon la fréquence choisie.</li>
+                <li>Délai minimum de 48h après livraison avant disponibilité.</li>
+                <li>Seuil minimum de retrait : 10 000 FCFA.</li>
+                <li>La commission de YéyéMarket est déduite avant virement.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </div>
@@ -675,13 +722,13 @@ function showApp(){
   loadDashboard();
 }
 
-const titles={dashboard:'Tableau de bord',dispo:'Commandes disponibles',livraisons:'Mes livraisons',historique:'Historique',profil:'Mon profil'};
+const titles={dashboard:'Tableau de bord',dispo:'Commandes disponibles',livraisons:'Mes livraisons',historique:'Historique',profil:'Mon profil',paiements:'Paiements'};
 function go(name,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={dispo:loadDispoCommandes,livraisons:loadLivraisons,historique:loadHistorique,profil:loadProfil};
+  const loaders={dispo:loadDispoCommandes,livraisons:loadLivraisons,historique:loadHistorique,profil:loadProfil,paiements:loadPaiementsPage};
   if(loaders[name])loaders[name]();
 }
 
@@ -721,20 +768,8 @@ async function loadDashboard(){
   if(enCours.length>0){document.getElementById('b-liv').textContent=enCours.length;document.getElementById('b-liv').style.display='inline';}
   const wrap=document.getElementById('current-livraisons');
   if(!enCours.length){wrap.innerHTML='<div style="text-align:center;padding:32px;color:var(--g400)"><div style="font-size:36px;margin-bottom:8px">✅</div><p>Aucune livraison en cours</p></div>';return;}
-  wrap.innerHTML=enCours.map(l=>`<div class="liv-card">
-    <div class="liv-head"><span style="font-size:13px;font-weight:600">Commande #${l.commandes?.id?.substring(0,8)||'—'}</span>${sbadge(l.statut)}</div>
-    <div class="liv-body">
-      <div class="liv-adresse">📍 ${l.commandes?.adresse_livraison||'—'}</div>
-      <div class="liv-adresse">👤 ${l.commandes?.utilisateurs?.nom||'—'}</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
-        <div class="liv-total">💰 500 FCFA</div>
-        <div class="acts">
-          ${l.statut==='assignee'?`<button class="btn btn-sm btn-p" onclick="updateLivraison('${l.id}','en_cours')">🚴 Démarrer</button>`:''}
-          ${l.statut==='en_cours'?`<button class="btn btn-sm btn-ok" onclick="updateLivraison('${l.id}','livree')">✅ Livré !</button>`:''}
-        </div>
-      </div>
-    </div>
-  </div>`).join('');
+  await resolvePickups(enCours);
+  wrap.innerHTML=enCours.map(l=>livCard(l)).join('');
 }
 
 async function updateLivraison(id,statut){
@@ -757,6 +792,79 @@ async function updateLivraison(id,statut){
     toast('🎉 Livraison confirmée ! +500 FCFA','ok');
   }
   loadDashboard();
+}
+
+
+// Carte de course : retrait → livraison
+function livCard(l){
+  const pickup=l._pickup;
+  return `<div class="liv-card">
+    <div class="liv-head"><span style="font-size:13px;font-weight:600">Commande #${l.commandes?.id?.substring(0,8)||'—'}</span>${sbadge(l.statut)}</div>
+    <div class="liv-body">
+      <div style="background:var(--g50,#f9fafb);border-radius:10px;padding:10px 12px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:800;color:#d97706;margin-bottom:2px">📍 RETRAIT DU COLIS</div>
+        <div style="font-size:13px;font-weight:700">${pickup?.nom||'—'}</div>
+        <div style="font-size:12px;color:var(--g600,#4b5563)">${pickup?.adresse||''} ${pickup?.telephone?`· <a href="tel:${pickup.telephone}" style="color:#2563eb;font-weight:700">📞 Appeler</a>`:''}</div>
+      </div>
+      <div style="background:#eff6ff;border-radius:10px;padding:10px 12px;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:800;color:#2563eb;margin-bottom:2px">🏁 LIVRAISON</div>
+        <div style="font-size:13px;font-weight:700">👤 ${l.commandes?.utilisateurs?.nom||'—'}</div>
+        <div style="font-size:12px;color:var(--g600,#4b5563)">${l.commandes?.adresse_livraison||'—'}</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
+        <div class="liv-total">💰 ${fmt(l.commandes?.frais_livraison||500)} FCFA</div>
+        <div style="display:flex;gap:6px">
+          ${l.statut==='assignee'?`<button class="btn btn-sm btn-p" onclick="updateLivraison('${l.id}','en_cours')">📦 Colis récupéré — démarrer</button>`:''}
+          ${l.statut==='en_cours'?`<button class="btn btn-sm btn-ok" onclick="ouvrirPreuveLivraison('${l.id}')">📸 Livré — photo de preuve</button>`:''}
+        </div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// Résout le point de retrait (boutique ou restaurant) d'une commande
+async function resolvePickups(livs){
+  for(const l of livs){
+    if(!l.commandes?.id)continue;
+    try{
+      const {data:ligs}=await sb.from('lignes_commande').select('produit_id,menu_id').eq('commande_id',l.commandes.id).limit(1);
+      const lig=(ligs||[])[0];
+      if(lig?.produit_id){
+        const {data:p}=await sb.from('produits').select('boutiques(nom,adresse,telephone)').eq('id',lig.produit_id).single();
+        l._pickup=p?.boutiques;
+      }else if(lig?.menu_id){
+        const {data:m}=await sb.from('menus').select('restaurants(nom,adresse,telephone)').eq('id',lig.menu_id).single();
+        l._pickup=m?.restaurants;
+      }
+    }catch(e){}
+  }
+  return livs;
+}
+
+// Preuve de livraison par photo
+let _preuveLivId=null;
+function ouvrirPreuveLivraison(livId){_preuveLivId=livId;openModal('m-preuve');}
+async function confirmerLivraisonAvecPhoto(input){
+  const file=input.files[0];if(!file)return;
+  const st=document.getElementById('preuve-status');st.textContent='📤 Envoi de la photo...';
+  const ext=file.name.split('.').pop()||'jpg';
+  const path=`preuves/${_preuveLivId}_${Date.now()}.${ext}`;
+  const {error:upErr}=await sb.storage.from('livreurs').upload(path,file,{upsert:true});
+  if(upErr){st.textContent='';toast('Erreur photo : '+upErr.message,'err');return;}
+  const {data:pub}=sb.storage.from('livreurs').getPublicUrl(path);
+  st.textContent='✅ Photo envoyée — finalisation...';
+  const {error}=await sb.from('livraisons').update({statut:'livree',photo_preuve:pub?.publicUrl,heure_livraison:new Date().toISOString()}).eq('id',_preuveLivId);
+  if(error){st.textContent='';toast('Erreur : '+error.message,'err');return;}
+  const {data:liv}=await sb.from('livraisons').select('commande_id').eq('id',_preuveLivId).single();
+  if(liv)await sb.from('commandes').update({statut:'livree'}).eq('id',liv.commande_id);
+  try{
+    const {data:cmd}=await sb.from('commandes').select('client_id').eq('id',liv.commande_id).single();
+    if(cmd?.client_id)await sb.from('notifications').insert({user_id:cmd.client_id,titre:'Colis livré 🎉',message:'Votre commande a été livrée. Une photo de preuve est disponible dans le suivi.',type:'livraison',lu:false});
+  }catch(e){}
+  arreterSuiviGPS();
+  st.textContent='';closeModal('m-preuve');
+  toast('🎉 Livraison confirmée avec preuve photo !','ok');
+  loadDashboard();loadLivraisons();
 }
 
 // ====== SUIVI GPS TEMPS RÉEL ======
@@ -787,17 +895,7 @@ async function loadLivraisons(){
   const {data}=await sb.from('livraisons').select('*,commandes(id,total,adresse_livraison,statut,utilisateurs(nom))').eq('livreur_id',currentLivreur.id).in('statut',['assignee','en_cours']);
   const wrap=document.getElementById('liv-list');
   if(!data?.length){wrap.innerHTML='<div style="text-align:center;padding:32px;color:var(--g400)">Aucune livraison assignée</div>';return;}
-  wrap.innerHTML=data.map(l=>`<div class="liv-card">
-    <div class="liv-head"><span style="font-size:13px;font-weight:600">#${l.commandes?.id?.substring(0,8)}</span>${sbadge(l.statut)}</div>
-    <div class="liv-body">
-      <div class="liv-adresse">📍 ${l.commandes?.adresse_livraison||'—'}</div>
-      <div class="liv-adresse">👤 ${l.commandes?.utilisateurs?.nom||'—'}</div>
-      <div class="acts" style="margin-top:8px">
-        ${l.statut==='assignee'?`<button class="btn btn-sm btn-p" onclick="updateLivraison('${l.id}','en_cours')">🚴 Démarrer</button>`:''}
-        ${l.statut==='en_cours'?`<button class="btn btn-sm btn-ok" onclick="updateLivraison('${l.id}','livree')">✅ Marquer comme livré</button>`:''}
-      </div>
-    </div>
-  </div>`).join('');
+  wrap.innerHTML=(await resolvePickups(data||[])).map(l=>livCard(l)).join('');
 }
 
 async function loadHistorique(){
@@ -814,12 +912,99 @@ async function loadHistorique(){
 
 function loadProfil(){
   const m=document.getElementById('profil-content');
-  m.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+  m.innerHTML=`
+  <div style="display:flex;align-items:center;gap:18px;margin-bottom:20px">
+    ${currentLivreur.photo_url?`<img class="avatar-lg" src="${currentLivreur.photo_url}"/>`:'<span class="avatar-lg">🚴</span>'}
+    <div>
+      <div style="font-weight:800;font-size:16px">${currentLivreur.nom||'—'}</div>
+      <label style="display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:#2563eb;cursor:pointer">
+        📷 ${currentLivreur.photo_url?'Changer la photo':'Ajouter une photo de profil'}
+        <input type="file" accept="image/*" style="display:none" onchange="uploadProfilPhoto(this)"/>
+      </label>
+      <div id="photo-status" style="font-size:11px;color:var(--g400,#9ca3af);margin-top:2px"></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
     <div class="fgm"><label>Nom</label><input value="${currentLivreur.nom||''}" readonly style="background:var(--g50)"/></div>
     <div class="fgm"><label>Téléphone</label><input value="${currentLivreur.telephone||''}" readonly style="background:var(--g50)"/></div>
     <div class="fgm"><label>Zone</label><input value="${currentLivreur.zones?.nom||'—'}" readonly style="background:var(--g50)"/></div>
     <div class="fgm"><label>Statut</label><input value="${currentLivreur.statut}" readonly style="background:var(--g50)"/></div>
   </div>`;
+}
+
+async function uploadProfilPhoto(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>3*1024*1024){toast('Image trop lourde (max 3 Mo)','err');return;}
+  const st=document.getElementById('photo-status');if(st)st.textContent='Envoi en cours...';
+  const ext=file.name.split('.').pop();
+  const path=`profils/${currentLivreur.id}_${Date.now()}.${ext}`;
+  const {error:upErr}=await sb.storage.from('livreurs').upload(path,file,{upsert:true});
+  if(upErr){toast('Erreur upload : '+upErr.message,'err');if(st)st.textContent='';return;}
+  const {data:pub}=sb.storage.from('livreurs').getPublicUrl(path);
+  const url=pub?.publicUrl;
+  const {error}=await sb.from('livreurs').update({photo_url:url}).eq('id',currentLivreur.id);
+  if(error){toast('Erreur : '+error.message,'err');if(st)st.textContent='';return;}
+  currentLivreur.photo_url=url;
+  toast('✅ Photo de profil mise à jour','ok');
+  loadProfil();
+}
+
+async function loadPaiementsPage(){
+  if(!currentLivreur)return;
+  const {data:livs}=await sb.from('livraisons').select('statut,created_at,heure_livraison,commandes(frais_livraison)').eq('livreur_id',currentLivreur.id);
+  const livrees=(livs||[]).filter(l=>l.statut==='livree').map(l=>({date:l.heure_livraison||l.created_at,gain:l.commandes?.frais_livraison||500}));
+  let txCom=8;
+  try{
+    const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_liv').single();
+    if(pc&&pc.valeur!=null&&pc.valeur!=='')txCom=parseFloat(pc.valeur)||8;
+  }catch(e){}
+  const net=g=>Math.round(g*(100-txCom)/100);
+  const gainsNet=livrees.reduce((s,l)=>s+net(l.gain),0);
+  document.getElementById('rev-txcom').textContent=txCom+'%';
+  document.getElementById('rev-net').textContent=fmt(gainsNet)+' FCFA';
+  const h48=new Date(Date.now()-48*3600*1000);
+  const dispoBrut=livrees.filter(l=>new Date(l.date)<h48).reduce((s,l)=>s+net(l.gain),0);
+  const attente=livrees.filter(l=>new Date(l.date)>=h48).reduce((s,l)=>s+net(l.gain),0);
+  let totalVerse=0,dernier=null;
+  try{
+    const {data:vers,error:vErr}=await sb.from('versements').select('montant,created_at').eq('beneficiaire_type','livreur').eq('beneficiaire_id',currentLivreur.id).order('created_at',{ascending:false});
+    if(!vErr&&vers){totalVerse=vers.reduce((s,v)=>s+(v.montant||0),0);dernier=vers[0]||null;}
+  }catch(e){}
+  const dispo=Math.max(0,dispoBrut-totalVerse);
+  document.getElementById('pay-dispo').textContent=fmt(dispo)+' FCFA';
+  document.getElementById('pay-attente').textContent=fmt(attente)+' FCFA';
+  document.getElementById('pay-dernier').innerHTML=dernier?`${fdate(dernier.created_at)}<br><strong>${fmt(dernier.montant)} FCFA</strong>`:"Aucun pour l'instant";
+  const fj={'2jours':2,'semaine':7,'mois':30};
+  const freq=currentLivreur.freq_paiement||'2jours';
+  const radio=document.querySelector(`#sec-paiements input[name="freq"][value="${freq}"]`);if(radio)radio.checked=true;
+  const elP=document.getElementById('pay-prochain');
+  if(dispo<10000){elP.textContent='Dès 10 000 F de solde';}
+  else{
+    const base=dernier?new Date(dernier.created_at):new Date();
+    const next=new Date(base.getTime()+(fj[freq]||2)*24*3600*1000);
+    const dj=Math.max(0,Math.ceil((next-new Date())/(24*3600*1000)));
+    elP.innerHTML=fdate(next)+` <span style="background:#eff6ff;color:#2563eb;font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px">${dj===0?"Aujourd'hui":'Dans '+dj+' jour'+(dj>1?'s':'')}</span>`;
+  }
+  document.getElementById('pay-methode').textContent=currentLivreur.paiement_numero?`${currentLivreur.paiement_operateur||'MTN'} · ${currentLivreur.paiement_numero}`:'Non configurée';
+}
+function openPaiementModal(){
+  document.getElementById('pm-numero').value=currentLivreur.paiement_numero||currentLivreur.telephone||'';
+  document.getElementById('pm-operateur').value=currentLivreur.paiement_operateur||'MTN';
+  openModal('m-paiement');
+}
+async function saveFreqPaiement(v){
+  const {error}=await sb.from('livreurs').update({freq_paiement:v}).eq('id',currentLivreur.id);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  currentLivreur.freq_paiement=v;toast('✅ Fréquence enregistrée','ok');loadPaiementsPage();
+}
+async function savePaiementMethode(){
+  const numero=document.getElementById('pm-numero').value.trim();
+  const operateur=document.getElementById('pm-operateur').value;
+  if(!numero){toast('Entrez votre numéro Mobile Money','err');return;}
+  const {error}=await sb.from('livreurs').update({paiement_numero:numero,paiement_operateur:operateur}).eq('id',currentLivreur.id);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  currentLivreur.paiement_numero=numero;currentLivreur.paiement_operateur=operateur;
+  toast('✅ Méthode enregistrée','ok');closeModal('m-paiement');loadPaiementsPage();
 }
 
 async function loadZonesSelect(){
@@ -1020,5 +1205,29 @@ function subscribeDispoCommandes() {
 }
 
 </script>
+<div class="overlay" id="m-preuve">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head"><h3>📸 Preuve de livraison</h3><button class="modal-x" onclick="closeModal('m-preuve')">✕</button></div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--g600,#4b5563);margin-bottom:14px">Prenez une photo du colis remis au client (colis en main, devant la porte...). Elle sera visible par le client et la plateforme comme preuve de livraison.</p>
+      <label class="btn btn-ok" style="width:100%;text-align:center;cursor:pointer;display:block">
+        📷 Prendre la photo
+        <input type="file" accept="image/*" capture="environment" style="display:none" onchange="confirmerLivraisonAvecPhoto(this)"/>
+      </label>
+      <div id="preuve-status" style="font-size:12px;color:var(--g600,#4b5563);text-align:center;margin-top:10px"></div>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="m-paiement">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head"><h3>💳 Méthode de paiement</h3><button class="modal-x" onclick="closeModal('m-paiement')">✕</button></div>
+    <div class="modal-body">
+      <div class="fgm"><label>Opérateur *</label><select id="pm-operateur"><option value="MTN">MTN MoMo</option><option value="Moov">Moov Money</option><option value="Celtiis">Celtiis Cash</option></select></div>
+      <div class="fgm" style="margin-top:10px"><label>Numéro Mobile Money *</label><input type="tel" id="pm-numero" placeholder="+229 97 00 00 00"/></div>
+      <button class="btn btn-p" style="margin-top:14px;width:100%" onclick="savePaiementMethode()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>

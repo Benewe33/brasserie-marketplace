@@ -88,6 +88,77 @@ body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g900);min-
 .sb-btn:hover{background:rgba(255,255,255,.1);color:#fff}
 .sb-btn.active{background:rgba(255,255,255,.18);color:#fff}
 .sb-btn svg{width:17px;height:17px;flex-shrink:0}
+/* — Vue d'ensemble façon maquette — */
+.welcome-bar{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.welcome-bar h1{font-size:22px;font-weight:800;color:var(--g900)}
+.welcome-bar .wb-sub{font-size:13px;color:var(--g600);margin-top:2px}
+.wb-right{display:flex;align-items:center;gap:10px}
+.badge-live{display:inline-flex;align-items:center;gap:6px;background:var(--vl);color:var(--vd);font-size:12px;font-weight:700;padding:6px 12px;border-radius:99px}
+.badge-live::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--vd);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.wb-date{font-size:12px;color:var(--g600);background:#fff;border:1px solid var(--g200);padding:6px 12px;border-radius:10px;font-weight:600}
+.stat{display:flex;flex-direction:column;gap:2px;position:relative}
+.stat-ico{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:8px}
+.si-g{background:var(--vl)}.si-o{background:var(--orl)}.si-b{background:var(--bll)}.si-y{background:#fef9c3}
+.trend{font-size:11.5px;font-weight:700;margin-top:4px;display:inline-flex;align-items:center;gap:3px}
+.trend.up{color:var(--vd)}.trend.down{color:var(--r)}.trend.flat{color:var(--g400)}
+.rank-chip{width:22px;height:22px;border-radius:6px;background:var(--orl);color:var(--or);font-size:11px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.tp-thumb{width:34px;height:34px;border-radius:8px;object-fit:cover;background:var(--g100);flex-shrink:0;display:inline-flex;align-items:center;justify-content:center}
+.mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:16px}
+.mini-stat{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.ms-ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.ms-info .ms-label{font-size:11px;color:var(--g600);font-weight:600}
+.ms-info .ms-val{font-size:17px;font-weight:800;color:var(--g900)}
+.rev-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--g100);font-size:13px}
+.rev-row:last-child{border-bottom:none}
+.freq-opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1.5px solid var(--g200);border-radius:10px;margin-bottom:7px;cursor:pointer;transition:.15s}
+.freq-opt:has(input:checked){border-color:var(--vd);background:var(--vl)}
+.freq-opt input{margin-top:3px;accent-color:var(--vd)}
+.freq-opt .fo-t{font-size:12.5px;font-weight:700}
+.freq-opt .fo-s{font-size:11px;color:var(--g600)}
+.fo-reco{background:var(--vl);color:var(--vd);font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;border:1px solid var(--v);margin-left:4px}
+.see-all{font-size:12px;font-weight:700;color:var(--vd);cursor:pointer;background:none;border:none;font-family:inherit}
+.see-all:hover{text-decoration:underline}
+/* — Détail de commande — */
+.cmd-stepper{display:flex;align-items:center;gap:0;background:#fff;border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px;overflow-x:auto}
+.cstep{display:flex;align-items:center;gap:10px;flex:1;min-width:120px}
+.cstep .cnum{width:34px;height:34px;border-radius:50%;background:var(--g100);color:var(--g400);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cstep.done .cnum{background:var(--vd);color:#fff}
+.cstep.current .cnum{background:var(--vd);color:#fff;box-shadow:0 0 0 4px var(--vl)}
+.cstep .clab{font-size:12.5px;font-weight:700;color:var(--g900)}
+.cstep .csub{font-size:10.5px;color:var(--g400)}
+.cstep-arrow{color:var(--g200);font-size:18px;margin:0 8px;flex-shrink:0}
+.action-card{background:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.action-card.locked{opacity:.55;pointer-events:none}
+.action-card h4{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.action-card .ac-num{width:26px;height:26px;border-radius:50%;background:var(--vl);color:var(--vd);font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.action-card p{font-size:12px;color:var(--g600);margin-bottom:10px}
+.hint-box{background:var(--vl);border-radius:10px;padding:10px 12px;font-size:11.5px;color:var(--g600);margin-bottom:12px}
+.rev-row strong{font-weight:800}
+@media(max-width:900px){.mini-stats{grid-template-columns:repeat(2,1fr)}}
+.freq-opt{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1.5px solid var(--g200);border-radius:10px;margin-bottom:7px;cursor:pointer;transition:.15s}
+.freq-opt:has(input:checked){border-color:var(--vd);background:var(--vl)}
+.freq-opt input{margin-top:3px;accent-color:var(--vd)}
+.freq-opt .fo-t{font-size:12.5px;font-weight:700}
+.freq-opt .fo-s{font-size:11px;color:var(--g600)}
+.fo-reco{background:var(--vl);color:var(--vd);font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px;border:1px solid var(--v);margin-left:4px}
+.see-all{font-size:12px;font-weight:700;color:var(--vd);cursor:pointer;background:none;border:none;font-family:inherit}
+.see-all:hover{text-decoration:underline}
+/* — Détail de commande — */
+.cmd-stepper{display:flex;align-items:center;gap:0;background:#fff;border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px;overflow-x:auto}
+.cstep{display:flex;align-items:center;gap:10px;flex:1;min-width:120px}
+.cstep .cnum{width:34px;height:34px;border-radius:50%;background:var(--g100);color:var(--g400);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cstep.done .cnum{background:var(--vd);color:#fff}
+.cstep.current .cnum{background:var(--vd);color:#fff;box-shadow:0 0 0 4px var(--vl)}
+.cstep .clab{font-size:12.5px;font-weight:700;color:var(--g900)}
+.cstep .csub{font-size:10.5px;color:var(--g400)}
+.cstep-arrow{color:var(--g200);font-size:18px;margin:0 8px;flex-shrink:0}
+.action-card{background:#fff;border-radius:14px;padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.action-card.locked{opacity:.55;pointer-events:none}
+.action-card h4{font-size:14px;font-weight:800;display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.action-card .ac-num{width:26px;height:26px;border-radius:50%;background:var(--vl);color:var(--vd);font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center}
+.action-card p{font-size:12px;color:var(--g600);margin-bottom:10px}
+.hint-box{background:var(--vl);border-radius:10px;padding:10px 12px;font-size:11.5px;color:var(--g600);margin-bottom:12px}
 .sb-badge{margin-left:auto;background:var(--r);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:600}
 .sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.1)}
 .main{margin-left:240px;padding:28px;min-height:100vh}
@@ -329,6 +400,9 @@ tr:hover td{background:var(--g50)}
       </button>
     </nav>
     <div class="sb-foot">
+      <button class="sb-btn" onclick="go('paiements',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Paiements
+      </button>
       <button class="sb-btn" onclick="doLogout()" style="color:rgba(255,120,120,.9)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Déconnexion
       </button>
@@ -340,23 +414,69 @@ tr:hover td{background:var(--g50)}
 
     <!-- DASHBOARD -->
     <div class="sec active" id="sec-dashboard">
+      <div class="welcome-bar">
+        <div><h1>Vue d'ensemble</h1><p class="wb-sub">Bienvenue, <strong id="wb-nom">—</strong> 👋</p></div>
+        <div class="wb-right"><span class="badge-live">Actif</span><span class="wb-date" id="wb-date">—</span></div>
+      </div>
       <div class="stats" style="grid-template-columns:repeat(4,1fr)">
-        <div class="stat"><div class="stat-ico">🍽️</div><div class="stat-label">Menus actifs</div><div class="stat-val" id="s-menus">—</div></div>
-        <div class="stat"><div class="stat-ico">🛒</div><div class="stat-label">Commandes</div><div class="stat-val" id="s-cmds">—</div></div>
-        <div class="stat"><div class="stat-ico">💰</div><div class="stat-label">CA total</div><div class="stat-val" id="s-ca">—</div></div>
-        <div class="stat"><div class="stat-ico">⭐</div><div class="stat-label">Note moyenne</div><div class="stat-val" id="s-note">—</div></div>
+        <div class="stat"><div class="stat-ico si-o">🍽️</div><div class="stat-label">Menus actifs</div><div class="stat-val" id="s-menus">—</div><span class="trend flat" id="t-menus"></span></div>
+        <div class="stat"><div class="stat-ico si-g">🛒</div><div class="stat-label">Commandes</div><div class="stat-val" id="s-cmds">—</div><span class="trend flat" id="t-cmds"></span></div>
+        <div class="stat"><div class="stat-ico si-y">💰</div><div class="stat-label">CA total</div><div class="stat-val" id="s-ca">—</div><span class="trend flat" id="t-ca"></span></div>
+        <div class="stat"><div class="stat-ico si-b">⭐</div><div class="stat-label">Note moyenne</div><div class="stat-val" id="s-note">—</div><span class="trend flat" id="t-note"></span></div>
       </div>
       <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px">
         <div class="card">
-          <div class="card-head"><h2>📈 Ventes des 7 derniers jours</h2></div>
+          <div class="card-head"><h2>📈 Ventes</h2><select id="chart-period" onchange="renderVentesChart()" style="padding:6px 10px;border:1.5px solid var(--g200);border-radius:8px;font-family:inherit;font-size:12px;font-weight:600;color:var(--g600)"><option value="7">7 jours</option><option value="14">14 jours</option><option value="30">30 jours</option></select></div>
           <div class="card-body" style="padding:16px"><canvas id="chart-ventes" height="120"></canvas></div>
         </div>
         <div class="card">
-          <div class="card-head"><h2>🏆 Top plats</h2></div>
+          <div class="card-head"><h2>🏆 Top plats</h2><button class="see-all" onclick="go('menus',document.querySelectorAll('.sb-btn')[1])">Voir tout</button></div>
           <div class="card-body" style="padding:12px"><div id="top-menus-list" style="font-size:13px"></div></div>
         </div>
       </div>
-      <div class="card"><div class="card-head"><h2>🛒 Dernières commandes</h2></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Plats</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead><tbody id="dash-cmds"></tbody></table></div></div></div>
+      <div class="card"><div class="card-head"><h2>🛒 Dernières commandes</h2><button class="see-all" onclick="go('commandes',document.querySelectorAll('.sb-btn')[2])">Voir toutes</button></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Plats</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead><tbody id="dash-cmds"></tbody></table></div></div></div>
+      <div class="mini-stats">
+        <div class="mini-stat"><div class="ms-ico" style="background:var(--orl)">🛒</div><div class="ms-info"><div class="ms-label">Commandes aujourd'hui</div><div class="ms-val" id="ms-cmds">—</div></div></div>
+        <div class="mini-stat"><div class="ms-ico" style="background:var(--vl)">💵</div><div class="ms-info"><div class="ms-label">Revenus aujourd'hui</div><div class="ms-val" id="ms-rev">—</div></div></div>
+        <div class="mini-stat"><div class="ms-ico" style="background:var(--bll)">👥</div><div class="ms-info"><div class="ms-label">Clients uniques</div><div class="ms-val" id="ms-clients">—</div></div></div>
+        <div class="mini-stat"><div class="ms-ico" style="background:#f3e8ff">🧺</div><div class="ms-info"><div class="ms-label">Panier moyen</div><div class="ms-val" id="ms-panier">—</div></div></div>
+      </div>
+    </div>
+
+    <!-- PAIEMENTS -->
+    <div class="sec" id="sec-cmddetail"><div id="cmddetail-content"></div></div>
+
+    <div class="sec" id="sec-paiements">
+      <div style="max-width:640px">
+        <div class="card">
+          <div class="card-head"><h2>🏦 Paramètres de paiement</h2></div>
+          <div class="card-body" style="padding:14px 16px">
+            <p style="font-size:12px;color:var(--g600);margin-bottom:12px">Configurez la fréquence à laquelle vous souhaitez recevoir vos paiements.</p>
+            <div style="font-size:13px;font-weight:700;margin-bottom:8px">Fréquence des paiements</div>
+            <label class="freq-opt"><input type="radio" name="freq" value="2jours" onchange="saveFreqPaiement(this.value)"/><div><div class="fo-t">Option A : Chaque 2 jours <span class="fo-reco">Recommandé</span></div><div class="fo-s">Recevez vos paiements tous les 2 jours.</div></div></label>
+            <label class="freq-opt"><input type="radio" name="freq" value="semaine" onchange="saveFreqPaiement(this.value)"/><div><div class="fo-t">Option B : Chaque semaine</div><div class="fo-s">Recevez vos paiements chaque semaine.</div></div></label>
+            <label class="freq-opt"><input type="radio" name="freq" value="mois" onchange="saveFreqPaiement(this.value)"/><div><div class="fo-t">Option C : Chaque mois</div><div class="fo-s">Recevez vos paiements chaque mois.</div></div></label>
+            <div style="font-size:13px;font-weight:700;margin:16px 0 4px">Informations de paiement</div>
+            <div class="rev-row"><span>CA livré (net de commission <span id="rev-txcom">—</span>)</span><strong id="rev-net">—</strong></div>
+            <div class="rev-row"><span>Solde disponible</span><strong id="pay-dispo" style="color:var(--vd)">—</strong></div>
+            <div class="rev-row"><span>Solde en attente</span><strong id="pay-attente" style="color:var(--or)">—</strong></div>
+            <div class="rev-row"><span>Dernier paiement</span><span id="pay-dernier" style="text-align:right;font-size:12px">—</span></div>
+            <div class="rev-row"><span>Prochain paiement prévu</span><span id="pay-prochain" style="text-align:right;font-size:12px;font-weight:700">—</span></div>
+            <div class="rev-row" style="align-items:center"><span>Méthode de paiement</span>
+              <span style="display:flex;align-items:center;gap:6px"><span id="pay-methode" style="font-size:12px;font-weight:600">—</span><button class="btn btn-sm btn-ed" onclick="openPaiementModal()" title="Modifier">✏️</button></span>
+            </div>
+            <div style="background:var(--orl);border-radius:10px;padding:12px 14px;margin-top:12px">
+              <div style="font-size:12px;font-weight:800;color:var(--or);margin-bottom:6px">⚠️ Informations importantes</div>
+              <ul style="font-size:11.5px;color:var(--g600);margin-left:16px;display:flex;flex-direction:column;gap:4px">
+                <li>Les paiements sont effectués selon la fréquence choisie.</li>
+                <li>Délai minimum de 48h après livraison avant disponibilité.</li>
+                <li>Seuil minimum de retrait : 10 000 FCFA.</li>
+                <li>Les commissions de YéyéMarket sont déduites avant virement.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- MENUS -->
@@ -605,13 +725,365 @@ function showApp(){
   loadDashboard();loadCatSelect();
 }
 
-const titles={dashboard:'Vue d\'ensemble',menus:'Mes menus',commandes:'Commandes',restaurant:'Mon restaurant'};
+const titles={dashboard:'Vue d\'ensemble',menus:'Mes menus',commandes:'Commandes',restaurant:'Mon restaurant',paiements:'Paiements'};
 function go(name,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={menus:loadMenus,commandes:loadCmds,restaurant:loadRestoForm};
+  const loaders={menus:loadMenus,commandes:loadCmds,restaurant:loadRestoForm,paiements:loadPaiementsPage};
+  if(loaders[name])loaders[name]();
+}
+
+function pctTrend(t,y){if(!y&&!t)return null;if(!y)return{pct:100,up:true};const p=Math.round((t-y)/y*100);return{pct:Math.abs(p),up:p>=0};}
+function setTrend(id,tr){const el=document.getElementById(id);if(!el)return;if(!tr){el.textContent='';return;}el.className='trend '+(tr.up?'up':'down');el.innerHTML=(tr.up?'↗':'↘')+' '+tr.pct+'% vs hier';}
+
+async function loadDashboard(){
+  if(!currentResto)return;
+  const wbNom=document.getElementById('wb-nom');if(wbNom)wbNom.textContent=currentResto.nom||'—';
+  const wbDate=document.getElementById('wb-date');if(wbDate)wbDate.textContent='📅 '+new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+
+  const {data:menus}=await sb.from('menus').select('*').eq('restaurant_id',currentResto.id);
+  const menuIds=(menus||[]).map(m=>m.id);
+  document.getElementById('s-menus').textContent=(menus||[]).filter(m=>m.disponible!==false).length;
+  const moisDebut=new Date();moisDebut.setDate(1);moisDebut.setHours(0,0,0,0);
+  const nvMois=(menus||[]).filter(m=>m.created_at&&new Date(m.created_at)>=moisDebut).length;
+  const tM=document.getElementById('t-menus');if(tM){tM.className='trend up';tM.textContent=nvMois?`+${nvMois} ce mois`:'';}
+
+  if(!menuIds.length){
+    document.getElementById('s-cmds').textContent=0;document.getElementById('s-ca').textContent='0 FCFA';
+    const s=document.getElementById('s-note');if(s)s.textContent='—';
+    document.getElementById('dash-cmds').innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';
+    return;
+  }
+
+  const {data:ligs}=await sb.from('lignes_commande').select('*,commandes(id,statut,created_at,utilisateurs(nom))').in('menu_id',menuIds);
+  const cmdMap={};
+  (ligs||[]).forEach(l=>{
+    if(!l.commandes)return;
+    if(!cmdMap[l.commande_id])cmdMap[l.commande_id]={...l.commandes,items:[],total:0,menuVentes:{}};
+    cmdMap[l.commande_id].items.push(l.nom_item||'—');
+    cmdMap[l.commande_id].total+=(l.sous_total||0);
+    cmdMap[l.commande_id].menuVentes[l.menu_id]=(cmdMap[l.commande_id].menuVentes[l.menu_id]||0)+(l.quantite||1);
+  });
+  const cmds=Object.values(cmdMap).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  const livrees=cmds.filter(c=>c.statut==='livree');
+  const ca=livrees.reduce((s,c)=>s+c.total,0);
+  document.getElementById('s-cmds').textContent=cmds.length;
+  document.getElementById('s-ca').textContent=fmt(ca)+' FCFA';
+
+  const todayStr=new Date().toISOString().split('T')[0];
+  const yest=new Date();yest.setDate(yest.getDate()-1);const yestStr=yest.toISOString().split('T')[0];
+  const cT=cmds.filter(c=>c.created_at?.startsWith(todayStr)),cY=cmds.filter(c=>c.created_at?.startsWith(yestStr));
+  setTrend('t-cmds',pctTrend(cT.length,cY.length));
+  const caT=cT.filter(c=>c.statut==='livree').reduce((s,c)=>s+c.total,0),caY=cY.filter(c=>c.statut==='livree').reduce((s,c)=>s+c.total,0);
+  setTrend('t-ca',pctTrend(caT,caY));
+
+  const {data:avis}=await sb.from('avis').select('note').eq('restaurant_id',currentResto.id);
+  const s_note=document.getElementById('s-note');
+  if(s_note)s_note.textContent=avis?.length?(avis.reduce((s,a)=>s+(a.note||0),0)/avis.length).toFixed(1)+' / 5':'—';
+  const tN=document.getElementById('t-note');if(tN&&avis?.length){tN.className='trend up';tN.textContent='↗ '+avis.length+' avis';}
+
+  const msC=document.getElementById('ms-cmds');if(msC)msC.textContent=cT.length;
+  const msR=document.getElementById('ms-rev');if(msR)msR.textContent=fmt(caT)+' F';
+  const msCl=document.getElementById('ms-clients');if(msCl)msCl.textContent=new Set(cmds.map(c=>c.utilisateurs?.nom).filter(Boolean)).size;
+  const msP=document.getElementById('ms-panier');if(msP)msP.textContent=fmt(cmds.length?Math.round(cmds.reduce((s,c)=>s+c.total,0)/cmds.length):0)+' F';
+
+  const pending=cmds.filter(c=>c.statut==='en_attente').length;
+  if(pending>0){const b=document.getElementById('b-cmd');if(b){b.textContent=pending;b.style.display='inline';}}
+
+  const tb=document.getElementById('dash-cmds');
+  tb.innerHTML=cmds.length
+    ? cmds.slice(0,8).map(c=>`<tr>
+        <td><code>#${c.id?.substring(0,8)}</code></td>
+        <td>${c.utilisateurs?.nom||'—'}</td>
+        <td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.items?.slice(0,2).join(', ')+(c.items?.length>2?' +'+(c.items.length-2):'')}</td>
+        <td><strong>${fmt(c.total)} FCFA</strong></td>
+        <td>${sbadge(c.statut)}</td>
+        <td>${fdate(c.created_at)}</td>
+      </tr>`).join('')
+    : '<tr><td colspan="6" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';
+
+  const mv={};cmds.forEach(c=>Object.entries(c.menuVentes||{}).forEach(([id,q])=>{mv[id]=(mv[id]||0)+q;}));
+  const top=Object.entries(mv).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const tl=document.getElementById('top-menus-list');
+  if(tl)tl.innerHTML=top.length
+    ? top.map(([id,q],i)=>{
+        const m=menus.find(x=>x.id===id);
+        return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--g100)">
+          ${m?.image_url?`<img class="tp-thumb" src="${m.image_url}"/>`:'<span class="tp-thumb">🍽️</span>'}
+          <span class="rank-chip">${i+1}</span>
+          <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${m?.nom||id.substring(0,8)}</div>
+          <div style="font-size:11px;color:var(--g400)">${q} commande${q>1?'s':''}</div></div>
+        </div>`;
+      }).join('')
+    : '<p style="color:var(--g400);text-align:center;padding:20px;font-size:13px">Aucune vente</p>';
+
+  window._dashLivrees=livrees;
+  renderVentesChart();
+}
+
+function renderVentesChart(){
+  const livrees=window._dashLivrees||[];
+  const nb=parseInt(document.getElementById('chart-period')?.value)||7;
+  const days=[],vd=[];
+  for(let i=nb-1;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);
+    days.push(nb>14?d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'}));
+    const ds=d.toISOString().split('T')[0];
+    vd.push(livrees.filter(c=>c.created_at?.startsWith(ds)).reduce((s,c)=>s+c.total,0));
+  }
+  const ctx=document.getElementById('chart-ventes')?.getContext('2d');
+  if(ctx){
+    if(window._chartVentes)window._chartVentes.destroy();
+    window._chartVentes=new Chart(ctx,{type:'line',data:{labels:days,datasets:[{label:'FCFA',data:vd,borderColor:'#1a6b3c',backgroundColor:'rgba(26,107,60,0.08)',fill:true,tension:0.4,borderWidth:2.5,pointBackgroundColor:'#fff',pointBorderColor:'#1a6b3c',pointBorderWidth:2,pointRadius:nb>14?2:4,pointHoverRadius:6}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt(c.parsed.y)+' FCFA'}}},scales:{y:{beginAtZero:true,ticks:{callback:v=>fmt(v)}},x:{grid:{display:false}}}}});
+  }
+}
+
+// ============================================================
+// DÉTAIL DE COMMANDE + ACTIONS (accepter → prête → livreur)
+// ============================================================
+async function openCmdDetail(cmdId){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-cmddetail').classList.add('active');
+  document.getElementById('ptitle').textContent='Détail de la commande';
+  const wrap=document.getElementById('cmddetail-content');
+  wrap.innerHTML='<div style="text-align:center;padding:48px;color:var(--g400)">⏳ Chargement...</div>';
+
+  const {data:cmd}=await sb.from('commandes').select('*,utilisateurs(nom,telephone),zones(nom,ville)').eq('id',cmdId).single();
+  if(!cmd){wrap.innerHTML='<p style="color:var(--r)">Commande introuvable</p>';return;}
+  const {data:prods}=await sb.from('menus').select('id').eq('restaurant_id',currentResto.id);
+  const prodIds=(prods||[]).map(p=>p.id);
+  const {data:lignes}=await sb.from('lignes_commande').select('*,menus(nom,image_url)').eq('commande_id',cmdId).in('menu_id',prodIds);
+  const {data:liv}=await sb.from('livraisons').select('*,livreurs(nom,telephone)').eq('commande_id',cmdId).maybeSingle();
+  renderCmdDetail(cmd,lignes||[],liv);
+}
+
+function renderCmdDetail(cmd,lignes,liv){
+  const wrap=document.getElementById('cmddetail-content');
+  const sousTotal=lignes.reduce((s,l)=>s+(l.sous_total||0),0);
+  let txCom=10;try{txCom=window._txComCache||10;}catch(e){}
+  const com=Math.round(sousTotal*txCom/100);
+  const order=['confirmee','en_preparation','prete','en_livraison','livree'];
+  let idx=order.indexOf(cmd.statut);if(cmd.statut==='en_attente')idx=0;if(idx<0)idx=0;
+  const steps=[
+    {n:1,lab:'Commande reçue',sub:idx>0?'Acceptée':'En attente'},
+    {n:2,lab:'Préparer le colis',sub:idx>1?'Prêt':(idx===1?'En cours':'En attente')},
+    {n:3,lab:'En route',sub:idx>3?'Parti':(idx===3?'En livraison':'En attente')},
+    {n:4,lab:'Livrée',sub:idx>=4?'Terminé 🎉':'En attente'}
+  ];
+  const stepState=i=>{const map=[0,1,3,4];if(idx>map[i])return'done';if(idx===map[i]||(i===0&&idx===0))return i===0&&idx===0?'current':'current';return'';};
+  const stepHtml=steps.map((s,i)=>{
+    const st=idx>[0,1,3,4][i]?'done':(idx===[0,1,3,4][i]?'current':'');
+    return `<div class="cstep ${st}"><span class="cnum">${st==='done'?'✓':s.n}</span><div><div class="clab">${s.lab}</div><div class="csub">${s.sub}</div></div></div>${i<3?'<span class="cstep-arrow">›</span>':''}`;
+  }).join('');
+
+  const alerte=cmd.statut==='confirmee'||cmd.statut==='en_attente'
+    ?'<div class="hint-box" style="display:flex;gap:8px;align-items:center">🔔 <strong>Vous avez une nouvelle commande.</strong>&nbsp;Veuillez l\'accepter pour commencer le traitement.</div>':'';
+
+  wrap.innerHTML=`
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+    <button class="btn btn-sm" onclick="go('commandes',document.querySelectorAll('.sb-btn')[2])">← Retour</button>
+    <div><h1 style="font-size:19px;font-weight:800">Commande #${cmd.id.substring(0,8).toUpperCase()}</h1>
+    <p style="font-size:12px;color:var(--g600)">Passée le ${new Date(cmd.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})} à ${new Date(cmd.created_at).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})} ${sbadge(cmd.statut)}</p></div>
+  </div>
+  <div class="cmd-stepper">${stepHtml}</div>
+  ${alerte}
+  <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card" style="margin-bottom:0">
+      <div class="card-head"><h2>📋 Détails de la commande</h2></div>
+      <div class="card-body">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Plat</th><th>Qté</th><th>Prix unitaire</th><th>Total</th></tr></thead>
+          <tbody>${lignes.map(l=>`<tr>
+            <td><div style="display:flex;align-items:center;gap:10px">${l.menus?.image_url?`<img src="${l.menus.image_url}" style="width:38px;height:38px;border-radius:8px;object-fit:cover"/>`:'<span style="font-size:22px">🍽️</span>'}<strong>${l.nom_item||l.menus?.nom||'—'}</strong></div></td>
+            <td>${l.quantite||1}</td>
+            <td>${fmt(Math.round((l.sous_total||0)/(l.quantite||1)))} FCFA</td>
+            <td><strong>${fmt(l.sous_total||0)} FCFA</strong></td>
+          </tr>`).join('')}</tbody>
+        </table></div>
+        <div style="margin-top:12px;border-top:1px solid var(--g100);padding-top:10px;font-size:13px">
+          <div class="rev-row"><span>Sous-total (vos plats)</span><strong>${fmt(sousTotal)} FCFA</strong></div>
+          <div class="rev-row"><span>Frais de livraison (commande)</span><span>${fmt(cmd.frais_livraison||0)} FCFA</span></div>
+          <div class="rev-row"><span>Commission YéyéMarket (${txCom}%)</span><span style="color:var(--r)">−${fmt(com)} FCFA</span></div>
+          <div class="rev-row" style="font-size:14px"><span><strong>Vous recevrez</strong></span><strong style="color:var(--vd)">${fmt(sousTotal-com)} FCFA</strong></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div class="card" style="margin-bottom:0"><div class="card-head"><h2>👤 Client</h2></div>
+        <div class="card-body" style="font-size:13px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <div><strong>${cmd.utilisateurs?.nom||'—'}</strong><br><span style="color:var(--g600)">${cmd.utilisateurs?.telephone||''}</span></div>
+            ${cmd.utilisateurs?.telephone?`<a href="tel:${cmd.utilisateurs.telephone}" class="btn btn-sm btn-ok" style="text-decoration:none">📞</a>`:''}
+          </div>
+          <div style="border-top:1px solid var(--g100);padding-top:10px;margin-bottom:10px">
+            <div style="font-weight:700;margin-bottom:4px">📍 Adresse de livraison</div>
+            <div style="color:var(--g600)">${cmd.adresse_livraison||'—'}<br>${cmd.zones?.nom||''}, ${cmd.zones?.ville||''}</div>
+          </div>
+          <div style="border-top:1px solid var(--g100);padding-top:10px;margin-bottom:10px">
+            <div style="font-weight:700;margin-bottom:4px">💳 Paiement</div>
+            <div class="rev-row"><span>Méthode</span><span>Mobile Money (KKiaPay)</span></div>
+            <div class="rev-row"><span>Statut</span><span class="badge bg">Payé</span></div>
+            <div class="rev-row"><span>Montant payé</span><strong>${fmt(cmd.total)} FCFA</strong></div>
+          </div>
+          <div style="border-top:1px solid var(--g100);padding-top:10px">
+            <div style="font-weight:700;margin-bottom:4px">💬 Notes du client</div>
+            <div style="color:var(--g600)">${cmd.notes||'Pas de note'}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px">
+    <div class="action-card ${idx>=1?'locked':''}">
+      <h4><span class="ac-num">1</span> Accepter la commande</h4>
+      <p>Vérifiez les détails et acceptez la commande pour commencer.</p>
+      <div class="hint-box">ℹ️ En acceptant, vous confirmez que vous pouvez préparer cette commande.</div>
+      <button class="btn btn-p" style="margin-top:auto" ${idx>=1?'disabled':''} onclick="cmdAvance('${cmd.id}','en_preparation','✅ Commande acceptée — le client est notifié')">${idx>=1?'✓ Acceptée':'Accepter la commande'}</button>
+    </div>
+    <div class="action-card ${idx!==1?'locked':''}">
+      <h4><span class="ac-num">2</span> Préparer le colis</h4>
+      <p>Préparez la commande selon les détails.</p>
+      <div class="hint-box">✔️ Vérifiez les produits<br>✔️ Préparez le colis<br>✔️ Emballez soigneusement</div>
+      <button class="btn btn-p" style="margin-top:auto" ${idx!==1?'disabled':''} onclick="cmdAvance('${cmd.id}','prete','📦 Commande marquée prête')">${idx>=2?'✓ Prête':'Commande prête'}</button>
+    </div>
+    <div class="action-card ${idx!==2&&idx!==3?'locked':''}">
+      <h4><span class="ac-num">3</span> Mettre en route</h4>
+      ${liv?`<p>Livreur assigné : <strong>${liv.livreurs?.nom||'—'}</strong> ${liv.livreurs?.telephone?'· '+liv.livreurs.telephone:''}</p><div class="hint-box">${liv.statut==='assignee'?'📋 Le livreur a été notifié et va récupérer le colis.':liv.statut==='en_cours'?'🚴 Livraison en cours — le client suit le trajet en direct.':'✅ Livraison terminée.'}</div>`
+      :`<p>Sélectionnez un livreur pour livrer la commande.</p>
+      <select id="cd-livreur" style="padding:9px;border:1.5px solid var(--g200);border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:10px"><option value="">Sélectionner un livreur...</option></select>
+      <div class="hint-box">ℹ️ Le livreur sera notifié et se rendra chez vous pour récupérer le colis.</div>
+      <button class="btn btn-ok" style="margin-top:auto" ${idx!==2?'disabled':''} onclick="assignerLivreur('${cmd.id}')">📨 Mettre en route</button>`}
+    </div>
+  </div>
+  <div class="card"><div class="card-head"><h2>🕐 Historique</h2></div>
+    <div class="card-body" style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:13px">
+      <div>
+        <div style="padding:6px 0;border-left:3px solid var(--vd);padding-left:12px"><strong>${fdate(cmd.created_at)}</strong><br><span style="color:var(--g600)">Commande passée par le client</span></div>
+        ${liv?`<div style="padding:6px 0;border-left:3px solid var(--vd);padding-left:12px;margin-top:8px"><strong>${fdate(liv.created_at)}</strong><br><span style="color:var(--g600)">Livreur assigné : ${liv.livreurs?.nom||''}</span></div>`:''}
+        ${liv?.photo_preuve?`<div style="padding:6px 0;border-left:3px solid var(--vd);padding-left:12px;margin-top:8px"><strong>Preuve de livraison</strong><br><img src="${liv.photo_preuve}" style="width:120px;border-radius:10px;margin-top:6px"/></div>`:''}
+      </div>
+      <div style="background:var(--orl);border-radius:10px;padding:12px 14px;height:fit-content">
+        <div style="font-size:12px;font-weight:800;color:var(--or);margin-bottom:6px">⚠️ À savoir</div>
+        <ul style="font-size:11.5px;color:var(--g600);margin-left:16px">
+          <li>Acceptez rapidement pour ne pas faire attendre le client.</li>
+          <li>Le client est notifié à chaque étape.</li>
+        </ul>
+      </div>
+    </div>
+  </div>`;
+  if(!liv&&idx===2)chargerLivreurs();
+}
+
+async function cmdAvance(cmdId,statut,msg){
+  const {error}=await sb.from('commandes').update({statut}).eq('id',cmdId);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  toast(msg,'ok');
+  try{
+    const {data:cmd}=await sb.from('commandes').select('client_id').eq('id',cmdId).single();
+    if(cmd?.client_id)await sb.from('notifications').insert({user_id:cmd.client_id,titre:statut==='en_preparation'?'Commande acceptée ✅':'Commande prête 📦',message:statut==='en_preparation'?'Votre commande est en préparation.':'Votre commande est prête, un livreur va la récupérer.',type:'commande',lu:false});
+  }catch(e){}
+  openCmdDetail(cmdId);
+}
+
+async function chargerLivreurs(){
+  const sel=document.getElementById('cd-livreur');if(!sel)return;
+  const {data}=await sb.from('livreurs').select('id,nom,disponible,statut,zones(nom)').eq('statut','actif').order('nom');
+  const dispos=(data||[]);
+  sel.innerHTML='<option value="">Sélectionner un livreur...</option>'+dispos.map(l=>`<option value="${l.id}">${l.disponible?'🟢':'⚪'} ${l.nom}${l.zones?.nom?' — '+l.zones.nom:''}</option>`).join('');
+}
+
+async function assignerLivreur(cmdId){
+  const sel=document.getElementById('cd-livreur');
+  const livreurId=sel?.value;
+  if(!livreurId){toast('Sélectionnez un livreur','err');return;}
+  const {error}=await sb.from('livraisons').insert({commande_id:cmdId,livreur_id:livreurId,statut:'assignee'});
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  try{
+    const {data:l}=await sb.from('livreurs').select('user_id,nom').eq('id',livreurId).single();
+    if(l?.user_id)await sb.from('notifications').insert({user_id:l.user_id,titre:'Nouvelle course 🚴',message:'Une commande vous a été assignée — récupérez le colis chez '+(currentResto?.nom||'le restaurant')+'.',type:'livraison',lu:false});
+  }catch(e){}
+  toast('📨 Livreur notifié !','ok');
+  openCmdDetail(cmdId);
+}
+
+
+async function loadPaiementsPage(){
+  if(!currentResto)return;
+  const {data:menus}=await sb.from('menus').select('id').eq('restaurant_id',currentResto.id);
+  const ids=(menus||[]).map(m=>m.id);
+  let livrees=[];
+  if(ids.length){
+    const {data:ligs}=await sb.from('lignes_commande').select('commande_id,sous_total,commandes(id,statut,created_at)').in('menu_id',ids);
+    const map={};
+    (ligs||[]).forEach(l=>{
+      if(!l.commandes||l.commandes.statut!=='livree')return;
+      if(!map[l.commande_id])map[l.commande_id]={created_at:l.commandes.created_at,total:0};
+      map[l.commande_id].total+=(l.sous_total||0);
+    });
+    livrees=Object.values(map);
+  }
+  const ca=livrees.reduce((s,c)=>s+c.total,0);
+  let txCom=10;
+  try{
+    const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_rest').single();
+    if(pc&&pc.valeur!=null&&pc.valeur!=='')txCom=parseFloat(pc.valeur)||10;window._txComCache=txCom;
+  }catch(e){}
+  const net=t=>Math.round(t*(100-txCom)/100);
+  document.getElementById('rev-txcom').textContent=txCom+'%';
+  document.getElementById('rev-net').textContent=fmt(net(ca))+' FCFA';
+  const h48=new Date(Date.now()-48*3600*1000);
+  const netMur=net(livrees.filter(c=>new Date(c.created_at)<h48).reduce((s,c)=>s+c.total,0));
+  const netAtt=net(livrees.filter(c=>new Date(c.created_at)>=h48).reduce((s,c)=>s+c.total,0));
+  let totalVerse=0,dernier=null;
+  try{
+    const {data:vers,error:vErr}=await sb.from('versements').select('montant,created_at').eq('beneficiaire_type','restaurant').eq('beneficiaire_id',currentResto.id).order('created_at',{ascending:false});
+    if(!vErr&&vers){totalVerse=vers.reduce((s,v)=>s+(v.montant||0),0);dernier=vers[0]||null;}
+  }catch(e){}
+  const dispo=Math.max(0,netMur-totalVerse);
+  document.getElementById('pay-dispo').textContent=fmt(dispo)+' FCFA';
+  document.getElementById('pay-attente').textContent=fmt(netAtt)+' FCFA';
+  document.getElementById('pay-dernier').innerHTML=dernier?`${fdate(dernier.created_at)}<br><strong>${fmt(dernier.montant)} FCFA</strong>`:"Aucun pour l'instant";
+  const fj={'2jours':2,'semaine':7,'mois':30};
+  const freq=currentResto.freq_paiement||'2jours';
+  const radio=document.querySelector(`input[name="freq"][value="${freq}"]`);if(radio)radio.checked=true;
+  const elP=document.getElementById('pay-prochain');
+  if(dispo<10000){elP.textContent='Dès 10 000 F de solde';}
+  else{
+    const base=dernier?new Date(dernier.created_at):new Date();
+    const next=new Date(base.getTime()+(fj[freq]||2)*24*3600*1000);
+    const dj=Math.max(0,Math.ceil((next-new Date())/(24*3600*1000)));
+    elP.innerHTML=fdate(next)+` <span style="background:var(--bll);color:var(--bl);font-size:10px;font-weight:800;padding:2px 7px;border-radius:99px">${dj===0?"Aujourd'hui":'Dans '+dj+' jour'+(dj>1?'s':'')}</span>`;
+  }
+  document.getElementById('pay-methode').textContent=currentResto.paiement_numero?`${currentResto.paiement_operateur||'MTN'} · ${currentResto.paiement_numero}`:'Non configurée';
+}
+function openPaiementModal(){
+  document.getElementById('pm-numero').value=currentResto.paiement_numero||'';
+  document.getElementById('pm-operateur').value=currentResto.paiement_operateur||'MTN';
+  openModal('m-paiement');
+}
+async function saveFreqPaiement(v){
+  const {error}=await sb.from('restaurants').update({freq_paiement:v}).eq('id',currentResto.id);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  currentResto.freq_paiement=v;toast('✅ Fréquence enregistrée','ok');loadPaiementsPage();
+}
+async function savePaiementMethode(){
+  const numero=document.getElementById('pm-numero').value.trim();
+  const operateur=document.getElementById('pm-operateur').value;
+  if(!numero){toast('Entrez votre numéro Mobile Money','err');return;}
+  const {error}=await sb.from('restaurants').update({paiement_numero:numero,paiement_operateur:operateur}).eq('id',currentResto.id);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  currentResto.paiement_numero=numero;currentResto.paiement_operateur=operateur;
+  toast('✅ Méthode enregistrée','ok');closeModal('m-paiement');loadPaiementsPage();
+}
+
+function go(name,btn){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');btn.classList.add('active');
+  document.getElementById('ptitle').textContent=titles[name]||name;
+  const loaders={menus:loadMenus,commandes:loadCmds,restaurant:loadRestoForm,paiements:loadPaiementsPage};
   if(loaders[name])loaders[name]();
 }
 
@@ -757,7 +1229,7 @@ async function loadCmds(){
   const cmds=Object.values(cmdMap).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
   const tb=document.getElementById('cmd-body');
   if(!cmds.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--g400);padding:32px">Aucune commande</td></tr>';return;}
-  tb.innerHTML=cmds.map(c=>`<tr><td><code>#${c.id?.substring(0,8)}</code></td><td>${c.utilisateurs?.nom||'—'}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.items?.join(', ')}</td><td><strong>${fmt(c.total)} FCFA</strong></td><td>${sbadge(c.statut)}</td><td>${fdate(c.created_at)}</td></tr>`).join('');
+  tb.innerHTML=cmds.map(c=>`<tr style="cursor:pointer" onclick="openCmdDetail('${c.id}')"><td><code>#${c.id?.substring(0,8)}</code></td><td>${c.utilisateurs?.nom||'—'}</td><td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.items?.join(', ')}</td><td><strong>${fmt(c.total)} FCFA</strong></td><td>${sbadge(c.statut)}</td><td>${fdate(c.created_at)}</td></tr>`).join('');
 }
 
 function loadRestoForm(){
@@ -791,7 +1263,7 @@ async function loadZonesSelect(){
   (data||[]).forEach(z=>sel.innerHTML+=`<option value="${z.id}">${z.ville} — ${z.nom}</option>`);
 }
 function switchTab(type,btn){document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.aform').forEach(f=>f.classList.remove('active'));btn.classList.add('active');document.getElementById('form-'+type).classList.add('active');}
-function sbadge(s){const m={en_attente:'<span class="badge bo">⏳</span>',confirmee:'<span class="badge bb">✅</span>',en_preparation:'<span class="badge bo">👨‍🍳</span>',prete:'<span class="badge bg">📦</span>',en_livraison:'<span class="badge bb">🚴</span>',livree:'<span class="badge bg">✅ Livrée</span>',annulee:'<span class="badge br">❌</span>'};return m[s]||`<span class="badge bgr">${s||'—'}</span>`;}
+function sbadge(s){const m={en_preparation:'<span class="badge bo">👨‍🍳 En préparation</span>',prete:'<span class="badge bb">📦 Prête</span>',en_livraison:'<span class="badge bo">🚴 En livraison</span>',en_attente:'<span class="badge bo">⏳</span>',confirmee:'<span class="badge bb">✅</span>',en_preparation:'<span class="badge bo">👨‍🍳</span>',prete:'<span class="badge bg">📦</span>',en_livraison:'<span class="badge bb">🚴</span>',livree:'<span class="badge bg">✅ Livrée</span>',annulee:'<span class="badge br">❌</span>'};return m[s]||`<span class="badge bgr">${s||'—'}</span>`;}
 function fmt(n){return(n||0).toLocaleString('fr-FR');}
 function fdate(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
 function openModal(id){document.getElementById(id).classList.add('open');}
@@ -859,5 +1331,15 @@ function getSignatureData() {
 }
 
 </script>
+<div class="overlay" id="m-paiement">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head"><h3>💳 Méthode de paiement</h3><button class="modal-x" onclick="closeModal('m-paiement')">✕</button></div>
+    <div class="modal-body">
+      <div class="fgm"><label>Opérateur *</label><select id="pm-operateur"><option value="MTN">MTN MoMo</option><option value="Moov">Moov Money</option><option value="Celtiis">Celtiis Cash</option></select></div>
+      <div class="fgm" style="margin-top:10px"><label>Numéro Mobile Money *</label><input type="tel" id="pm-numero" placeholder="+229 97 00 00 00"/></div>
+      <button class="btn btn-p" style="margin-top:14px;width:100%" onclick="savePaiementMethode()">💾 Enregistrer</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
