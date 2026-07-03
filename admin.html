@@ -886,6 +886,18 @@ tr:hover td{background:var(--g50)}
           </div>
         </div>
       </div>
+      <div class="card" style="margin-top:16px;margin-bottom:0">
+        <div class="card-head"><h2>📣 Pixels publicitaires (Ads)</h2></div>
+        <div class="card-body">
+          <p style="font-size:12px;color:var(--g400);margin-bottom:14px">Colle uniquement l'<strong>identifiant</strong> du pixel (pas le code complet). Le site l'installe automatiquement et envoie les événements PageView, Ajout au panier, Début de commande et Achat — utiles pour mesurer et optimiser tes campagnes.</p>
+          <div class="stats-grid-2" style="gap:14px">
+            <div><label class="set-lbl">📘 Meta Pixel ID (Facebook/Instagram Ads)</label><input class="set-inp" id="set-px-meta" placeholder="ex: 123456789012345"/></div>
+            <div><label class="set-lbl">🎵 TikTok Pixel ID</label><input class="set-inp" id="set-px-tiktok" placeholder="ex: C0ABC1DEF2GHI3JKL4"/></div>
+            <div><label class="set-lbl">🔎 Google Tag ID (Analytics / Google Ads)</label><input class="set-inp" id="set-px-gtag" placeholder="ex: G-XXXXXXX ou AW-XXXXXXX"/></div>
+          </div>
+          <p style="font-size:11px;color:var(--or);margin-top:12px">⚠️ Laisse vide pour désactiver. L'activation d'un pixel implique de le mentionner dans la politique de confidentialité.</p>
+        </div>
+      </div>
       <div style="margin-top:18px"><button class="btn-primary" id="set-save-btn" onclick="saveParametres()" style="padding:12px 28px">💾 Enregistrer les modifications</button></div>
     </div>
 
@@ -1945,6 +1957,7 @@ async function loadParametres(){  try{
     setVal('set-wa',p.social_whatsapp);setVal('set-tk',p.social_tiktok);
     // Application
     setVal('set-ios',p.app_ios);setVal('set-android',p.app_android);
+    setVal('set-px-meta',p.pixel_meta);setVal('set-px-tiktok',p.pixel_tiktok);setVal('set-px-gtag',p.pixel_gtag);
     refreshQR();
   }catch(e){}
 }
@@ -2050,7 +2063,10 @@ async function saveParametres(){
     {cle:'social_whatsapp',valeur:v('set-wa')},
     {cle:'social_tiktok',valeur:v('set-tk')},
     {cle:'app_ios',valeur:v('set-ios')},
-    {cle:'app_android',valeur:v('set-android')}
+    {cle:'app_android',valeur:v('set-android')},
+    {cle:'pixel_meta',valeur:v('set-px-meta').trim()},
+    {cle:'pixel_tiktok',valeur:v('set-px-tiktok').trim()},
+    {cle:'pixel_gtag',valeur:v('set-px-gtag').trim()}
   ];
   const btn=document.getElementById('set-save-btn');if(btn){btn.disabled=true;btn.textContent='⏳ Enregistrement...';}
   const {error}=await sb.from('parametres').upsert(rows,{onConflict:'cle'});

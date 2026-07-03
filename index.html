@@ -1676,6 +1676,7 @@ function addToCart(id,qty,prod=null){
   if(!prod){toast('Produit indisponible, réessayez','err');return;}
   if(cart[id])cart[id].qty+=qty;else cart[id]={...prod,qty};
   updateCartBadge();toast('✅ Ajouté au panier','ok');
+  try{pxTrack('AddToCart',{value:(prod.prix_promo||prod.prix)*qty});}catch(e){}
   if(typeof trackEvent==='function')trackEvent('ajout_panier',{produit_id:prod.id,produit_nom:prod.nom});
 }
 
@@ -1789,6 +1790,7 @@ function showCheckout(){
       <button class="btn-main" id="pay-btn" onclick="passOrder()">💳 Payer — ${fmt(_sub)} FCFA + livraison</button>
     </div>`;
   loadZonesSelect();
+  try{pxTrack('InitiateCheckout',{value:_sub});}catch(e){}
 }
 
 async function loadZonesSelect(){
@@ -1835,6 +1837,7 @@ async function passOrder(){
 async function onKKiapaySuccess(response){
   if(!pendingOrder)return;
   toast('💳 Paiement confirmé !','ok');
+  try{pxTrack('Purchase',{value:pendingOrder.total});}catch(e){}
   let {data:cmd,error}=await sb.from('commandes').insert({client_id:currentUser.id,total:pendingOrder.total,adresse_livraison:pendingOrder.adresse,zone_id:pendingOrder.zone_id,notes:pendingOrder.notes,statut:'confirmee',frais_livraison:pendingOrder.frais}).select().single();
   if(error){ // repli si la colonne frais_livraison n'existe pas encore
     ({data:cmd,error}=await sb.from('commandes').insert({client_id:currentUser.id,total:pendingOrder.total,adresse_livraison:pendingOrder.adresse,zone_id:pendingOrder.zone_id,notes:pendingOrder.notes,statut:'confirmee'}).select().single());
@@ -2243,6 +2246,37 @@ function setVille(v){
   if(typeof loadProducts==='function')loadProducts(_catFilter||null);
 }
 updateVilleLabel();
+
+// ============================================================
+// PIXELS PUBLICITAIRES (Meta, TikTok, Google) — pilotés depuis l'admin
+// ============================================================
+let _px={meta:null,tiktok:null,gtag:null};
+async function loadPixels(){
+  try{
+    const {data,error}=await sb.from('parametres').select('cle,valeur').in('cle',['pixel_meta','pixel_tiktok','pixel_gtag']);
+    if(error)return;
+    const p={};(data||[]).forEach(r=>p[r.cle]=(r.valeur||'').trim());
+    if(p.pixel_meta){_px.meta=p.pixel_meta;
+      !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init',_px.meta);fbq('track','PageView');
+    }
+    if(p.pixel_tiktok){_px.tiktok=p.pixel_tiktok;
+      !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=['page','track','identify','instances','debug','on','off','once','ready','alias','group','enableCookie','disableCookie'];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){var e=ttq._i[t]||[];for(var n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};ttq.load=function(e,n){var i='https://analytics.tiktok.com/i18n/pixel/events.js';ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=i;ttq._t=ttq._t||{};ttq._t[e]=+new Date;ttq._o=ttq._o||{};ttq._o[e]=n||{};var o=d.createElement('script');o.type='text/javascript';o.async=!0;o.src=i+'?sdkid='+e+'&lib='+t;var a=d.getElementsByTagName('script')[0];a.parentNode.insertBefore(o,a)};ttq.load(p.pixel_tiktok);ttq.page();}(window,document,'ttq');
+    }
+    if(p.pixel_gtag){_px.gtag=p.pixel_gtag;
+      const s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(p.pixel_gtag);document.head.appendChild(s);
+      window.dataLayer=window.dataLayer||[];window.gtag=window.gtag||function(){dataLayer.push(arguments);};gtag('js',new Date());gtag('config',p.pixel_gtag);
+    }
+  }catch(e){}
+}
+// Événement de conversion envoyé à tous les pixels actifs (montants en XOF)
+function pxTrack(evt,data){
+  data=data||{};
+  try{if(_px.meta&&window.fbq)fbq('track',evt,{value:data.value||0,currency:'XOF'});}catch(e){}
+  try{if(_px.tiktok&&window.ttq){const m={AddToCart:'AddToCart',InitiateCheckout:'InitiateCheckout',Purchase:'CompletePayment'};ttq.track(m[evt]||evt,{value:data.value||0,currency:'XOF'});}}catch(e){}
+  try{if(_px.gtag&&window.gtag){const m={AddToCart:'add_to_cart',InitiateCheckout:'begin_checkout',Purchase:'purchase'};gtag('event',m[evt]||evt,{value:data.value||0,currency:'XOF'});}}catch(e){}
+}
+loadPixels();
 
 // Échap ferme les panneaux ouverts (fiche produit, ville, notifications)
 document.addEventListener('keydown',e=>{
