@@ -479,9 +479,19 @@ async function createLivreur(){
   if(pass.length<6){err.textContent='❌ Mot de passe : min. 6 caractères';err.style.display='block';return;}
   const btn=document.getElementById('nl-submit');btn.disabled=true;btn.textContent='⏳ Création du compte...';
 
-  // 1) Upload documents (bucket privé) — l'agence est connectée, donc autorisée
+  // 1) Upload documents : pièce (privé) + photo (privé pour identité + public pour profil)
   const pieceUrl=await uploadDoc(_docs.piece,'piece');
   const photoIdUrl=await uploadDoc(_docs.photo,'photo');
+  // La photo d'identité sert aussi de photo de profil → copie publique
+  let photoProfilUrl=null;
+  if(_docs.photo){
+    try{
+      const ext=(_docs.photo.name.split('.').pop()||'jpg').toLowerCase();
+      const ppath=`profils/liv_${currentAgence.id}_${Date.now()}.${ext}`;
+      const {error:pErr}=await sb.storage.from('livreurs').upload(ppath,_docs.photo,{upsert:true,contentType:_docs.photo.type});
+      if(!pErr){const {data:pub}=sb.storage.from('livreurs').getPublicUrl(ppath);photoProfilUrl=pub?.publicUrl;}
+    }catch(e){}
+  }
 
   // 2) Créer le compte via Edge Function (ne touche pas à la session de l'agence)
   try{
@@ -492,7 +502,7 @@ async function createLivreur(){
         type:'livreur',email,password:pass,
         nom:prenom+' '+nom, nom_famille:nom, prenom, telephone:tel,
         vehicule, matricule, zone_id:zone||null, agence_id:currentAgence.id,
-        piece_url:pieceUrl, photo_url:photoIdUrl
+        piece_url:pieceUrl, photo_url:photoIdUrl, photo_profil:photoProfilUrl
       })
     });
     const out=await res.json();

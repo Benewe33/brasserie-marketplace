@@ -250,6 +250,7 @@ tr:hover td{background:var(--g50)}
         <div class="fg fg-col"><label>Adresse de l'agence</label><input type="text" id="ag-adresse" placeholder="Quartier, ville"/></div>
         <div class="fg fg-col"><label>Zones de couverture *</label><div id="ag-zones" class="zones-check"></div></div>
         <div class="fg fg-col"><label>Mot de passe *</label><input type="password" id="ag-pass" placeholder="Min. 6 caractères"/></div>
+        <div class="fg fg-col"><label>Logo de l'agence (optionnel)</label><label class="upload-box" id="ag-logo-box" style="border:1.5px dashed var(--g200,#e5e7eb);border-radius:10px;padding:12px;text-align:center;cursor:pointer;display:block;font-size:13px;color:var(--g600,#4b5563)">🖼️ Choisir un logo<input type="file" accept="image/*" style="display:none" onchange="pickAgLogo(this)"/></label></div>
       </div>
       <button class="btn-main" style="width:100%;margin-top:8px" id="ag-submit" onclick="doRegisterAgence()">✅ Créer mon agence</button>
       <div class="auth-err" id="ag-err"></div>
@@ -1120,6 +1121,8 @@ function choisirType(t){
   if(t==='solo')switchTab('register',null);
   else switchTab('agence',null);
 }
+let _agLogo=null;
+function pickAgLogo(input){const f=input.files[0];if(!f)return;_agLogo=f;const b=document.getElementById('ag-logo-box');b.style.borderColor='#1d9e75';b.childNodes[0].textContent='🖼️ ✓ '+f.name.substring(0,18);}
 async function doRegisterAgence(){
   const nom=document.getElementById('ag-nom').value.trim();
   const resp=document.getElementById('ag-resp').value.trim();
@@ -1135,11 +1138,21 @@ async function doRegisterAgence(){
   if(!zones.length){err.textContent='❌ Sélectionnez au moins une zone de couverture';err.style.display='block';return;}
   if(pass.length<6){err.textContent='❌ Mot de passe : min. 6 caractères';err.style.display='block';return;}
   const btn=document.getElementById('ag-submit');btn.disabled=true;btn.textContent='⏳ Création...';
+  // Upload du logo si fourni (bucket public livreurs)
+  let logoUrl=null;
+  if(_agLogo){
+    try{
+      const ext=(_agLogo.name.split('.').pop()||'jpg').toLowerCase();
+      const path=`logos/agence_${Date.now()}.${ext}`;
+      const {error:upErr}=await sb.storage.from('livreurs').upload(path,_agLogo,{upsert:true,contentType:_agLogo.type});
+      if(!upErr){const {data:pub}=sb.storage.from('livreurs').getPublicUrl(path);logoUrl=pub?.publicUrl;}
+    }catch(e){}
+  }
   try{
     const res=await fetch(`${SUPA_URL}/functions/v1/create-account`,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPA_KEY}`,'apikey':SUPA_KEY},
-      body:JSON.stringify({type:'agence',email,password:pass,nom,responsable:resp,telephone:tel,telephone2:tel2,adresse,zones})
+      body:JSON.stringify({type:'agence',email,password:pass,nom,responsable:resp,telephone:tel,telephone2:tel2,adresse,zones,logo_url:logoUrl})
     });
     const out=await res.json();
     if(!out.ok)throw new Error(out.error||'Erreur inconnue');
