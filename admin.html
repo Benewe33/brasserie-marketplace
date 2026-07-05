@@ -1693,7 +1693,7 @@ async function loadAgences(statut,btn){
             <button class="btn btn-sm" style="background:var(--vd);color:#fff" onclick="toggleAgenceLivreurs('${a.id}',this)">👥 Voir les livreurs</button>
             ${statut==='en_attente'?`<button class="btn btn-sm btn-ok" onclick="valider('agences','${a.id}','actif')">✅ Valider</button><button class="btn btn-sm btn-del" onclick="valider('agences','${a.id}','suspendu')">❌ Refuser</button>`:''}
             ${statut==='actif'?`<button class="btn btn-sm btn-del" onclick="valider('agences','${a.id}','suspendu')">Suspendre</button>`:''}
-            ${statut==='suspendu'?`<button class="btn btn-sm btn-ok" onclick="valider('agences','${a.id}','actif')">Réactiver</button>`:''}
+            ${statut==='suspendu'?`<button class="btn btn-sm btn-ok" onclick="valider('agences','${a.id}','actif')">Réactiver</button><button class="btn btn-sm btn-del" onclick="supprimerAgence('${a.id}','${a.user_id||''}','${(a.nom||'').replace(/'/g,'')}')">🗑️ Supprimer</button>`:''}
           </div>
         </div>
         <div id="agliv-${a.id}" style="display:none;margin-top:14px;border-top:1px solid var(--g100);padding-top:14px"></div>
@@ -1733,6 +1733,48 @@ async function docSignedLink(path){
     if(error)return null;
     return data?.signedUrl||null;
   }catch(e){return null;}
+}
+
+async function supprimerAgence(agenceId,userId,nom){
+  // Compter les livreurs rattachés
+  const {data:livreurs}=await sb.from('livreurs').select('id,user_id').eq('agence_id',agenceId);
+  const nbLiv=(livreurs||[]).length;
+  const msg=nbLiv>0
+    ? `⚠️ Supprimer définitivement l'agence "${nom}" ET ses ${nbLiv} livreur(s) ?\n\nCette action est irréversible. Les comptes des livreurs seront aussi supprimés.`
+    : `⚠️ Supprimer définitivement l'agence "${nom}" ?\n\nCette action est irréversible.`;
+  if(!confirm(msg))return;
+
+  // 1) Supprimer chaque livreur (fiche + utilisateur + compte Auth via Edge Function)
+  for(const l of (livreurs||[])){
+    await sb.from('livraisons').delete().eq('livreur_id',l.id); // détacher ses livraisons
+    await sb.from('livreurs').delete().eq('id',l.id);
+    if(l.user_id){
+      await sb.from('utilisateurs').delete().eq('id',l.user_id);
+      await deleteAuthUser(l.user_id);
+    }
+  }
+  // 2) Supprimer l'agence
+  const {error}=await sb.from('agences').delete().eq('id',agenceId);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  // 3) Supprimer l'utilisateur + compte Auth de l'agence
+  if(userId){
+    await sb.from('utilisateurs').delete().eq('id',userId);
+    await deleteAuthUser(userId);
+  }
+  toast('🗑️ Agence et ses livreurs supprimés','err');
+  loadAgences('suspendu');
+  loadDashboard();
+}
+
+// Supprime un compte Auth via l'Edge Function (clé admin côté serveur)
+async function deleteAuthUser(uid){
+  try{
+    await fetch(`${SUPA_URL}/functions/v1/create-account`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPA_KEY}`,'apikey':SUPA_KEY},
+      body:JSON.stringify({action:'delete',user_id:uid})
+    });
+  }catch(e){console.warn('delete auth',e);}
 }
 
 async function valider(table,id,statut){
