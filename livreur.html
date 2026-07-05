@@ -1135,17 +1135,17 @@ async function doRegisterAgence(){
   if(!zones.length){err.textContent='❌ Sélectionnez au moins une zone de couverture';err.style.display='block';return;}
   if(pass.length<6){err.textContent='❌ Mot de passe : min. 6 caractères';err.style.display='block';return;}
   const btn=document.getElementById('ag-submit');btn.disabled=true;btn.textContent='⏳ Création...';
-  const {data,error}=await sb.auth.signUp({email,password:pass});
-  if(error){err.textContent='❌ '+error.message;err.style.display='block';btn.disabled=false;btn.textContent='✅ Créer mon agence';return;}
-  await sb.from('utilisateurs').insert({id:data.user.id,nom,email,telephone:tel,role:'agence',statut:'actif'});
-  const {error:agErr}=await sb.from('agences').insert({user_id:data.user.id,nom,responsable:resp,email,telephone:tel,telephone2:tel2||null,adresse:adresse||null,zones_couverture:zones,statut:'en_attente'});
-  if(agErr){err.textContent='❌ '+agErr.message;err.style.display='block';btn.disabled=false;btn.textContent='✅ Créer mon agence';return;}
   try{
-    const {data:admins}=await sb.from('utilisateurs').select('id').eq('role','admin');
-    for(const a of (admins||[])){
-      await sb.from('notifications').insert({user_id:a.id,titre:'🏢 Nouvelle agence de livraison',message:`L'agence "${nom}" (${resp}) demande à rejoindre YéyéMarket. Zones : ${zones.join(', ')}.`,type:'inscription',lu:false});
-    }
-  }catch(e){}
+    const res=await fetch(`${SUPA_URL}/functions/v1/create-account`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPA_KEY}`,'apikey':SUPA_KEY},
+      body:JSON.stringify({type:'agence',email,password:pass,nom,responsable:resp,telephone:tel,telephone2:tel2,adresse,zones})
+    });
+    const out=await res.json();
+    if(!out.ok)throw new Error(out.error||'Erreur inconnue');
+  }catch(e){
+    err.textContent='❌ '+e.message;err.style.display='block';btn.disabled=false;btn.textContent='✅ Créer mon agence';return;
+  }
   btn.textContent='✅ Compte créé';
   toast('🎉 Agence enregistrée ! En attente de validation par YéyéMarket.','ok');
   setTimeout(()=>{document.getElementById('ag-nom').value='';document.getElementById('ag-resp').value='';document.getElementById('ag-email').value='';document.getElementById('ag-tel').value='';document.getElementById('ag-pass').value='';btn.disabled=false;btn.textContent='✅ Créer mon agence';switchTab('login',document.querySelector('.atab'));},2500);

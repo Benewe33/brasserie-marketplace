@@ -479,28 +479,27 @@ async function createLivreur(){
   if(pass.length<6){err.textContent='❌ Mot de passe : min. 6 caractères';err.style.display='block';return;}
   const btn=document.getElementById('nl-submit');btn.disabled=true;btn.textContent='⏳ Création du compte...';
 
-  // 1) Upload documents (bucket privé)
+  // 1) Upload documents (bucket privé) — l'agence est connectée, donc autorisée
   const pieceUrl=await uploadDoc(_docs.piece,'piece');
   const photoIdUrl=await uploadDoc(_docs.photo,'photo');
 
-  // 2) Créer le compte Auth du livreur (sans déconnecter l'agence : signUp crée mais ne change pas la session active si email confirm off — on restaure la session ensuite)
-  const agenceSession=(await sb.auth.getSession()).data.session;
-  const {data:signUpData,error:signErr}=await sb.auth.signUp({email,password:pass});
-  if(signErr){err.textContent='❌ '+signErr.message;err.style.display='block';btn.disabled=false;btn.textContent='✅ Créer le compte livreur';return;}
-  const newUserId=signUpData.user?.id;
-
-  // 3) Restaurer la session agence (signUp peut avoir basculé la session)
-  if(agenceSession){await sb.auth.setSession({access_token:agenceSession.access_token,refresh_token:agenceSession.refresh_token});}
-
-  // 4) Créer l'entrée utilisateur + livreur rattaché à l'agence
-  await sb.from('utilisateurs').insert({id:newUserId,nom:prenom+' '+nom,email,telephone:tel,role:'livreur',statut:'actif'});
-  const {error:livErr}=await sb.from('livreurs').insert({
-    user_id:newUserId,agence_id:currentAgence.id,nom,prenom,telephone:tel,vehicule,
-    matricule_vehicule:matricule||null,zone_id:zone||null,
-    piece_identite_url:pieceUrl,photo_identite_url:photoIdUrl,
-    disponible:false,statut:'actif'
-  });
-  if(livErr){err.textContent='❌ '+livErr.message;err.style.display='block';btn.disabled=false;btn.textContent='✅ Créer le compte livreur';return;}
+  // 2) Créer le compte via Edge Function (ne touche pas à la session de l'agence)
+  try{
+    const res=await fetch(`${SUPA_URL}/functions/v1/create-account`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPA_KEY}`,'apikey':SUPA_KEY},
+      body:JSON.stringify({
+        type:'livreur',email,password:pass,
+        nom:prenom+' '+nom, nom_famille:nom, prenom, telephone:tel,
+        vehicule, matricule, zone_id:zone||null, agence_id:currentAgence.id,
+        piece_url:pieceUrl, photo_url:photoIdUrl
+      })
+    });
+    const out=await res.json();
+    if(!out.ok)throw new Error(out.error||'Erreur inconnue');
+  }catch(e){
+    err.textContent='❌ '+e.message;err.style.display='block';btn.disabled=false;btn.textContent='✅ Créer le compte livreur';return;
+  }
 
   btn.disabled=false;btn.textContent='✅ Créer le compte livreur';
   closeModal('m-livreur');
