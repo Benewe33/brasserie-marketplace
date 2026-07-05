@@ -150,6 +150,16 @@ tr:hover td{background:var(--g50)}
 .fgm label{font-size:13px;font-weight:600;color:var(--g600,#4b5563);display:block;margin-bottom:5px}
 .fgm input,.fgm select,.fgm textarea{width:100%;padding:10px 12px;border:1.5px solid var(--g200,#e5e7eb);border-radius:8px;font-size:14px;font-family:inherit;outline:none;background:#fff}
 .fgm input:focus,.fgm select:focus{border-color:var(--vd,#1a6b3c)}
+.choix-card{width:100%;display:flex;align-items:center;gap:14px;padding:16px;border:2px solid var(--g200,#e5e7eb);border-radius:14px;background:#fff;cursor:pointer;margin-bottom:12px;text-align:left;transition:.15s;font-family:inherit}
+.choix-card:hover{border-color:#2563eb;background:#f5f8ff}
+.choix-card:active{transform:scale(.99)}
+.cc-ico{width:48px;height:48px;border-radius:12px;background:var(--vl,#e8f5e9);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.cc-t{font-size:15px;font-weight:800;color:var(--g900,#111827)}
+.cc-s{font-size:12.5px;color:var(--g600,#4b5563);margin-top:2px}
+.cc-arrow{margin-left:auto;color:#2563eb;font-size:20px;font-weight:700}
+.zones-check{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;border:1.5px solid var(--g200,#e5e7eb);border-radius:8px;padding:10px;max-height:140px;overflow-y:auto}
+.zones-check label{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;cursor:pointer}
+.zones-check input{width:auto;accent-color:var(--vd,#1a6b3c)}
 
 .fgm{margin-bottom:13px}
 .fgm label{font-size:13px;font-weight:500;color:var(--g600);display:block;margin-bottom:5px}
@@ -201,7 +211,7 @@ tr:hover td{background:var(--g50)}
     <div class="auth-logo"><div class="ico">🚴</div><h1>Espace Livreur</h1><p>Yéyé Market — Bénin 🇧🇯</p></div>
     <div class="auth-tabs">
       <button class="atab active" onclick="switchTab('login',this)">Se connecter</button>
-      <button class="atab" onclick="switchTab('register',this)">S'inscrire</button>
+      <button class="atab" onclick="switchTab('choix',this)">S'inscrire</button>
     </div>
 
     <!-- LOGIN -->
@@ -212,7 +222,40 @@ tr:hover td{background:var(--g50)}
       <div class="auth-err" id="l-err"></div>
     </div>
 
-    <!-- REGISTER -->
+    <!-- CHOIX DU TYPE (affiché quand on clique S'inscrire) -->
+    <div class="aform" id="form-choix">
+      <p style="font-size:14px;color:var(--g600,#4b5563);text-align:center;margin-bottom:18px">Comment souhaitez-vous vous inscrire ?</p>
+      <button class="choix-card" onclick="choisirType('solo')">
+        <div class="cc-ico">🚴</div>
+        <div><div class="cc-t">Livreur solo</div><div class="cc-s">Je livre moi-même, en indépendant.</div></div>
+        <div class="cc-arrow">→</div>
+      </button>
+      <button class="choix-card" onclick="choisirType('agence')">
+        <div class="cc-ico">🏢</div>
+        <div><div class="cc-t">Agence de livraison</div><div class="cc-s">J'ai une équipe de livreurs à gérer.</div></div>
+        <div class="cc-arrow">→</div>
+      </button>
+    </div>
+
+    <!-- REGISTER AGENCE -->
+    <div class="aform" id="form-agence">
+      <button onclick="switchTab('choix',null)" style="background:none;border:none;color:var(--g600,#4b5563);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:12px;font-family:inherit">← Retour au choix</button>
+      <div style="background:var(--vl,#e8f5e9);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:var(--g600,#4b5563)">🏢 Inscrivez votre agence. Vous pourrez ajouter vos livreurs (avec pièces d'identité et véhicules) depuis votre tableau de bord après validation.</div>
+      <div class="fg-grid">
+        <div class="fg fg-col"><label>Nom de l'agence *</label><input type="text" id="ag-nom" placeholder="Ex: Express Livraison Bénin"/></div>
+        <div class="fg fg-col"><label>Nom du responsable *</label><input type="text" id="ag-resp" placeholder="Kofi Mensah"/></div>
+        <div class="fg"><label>Téléphone *</label><input type="tel" id="ag-tel" placeholder="97 00 00 00"/></div>
+        <div class="fg"><label>Téléphone 2</label><input type="tel" id="ag-tel2" placeholder="Optionnel"/></div>
+        <div class="fg fg-col"><label>Email *</label><input type="email" id="ag-email" placeholder="agence@exemple.com"/></div>
+        <div class="fg fg-col"><label>Adresse de l'agence</label><input type="text" id="ag-adresse" placeholder="Quartier, ville"/></div>
+        <div class="fg fg-col"><label>Zones de couverture *</label><div id="ag-zones" class="zones-check"></div></div>
+        <div class="fg fg-col"><label>Mot de passe *</label><input type="password" id="ag-pass" placeholder="Min. 6 caractères"/></div>
+      </div>
+      <button class="btn-main" style="width:100%;margin-top:8px" id="ag-submit" onclick="doRegisterAgence()">✅ Créer mon agence</button>
+      <div class="auth-err" id="ag-err"></div>
+    </div>
+
+    <!-- REGISTER SOLO -->
     <div class="aform" id="form-register">
       <div class="steps">
         <div class="step active" id="step-ind-1"><div class="step-dot">1</div><div class="step-label">Infos</div></div>
@@ -1059,11 +1102,54 @@ async function savePaiementMethode(){
 
 async function loadZonesSelect(){
   const {data}=await sb.from('zones').select('*').eq('actif',true).order('nom');
-  const sel=document.getElementById('r-zone');if(!sel)return;
-  sel.innerHTML='<option value="">Choisir votre zone...</option>';
-  (data||[]).forEach(z=>sel.innerHTML+=`<option value="${z.id}">${z.ville} — ${z.nom}</option>`);
+  const sel=document.getElementById('r-zone');
+  if(sel)sel.innerHTML='<option value="">Choisir votre zone...</option>'+(data||[]).map(z=>`<option value="${z.id}">${z.nom}${z.ville?' — '+z.ville:''}</option>`).join('');
+  // Zones cochables pour l'agence
+  const box=document.getElementById('ag-zones');
+  if(box)box.innerHTML=(data||[]).map(z=>`<label><input type="checkbox" value="${z.nom}" class="ag-zone-cb"/> ${z.nom}</label>`).join('')||'<span style="font-size:12px;color:#9ca3af">Aucune zone configurée</span>';
 }
-function switchTab(type,btn){document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.aform').forEach(f=>f.classList.remove('active'));btn.classList.add('active');document.getElementById('form-'+type).classList.add('active');}
+function switchTab(type,btn){
+  document.querySelectorAll('.atab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.aform').forEach(f=>f.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  else document.querySelector('.atab:nth-child(2)')?.classList.add('active');
+  document.getElementById('form-'+type).classList.add('active');
+  if(type==='choix'||type==='agence')loadZonesSelect();
+}
+function choisirType(t){
+  if(t==='solo')switchTab('register',null);
+  else switchTab('agence',null);
+}
+async function doRegisterAgence(){
+  const nom=document.getElementById('ag-nom').value.trim();
+  const resp=document.getElementById('ag-resp').value.trim();
+  const email=document.getElementById('ag-email').value.trim();
+  const tel=document.getElementById('ag-tel').value.trim();
+  const tel2=document.getElementById('ag-tel2').value.trim();
+  const adresse=document.getElementById('ag-adresse').value.trim();
+  const pass=document.getElementById('ag-pass').value;
+  const zones=[...document.querySelectorAll('.ag-zone-cb:checked')].map(c=>c.value);
+  const err=document.getElementById('ag-err');
+  err.style.display='none';
+  if(!nom||!resp||!email||!tel||!pass){err.textContent='❌ Remplissez tous les champs obligatoires';err.style.display='block';return;}
+  if(!zones.length){err.textContent='❌ Sélectionnez au moins une zone de couverture';err.style.display='block';return;}
+  if(pass.length<6){err.textContent='❌ Mot de passe : min. 6 caractères';err.style.display='block';return;}
+  const btn=document.getElementById('ag-submit');btn.disabled=true;btn.textContent='⏳ Création...';
+  const {data,error}=await sb.auth.signUp({email,password:pass});
+  if(error){err.textContent='❌ '+error.message;err.style.display='block';btn.disabled=false;btn.textContent='✅ Créer mon agence';return;}
+  await sb.from('utilisateurs').insert({id:data.user.id,nom,email,telephone:tel,role:'agence',statut:'actif'});
+  const {error:agErr}=await sb.from('agences').insert({user_id:data.user.id,nom,responsable:resp,email,telephone:tel,telephone2:tel2||null,adresse:adresse||null,zones_couverture:zones,statut:'en_attente'});
+  if(agErr){err.textContent='❌ '+agErr.message;err.style.display='block';btn.disabled=false;btn.textContent='✅ Créer mon agence';return;}
+  try{
+    const {data:admins}=await sb.from('utilisateurs').select('id').eq('role','admin');
+    for(const a of (admins||[])){
+      await sb.from('notifications').insert({user_id:a.id,titre:'🏢 Nouvelle agence de livraison',message:`L'agence "${nom}" (${resp}) demande à rejoindre YéyéMarket. Zones : ${zones.join(', ')}.`,type:'inscription',lu:false});
+    }
+  }catch(e){}
+  btn.textContent='✅ Compte créé';
+  toast('🎉 Agence enregistrée ! En attente de validation par YéyéMarket.','ok');
+  setTimeout(()=>{document.getElementById('ag-nom').value='';document.getElementById('ag-resp').value='';document.getElementById('ag-email').value='';document.getElementById('ag-tel').value='';document.getElementById('ag-pass').value='';btn.disabled=false;btn.textContent='✅ Créer mon agence';switchTab('login',document.querySelector('.atab'));},2500);
+}
 function sbadge(s){const m={en_attente:'<span class="badge bo">⏳</span>',assignee:'<span class="badge bb">📋 Assignée</span>',en_cours:'<span class="badge bo">🚴 En cours</span>',livree:'<span class="badge bg">✅ Livrée</span>',echouee:'<span class="badge br">❌</span>'};return m[s]||`<span class="badge bgr">${s||'—'}</span>`;}
 function fmt(n){return(n||0).toLocaleString('fr-FR');}
 function fdate(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'});}
