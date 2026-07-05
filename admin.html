@@ -321,6 +321,9 @@ tr:hover td{background:var(--g50)}
       <button class="sb-btn" onclick="go('livreurs',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>Livreurs <span class="sb-badge" id="b-livreurs" style="display:none">0</span>
       </button>
+      <button class="sb-btn" onclick="go('agences',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"/></svg>Agences <span class="sb-badge" id="b-agences" style="display:none">0</span>
+      </button>
       <div class="sb-sec">Clients</div>
       <button class="sb-btn" onclick="go('clients',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Clients <span class="sb-badge" id="b-clients" style="display:none">0</span>
@@ -480,6 +483,12 @@ tr:hover td{background:var(--g50)}
     <div class="sec" id="sec-livreurs">
       <div class="tabs"><button class="tab active" onclick="loadService('livreurs','en_attente',this)">En attente</button><button class="tab" onclick="loadService('livreurs','actif',this)">Actifs</button><button class="tab" onclick="loadService('livreurs','suspendu',this)">Suspendus</button></div>
       <div class="card"><div class="card-head"><h2>🚴 Livreurs</h2></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Nom</th><th>Téléphone</th><th>Zone</th><th>Disponible</th><th>Statut</th><th>Date</th><th>Actions</th></tr></thead><tbody id="livr-body"></tbody></table></div></div></div>
+    </div>
+
+    <!-- AGENCES -->
+    <div class="sec" id="sec-agences">
+      <div class="tabs"><button class="tab active" onclick="loadAgences('en_attente',this)">En attente</button><button class="tab" onclick="loadAgences('actif',this)">Actives</button><button class="tab" onclick="loadAgences('suspendu',this)">Suspendues</button></div>
+      <div class="card"><div class="card-head"><h2>🏢 Agences de livraison</h2></div><div class="card-body"><div id="agences-list"></div></div></div>
     </div>
 
     <!-- COMPTES -->
@@ -681,6 +690,25 @@ tr:hover td{background:var(--g50)}
         <div class="kpi" style="border-color:#d97706"><div class="kpi-ico">🏦</div><div class="kpi-val" id="pay-comm">—</div><div class="kpi-label">Commissions plateforme</div></div>
         <div class="kpi" style="border-color:#2563eb"><div class="kpi-ico">📲</div><div class="kpi-val" id="pay-momo">—</div><div class="kpi-label">Mobile Money</div></div>
         <div class="kpi" style="border-color:#dc2626"><div class="kpi-ico">⏳</div><div class="kpi-val" id="pay-pending">—</div><div class="kpi-label">En attente</div></div>
+      </div>
+
+      <!-- VERSEMENTS PARTENAIRES -->
+      <div class="card">
+        <div class="card-head"><h2>💸 Verser un partenaire</h2></div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:150px 1fr 150px 1fr auto;gap:10px;align-items:end;flex-wrap:wrap">
+            <div class="fgm"><label>Type</label><select id="vs-type" onchange="loadVsBenefs()"><option value="boutique">Vendeur</option><option value="restaurant">Restaurant</option><option value="livreur">Livreur</option></select></div>
+            <div class="fgm"><label>Bénéficiaire</label><select id="vs-benef" onchange="showVsSolde()"><option value="">Choisir...</option></select></div>
+            <div class="fgm"><label>Montant (FCFA)</label><input type="number" id="vs-montant" min="0" step="500" placeholder="ex: 25000"/></div>
+            <div class="fgm"><label>Référence MoMo</label><input type="text" id="vs-ref" placeholder="Réf. de la transaction"/></div>
+            <button class="btn-primary" style="padding:10px 20px;white-space:nowrap" onclick="saveVersement()">💾 Enregistrer</button>
+          </div>
+          <div id="vs-solde-info" style="margin-top:10px;font-size:12.5px;color:var(--g600)"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>📜 Historique des versements</h2></div>
+        <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Bénéficiaire</th><th>Montant</th><th>Référence</th></tr></thead><tbody id="vs-body"></tbody></table></div></div>
       </div>
       <div class="card">
         <div class="card-head"><h2>💳 Transactions récentes</h2><span id="pay-count" style="font-size:12px;color:var(--g400)"></span></div>
@@ -1251,7 +1279,7 @@ function go(name,btn){
   document.getElementById('sec-'+name).classList.add('active');
   btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),zones:loadZonesTable,clients:loadClients,rapports:()=>loadRapports(currentRapportDays),comptes:()=>{loadZonesSelect('cv-zone');loadZonesSelect('cr-zone');loadZonesSelect('cl-zone');loadAgents();},support:()=>{loadSupConvs();subscribeSupport();},paiements:loadPaiements,avis:loadAvis,promotions:loadPromotions,carte:initCarte,parametres:loadParametres,live:initLive};
+  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),agences:()=>loadAgences('en_attente'),zones:loadZonesTable,clients:loadClients,rapports:()=>loadRapports(currentRapportDays),comptes:()=>{loadZonesSelect('cv-zone');loadZonesSelect('cr-zone');loadZonesSelect('cl-zone');loadAgents();},support:()=>{loadSupConvs();subscribeSupport();},paiements:loadPaiements,avis:loadAvis,promotions:loadPromotions,carte:initCarte,parametres:loadParametres,live:initLive};
   if(loaders[name])loaders[name]();
 }
 
@@ -1306,6 +1334,7 @@ async function loadDashboard(){
   setBadge('b-vendeurs',vp.data?.length||0);
   setBadge('b-restaurants',rp.data?.length||0);
   setBadge('b-livreurs',lp.data?.length||0);
+  try{const {data:agp}=await sb.from('agences').select('id').eq('statut','en_attente');setBadge('b-agences',agp?.length||0);}catch(e){}
 
   const pending=[...(vp.data||[]).map(x=>({...x,_t:'vendeur'})),...(rp.data||[]).map(x=>({...x,_t:'restaurant'})),...(lp.data||[]).map(x=>({...x,_t:'livreur'}))];
   const pw=document.getElementById('pending-wrap');
@@ -1642,6 +1671,70 @@ async function loadService(table,statut,btn){
   </tr>`).join('');
 }
 
+// ============================================================
+// AGENCES DE LIVRAISON — validation + dossiers livreurs
+// ============================================================
+async function loadAgences(statut,btn){
+  if(btn){document.querySelectorAll('#sec-agences .tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');}
+  const {data,error}=await sb.from('agences').select('*').eq('statut',statut).order('created_at',{ascending:false});
+  const el=document.getElementById('agences-list');
+  if(error){el.innerHTML='<p style="color:var(--r);padding:24px">Table agences absente — exécutez la migration.</p>';return;}
+  if(!data?.length){el.innerHTML='<p style="text-align:center;color:var(--g400);padding:32px">Aucune agence</p>';return;}
+  el.innerHTML=data.map(a=>`
+    <div class="card" style="margin-bottom:12px;box-shadow:none;border:1px solid var(--g200)">
+      <div class="card-body">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-weight:800;font-size:15px">🏢 ${a.nom}</div>
+            <div style="font-size:13px;color:var(--g600);margin-top:2px">Responsable : <strong>${a.responsable||'—'}</strong> · ${a.telephone||''} · ${a.email||''}</div>
+            <div style="font-size:12px;color:var(--g400);margin-top:2px">Zones : ${(a.zones_couverture||[]).join(', ')||'—'} · Inscrite le ${fdate(a.created_at)}</div>
+          </div>
+          <div class="acts">
+            <button class="btn btn-sm" style="background:var(--vd);color:#fff" onclick="toggleAgenceLivreurs('${a.id}',this)">👥 Voir les livreurs</button>
+            ${statut==='en_attente'?`<button class="btn btn-sm btn-ok" onclick="valider('agences','${a.id}','actif')">✅ Valider</button><button class="btn btn-sm btn-del" onclick="valider('agences','${a.id}','suspendu')">❌ Refuser</button>`:''}
+            ${statut==='actif'?`<button class="btn btn-sm btn-del" onclick="valider('agences','${a.id}','suspendu')">Suspendre</button>`:''}
+            ${statut==='suspendu'?`<button class="btn btn-sm btn-ok" onclick="valider('agences','${a.id}','actif')">Réactiver</button>`:''}
+          </div>
+        </div>
+        <div id="agliv-${a.id}" style="display:none;margin-top:14px;border-top:1px solid var(--g100);padding-top:14px"></div>
+      </div>
+    </div>`).join('');
+}
+
+async function toggleAgenceLivreurs(agenceId,btn){
+  const box=document.getElementById('agliv-'+agenceId);
+  if(box.style.display==='block'){box.style.display='none';btn.textContent='👥 Voir les livreurs';return;}
+  btn.textContent='🔼 Masquer';box.style.display='block';
+  box.innerHTML='<p style="color:var(--g400);font-size:13px">Chargement des livreurs...</p>';
+  const {data:livreurs}=await sb.from('livreurs').select('*').eq('agence_id',agenceId).order('created_at',{ascending:false});
+  if(!livreurs?.length){box.innerHTML='<p style="color:var(--g400);font-size:13px">Cette agence n\'a pas encore ajouté de livreurs.</p>';return;}
+  const cards=await Promise.all(livreurs.map(async l=>{
+    const pieceLink=await docSignedLink(l.piece_identite_url);
+    const photoLink=await docSignedLink(l.photo_identite_url);
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--g200);border-radius:10px;margin-bottom:8px">
+      <div style="width:38px;height:38px;border-radius:50%;background:var(--vl);color:var(--vd);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">${(l.prenom||l.nom||'?')[0]}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:13px">${l.prenom||''} ${l.nom||''}</div>
+        <div style="font-size:12px;color:var(--g600)">${l.vehicule||'—'}${l.matricule_vehicule?' · '+l.matricule_vehicule:''} · ${l.telephone||''}</div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        ${pieceLink?`<a href="${pieceLink}" target="_blank" class="btn btn-sm btn-ed" style="text-decoration:none">📄 Pièce</a>`:'<span class="badge bgr">Pas de pièce</span>'}
+        ${photoLink?`<a href="${photoLink}" target="_blank" class="btn btn-sm btn-ed" style="text-decoration:none">📷 Photo</a>`:''}
+      </div>
+    </div>`;
+  }));
+  box.innerHTML=`<div style="font-size:12px;font-weight:700;color:var(--g600);margin-bottom:8px">👥 ${livreurs.length} livreur(s) · documents d'identité</div>`+cards.join('');
+}
+
+async function docSignedLink(path){
+  if(!path)return null;
+  try{
+    const {data,error}=await sb.storage.from('documents-livreurs').createSignedUrl(path,3600);
+    if(error)return null;
+    return data?.signedUrl||null;
+  }catch(e){return null;}
+}
+
 async function valider(table,id,statut){
   const {error}=await sb.from(table).update({statut}).eq('id',id);
   if(error){toast('Erreur: '+error.message,'err');return;}
@@ -1759,7 +1852,69 @@ function filterTbl(inp,tbId){const q=inp.value.toLowerCase();document.querySelec
 // PAIEMENTS
 // ============================================================
 function payMethodLabel(m){const x={mobile_money:'📲 Mobile Money',momo:'📲 MTN MoMo',celtiis:'📲 Celtiis Cash',kkiapay:'💳 Kkiapay',carte:'💳 Carte',especes:'💵 Espèces'};return x[m]||('💳 '+(m||'—'));}
+// ============================================================
+// VERSEMENTS PARTENAIRES
+// ============================================================
+const _vsTables={boutique:'boutiques',restaurant:'restaurants',livreur:'livreurs'};
+let _vsBenefs=[];
+async function loadVsBenefs(){
+  const type=document.getElementById('vs-type').value;
+  const sel=document.getElementById('vs-benef');
+  sel.innerHTML='<option value="">Chargement...</option>';
+  const {data}=await sb.from(_vsTables[type]).select('id,nom,paiement_numero,paiement_operateur').order('nom');
+  _vsBenefs=data||[];
+  sel.innerHTML='<option value="">Choisir...</option>'+_vsBenefs.map(b=>`<option value="${b.id}">${b.nom}</option>`).join('');
+  document.getElementById('vs-solde-info').innerHTML='';
+}
+function showVsSolde(){
+  const id=document.getElementById('vs-benef').value;
+  const b=_vsBenefs.find(x=>x.id===id);
+  const info=document.getElementById('vs-solde-info');
+  if(!b){info.innerHTML='';return;}
+  info.innerHTML=b.paiement_numero
+    ?`📲 Numéro de versement : <strong>${b.paiement_operateur||'MTN'} · ${b.paiement_numero}</strong> — le solde disponible s'affiche sur le dashboard du partenaire.`
+    :`⚠️ <span style="color:var(--r);font-weight:700">Ce partenaire n'a pas encore configuré son numéro Mobile Money</span> (il peut le faire depuis son tableau de bord).`;
+}
+async function saveVersement(){
+  const type=document.getElementById('vs-type').value;
+  const benef=document.getElementById('vs-benef').value;
+  const montant=parseInt(document.getElementById('vs-montant').value)||0;
+  const ref=document.getElementById('vs-ref').value.trim();
+  if(!benef){toast('Choisissez un bénéficiaire','err');return;}
+  if(montant<=0){toast('Entrez un montant valide','err');return;}
+  if(!confirm(`Confirmer l'enregistrement d'un versement de ${montant.toLocaleString('fr-FR')} FCFA ?\n\n(Le transfert Mobile Money doit avoir été effectué au préalable.)`))return;
+  const {error}=await sb.from('versements').insert({beneficiaire_type:type,beneficiaire_id:benef,montant,reference:ref||null});
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  toast('✅ Versement enregistré','ok');
+  document.getElementById('vs-montant').value='';document.getElementById('vs-ref').value='';
+  loadVsHistorique();
+}
+async function loadVsHistorique(){
+  const tb=document.getElementById('vs-body');if(!tb)return;
+  const {data,error}=await sb.from('versements').select('*').order('created_at',{ascending:false}).limit(50);
+  if(error){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Table versements absente — exécutez la migration SQL</td></tr>';return;}
+  if(!data?.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucun versement enregistré</td></tr>';return;}
+  // Résolution des noms des bénéficiaires
+  const byType={boutique:[],restaurant:[],livreur:[]};
+  data.forEach(v=>{if(byType[v.beneficiaire_type])byType[v.beneficiaire_type].push(v.beneficiaire_id);});
+  const names={};
+  for(const [t,ids] of Object.entries(byType)){
+    if(!ids.length)continue;
+    const {data:rows}=await sb.from(_vsTables[t]).select('id,nom').in('id',[...new Set(ids)]);
+    (rows||[]).forEach(r=>names[t+r.id]=r.nom);
+  }
+  const tLabel={boutique:'🏪 Vendeur',restaurant:'🍽️ Restaurant',livreur:'🚴 Livreur'};
+  tb.innerHTML=data.map(v=>`<tr>
+    <td>${new Date(v.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'})}</td>
+    <td>${tLabel[v.beneficiaire_type]||v.beneficiaire_type}</td>
+    <td><strong>${names[v.beneficiaire_type+v.beneficiaire_id]||v.beneficiaire_id.substring(0,8)}</strong></td>
+    <td><strong style="color:var(--vd)">${(v.montant||0).toLocaleString('fr-FR')} FCFA</strong></td>
+    <td>${v.reference?`<code>${v.reference}</code>`:'—'}</td>
+  </tr>`).join('');
+}
+
 async function loadPaiements(){
+  loadVsBenefs();loadVsHistorique();
   const tb=document.getElementById('pay-rows');
   try{
     const {data}=await sb.from('paiements').select('*,commandes(id,total)').order('created_at',{ascending:false}).limit(100);
