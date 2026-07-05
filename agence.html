@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Espace Agence — Yéyé Market</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --vd:#0c447c;--vl:#e6f1fb;--v:#185fa5;
+  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g400:#9ca3af;--g600:#4b5563;--g900:#111827;
+  --r:#dc2626;--rl:#fef2f2;--or:#d97706;--orl:#fffbeb;--bl:#2563eb;--bll:#eff6ff;
+  --gr:#0f6e56;--grl:#e1f5ee;
+  --shadow:0 1px 3px rgba(0,0,0,.08);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--g50);color:var(--g900);font-size:14px}
+.hidden{display:none!important}
+
+/* AUTH */
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,#0c447c,#185fa5)}
+.auth-card{background:#fff;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.2);width:100%;max-width:440px;padding:32px}
+.auth-logo{text-align:center;margin-bottom:24px}
+.auth-logo .ico{width:56px;height:56px;border-radius:16px;background:var(--vl);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px}
+.auth-logo h1{font-size:20px;font-weight:800}
+.auth-logo p{font-size:13px;color:var(--g400);margin-top:2px}
+.auth-tabs{display:flex;gap:6px;background:var(--g100);border-radius:10px;padding:4px;margin-bottom:20px}
+.atab{flex:1;padding:9px;border:none;background:none;border-radius:8px;font-size:13px;font-weight:600;color:var(--g600);cursor:pointer;font-family:inherit}
+.atab.active{background:#fff;color:var(--vd);box-shadow:var(--shadow)}
+.aform{display:none}.aform.active{display:block}
+.fg{margin-bottom:14px}
+.fg label{font-size:13px;font-weight:600;color:var(--g600);display:block;margin-bottom:5px}
+.fg input,.fg select{width:100%;padding:11px 13px;border:1.5px solid var(--g200);border-radius:9px;font-size:14px;font-family:inherit;outline:none}
+.fg input:focus,.fg select:focus{border-color:var(--vd)}
+.btn-main{background:var(--vd);color:#fff;border:none;padding:12px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;width:100%}
+.auth-err{color:var(--r);font-size:13px;margin-top:10px;display:none;background:var(--rl);padding:8px 12px;border-radius:8px}
+
+/* SHELL */
+.shell{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--vd);position:fixed;top:0;left:0;bottom:0;z-index:100;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.32,.72,0,1)}
+.sb-head{padding:18px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-head .ico{width:36px;height:36px;border-radius:9px;background:var(--v);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.sb-head .nom{color:#fff;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-head .sub{color:rgba(255,255,255,.6);font-size:11px}
+.sb-nav{flex:1;padding:12px 10px;overflow-y:auto}
+.sb-cat{color:rgba(255,255,255,.4);font-size:10px;font-weight:700;letter-spacing:.05em;padding:12px 10px 6px}
+.sb-btn{width:100%;display:flex;align-items:center;gap:10px;padding:10px 12px;border:none;background:none;color:rgba(255,255,255,.85);font-size:13.5px;font-weight:500;border-radius:9px;cursor:pointer;font-family:inherit;text-align:left;margin-bottom:2px}
+.sb-btn:hover{background:rgba(255,255,255,.08)}
+.sb-btn.active{background:var(--v);color:#fff;font-weight:600}
+.sb-btn svg{width:17px;height:17px;flex-shrink:0}
+.sb-foot{padding:12px}
+.sb-logout{width:100%;display:flex;align-items:center;gap:8px;padding:11px;border:none;background:none;color:rgba(255,140,140,.9);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;border-radius:9px}
+.main{flex:1;margin-left:230px;padding:24px 28px}
+.hb-btn{display:none;background:none;border:none;cursor:pointer;padding:6px;margin-right:10px}
+.hb-btn svg{width:24px;height:24px;color:var(--g900)}
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:99}
+.sb-overlay.open{display:block}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.topbar h1{font-size:22px;font-weight:800}
+.wb-sub{font-size:13px;color:var(--g600);margin-top:2px}
+.badge-live{display:inline-flex;align-items:center;gap:6px;background:var(--grl);color:var(--gr);font-size:12px;font-weight:700;padding:6px 12px;border-radius:99px}
+
+.sec{display:none}.sec.active{display:block}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat{background:#fff;border-radius:14px;padding:16px 18px;box-shadow:var(--shadow)}
+.stat-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;margin-bottom:8px}
+.si-b{background:var(--bll)}.si-o{background:var(--orl)}.si-g{background:var(--grl)}.si-y{background:#fef9c3}
+.stat-label{font-size:12px;color:var(--g600)}
+.stat-val{font-size:23px;font-weight:800;margin-top:2px}
+
+.card{background:#fff;border-radius:14px;box-shadow:var(--shadow);margin-bottom:18px}
+.card-head{padding:15px 18px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between}
+.card-head h2{font-size:15px;font-weight:700}
+.card-body{padding:16px 18px}
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.03em;padding:8px 10px;border-bottom:1px solid var(--g100)}
+td{padding:11px 10px;font-size:13px;border-bottom:1px solid var(--g100)}
+tr:last-child td{border-bottom:none}
+code{background:var(--g100);padding:2px 6px;border-radius:5px;font-size:12px}
+
+.btn{border:none;border-radius:8px;font-family:inherit;font-weight:600;cursor:pointer;font-size:13px;padding:8px 14px}
+.btn-p{background:var(--vd);color:#fff}
+.btn-sm{padding:5px 11px;font-size:12px;border-radius:6px}
+.btn-ok{background:var(--grl);color:var(--gr)}
+.btn-del{background:var(--rl);color:var(--r)}
+.btn-ed{background:var(--g100);color:var(--g600)}
+
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.bg{background:var(--grl);color:var(--gr)}.bo{background:var(--orl);color:var(--or)}
+.bb{background:var(--bll);color:var(--bl)}.br{background:var(--rl);color:var(--r)}
+.bgr{background:var(--g100);color:var(--g600)}
+
+.livreur-card{border:1px solid var(--g200);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px}
+.lc-av{width:44px;height:44px;border-radius:50%;background:var(--vl);color:var(--vd);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0;object-fit:cover}
+.lc-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.dot-on{background:#1d9e75}.dot-off{background:#b4b2a9}
+
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:480px;max-height:92vh;overflow-y:auto;box-shadow:0 25px 60px rgba(0,0,0,.2)}
+.modal-head{padding:16px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1}
+.modal-head h3{font-size:16px;font-weight:700}
+.modal-x{background:none;border:none;cursor:pointer;color:var(--g400);font-size:22px;padding:2px 8px;line-height:1}
+.modal-body{padding:20px}
+.fgm{margin-bottom:13px}
+.fgm label{font-size:13px;font-weight:600;color:var(--g600);display:block;margin-bottom:5px}
+.fgm input,.fgm select{width:100%;padding:10px 12px;border:1.5px solid var(--g200);border-radius:8px;font-size:14px;font-family:inherit;outline:none}
+.fgm input:focus,.fgm select:focus{border-color:var(--vd)}
+.upload-box{border:1.5px dashed var(--g200);border-radius:10px;padding:14px;text-align:center;cursor:pointer;font-size:13px;color:var(--g600)}
+.upload-box.done{border-color:var(--gr);background:var(--grl);color:var(--gr)}
+
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--g900);color:#fff;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;z-index:500;transition:transform .3s;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.ok{background:var(--gr)}.toast.err{background:var(--r)}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0;padding:16px}
+  .stats{grid-template-columns:1fr 1fr}
+  .hb-btn{display:block}
+  .grid-2{grid-template-columns:1fr!important}
+}
+</style>
+</head>
+<body>
+
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+
+<!-- AUTH -->
+<div id="auth-page" class="auth-page">
+  <div class="auth-card">
+    <div class="auth-logo"><div class="ico">🏢</div><h1>Espace Agence</h1><p>Yéyé Market — Bénin 🇧🇯</p></div>
+    <div class="aform active" id="form-login">
+      <div class="fg"><label>Email de l'agence</label><input type="email" id="l-email" placeholder="agence@exemple.com"/></div>
+      <div class="fg"><label>Mot de passe</label><input type="password" id="l-pass" placeholder="••••••••"/></div>
+      <button class="btn-main" onclick="doLogin()">🔐 Se connecter</button>
+      <div class="auth-err" id="login-err"></div>
+      <p style="font-size:12px;color:var(--g400);text-align:center;margin-top:16px">Pas encore d'agence ? Inscrivez-vous depuis la page <a href="/livreur.html" style="color:var(--vd);font-weight:600">Devenir livreur → Agence</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" class="shell hidden">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <div class="ico">🏢</div>
+      <div style="min-width:0"><div class="nom" id="sb-nom">—</div><div class="sub" id="sb-email">Agence</div></div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-cat">GESTION</div>
+      <button class="sb-btn active" onclick="go('dashboard',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Vue d'ensemble</button>
+      <button class="sb-btn" onclick="go('livreurs',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>Mes livreurs</button>
+      <button class="sb-btn" onclick="go('courses',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 16v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8m12 0h4l-2-4m-2 4H4"/></svg>Courses reçues</button>
+      <button class="sb-btn" onclick="go('historique',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 106 5.3L3 8"/><path d="M12 7v5l3 3"/></svg>Historique</button>
+      <div class="sb-cat">PARAMÈTRES</div>
+      <button class="sb-btn" onclick="go('agence',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"/></svg>Mon agence</button>
+      <button class="sb-btn" onclick="go('paiements',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Paiements</button>
+    </nav>
+    <div class="sb-foot"><button class="sb-logout" onclick="doLogout()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Déconnexion</button></div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center">
+        <button class="hb-btn" onclick="openSidebar()" aria-label="Menu"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button>
+        <div><h1 id="ptitle">Vue d'ensemble</h1></div>
+      </div>
+      <span class="badge-live" id="statut-badge">✅ Actif</span>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div class="sec active" id="sec-dashboard">
+      <p class="wb-sub" style="margin-bottom:16px">Bienvenue, <strong id="wb-nom">—</strong> 👋</p>
+      <div class="stats">
+        <div class="stat"><div class="stat-ico si-b">🚴</div><div class="stat-label">Livreurs actifs</div><div class="stat-val" id="s-livreurs">—</div></div>
+        <div class="stat"><div class="stat-ico si-o">📦</div><div class="stat-label">Courses en cours</div><div class="stat-val" id="s-encours">—</div></div>
+        <div class="stat"><div class="stat-ico si-g">✅</div><div class="stat-label">Livrées (total)</div><div class="stat-val" id="s-livrees">—</div></div>
+        <div class="stat"><div class="stat-ico si-y">💰</div><div class="stat-label">Gains nets</div><div class="stat-val" id="s-gains">—</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px" class="grid-2">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>📦 Courses à redispatcher</h2><button class="btn btn-sm btn-ed" onclick="go('courses',document.querySelectorAll('.sb-btn')[2])">Tout voir</button></div>
+          <div class="card-body" id="dash-courses"><p style="color:var(--g400);text-align:center;padding:24px">Chargement...</p></div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>🚴 Mes livreurs</h2></div>
+          <div class="card-body" id="dash-livreurs"><p style="color:var(--g400);text-align:center;padding:24px">Chargement...</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVREURS -->
+    <div class="sec" id="sec-livreurs">
+      <div class="card">
+        <div class="card-head"><h2>🚴 Mes livreurs</h2><button class="btn btn-p" onclick="openAddLivreur()">➕ Ajouter un livreur</button></div>
+        <div class="card-body"><div id="livreurs-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px"></div></div>
+      </div>
+    </div>
+
+    <!-- COURSES -->
+    <div class="sec" id="sec-courses">
+      <div class="card">
+        <div class="card-head"><h2>📦 Courses reçues</h2><button class="btn btn-sm btn-ed" onclick="loadCourses()">🔄 Actualiser</button></div>
+        <div class="card-body" id="courses-list"><p style="color:var(--g400);text-align:center;padding:24px">Chargement...</p></div>
+      </div>
+    </div>
+
+    <!-- HISTORIQUE -->
+    <div class="sec" id="sec-historique">
+      <div class="card">
+        <div class="card-head"><h2>🕐 Historique des livraisons</h2></div>
+        <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Commande</th><th>Livreur</th><th>Gain net</th><th>Date</th><th>Statut</th></tr></thead><tbody id="histo-body"></tbody></table></div></div>
+      </div>
+    </div>
+
+    <!-- MON AGENCE -->
+    <div class="sec" id="sec-agence">
+      <div class="card" style="max-width:600px">
+        <div class="card-head"><h2>🏢 Informations de l'agence</h2></div>
+        <div class="card-body" id="agence-form"></div>
+      </div>
+    </div>
+
+    <!-- PAIEMENTS -->
+    <div class="sec" id="sec-paiements">
+      <div class="card" style="max-width:600px">
+        <div class="card-head"><h2>🏦 Paramètres de paiement</h2></div>
+        <div class="card-body" id="paiements-content"><p style="color:var(--g400);text-align:center;padding:24px">Chargement...</p></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL AJOUT LIVREUR -->
+<div class="overlay" id="m-livreur">
+  <div class="modal">
+    <div class="modal-head"><h3>➕ Ajouter un livreur</h3><button class="modal-x" onclick="closeModal('m-livreur')">✕</button></div>
+    <div class="modal-body">
+      <div style="background:var(--vl);border-radius:10px;padding:11px 13px;margin-bottom:16px;font-size:12px;color:var(--g600)">Le livreur pourra se connecter à son tableau de bord avec l'email et le mot de passe que vous définissez ici.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fgm"><label>Nom *</label><input type="text" id="nl-nom" placeholder="Mensah"/></div>
+        <div class="fgm"><label>Prénom *</label><input type="text" id="nl-prenom" placeholder="Kofi"/></div>
+      </div>
+      <div class="fgm"><label>Téléphone *</label><input type="tel" id="nl-tel" placeholder="+229 97 00 00 00"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fgm"><label>Type de véhicule *</label><select id="nl-vehicule"><option value="Moto">Moto</option><option value="Vélo">Vélo</option><option value="Voiture">Voiture</option><option value="À pied">À pied</option></select></div>
+        <div class="fgm"><label>Matricule véhicule</label><input type="text" id="nl-matricule" placeholder="BEN-2451"/></div>
+      </div>
+      <div class="fgm"><label>Zone de travail</label><select id="nl-zone"><option value="">Choisir...</option></select></div>
+      <hr style="border:none;border-top:1px solid var(--g100);margin:6px 0 14px"/>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fgm"><label>Pièce d'identité</label><label class="upload-box" id="box-piece">📄 Choisir<input type="file" accept="image/*,.pdf" style="display:none" onchange="pickDoc(this,'piece')"/></label></div>
+        <div class="fgm"><label>Photo d'identité</label><label class="upload-box" id="box-photo">📷 Choisir<input type="file" accept="image/*" style="display:none" onchange="pickDoc(this,'photo')"/></label></div>
+      </div>
+      <hr style="border:none;border-top:1px solid var(--g100);margin:6px 0 14px"/>
+      <div class="fgm"><label>Email de connexion *</label><input type="email" id="nl-email" placeholder="kofi.livreur@exemple.com"/></div>
+      <div class="fgm"><label>Mot de passe *</label><input type="text" id="nl-pass" placeholder="Min. 6 caractères — à communiquer au livreur"/></div>
+      <button class="btn btn-p" style="width:100%;margin-top:8px" id="nl-submit" onclick="createLivreur()">✅ Créer le compte livreur</button>
+      <div class="auth-err" id="nl-err"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
+const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
+const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
+let currentUser=null,currentAgence=null;
+let _docs={piece:null,photo:null};
+
+const fmt=n=>(n||0).toLocaleString('fr-FR');
+const fdate=d=>d?new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'—';
+function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sb-overlay').classList.add('open');}
+function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');}
+function showAuth(){document.getElementById('auth-page').classList.remove('hidden');document.getElementById('app').classList.add('hidden');}
+function showApp(){document.getElementById('auth-page').classList.add('hidden');document.getElementById('app').classList.remove('hidden');}
+
+function sbadge(s){const m={en_attente:'<span class="badge bo">⏳ En attente</span>',assignee:'<span class="badge bb">📋 Assignée</span>',en_cours:'<span class="badge bo">🚴 En cours</span>',livree:'<span class="badge bg">✅ Livrée</span>',confirmee:'<span class="badge bb">📦 À redispatcher</span>',prete:'<span class="badge bb">📦 À redispatcher</span>'};return m[s]||`<span class="badge bgr">${s||'—'}</span>`;}
+
+const titles={dashboard:"Vue d'ensemble",livreurs:'Mes livreurs',courses:'Courses reçues',historique:'Historique',agence:'Mon agence',paiements:'Paiements'};
+function go(name,btn){
+  closeSidebar();
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  if(btn)btn.classList.add('active');
+  document.getElementById('ptitle').textContent=titles[name]||name;
+  const loaders={livreurs:loadLivreurs,courses:loadCourses,historique:loadHistorique,agence:loadAgenceForm,paiements:loadPaiementsPage};
+  if(loaders[name])loaders[name]();
+}
+
+async function doLogin(){
+  const email=document.getElementById('l-email').value.trim();
+  const pass=document.getElementById('l-pass').value;
+  const err=document.getElementById('login-err');err.style.display='none';
+  if(!email||!pass){err.textContent='Remplissez tous les champs';err.style.display='block';return;}
+  const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
+  if(error){err.textContent='❌ '+error.message;err.style.display='block';return;}
+  currentUser=data.user;await loadAgence();
+}
+async function doLogout(){await sb.auth.signOut();location.reload();}
+
+async function checkSession(){
+  const {data:{session}}=await sb.auth.getSession();
+  if(!session){showAuth();return;}
+  currentUser=session.user;await loadAgence();
+}
+
+async function loadAgence(){
+  const {data,error}=await sb.from('agences').select('*').eq('user_id',currentUser.id).single();
+  if(error||!data){
+    toast('Compte agence introuvable','err');
+    await sb.auth.signOut();showAuth();return;
+  }
+  currentAgence=data;
+  showApp();
+  document.getElementById('sb-nom').textContent=currentAgence.nom;
+  document.getElementById('sb-email').textContent=currentUser.email;
+  document.getElementById('wb-nom').textContent=currentAgence.nom;
+  const badge=document.getElementById('statut-badge');
+  if(currentAgence.statut==='en_attente'){badge.textContent='⏳ En attente de validation';badge.style.background='var(--orl)';badge.style.color='var(--or)';}
+  else if(currentAgence.statut==='suspendu'){badge.textContent='⛔ Suspendu';badge.style.background='var(--rl)';badge.style.color='var(--r)';}
+  loadDashboard();
+}
+
+// ============ DASHBOARD ============
+async function loadDashboard(){
+  const {data:livreurs}=await sb.from('livreurs').select('*').eq('agence_id',currentAgence.id);
+  const livIds=(livreurs||[]).map(l=>l.id);
+  document.getElementById('s-livreurs').textContent=(livreurs||[]).filter(l=>l.statut==='actif').length;
+
+  // Livraisons de tous les livreurs de l'agence
+  let livs=[];
+  if(livIds.length){
+    const {data}=await sb.from('livraisons').select('*,commandes(id,frais_livraison)').in('livreur_id',livIds);
+    livs=data||[];
+  }
+  const enCours=livs.filter(l=>['assignee','en_cours'].includes(l.statut)).length;
+  const livrees=livs.filter(l=>l.statut==='livree');
+  document.getElementById('s-encours').textContent=enCours;
+  document.getElementById('s-livrees').textContent=livrees.length;
+
+  let txCom=8;
+  try{const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_liv').single();if(pc&&pc.valeur)txCom=parseFloat(pc.valeur)||8;}catch(e){}
+  const gains=livrees.reduce((s,l)=>s+Math.round((l.commandes?.frais_livraison||500)*(100-txCom)/100),0);
+  document.getElementById('s-gains').textContent=fmt(gains)+' F';
+
+  // Courses à redispatcher (assignées à l'agence, pas encore à un livreur)
+  const courses=await getCoursesAgence();
+  const dc=document.getElementById('dash-courses');
+  const aRedispatch=courses.filter(c=>!c.livreur_id);
+  dc.innerHTML=aRedispatch.length?aRedispatch.slice(0,4).map(c=>courseRow(c,livreurs)).join(''):'<p style="color:var(--g400);text-align:center;padding:20px">✅ Aucune course en attente</p>';
+
+  // Aperçu livreurs
+  const dl=document.getElementById('dash-livreurs');
+  dl.innerHTML=(livreurs||[]).length?(livreurs||[]).slice(0,5).map(l=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g100)">
+      ${l.photo_url?`<img class="lc-av" style="width:30px;height:30px" src="${l.photo_url}"/>`:`<div class="lc-av" style="width:30px;height:30px;font-size:12px">${(l.prenom||l.nom||'?')[0]}</div>`}
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${l.prenom||''} ${l.nom||''}</div><div style="font-size:11px;color:var(--g400)">${l.matricule_vehicule||l.vehicule||'—'}</div></div>
+      <span class="lc-dot ${l.disponible?'dot-on':'dot-off'}"></span>
+    </div>`).join(''):'<p style="color:var(--g400);text-align:center;padding:20px">Aucun livreur.<br><button class="btn btn-sm btn-p" style="margin-top:8px" onclick="go(\'livreurs\',document.querySelectorAll(\'.sb-btn\')[1])">Ajouter</button></p>';
+}
+
+// Récupère les commandes assignées à l'agence
+async function getCoursesAgence(){
+  const {data,error}=await sb.from('livraisons').select('*,commandes(id,statut,adresse_livraison,frais_livraison,zones(nom)),livreurs(nom,prenom)').eq('agence_id',currentAgence.id);
+  if(error)return [];
+  return (data||[]).filter(l=>l.statut!=='livree');
+}
+
+function courseRow(c,livreurs){
+  const opts=(livreurs||[]).filter(l=>l.statut==='actif').map(l=>`<option value="${l.id}">${l.prenom||''} ${l.nom||''}${l.disponible?' 🟢':' ⚪'}</option>`).join('');
+  return `<div style="border:1px solid var(--g200);border-radius:10px;padding:11px;margin-bottom:8px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <span style="font-size:13px;font-weight:600">#${c.commandes?.id?.substring(0,6)||'—'}</span>
+      ${c.livreur_id?`<span class="badge bb">${c.livreurs?.prenom||''} ${c.livreurs?.nom||''}</span>`:'<span class="badge bo">À assigner</span>'}
+    </div>
+    <div style="font-size:12px;color:var(--g600);margin-bottom:8px">📍 ${c.commandes?.adresse_livraison?.substring(0,50)||'—'} · ${fmt(c.commandes?.frais_livraison||500)} F</div>
+    ${c.livreur_id?`<div style="font-size:12px;color:var(--gr)">🚴 ${statutLiv(c.statut)}</div>`
+    :`<div style="display:flex;gap:6px"><select id="disp-${c.id}" style="flex:1;padding:6px;border:1.5px solid var(--g200);border-radius:7px;font-size:12px;font-family:inherit"><option value="">Choisir un livreur...</option>${opts}</select><button class="btn btn-sm btn-p" onclick="dispatchCourse('${c.id}')">Assigner</button></div>`}
+  </div>`;
+}
+function statutLiv(s){return {assignee:'Assignée — en attente de récupération',en_cours:'En cours de livraison',livree:'Livrée'}[s]||s;}
+
+async function dispatchCourse(livId){
+  const sel=document.getElementById('disp-'+livId);
+  const livreurId=sel?.value;
+  if(!livreurId){toast('Choisissez un livreur','err');return;}
+  const {error}=await sb.from('livraisons').update({livreur_id:livreurId,statut:'assignee'}).eq('id',livId);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  try{
+    const {data:l}=await sb.from('livreurs').select('user_id').eq('id',livreurId).single();
+    if(l?.user_id)await sb.from('notifications').insert({user_id:l.user_id,titre:'Nouvelle course 🚴',message:'Votre agence vous a assigné une livraison.',type:'livraison',lu:false});
+  }catch(e){}
+  toast('✅ Course assignée au livreur','ok');
+  loadDashboard();loadCourses();
+}
+
+// ============ COURSES ============
+async function loadCourses(){
+  const {data:livreurs}=await sb.from('livreurs').select('*').eq('agence_id',currentAgence.id);
+  const courses=await getCoursesAgence();
+  const el=document.getElementById('courses-list');
+  el.innerHTML=courses.length?courses.map(c=>courseRow(c,livreurs)).join(''):'<p style="color:var(--g400);text-align:center;padding:32px">Aucune course reçue pour le moment.</p>';
+}
+
+// ============ LIVREURS ============
+async function loadLivreurs(){
+  const {data}=await sb.from('livreurs').select('*').eq('agence_id',currentAgence.id).order('created_at',{ascending:false});
+  const el=document.getElementById('livreurs-list');
+  if(!data?.length){el.innerHTML='<p style="color:var(--g400);grid-column:1/-1;text-align:center;padding:32px">Aucun livreur.<br>Cliquez sur « Ajouter un livreur » pour créer votre premier compte.</p>';return;}
+  el.innerHTML=data.map(l=>`
+    <div class="livreur-card">
+      ${l.photo_url?`<img class="lc-av" src="${l.photo_url}"/>`:`<div class="lc-av">${(l.prenom||l.nom||'?')[0]}</div>`}
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:700;font-size:14px">${l.prenom||''} ${l.nom||''}</div>
+        <div style="font-size:12px;color:var(--g600)">${l.vehicule||'—'}${l.matricule_vehicule?' · '+l.matricule_vehicule:''}</div>
+        <div style="font-size:11px;color:var(--g400);margin-top:2px">${l.telephone||''}</div>
+      </div>
+      <div style="text-align:right">
+        <span class="lc-dot ${l.disponible?'dot-on':'dot-off'}" style="display:inline-block;margin-bottom:6px"></span>
+        <div>${l.statut==='actif'?'<span class="badge bg">Actif</span>':'<span class="badge bgr">'+l.statut+'</span>'}</div>
+      </div>
+    </div>`).join('');
+}
+
+function pickDoc(input,type){
+  const f=input.files[0];if(!f)return;
+  _docs[type]=f;
+  const box=document.getElementById('box-'+type);
+  box.classList.add('done');
+  box.childNodes[0].textContent=(type==='piece'?'📄 ':'📷 ')+'✓ '+f.name.substring(0,14);
+}
+
+function openAddLivreur(){
+  _docs={piece:null,photo:null};
+  ['nl-nom','nl-prenom','nl-tel','nl-matricule','nl-email','nl-pass'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('box-piece').classList.remove('done');document.getElementById('box-piece').childNodes[0].textContent='📄 Choisir';
+  document.getElementById('box-photo').classList.remove('done');document.getElementById('box-photo').childNodes[0].textContent='📷 Choisir';
+  document.getElementById('nl-err').style.display='none';
+  // charger zones
+  sb.from('zones').select('id,nom').eq('actif',true).order('nom').then(({data})=>{
+    document.getElementById('nl-zone').innerHTML='<option value="">Choisir...</option>'+(data||[]).map(z=>`<option value="${z.id}">${z.nom}</option>`).join('');
+  });
+  openModal('m-livreur');
+}
+
+async function uploadDoc(file,prefix){
+  if(!file)return null;
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+  const path=`${currentAgence.id}/${prefix}_${Date.now()}.${ext}`;
+  const {error}=await sb.storage.from('documents-livreurs').upload(path,file,{upsert:true,contentType:file.type});
+  if(error){console.warn('upload doc',error.message);return null;}
+  return path; // chemin dans bucket privé (URL signée à la demande)
+}
+
+async function createLivreur(){
+  const nom=document.getElementById('nl-nom').value.trim();
+  const prenom=document.getElementById('nl-prenom').value.trim();
+  const tel=document.getElementById('nl-tel').value.trim();
+  const vehicule=document.getElementById('nl-vehicule').value;
+  const matricule=document.getElementById('nl-matricule').value.trim();
+  const zone=document.getElementById('nl-zone').value;
+  const email=document.getElementById('nl-email').value.trim();
+  const pass=document.getElementById('nl-pass').value;
+  const err=document.getElementById('nl-err');err.style.display='none';
+  if(!nom||!prenom||!tel||!email||!pass){err.textContent='❌ Remplissez tous les champs obligatoires';err.style.display='block';return;}
+  if(pass.length<6){err.textContent='❌ Mot de passe : min. 6 caractères';err.style.display='block';return;}
+  const btn=document.getElementById('nl-submit');btn.disabled=true;btn.textContent='⏳ Création du compte...';
+
+  // 1) Upload documents (bucket privé)
+  const pieceUrl=await uploadDoc(_docs.piece,'piece');
+  const photoIdUrl=await uploadDoc(_docs.photo,'photo');
+
+  // 2) Créer le compte Auth du livreur (sans déconnecter l'agence : signUp crée mais ne change pas la session active si email confirm off — on restaure la session ensuite)
+  const agenceSession=(await sb.auth.getSession()).data.session;
+  const {data:signUpData,error:signErr}=await sb.auth.signUp({email,password:pass});
+  if(signErr){err.textContent='❌ '+signErr.message;err.style.display='block';btn.disabled=false;btn.textContent='✅ Créer le compte livreur';return;}
+  const newUserId=signUpData.user?.id;
+
+  // 3) Restaurer la session agence (signUp peut avoir basculé la session)
+  if(agenceSession){await sb.auth.setSession({access_token:agenceSession.access_token,refresh_token:agenceSession.refresh_token});}
+
+  // 4) Créer l'entrée utilisateur + livreur rattaché à l'agence
+  await sb.from('utilisateurs').insert({id:newUserId,nom:prenom+' '+nom,email,telephone:tel,role:'livreur',statut:'actif'});
+  const {error:livErr}=await sb.from('livreurs').insert({
+    user_id:newUserId,agence_id:currentAgence.id,nom,prenom,telephone:tel,vehicule,
+    matricule_vehicule:matricule||null,zone_id:zone||null,
+    piece_identite_url:pieceUrl,photo_identite_url:photoIdUrl,
+    disponible:false,statut:'actif'
+  });
+  if(livErr){err.textContent='❌ '+livErr.message;err.style.display='block';btn.disabled=false;btn.textContent='✅ Créer le compte livreur';return;}
+
+  btn.disabled=false;btn.textContent='✅ Créer le compte livreur';
+  closeModal('m-livreur');
+  toast('🎉 Livreur créé ! Il peut se connecter avec '+email,'ok');
+  loadLivreurs();loadDashboard();
+}
+
+// ============ HISTORIQUE ============
+async function loadHistorique(){
+  const {data:livreurs}=await sb.from('livreurs').select('id,nom,prenom').eq('agence_id',currentAgence.id);
+  const livMap={};(livreurs||[]).forEach(l=>livMap[l.id]=(l.prenom||'')+' '+(l.nom||''));
+  const livIds=Object.keys(livMap);
+  const tb=document.getElementById('histo-body');
+  if(!livIds.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucun livreur</td></tr>';return;}
+  const {data}=await sb.from('livraisons').select('*,commandes(id,frais_livraison)').in('livreur_id',livIds).eq('statut','livree').order('heure_livraison',{ascending:false}).limit(50);
+  let txCom=8;try{const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_liv').single();if(pc&&pc.valeur)txCom=parseFloat(pc.valeur)||8;}catch(e){}
+  tb.innerHTML=(data||[]).length?(data||[]).map(l=>`<tr>
+    <td><code>#${l.commandes?.id?.substring(0,8)||'—'}</code></td>
+    <td>${livMap[l.livreur_id]||'—'}</td>
+    <td><strong style="color:var(--gr)">${fmt(Math.round((l.commandes?.frais_livraison||500)*(100-txCom)/100))} F</strong></td>
+    <td>${fdate(l.heure_livraison||l.created_at)}</td>
+    <td>${sbadge(l.statut)}</td>
+  </tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucune livraison terminée</td></tr>';
+}
+
+// ============ MON AGENCE ============
+function loadAgenceForm(){
+  const a=currentAgence;
+  document.getElementById('agence-form').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div class="fgm"><label>Nom de l'agence</label><input value="${a.nom||''}" readonly style="background:var(--g50)"/></div>
+      <div class="fgm"><label>Responsable</label><input value="${a.responsable||''}" readonly style="background:var(--g50)"/></div>
+      <div class="fgm"><label>Email</label><input value="${a.email||''}" readonly style="background:var(--g50)"/></div>
+      <div class="fgm"><label>Téléphone</label><input value="${a.telephone||''}" readonly style="background:var(--g50)"/></div>
+      <div class="fgm" style="grid-column:1/-1"><label>Zones de couverture</label><input value="${(a.zones_couverture||[]).join(', ')}" readonly style="background:var(--g50)"/></div>
+      <div class="fgm"><label>Statut</label><input value="${a.statut}" readonly style="background:var(--g50)"/></div>
+    </div>`;
+}
+
+// ============ PAIEMENTS ============
+async function loadPaiementsPage(){
+  const {data:livreurs}=await sb.from('livreurs').select('id').eq('agence_id',currentAgence.id);
+  const livIds=(livreurs||[]).map(l=>l.id);
+  let livrees=[];
+  if(livIds.length){
+    const {data}=await sb.from('livraisons').select('statut,heure_livraison,created_at,commandes(frais_livraison)').in('livreur_id',livIds).eq('statut','livree');
+    livrees=(data||[]).map(l=>({date:l.heure_livraison||l.created_at,gain:l.commandes?.frais_livraison||500}));
+  }
+  let txCom=8;try{const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_liv').single();if(pc&&pc.valeur)txCom=parseFloat(pc.valeur)||8;}catch(e){}
+  const net=g=>Math.round(g*(100-txCom)/100);
+  const gainsNet=livrees.reduce((s,l)=>s+net(l.gain),0);
+  const h48=new Date(Date.now()-48*3600*1000);
+  const dispoBrut=livrees.filter(l=>new Date(l.date)<h48).reduce((s,l)=>s+net(l.gain),0);
+  const attente=livrees.filter(l=>new Date(l.date)>=h48).reduce((s,l)=>s+net(l.gain),0);
+  let totalVerse=0,dernier=null;
+  try{const {data:vers}=await sb.from('versements').select('montant,created_at').eq('beneficiaire_type','agence').eq('beneficiaire_id',currentAgence.id).order('created_at',{ascending:false});if(vers){totalVerse=vers.reduce((s,v)=>s+(v.montant||0),0);dernier=vers[0]||null;}}catch(e){}
+  const dispo=Math.max(0,dispoBrut-totalVerse);
+  document.getElementById('paiements-content').innerHTML=`
+    <p style="font-size:12px;color:var(--g600);margin-bottom:12px">Fréquence des paiements</p>
+    <label style="display:flex;gap:8px;padding:9px 10px;border:1.5px solid var(--g200);border-radius:9px;margin-bottom:7px;cursor:pointer"><input type="radio" name="freq" value="2jours" ${(currentAgence.freq_paiement||'2jours')==='2jours'?'checked':''} onchange="saveFreq(this.value)"/> <div><strong style="font-size:13px">Chaque 2 jours</strong> <span style="font-size:11px;color:var(--gr);font-weight:700">Recommandé</span></div></label>
+    <label style="display:flex;gap:8px;padding:9px 10px;border:1.5px solid var(--g200);border-radius:9px;margin-bottom:7px;cursor:pointer"><input type="radio" name="freq" value="semaine" ${currentAgence.freq_paiement==='semaine'?'checked':''} onchange="saveFreq(this.value)"/> <strong style="font-size:13px">Chaque semaine</strong></label>
+    <label style="display:flex;gap:8px;padding:9px 10px;border:1.5px solid var(--g200);border-radius:9px;margin-bottom:14px;cursor:pointer"><input type="radio" name="freq" value="mois" ${currentAgence.freq_paiement==='mois'?'checked':''} onchange="saveFreq(this.value)"/> <strong style="font-size:13px">Chaque mois</strong></label>
+    <div style="border-top:1px solid var(--g100);padding-top:12px">
+      <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span>Gains totaux (net ${txCom}%)</span><strong>${fmt(gainsNet)} FCFA</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span>Solde disponible</span><strong style="color:var(--gr)">${fmt(dispo)} FCFA</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span>Solde en attente</span><strong style="color:var(--or)">${fmt(attente)} FCFA</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span>Dernier versement</span><span>${dernier?fdate(dernier.created_at)+' · '+fmt(dernier.montant)+' F':'Aucun'}</span></div>
+    </div>
+    <div style="background:var(--orl);border-radius:10px;padding:11px 13px;margin-top:12px;font-size:11.5px;color:var(--g600)">
+      ⚠️ Les gains de tous vos livreurs sont regroupés et versés à l'agence, qui les répartit ensuite. Délai de 48h après livraison. Seuil minimum : 10 000 FCFA.
+    </div>`;
+}
+async function saveFreq(v){
+  await sb.from('agences').update({freq_paiement:v}).eq('id',currentAgence.id);
+  currentAgence.freq_paiement=v;toast('✅ Fréquence enregistrée','ok');
+}
+
+checkSession();
+</script>
+</body>
+</html>
