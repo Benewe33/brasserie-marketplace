@@ -80,6 +80,17 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--g50
 .dleg-row{display:flex;align-items:center;gap:8px;padding:4px 0}
 .dleg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
 @media(max-width:1100px){.grid-3{grid-template-columns:1fr!important}}
+.lv-tabs{display:flex;gap:6px;background:var(--g100);border-radius:9px;padding:3px}
+.lv-tab{border:none;background:none;padding:6px 14px;border-radius:7px;font-size:12.5px;font-weight:600;color:var(--g600);cursor:pointer;font-family:inherit}
+.lv-tab.active{background:#fff;color:var(--vd);box-shadow:var(--shadow)}
+.perf-row{margin-bottom:14px}
+.perf-row .perf-top{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px}
+.perf-bar{height:8px;background:var(--g100);border-radius:99px;overflow:hidden}
+.perf-fill{height:100%;border-radius:99px}
+.mini-fin{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
+.mf-ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.mf-lab{font-size:11px;color:var(--g600);font-weight:600}
+.mf-val{font-size:17px;font-weight:800;color:var(--g900)}
 
 .card{background:#fff;border-radius:14px;box-shadow:var(--shadow);margin-bottom:18px}
 .card-head{padding:15px 18px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between}
@@ -167,10 +178,12 @@ code{background:var(--g100);padding:2px 6px;border-radius:5px;font-size:12px}
       <div class="sb-cat">GESTION</div>
       <button class="sb-btn active" onclick="go('dashboard',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Vue d'ensemble</button>
       <button class="sb-btn" onclick="go('livreurs',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>Mes livreurs</button>
+      <button class="sb-btn" onclick="go('livraisons',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8zM5.5 21a1.5 1.5 0 100-3 1.5 1.5 0 000 3zm13 0a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>Livraisons</button>
       <button class="sb-btn" onclick="go('courses',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 16v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8m12 0h4l-2-4m-2 4H4"/></svg>Courses reçues</button>
       <button class="sb-btn" onclick="go('historique',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 106 5.3L3 8"/><path d="M12 7v5l3 3"/></svg>Historique</button>
       <div class="sb-cat">PARAMÈTRES</div>
       <button class="sb-btn" onclick="go('agence',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"/></svg>Mon agence</button>
+      <button class="sb-btn" onclick="go('finances',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Finances</button>
       <button class="sb-btn" onclick="go('paiements',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Paiements</button>
     </nav>
     <div class="sb-foot"><button class="sb-logout" onclick="doLogout()"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" width="16" height="16"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Déconnexion</button></div>
@@ -237,6 +250,44 @@ code{background:var(--g100);padding:2px 6px;border-radius:5px;font-size:12px}
       </div>
     </div>
 
+    <!-- LIVRAISONS (vue complète) -->
+    <div class="sec" id="sec-livraisons">
+      <div class="stats" style="grid-template-columns:repeat(5,1fr)">
+        <div class="stat"><div class="stat-ico si-b">📦</div><div class="stat-label">Total livraisons</div><div class="stat-val" id="lv-total">—</div></div>
+        <div class="stat"><div class="stat-ico si-g">✅</div><div class="stat-label">Terminées</div><div class="stat-val" id="lv-term">—</div></div>
+        <div class="stat"><div class="stat-ico si-o">🕐</div><div class="stat-label">En cours</div><div class="stat-val" id="lv-cours">—</div></div>
+        <div class="stat"><div class="stat-ico" style="background:#f3e8ff">✖️</div><div class="stat-label">Annulées</div><div class="stat-val" id="lv-annul">—</div></div>
+        <div class="stat"><div class="stat-ico si-y">⏱️</div><div class="stat-label">Temps moyen</div><div class="stat-val" id="lv-temps">—</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head" style="flex-wrap:wrap;gap:10px">
+          <h2>🚚 Livraisons récentes</h2>
+          <div class="lv-tabs">
+            <button class="lv-tab active" onclick="filterLivraisons('all',this)">Toutes</button>
+            <button class="lv-tab" onclick="filterLivraisons('en_cours',this)">En cours</button>
+            <button class="lv-tab" onclick="filterLivraisons('livree',this)">Terminées</button>
+            <button class="lv-tab" onclick="filterLivraisons('annulee',this)">Annulées</button>
+          </div>
+        </div>
+        <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>N° Commande</th><th>Client</th><th>Livreur</th><th>Statut</th><th>Adresse</th><th>Heure</th></tr></thead><tbody id="lv-body"></tbody></table></div></div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" class="grid-2">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>📊 Performance</h2></div>
+          <div class="card-body" id="lv-perf" style="padding:16px 18px"></div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>🗺️ Répartition par zone</h2></div>
+          <div class="card-body" style="padding:16px;display:flex;align-items:center;gap:16px">
+            <canvas id="lv-zone-chart" height="140" style="max-width:150px"></canvas>
+            <div id="lv-zone-legend" style="flex:1;font-size:12.5px"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- COURSES -->
     <div class="sec" id="sec-courses">
       <div class="card">
@@ -258,6 +309,34 @@ code{background:var(--g100);padding:2px 6px;border-radius:5px;font-size:12px}
       <div class="card" style="max-width:600px">
         <div class="card-head"><h2>🏢 Informations de l'agence</h2></div>
         <div class="card-body" id="agence-form"></div>
+      </div>
+    </div>
+
+    <!-- FINANCES -->
+    <div class="sec" id="sec-finances">
+      <div class="stats" style="grid-template-columns:repeat(4,1fr)">
+        <div class="stat"><div class="stat-ico si-g">💵</div><div class="stat-label">Recette du jour</div><div class="stat-val" id="f-jour">—</div></div>
+        <div class="stat"><div class="stat-ico si-b">📅</div><div class="stat-label">Recette de la semaine</div><div class="stat-val" id="f-semaine">—</div></div>
+        <div class="stat"><div class="stat-ico si-o">📆</div><div class="stat-label">Recette du mois</div><div class="stat-val" id="f-mois">—</div></div>
+        <div class="stat" style="background:var(--orl)"><div class="stat-ico si-y">👛</div><div class="stat-label">Solde disponible</div><div class="stat-val" id="f-solde">—</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head" style="flex-wrap:wrap;gap:10px">
+          <h2>🚴 Gains des livreurs</h2>
+          <div style="display:flex;align-items:center;gap:16px">
+            <div style="text-align:right"><div style="font-size:11px;color:var(--g400)">Total des gains</div><div style="font-size:15px;font-weight:800;color:var(--gr)" id="f-total-gains">—</div></div>
+            <button class="btn btn-p" onclick="virerTousGains()">📤 Verser tous les gains</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="tbl-wrap"><table><thead><tr><th>Livreur</th><th>Livraisons</th><th>Recette générée</th><th>Gains (net)</th><th>Statut</th><th>Action</th></tr></thead><tbody id="fin-body"></tbody></table></div>
+        </div>
+      </div>
+      <div class="stats" style="grid-template-columns:repeat(4,1fr)">
+        <div class="mini-fin"><span class="mf-ico" style="background:var(--bll)">👥</span><div><div class="mf-lab">Nombre de livreurs</div><div class="mf-val" id="f-nb-liv">—</div></div></div>
+        <div class="mini-fin"><span class="mf-ico" style="background:var(--grl)">📦</span><div><div class="mf-lab">Total livraisons</div><div class="mf-val" id="f-nb-course">—</div></div></div>
+        <div class="mini-fin"><span class="mf-ico" style="background:var(--orl)">💰</span><div><div class="mf-lab">Recette totale</div><div class="mf-val" id="f-recette-tot">—</div></div></div>
+        <div class="mini-fin"><span class="mf-ico" style="background:#e1f5ee">📤</span><div><div class="mf-lab">À verser</div><div class="mf-val" id="f-a-verser">—</div></div></div>
       </div>
     </div>
 
@@ -322,7 +401,7 @@ function showApp(){document.getElementById('auth-page').classList.add('hidden');
 
 function sbadge(s){const m={en_attente:'<span class="badge bo">⏳ En attente</span>',assignee:'<span class="badge bb">📋 Assignée</span>',en_cours:'<span class="badge bo">🚴 En cours</span>',livree:'<span class="badge bg">✅ Livrée</span>',confirmee:'<span class="badge bb">📦 À redispatcher</span>',prete:'<span class="badge bb">📦 À redispatcher</span>'};return m[s]||`<span class="badge bgr">${s||'—'}</span>`;}
 
-const titles={dashboard:"Vue d'ensemble",livreurs:'Mes livreurs',courses:'Courses reçues',historique:'Historique',agence:'Mon agence',paiements:'Paiements'};
+const titles={dashboard:"Vue d'ensemble",livreurs:'Mes livreurs',courses:'Courses reçues',historique:'Historique',finances:'Finances',agence:'Mon agence',paiements:'Paiements'};
 function go(name,btn){
   closeSidebar();
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
@@ -330,7 +409,7 @@ function go(name,btn){
   document.getElementById('sec-'+name).classList.add('active');
   if(btn)btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={livreurs:loadLivreurs,courses:loadCourses,historique:loadHistorique,agence:loadAgenceForm,paiements:loadPaiementsPage};
+  const loaders={livraisons:loadLivraisons,livreurs:loadLivreurs,courses:loadCourses,historique:loadHistorique,finances:loadFinances,agence:loadAgenceForm,paiements:loadPaiementsPage};
   if(loaders[name])loaders[name]();
 }
 
@@ -456,6 +535,158 @@ async function loadDashboard(){
     const[bg,ico,txt]=map[l.statut]||['#f3f4f6','•',l.statut];
     return `<div class="act-item"><div class="act-ico" style="background:${bg}">${ico}</div><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:500">${txt}</div><div style="font-size:11px;color:var(--g400)">${fdate(l.created_at)}</div></div></div>`;
   }).join(''):'<p style="color:var(--g400);text-align:center;padding:20px;font-size:13px">Aucune activité</p>';
+}
+
+// ============ FINANCES ============
+let _lvData=[];
+async function loadLivraisons(){
+  const {data:livreurs}=await sb.from('livreurs').select('id,prenom,nom').eq('agence_id',currentAgence.id);
+  const livMap={};(livreurs||[]).forEach(l=>livMap[l.id]=(l.prenom||'')+' '+(l.nom||''));
+  const livIds=Object.keys(livMap);
+  if(!livIds.length){
+    ['lv-total','lv-term','lv-cours','lv-annul','lv-temps'].forEach(id=>document.getElementById(id).textContent='0');
+    document.getElementById('lv-body').innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--g400);padding:24px">Aucun livreur — donc aucune livraison</td></tr>';
+    document.getElementById('lv-perf').innerHTML='<p style="color:var(--g400);font-size:13px">Pas encore de données</p>';
+    document.getElementById('lv-zone-legend').innerHTML='<p style="color:var(--g400)">Pas encore de données</p>';
+    return;
+  }
+  const {data}=await sb.from('livraisons').select('*,commandes(id,adresse_livraison,zones(nom),utilisateurs(nom)),livreurs(prenom,nom)').in('livreur_id',livIds).order('created_at',{ascending:false});
+  _lvData=data||[];
+
+  const term=_lvData.filter(l=>l.statut==='livree');
+  const cours=_lvData.filter(l=>['assignee','en_cours'].includes(l.statut));
+  const annul=_lvData.filter(l=>['annulee','echouee'].includes(l.statut));
+  document.getElementById('lv-total').textContent=fmt(_lvData.length);
+  document.getElementById('lv-term').textContent=fmt(term.length);
+  document.getElementById('lv-cours').textContent=fmt(cours.length);
+  document.getElementById('lv-annul').textContent=fmt(annul.length);
+
+  // Temps moyen (pickup → livraison) si dispo
+  const durees=term.filter(l=>l.heure_pickup&&l.heure_livraison).map(l=>(new Date(l.heure_livraison)-new Date(l.heure_pickup))/60000);
+  const tempsMoy=durees.length?Math.round(durees.reduce((a,b)=>a+b,0)/durees.length):null;
+  document.getElementById('lv-temps').textContent=tempsMoy?tempsMoy+' min':'—';
+
+  filterLivraisons('all',document.querySelector('.lv-tab'));
+
+  // Performance
+  const taux=_lvData.length?Math.round(term.length/_lvData.length*100):0;
+  const perf=document.getElementById('lv-perf');
+  perf.innerHTML=`
+    ${perfBar('Taux de réussite',taux,'#1d4ed8')}
+    ${perfBar('Livraisons terminées',_lvData.length?Math.round(term.length/_lvData.length*100):0,'#1d9e75')}
+    ${perfBar('En cours',_lvData.length?Math.round(cours.length/_lvData.length*100):0,'#d97706')}
+    <div class="perf-row"><div class="perf-top"><span>Temps moyen de livraison</span><span>${tempsMoy?tempsMoy+' min':'—'}</span></div></div>`;
+
+  // Répartition par zone
+  const parZone={};
+  _lvData.forEach(l=>{const z=l.commandes?.zones?.nom||'Autre';parZone[z]=(parZone[z]||0)+1;});
+  const zones=Object.entries(parZone).sort((a,b)=>b[1]-a[1]);
+  const colors=['#1d4ed8','#1d9e75','#d97706','#7c3aed','#dc2626','#0891b2'];
+  const zctx=document.getElementById('lv-zone-chart')?.getContext('2d');
+  if(zctx){
+    if(window._chartZone)window._chartZone.destroy();
+    window._chartZone=new Chart(zctx,{type:'doughnut',data:{labels:zones.map(z=>z[0]),datasets:[{data:zones.map(z=>z[1]),backgroundColor:colors,borderWidth:0}]},options:{cutout:'65%',plugins:{legend:{display:false}}}});
+  }
+  const zl=document.getElementById('lv-zone-legend');
+  zl.innerHTML=zones.length?zones.map((z,i)=>`<div class="dleg-row"><span class="dleg-dot" style="background:${colors[i%colors.length]}"></span><span style="flex:1">${z[0]}</span><strong>${z[1]} (${Math.round(z[1]/_lvData.length*100)}%)</strong></div>`).join(''):'<p style="color:var(--g400)">Pas encore de données</p>';
+}
+
+function perfBar(label,pct,color){
+  return `<div class="perf-row"><div class="perf-top"><span>${label}</span><span>${pct}%</span></div><div class="perf-bar"><div class="perf-fill" style="width:${pct}%;background:${color}"></div></div></div>`;
+}
+
+function filterLivraisons(statut,btn){
+  if(btn){document.querySelectorAll('.lv-tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');}
+  let list=_lvData;
+  if(statut==='en_cours')list=_lvData.filter(l=>['assignee','en_cours'].includes(l.statut));
+  else if(statut==='livree')list=_lvData.filter(l=>l.statut==='livree');
+  else if(statut==='annulee')list=_lvData.filter(l=>['annulee','echouee'].includes(l.statut));
+  const tb=document.getElementById('lv-body');
+  tb.innerHTML=list.length?list.slice(0,30).map(l=>`<tr>
+    <td><code>#${l.commandes?.id?.substring(0,8)||'—'}</code></td>
+    <td>${l.commandes?.utilisateurs?.nom||'—'}</td>
+    <td>${(l.livreurs?.prenom||'')+' '+(l.livreurs?.nom||'')||'—'}</td>
+    <td>${sbadge(l.statut)}</td>
+    <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${l.commandes?.adresse_livraison?.replace(/Quartier : /,'').substring(0,40)||'—'}</td>
+    <td>${fdate(l.heure_livraison||l.created_at)}</td>
+  </tr>`).join(''):'<tr><td colspan="6" style="text-align:center;color:var(--g400);padding:24px">Aucune livraison</td></tr>';
+}
+
+let _finTxCom=8;
+async function loadFinances(){
+  const {data:livreurs}=await sb.from('livreurs').select('*').eq('agence_id',currentAgence.id);
+  const livIds=(livreurs||[]).map(l=>l.id);
+  try{const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_liv').single();if(pc&&pc.valeur)_finTxCom=parseFloat(pc.valeur)||8;}catch(e){}
+  const net=g=>Math.round(g*(100-_finTxCom)/100);
+
+  let livs=[];
+  if(livIds.length){
+    const {data}=await sb.from('livraisons').select('livreur_id,statut,created_at,heure_livraison,commandes(frais_livraison)').in('livreur_id',livIds).eq('statut','livree');
+    livs=data||[];
+  }
+  const now=new Date();
+  const jourStr=now.toISOString().split('T')[0];
+  const semaineDebut=new Date(now);semaineDebut.setDate(now.getDate()-now.getDay());
+  const moisDebut=new Date(now.getFullYear(),now.getMonth(),1);
+  const dt=l=>new Date(l.heure_livraison||l.created_at);
+  const recette=l=>l.commandes?.frais_livraison||500;
+
+  const rJour=livs.filter(l=>(l.heure_livraison||l.created_at||'').startsWith(jourStr)).reduce((s,l)=>s+recette(l),0);
+  const rSem=livs.filter(l=>dt(l)>=semaineDebut).reduce((s,l)=>s+recette(l),0);
+  const rMois=livs.filter(l=>dt(l)>=moisDebut).reduce((s,l)=>s+recette(l),0);
+  const recetteTotale=livs.reduce((s,l)=>s+recette(l),0);
+  const gainsTotal=livs.reduce((s,l)=>s+net(recette(l)),0);
+
+  document.getElementById('f-jour').textContent=fmt(rJour)+' F';
+  document.getElementById('f-semaine').textContent=fmt(rSem)+' F';
+  document.getElementById('f-mois').textContent=fmt(rMois)+' F';
+  document.getElementById('f-solde').textContent=fmt(gainsTotal)+' F';
+  document.getElementById('f-total-gains').textContent=fmt(gainsTotal)+' FCFA';
+  document.getElementById('f-nb-liv').textContent=(livreurs||[]).length;
+  document.getElementById('f-nb-course').textContent=livs.length;
+  document.getElementById('f-recette-tot').textContent=fmt(recetteTotale)+' F';
+  document.getElementById('f-a-verser').textContent=fmt(gainsTotal)+' F';
+
+  // Par livreur
+  const parLiv={};
+  livs.forEach(l=>{if(!parLiv[l.livreur_id])parLiv[l.livreur_id]={n:0,recette:0};parLiv[l.livreur_id].n++;parLiv[l.livreur_id].recette+=recette(l);});
+  const tb=document.getElementById('fin-body');
+  const rows=(livreurs||[]).map(l=>{
+    const d=parLiv[l.id]||{n:0,recette:0};
+    const gain=net(d.recette);
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:10px">${l.photo_url?`<img class="lc-av" style="width:34px;height:34px" src="${l.photo_url}"/>`:`<div class="lc-av" style="width:34px;height:34px;font-size:13px">${(l.prenom||l.nom||'?')[0]}</div>`}<div><div style="font-weight:700;font-size:13px">${l.prenom||''} ${l.nom||''}</div><div style="font-size:11px;color:var(--g400)">${l.telephone||''}</div></div></div></td>
+      <td>${d.n}</td>
+      <td>${fmt(d.recette)} F</td>
+      <td><strong style="color:var(--gr)">${fmt(gain)} F</strong></td>
+      <td>${d.n>0?'<span class="badge bg">Actif</span>':'<span class="badge bgr">—</span>'}</td>
+      <td>${gain>0?`<button class="btn btn-sm btn-p" onclick="virerGainLivreur('${l.id}','${(l.prenom||'')+' '+(l.nom||'')}',${gain})">📤 Verser</button>`:'<span style="color:var(--g400);font-size:12px">Rien à verser</span>'}</td>
+    </tr>`;
+  }).join('');
+  tb.innerHTML=rows||'<tr><td colspan="6" style="text-align:center;color:var(--g400);padding:24px">Aucun livreur</td></tr>';
+}
+
+async function virerGainLivreur(livreurId,nom,montant){
+  if(!confirm(`Verser ${fmt(montant)} FCFA à ${nom.trim()} ?\n\n⚠️ Effectuez d'abord le transfert Mobile Money, puis confirmez ici pour l'enregistrer.`))return;
+  const {error}=await sb.from('versements').insert({beneficiaire_type:'livreur',beneficiaire_id:livreurId,montant,reference:'Versement agence'});
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  toast('✅ Versement enregistré pour '+nom.trim(),'ok');
+  loadFinances();
+}
+
+async function virerTousGains(){
+  if(!confirm('Verser les gains de TOUS les livreurs ?\n\n⚠️ Assurez-vous d\'avoir effectué les transferts Mobile Money correspondants avant de confirmer.'))return;
+  const {data:livreurs}=await sb.from('livreurs').select('*').eq('agence_id',currentAgence.id);
+  const livIds=(livreurs||[]).map(l=>l.id);
+  const {data:livs}=await sb.from('livraisons').select('livreur_id,commandes(frais_livraison)').in('livreur_id',livIds).eq('statut','livree');
+  const net=g=>Math.round(g*(100-_finTxCom)/100);
+  const parLiv={};(livs||[]).forEach(l=>{parLiv[l.livreur_id]=(parLiv[l.livreur_id]||0)+net(l.commandes?.frais_livraison||500);});
+  let count=0;
+  for(const [id,montant] of Object.entries(parLiv)){
+    if(montant>0){await sb.from('versements').insert({beneficiaire_type:'livreur',beneficiaire_id:id,montant,reference:'Versement groupé agence'});count++;}
+  }
+  toast(`✅ ${count} versement(s) enregistré(s)`,'ok');
+  loadFinances();
 }
 
 function setKpiTrend(id,today,yest){
