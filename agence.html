@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Espace Agence — Yéyé Market</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
 :root{
   --vd:#0c447c;--vl:#e6f1fb;--v:#185fa5;
@@ -69,6 +70,16 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--g50
 .si-b{background:var(--bll)}.si-o{background:var(--orl)}.si-g{background:var(--grl)}.si-y{background:#fef9c3}
 .stat-label{font-size:12px;color:var(--g600)}
 .stat-val{font-size:23px;font-weight:800;margin-top:2px}
+.kpi-trend{font-size:11.5px;font-weight:700;margin-top:4px;display:inline-block;color:var(--gr)}
+.kpi-trend.down{color:var(--r)}
+.see-all{font-size:12px;font-weight:700;color:var(--vd);cursor:pointer;background:none;border:none;font-family:inherit}
+.see-all:hover{text-decoration:underline}
+.act-item{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--g100)}
+.act-item:last-child{border-bottom:none}
+.act-ico{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.dleg-row{display:flex;align-items:center;gap:8px;padding:4px 0}
+.dleg-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+@media(max-width:1100px){.grid-3{grid-template-columns:1fr!important}}
 
 .card{background:#fff;border-radius:14px;box-shadow:var(--shadow);margin-bottom:18px}
 .card-head{padding:15px 18px;border-bottom:1px solid var(--g100);display:flex;align-items:center;justify-content:space-between}
@@ -149,7 +160,7 @@ code{background:var(--g100);padding:2px 6px;border-radius:5px;font-size:12px}
 <div id="app" class="shell hidden">
   <aside class="sidebar" id="sidebar">
     <div class="sb-head">
-      <div class="ico">🏢</div>
+      <div class="ico" id="sb-logo-box">🏢</div>
       <div style="min-width:0"><div class="nom" id="sb-nom">—</div><div class="sub" id="sb-email">Agence</div></div>
     </div>
     <nav class="sb-nav">
@@ -176,21 +187,44 @@ code{background:var(--g100);padding:2px 6px;border-radius:5px;font-size:12px}
 
     <!-- DASHBOARD -->
     <div class="sec active" id="sec-dashboard">
-      <p class="wb-sub" style="margin-bottom:16px">Bienvenue, <strong id="wb-nom">—</strong> 👋</p>
+      <p class="wb-sub" style="margin-bottom:16px">Voici ce qui se passe dans votre agence aujourd'hui.</p>
+
+      <!-- KPIs -->
       <div class="stats">
-        <div class="stat"><div class="stat-ico si-b">🚴</div><div class="stat-label">Livreurs actifs</div><div class="stat-val" id="s-livreurs">—</div></div>
-        <div class="stat"><div class="stat-ico si-o">📦</div><div class="stat-label">Courses en cours</div><div class="stat-val" id="s-encours">—</div></div>
-        <div class="stat"><div class="stat-ico si-g">✅</div><div class="stat-label">Livrées (total)</div><div class="stat-val" id="s-livrees">—</div></div>
-        <div class="stat"><div class="stat-ico si-y">💰</div><div class="stat-label">Gains nets</div><div class="stat-val" id="s-gains">—</div></div>
+        <div class="stat"><div class="stat-ico si-b">📦</div><div class="stat-label">Courses totales</div><div class="stat-val" id="s-total">—</div><span class="kpi-trend" id="t-total"></span></div>
+        <div class="stat"><div class="stat-ico si-g">🛵</div><div class="stat-label">Livraisons en cours</div><div class="stat-val" id="s-encours">—</div><span class="kpi-trend" id="t-encours"></span></div>
+        <div class="stat"><div class="stat-ico si-y">✅</div><div class="stat-label">Livraisons terminées</div><div class="stat-val" id="s-livrees">—</div><span class="kpi-trend" id="t-livrees"></span></div>
+        <div class="stat"><div class="stat-ico si-o">💰</div><div class="stat-label">Gains nets (FCFA)</div><div class="stat-val" id="s-gains">—</div><span class="kpi-trend" id="t-gains"></span></div>
       </div>
-      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:16px" class="grid-2">
+
+      <!-- Graphique + Donut + Livreurs en ligne -->
+      <div style="display:grid;grid-template-columns:1.5fr 1.1fr 1fr;gap:16px;margin-bottom:16px" class="grid-3">
         <div class="card" style="margin-bottom:0">
-          <div class="card-head"><h2>📦 Courses à redispatcher</h2><button class="btn btn-sm btn-ed" onclick="go('courses',document.querySelectorAll('.sb-btn')[2])">Tout voir</button></div>
+          <div class="card-head"><h2>📈 Aperçu des livraisons</h2></div>
+          <div class="card-body" style="padding:14px"><canvas id="chart-livraisons" height="150"></canvas></div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>🍩 Répartition des courses</h2></div>
+          <div class="card-body" style="padding:14px;display:flex;flex-direction:column;align-items:center">
+            <canvas id="chart-donut" height="150" style="max-width:180px"></canvas>
+            <div id="donut-legend" style="width:100%;margin-top:12px;font-size:12.5px"></div>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>🟢 Livreurs en ligne</h2><button class="see-all" onclick="go('livreurs',document.querySelectorAll('.sb-btn')[1])">Voir tout</button></div>
+          <div class="card-body" style="padding:10px 14px" id="dash-online"><p style="color:var(--g400);text-align:center;padding:20px;font-size:13px">Chargement...</p></div>
+        </div>
+      </div>
+
+      <!-- Courses récentes + Activités -->
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px" class="grid-2">
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>📦 Courses à redispatcher</h2><button class="see-all" onclick="go('courses',document.querySelectorAll('.sb-btn')[2])">Tout voir</button></div>
           <div class="card-body" id="dash-courses"><p style="color:var(--g400);text-align:center;padding:24px">Chargement...</p></div>
         </div>
         <div class="card" style="margin-bottom:0">
-          <div class="card-head"><h2>🚴 Mes livreurs</h2></div>
-          <div class="card-body" id="dash-livreurs"><p style="color:var(--g400);text-align:center;padding:24px">Chargement...</p></div>
+          <div class="card-head"><h2>🔔 Activités récentes</h2></div>
+          <div class="card-body" style="padding:10px 14px" id="dash-activites"><p style="color:var(--g400);text-align:center;padding:20px;font-size:13px">Chargement...</p></div>
         </div>
       </div>
     </div>
@@ -328,6 +362,7 @@ async function loadAgence(){
   document.getElementById('sb-nom').textContent=currentAgence.nom;
   document.getElementById('sb-email').textContent=currentUser.email;
   document.getElementById('wb-nom').textContent=currentAgence.nom;
+  applyAgenceLogo();
   const badge=document.getElementById('statut-badge');
   if(currentAgence.statut==='en_attente'){badge.textContent='⏳ En attente de validation';badge.style.background='var(--orl)';badge.style.color='var(--or)';}
   else if(currentAgence.statut==='suspendu'){badge.textContent='⛔ Suspendu';badge.style.background='var(--rl)';badge.style.color='var(--r)';}
@@ -338,38 +373,97 @@ async function loadAgence(){
 async function loadDashboard(){
   const {data:livreurs}=await sb.from('livreurs').select('*').eq('agence_id',currentAgence.id);
   const livIds=(livreurs||[]).map(l=>l.id);
-  document.getElementById('s-livreurs').textContent=(livreurs||[]).filter(l=>l.statut==='actif').length;
 
   // Livraisons de tous les livreurs de l'agence
   let livs=[];
   if(livIds.length){
-    const {data}=await sb.from('livraisons').select('*,commandes(id,frais_livraison)').in('livreur_id',livIds);
+    const {data}=await sb.from('livraisons').select('*,commandes(id,frais_livraison),livreurs(prenom,nom)').in('livreur_id',livIds);
     livs=data||[];
   }
-  const enCours=livs.filter(l=>['assignee','en_cours'].includes(l.statut)).length;
+  const enCours=livs.filter(l=>['assignee','en_cours'].includes(l.statut));
   const livrees=livs.filter(l=>l.statut==='livree');
-  document.getElementById('s-encours').textContent=enCours;
-  document.getElementById('s-livrees').textContent=livrees.length;
+  const annulees=livs.filter(l=>l.statut==='echouee'||l.statut==='annulee');
+  const total=livs.length;
+
+  document.getElementById('s-total').textContent=fmt(total);
+  document.getElementById('s-encours').textContent=fmt(enCours.length);
+  document.getElementById('s-livrees').textContent=fmt(livrees.length);
 
   let txCom=8;
   try{const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_liv').single();if(pc&&pc.valeur)txCom=parseFloat(pc.valeur)||8;}catch(e){}
   const gains=livrees.reduce((s,l)=>s+Math.round((l.commandes?.frais_livraison||500)*(100-txCom)/100),0);
-  document.getElementById('s-gains').textContent=fmt(gains)+' F';
+  document.getElementById('s-gains').textContent=fmt(gains);
 
-  // Courses à redispatcher (assignées à l'agence, pas encore à un livreur)
+  // Tendances (jour vs veille)
+  const todayStr=new Date().toISOString().split('T')[0];
+  const yest=new Date();yest.setDate(yest.getDate()-1);const yestStr=yest.toISOString().split('T')[0];
+  const nToday=livs.filter(l=>(l.created_at||'').startsWith(todayStr)).length;
+  const nYest=livs.filter(l=>(l.created_at||'').startsWith(yestStr)).length;
+  setKpiTrend('t-total',nToday,nYest);
+
+  // Graphique aperçu 7 jours (terminées / en cours)
+  const days=[],dTerm=[],dCours=[];
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];
+    days.push(d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}));
+    dTerm.push(livrees.filter(l=>(l.heure_livraison||l.created_at||'').startsWith(ds)).length);
+    dCours.push(enCours.filter(l=>(l.created_at||'').startsWith(ds)).length);
+  }
+  const ctx=document.getElementById('chart-livraisons')?.getContext('2d');
+  if(ctx){
+    if(window._chartLiv)window._chartLiv.destroy();
+    window._chartLiv=new Chart(ctx,{type:'line',data:{labels:days,datasets:[
+      {label:'Terminées',data:dTerm,borderColor:'#1d4ed8',backgroundColor:'rgba(29,78,216,.08)',fill:true,tension:.4,borderWidth:2.5,pointRadius:3},
+      {label:'En cours',data:dCours,borderColor:'#d97706',backgroundColor:'transparent',tension:.4,borderWidth:2.5,pointRadius:3}
+    ]},options:{responsive:true,plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}},scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{grid:{display:false}}}}});
+  }
+
+  // Donut de répartition
+  const dctx=document.getElementById('chart-donut')?.getContext('2d');
+  if(dctx){
+    if(window._chartDonut)window._chartDonut.destroy();
+    window._chartDonut=new Chart(dctx,{type:'doughnut',data:{labels:['Livrées','En cours','Annulées'],datasets:[{data:[livrees.length,enCours.length,annulees.length],backgroundColor:['#1d4ed8','#d97706','#dc2626'],borderWidth:0}]},options:{responsive:true,cutout:'70%',plugins:{legend:{display:false}}}});
+  }
+  const pct=n=>total?Math.round(n/total*1000)/10:0;
+  const leg=document.getElementById('donut-legend');
+  if(leg)leg.innerHTML=`
+    <div class="dleg-row"><span class="dleg-dot" style="background:#1d4ed8"></span><span style="flex:1">Livrées</span><strong>${livrees.length} (${pct(livrees.length)}%)</strong></div>
+    <div class="dleg-row"><span class="dleg-dot" style="background:#d97706"></span><span style="flex:1">En cours</span><strong>${enCours.length} (${pct(enCours.length)}%)</strong></div>
+    <div class="dleg-row"><span class="dleg-dot" style="background:#dc2626"></span><span style="flex:1">Annulées</span><strong>${annulees.length} (${pct(annulees.length)}%)</strong></div>`;
+
+  // Livreurs en ligne
+  const online=(livreurs||[]).filter(l=>l.disponible);
+  const dOn=document.getElementById('dash-online');
+  dOn.innerHTML=(livreurs||[]).length?(livreurs||[]).slice(0,6).map(l=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g100)">
+      ${l.photo_url?`<img class="lc-av" style="width:32px;height:32px" src="${l.photo_url}"/>`:`<div class="lc-av" style="width:32px;height:32px;font-size:12px">${(l.prenom||l.nom||'?')[0]}</div>`}
+      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${l.prenom||''} ${l.nom||''}</div><div style="font-size:11px;color:var(--g400)">${l.matricule_vehicule||l.vehicule||'—'}</div></div>
+      <span style="font-size:11px;font-weight:700;color:${l.disponible?'var(--gr)':'var(--g400)'}">${l.disponible?'🟢 Dispo':'⚪ Hors ligne'}</span>
+    </div>`).join(''):'<p style="color:var(--g400);text-align:center;padding:20px;font-size:13px">Aucun livreur.<br><button class="btn btn-sm btn-p" style="margin-top:8px" onclick="go(\'livreurs\',document.querySelectorAll(\'.sb-btn\')[1])">Ajouter</button></p>';
+
+  // Courses à redispatcher
   const courses=await getCoursesAgence();
   const dc=document.getElementById('dash-courses');
   const aRedispatch=courses.filter(c=>!c.livreur_id);
   dc.innerHTML=aRedispatch.length?aRedispatch.slice(0,4).map(c=>courseRow(c,livreurs)).join(''):'<p style="color:var(--g400);text-align:center;padding:20px">✅ Aucune course en attente</p>';
 
-  // Aperçu livreurs
-  const dl=document.getElementById('dash-livreurs');
-  dl.innerHTML=(livreurs||[]).length?(livreurs||[]).slice(0,5).map(l=>`
-    <div style="display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid var(--g100)">
-      ${l.photo_url?`<img class="lc-av" style="width:30px;height:30px" src="${l.photo_url}"/>`:`<div class="lc-av" style="width:30px;height:30px;font-size:12px">${(l.prenom||l.nom||'?')[0]}</div>`}
-      <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${l.prenom||''} ${l.nom||''}</div><div style="font-size:11px;color:var(--g400)">${l.matricule_vehicule||l.vehicule||'—'}</div></div>
-      <span class="lc-dot ${l.disponible?'dot-on':'dot-off'}"></span>
-    </div>`).join(''):'<p style="color:var(--g400);text-align:center;padding:20px">Aucun livreur.<br><button class="btn btn-sm btn-p" style="margin-top:8px" onclick="go(\'livreurs\',document.querySelectorAll(\'.sb-btn\')[1])">Ajouter</button></p>';
+  // Activités récentes (dérivées des livraisons)
+  const acts=livs.slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).slice(0,6);
+  const da=document.getElementById('dash-activites');
+  da.innerHTML=acts.length?acts.map(l=>{
+    const nom=(l.livreurs?.prenom||'')+' '+(l.livreurs?.nom||'');
+    const map={livree:['#e1f5ee','✅',nom+' a terminé une livraison'],en_cours:['#fef3c7','🛵',nom+' a démarré une livraison'],assignee:['#eff6ff','📋','Course assignée à '+nom],echouee:['#fef2f2','❌','Livraison annulée']};
+    const[bg,ico,txt]=map[l.statut]||['#f3f4f6','•',l.statut];
+    return `<div class="act-item"><div class="act-ico" style="background:${bg}">${ico}</div><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:500">${txt}</div><div style="font-size:11px;color:var(--g400)">${fdate(l.created_at)}</div></div></div>`;
+  }).join(''):'<p style="color:var(--g400);text-align:center;padding:20px;font-size:13px">Aucune activité</p>';
+}
+
+function setKpiTrend(id,today,yest){
+  const el=document.getElementById(id);if(!el)return;
+  if(!yest&&!today){el.textContent='';return;}
+  const pct=yest?Math.round((today-yest)/yest*100):100;
+  el.className='kpi-trend '+(pct>=0?'':'down');
+  el.textContent=(pct>=0?'↗ +':'↘ ')+Math.abs(pct)+'% ce jour';
 }
 
 // Récupère les commandes assignées à l'agence
@@ -539,6 +633,19 @@ async function loadHistorique(){
 function loadAgenceForm(){
   const a=currentAgence;
   document.getElementById('agence-form').innerHTML=`
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--g100)">
+      <div style="width:72px;height:72px;border-radius:14px;overflow:hidden;background:var(--vl);display:flex;align-items:center;justify-content:center;flex-shrink:0" id="ag-logo-preview">
+        ${a.logo_url?`<img src="${a.logo_url}" style="width:100%;height:100%;object-fit:cover"/>`:'<span style="font-size:32px">🏢</span>'}
+      </div>
+      <div>
+        <div style="font-weight:800;font-size:16px">${a.nom}</div>
+        <label style="display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:var(--vd);cursor:pointer">
+          🖼️ ${a.logo_url?'Changer le logo':'Ajouter un logo'}
+          <input type="file" accept="image/*" style="display:none" onchange="uploadAgLogo(this)"/>
+        </label>
+        <div id="ag-logo-status" style="font-size:11px;color:var(--g400);margin-top:2px"></div>
+      </div>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div class="fgm"><label>Nom de l'agence</label><input value="${a.nom||''}" readonly style="background:var(--g50)"/></div>
       <div class="fgm"><label>Responsable</label><input value="${a.responsable||''}" readonly style="background:var(--g50)"/></div>
@@ -547,6 +654,30 @@ function loadAgenceForm(){
       <div class="fgm" style="grid-column:1/-1"><label>Zones de couverture</label><input value="${(a.zones_couverture||[]).join(', ')}" readonly style="background:var(--g50)"/></div>
       <div class="fgm"><label>Statut</label><input value="${a.statut}" readonly style="background:var(--g50)"/></div>
     </div>`;
+}
+
+async function uploadAgLogo(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>3*1024*1024){toast('Image trop lourde (max 3 Mo)','err');return;}
+  const st=document.getElementById('ag-logo-status');if(st)st.textContent='Envoi en cours...';
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+  const path=`logos/agence_${currentAgence.id}_${Date.now()}.${ext}`;
+  const {error:upErr}=await sb.storage.from('livreurs').upload(path,file,{upsert:true,contentType:file.type});
+  if(upErr){toast('Erreur : '+upErr.message,'err');if(st)st.textContent='';return;}
+  const {data:pub}=sb.storage.from('livreurs').getPublicUrl(path);
+  const url=pub?.publicUrl;
+  const {error}=await sb.from('agences').update({logo_url:url}).eq('id',currentAgence.id);
+  if(error){toast('Erreur : '+error.message,'err');if(st)st.textContent='';return;}
+  currentAgence.logo_url=url;
+  toast('✅ Logo mis à jour','ok');
+  loadAgenceForm();
+  applyAgenceLogo();
+}
+
+// Affiche le logo dans l'en-tête de la sidebar
+function applyAgenceLogo(){
+  const box=document.getElementById('sb-logo-box');
+  if(box&&currentAgence?.logo_url){box.innerHTML=`<img src="${currentAgence.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>`;}
 }
 
 // ============ PAIEMENTS ============
