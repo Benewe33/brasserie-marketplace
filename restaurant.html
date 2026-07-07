@@ -418,6 +418,9 @@ tr:hover td{background:var(--g50)}
       <button class="sb-btn" onclick="go('cuisine',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 2v4M12 2v4M16 2v4M4 10h16M6 10v10a2 2 0 002 2h8a2 2 0 002-2V10"/></svg>Écran Cuisine
       </button>
+      <button class="sb-btn" onclick="go('promotions',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>Promotions
+      </button>
       <button class="sb-btn" onclick="go('clients',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>Clients & Avis
       </button>
@@ -562,6 +565,18 @@ tr:hover td{background:var(--g50)}
       <div id="kds-wrap" class="kds-grid"></div>
     </div>
 
+    <!-- PROMOTIONS -->
+    <div class="sec" id="sec-promotions">
+      <div class="card">
+        <div class="card-head"><h2>🎟️ Mes codes promo</h2><button class="btn btn-p" onclick="openPromoModal()">➕ Créer un code promo</button></div>
+        <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Code</th><th>Réduction</th><th>Min.</th><th>Utilisations</th><th>Validité</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="promo-body"></tbody></table></div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>🏷️ Réductions automatiques sur plats</h2></div>
+        <div class="card-body"><p style="font-size:13px;color:var(--g600);margin-bottom:12px">Appliquez un prix promo sur un plat. Le prix barré s'affiche aux clients.</p><div class="tbl-wrap"><table><thead><tr><th>Plat</th><th>Prix normal</th><th>Prix promo</th><th>Action</th></tr></thead><tbody id="promo-prod-body"></tbody></table></div></div>
+      </div>
+    </div>
+
     <!-- CLIENTS & AVIS -->
     <div class="sec" id="sec-clients">
       <div class="stats" style="margin-bottom:16px">
@@ -641,6 +656,39 @@ tr:hover td{background:var(--g50)}
 <div class="toast" id="toast"></div>
 
 <script>
+// ============ PROMOTIONS ============
+async function loadPromotions(){
+  const {data,error}=await sb.from('promotions').select('*').eq('proprietaire_type','restaurant').eq('proprietaire_id',currentResto.id).order('created_at',{ascending:false});
+  const tb=document.getElementById('promo-body');
+  if(error){tb.innerHTML='<tr><td colspan="7" style="color:var(--r);padding:16px">Table promotions absente — exécutez la migration.</td></tr>';}
+  else tb.innerHTML=(data||[]).length?(data||[]).map(p=>{
+    const red=p.type_reduction==='pourcentage'?`-${p.valeur}%`:p.type_reduction==='montant'?`-${fmt(p.valeur)} F`:'🚚 Livraison gratuite';
+    const valid=(p.date_debut||p.date_fin)?`${p.date_debut?fdate2(p.date_debut):'—'} → ${p.date_fin?fdate2(p.date_fin):'—'}`:'Toujours';
+    return `<tr><td><code style="font-weight:700">${p.code}</code></td><td><strong style="color:var(--vd)">${red}</strong></td><td>${p.min_commande?fmt(p.min_commande)+' F':'—'}</td><td>${p.utilisations||0}${p.max_utilisations?' / '+p.max_utilisations:''}</td><td style="font-size:12px">${valid}</td><td>${p.actif?'<span class="badge bg">Actif</span>':'<span class="badge bgr">Inactif</span>'}</td><td><button class="btn btn-sm btn-ed" onclick="togglePromo('${p.id}',${!p.actif})">${p.actif?'Désactiver':'Activer'}</button> <button class="btn btn-sm btn-del" onclick="delPromo('${p.id}')">🗑️</button></td></tr>`;
+  }).join(''):'<tr><td colspan="7" style="text-align:center;color:var(--g400);padding:24px">Aucun code promo</td></tr>';
+  const {data:menus}=await sb.from('menus').select('id,nom,prix,prix_promo').eq('restaurant_id',currentResto.id).order('nom');
+  document.getElementById('promo-prod-body').innerHTML=(menus||[]).length?(menus||[]).map(p=>`<tr><td><strong>${p.nom}</strong></td><td>${fmt(p.prix)} F</td><td>${p.prix_promo?`<span style="color:var(--vd);font-weight:700">${fmt(p.prix_promo)} F</span>`:'<span style="color:var(--g400)">—</span>'}</td><td><input type="number" placeholder="Prix promo" id="pp-${p.id}" value="${p.prix_promo||''}" style="width:100px;padding:6px;border:1.5px solid var(--g200);border-radius:6px;font-family:inherit"/> <button class="btn btn-sm btn-p" onclick="savePrixPromo('${p.id}')">💾</button>${p.prix_promo?` <button class="btn btn-sm btn-ed" onclick="clearPrixPromo('${p.id}')">Retirer</button>`:''}</td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:20px">Aucun plat</td></tr>';
+}
+function fdate2(d){return d?new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'2-digit'}):'—';}
+function promoTypeChange(){const t=document.getElementById('pr-type').value;const wrap=document.getElementById('pr-val-wrap');const lab=document.getElementById('pr-val-label');if(t==='livraison_gratuite'){wrap.style.display='none';}else{wrap.style.display='';lab.textContent=t==='pourcentage'?'Valeur (%) *':'Montant (FCFA) *';}}
+function openPromoModal(){['pr-code','pr-valeur','pr-min','pr-max','pr-debut','pr-fin'].forEach(id=>document.getElementById(id).value='');document.getElementById('pr-type').value='pourcentage';promoTypeChange();document.getElementById('pr-err').style.display='none';openModal('m-promo');}
+async function savePromo(){
+  const code=document.getElementById('pr-code').value.trim().toUpperCase();const type=document.getElementById('pr-type').value;
+  const valeur=parseInt(document.getElementById('pr-valeur').value)||0;const min=parseInt(document.getElementById('pr-min').value)||0;
+  const max=parseInt(document.getElementById('pr-max').value)||null;const debut=document.getElementById('pr-debut').value||null;const fin=document.getElementById('pr-fin').value||null;
+  const err=document.getElementById('pr-err');err.style.display='none';
+  if(!code){err.textContent='❌ Entrez un code';err.style.display='block';return;}
+  if(type!=='livraison_gratuite'&&valeur<=0){err.textContent='❌ Entrez une valeur valide';err.style.display='block';return;}
+  if(type==='pourcentage'&&valeur>100){err.textContent='❌ Max 100%';err.style.display='block';return;}
+  const {error}=await sb.from('promotions').insert({code,proprietaire_type:'restaurant',proprietaire_id:currentResto.id,type_reduction:type,valeur,min_commande:min,max_utilisations:max,date_debut:debut,date_fin:fin,actif:true});
+  if(error){err.textContent='❌ '+(error.message.includes('duplicate')?'Ce code existe déjà':error.message);err.style.display='block';return;}
+  closeModal('m-promo');toast('✅ Code promo créé','ok');loadPromotions();
+}
+async function togglePromo(id,actif){await sb.from('promotions').update({actif}).eq('id',id);toast(actif?'✅ Activé':'Désactivé','ok');loadPromotions();}
+async function delPromo(id){if(!confirm('Supprimer ce code ?'))return;await sb.from('promotions').delete().eq('id',id);toast('🗑️ Supprimé','err');loadPromotions();}
+async function savePrixPromo(pid){const v=parseInt(document.getElementById('pp-'+pid).value)||0;if(v<=0){toast('Prix promo invalide','err');return;}const {error}=await sb.from('menus').update({prix_promo:v}).eq('id',pid);if(error){toast('Erreur : '+error.message,'err');return;}toast('✅ Prix promo appliqué','ok');loadPromotions();}
+async function clearPrixPromo(pid){await sb.from('menus').update({prix_promo:null}).eq('id',pid);toast('Prix promo retiré','ok');loadPromotions();}
+
 // ============ ÉCRAN CUISINE (KDS) ============
 async function loadCuisine(){
   const {data:menus}=await sb.from('menus').select('id').eq('restaurant_id',currentResto.id);
@@ -984,13 +1032,13 @@ function showApp(){
   loadDashboard();loadCatSelect();
 }
 
-const titles={dashboard:'Vue d\'ensemble',menus:'Mes menus',commandes:'Commandes',restaurant:'Mon restaurant',paiements:'Paiements',cuisine:'Écran Cuisine',clients:'Clients & Avis',wallet:'Wallet & Paiements',rapports:'Rapports',parametres:'Paramètres'};
+const titles={dashboard:'Vue d\'ensemble',menus:'Mes menus',commandes:'Commandes',restaurant:'Mon restaurant',paiements:'Paiements',cuisine:'Écran Cuisine',clients:'Clients & Avis',wallet:'Wallet & Paiements',rapports:'Rapports',parametres:'Paramètres',promotions:'Promotions'};
 function go(name,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={menus:loadMenus,commandes:loadCmds,restaurant:loadRestoForm,paiements:loadPaiementsPage,cuisine:loadCuisine,clients:loadClients,wallet:loadWalletV,rapports:loadRapports,parametres:loadParametres};
+  const loaders={menus:loadMenus,commandes:loadCmds,restaurant:loadRestoForm,paiements:loadPaiementsPage,cuisine:loadCuisine,clients:loadClients,wallet:loadWalletV,rapports:loadRapports,parametres:loadParametres,promotions:loadPromotions};
   if(loaders[name])loaders[name]();
 }
 
@@ -1362,7 +1410,7 @@ function go(name,btn){
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={menus:loadMenus,commandes:loadCmds,restaurant:loadRestoForm,paiements:loadPaiementsPage,cuisine:loadCuisine,clients:loadClients,wallet:loadWalletV,rapports:loadRapports,parametres:loadParametres};
+  const loaders={menus:loadMenus,commandes:loadCmds,restaurant:loadRestoForm,paiements:loadPaiementsPage,cuisine:loadCuisine,clients:loadClients,wallet:loadWalletV,rapports:loadRapports,parametres:loadParametres,promotions:loadPromotions};
   if(loaders[name])loaders[name]();
 }
 
@@ -1610,6 +1658,27 @@ function getSignatureData() {
 }
 
 </script>
+<div class="overlay" id="m-promo">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-head"><h3>🎟️ Créer un code promo</h3><button class="modal-x" onclick="closeModal('m-promo')">✕</button></div>
+    <div class="modal-body">
+      <div class="fgm"><label>Code promo *</label><input type="text" id="pr-code" placeholder="RESTO10" style="text-transform:uppercase"/></div>
+      <div class="fgm"><label>Type de réduction *</label><select id="pr-type" onchange="promoTypeChange()"><option value="pourcentage">Pourcentage (%)</option><option value="montant">Montant fixe (FCFA)</option><option value="livraison_gratuite">Livraison gratuite</option></select></div>
+      <div class="fgm" id="pr-val-wrap"><label id="pr-val-label">Valeur (%) *</label><input type="number" id="pr-valeur" placeholder="10"/></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fgm"><label>Commande min. (FCFA)</label><input type="number" id="pr-min" placeholder="0"/></div>
+        <div class="fgm"><label>Max. utilisations</label><input type="number" id="pr-max" placeholder="Illimité"/></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fgm"><label>Date début</label><input type="date" id="pr-debut"/></div>
+        <div class="fgm"><label>Date fin</label><input type="date" id="pr-fin"/></div>
+      </div>
+      <button class="btn btn-p" style="width:100%;margin-top:6px" onclick="savePromo()">✅ Créer le code</button>
+      <div id="pr-err" style="color:var(--r);font-size:13px;margin-top:10px;display:none"></div>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="m-paiement">
   <div class="modal" style="max-width:400px">
     <div class="modal-head"><h3>💳 Méthode de paiement</h3><button class="modal-x" onclick="closeModal('m-paiement')">✕</button></div>

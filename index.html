@@ -937,6 +937,37 @@ let loginAttempts=0,loginBlocked=false;
 let trackingSubscription=null;
 let pendingOrder=null;
 let _deliveryFee=500;
+let _promoCode=null,_promoReduction=0,_promoData=null;
+async function appliquerPromo(){
+  const input=document.getElementById('promo-input');
+  const msg=document.getElementById('promo-msg');
+  const code=(input?.value||'').trim().toUpperCase();
+  if(!code){_promoCode=null;_promoReduction=0;_promoData=null;renderCart();return;}
+  // Déterminer le vendeur/resto du panier
+  const items=Object.values(cart);
+  if(!items.length){msg.textContent='Panier vide';msg.style.color='var(--r)';return;}
+  const subtotal=items.reduce((s,i)=>s+(i.prix_promo||i.prix)*i.qty,0);
+  // Chercher le code chez le(s) propriétaire(s) des produits du panier
+  const propIds=[...new Set(items.map(i=>i.boutique_id||i.restaurant_id).filter(Boolean))];
+  const {data:promos}=await sb.from('promotions').select('*').ilike('code',code).eq('actif',true);
+  const promo=(promos||[]).find(p=>propIds.includes(p.proprietaire_id));
+  if(!promo){msg.textContent='❌ Code invalide ou inactif';msg.style.color='var(--r)';_promoCode=null;_promoReduction=0;return;}
+  // Vérifs
+  const today=new Date().toISOString().split('T')[0];
+  if(promo.date_debut&&today<promo.date_debut){msg.textContent='❌ Ce code n\'est pas encore actif';msg.style.color='var(--r)';return;}
+  if(promo.date_fin&&today>promo.date_fin){msg.textContent='❌ Ce code a expiré';msg.style.color='var(--r)';return;}
+  if(promo.max_utilisations&&promo.utilisations>=promo.max_utilisations){msg.textContent='❌ Ce code a atteint sa limite';msg.style.color='var(--r)';return;}
+  if(promo.min_commande&&subtotal<promo.min_commande){msg.textContent=`❌ Minimum ${fmt(promo.min_commande)} FCFA requis`;msg.style.color='var(--r)';return;}
+  // Calcul réduction
+  let red=0;
+  if(promo.type_reduction==='pourcentage')red=Math.round(subtotal*promo.valeur/100);
+  else if(promo.type_reduction==='montant')red=Math.min(promo.valeur,subtotal);
+  else if(promo.type_reduction==='livraison_gratuite'){red=0;_deliveryFee=0;}
+  _promoCode=code;_promoReduction=red;_promoData=promo;
+  msg.textContent=promo.type_reduction==='livraison_gratuite'?'✅ Livraison gratuite appliquée !':`✅ Réduction de ${fmt(red)} FCFA appliquée !`;
+  msg.style.color='var(--vd)';
+  renderCart();
+}
 
 // NAVIGATION
 function goPage(name){
@@ -1716,7 +1747,9 @@ function renderCart(){
     return;
   }
   const subtotal=items.reduce((s,i)=>s+(i.prix_promo||i.prix)*i.qty,0);
-  const livraison=_deliveryFee||0;const total=subtotal+livraison;
+  const livraison=_deliveryFee||0;
+  const reduction=_promoReduction||0;
+  const total=Math.max(0,subtotal-reduction)+livraison;
   content.innerHTML=`
     <div style="background:#fff">
       ${items.map(item=>`
@@ -1733,8 +1766,16 @@ function renderCart(){
           </div>
         </div>`).join('')}
     </div>
+    <div style="padding:12px 16px">
+      <div style="display:flex;gap:8px">
+        <input type="text" id="promo-input" placeholder="Code promo" value="${_promoCode||''}" style="flex:1;padding:10px 12px;border:1.5px solid var(--g200);border-radius:9px;font-family:inherit;text-transform:uppercase"/>
+        <button class="btn-main" style="width:auto;padding:10px 18px" onclick="appliquerPromo()">${_promoCode?'✓':'Appliquer'}</button>
+      </div>
+      <div id="promo-msg" style="font-size:12px;margin-top:6px"></div>
+    </div>
     <div class="cart-summary">
       <div class="cart-row"><span>Sous-total</span><span>${fmt(subtotal)} FCFA</span></div>
+      ${reduction>0?`<div class="cart-row" style="color:var(--vd)"><span>Réduction (${_promoCode})</span><span>−${fmt(reduction)} FCFA</span></div>`:''}
       <div class="cart-row"><span>Livraison</span><span>${_deliveryFee?fmt(_deliveryFee)+' FCFA':'selon votre zone'}</span></div>
       <div class="cart-row total"><span>Total</span><span>${fmt(total)} FCFA${_deliveryFee?'':' + livraison'}</span></div>
     </div>
@@ -1829,8 +1870,9 @@ async function passOrder(){
   const adresse=`Quartier : ${quartier} — Maison : ${maison}`+(details?` — ${details}`:'');
   const items=Object.values(cart);
   const subtotal=items.reduce((s,i)=>s+(i.prix_promo||i.prix)*i.qty,0);
-  const total=subtotal+_deliveryFee;
-  pendingOrder={adresse,zone_id,tel,momo,notes,items,total,frais:_deliveryFee};
+  const reduction=_promoReduction||0;
+  const total=Math.max(0,subtotal-reduction)+_deliveryFee;
+  pendingOrder={adresse,zone_id,tel,momo,notes,items,total,frais:_deliveryFee,code_promo:_promoCode,reduction,promoId:_promoData?.id};
   openKkiapayWidget({amount:total,api_key:'782f2ffff070438f6693d98f861b909f89ff09eb',sandbox:false,phone:momo,name:currentUser.email,callback:window.location.href,theme:'#1a6b3c'});
 }
 
@@ -1838,7 +1880,7 @@ async function onKKiapaySuccess(response){
   if(!pendingOrder)return;
   toast('💳 Paiement confirmé !','ok');
   try{pxTrack('Purchase',{value:pendingOrder.total});}catch(e){}
-  let {data:cmd,error}=await sb.from('commandes').insert({client_id:currentUser.id,total:pendingOrder.total,adresse_livraison:pendingOrder.adresse,zone_id:pendingOrder.zone_id,notes:pendingOrder.notes,statut:'confirmee',frais_livraison:pendingOrder.frais}).select().single();
+  let {data:cmd,error}=await sb.from('commandes').insert({client_id:currentUser.id,total:pendingOrder.total,adresse_livraison:pendingOrder.adresse,zone_id:pendingOrder.zone_id,notes:pendingOrder.notes,statut:'confirmee',frais_livraison:pendingOrder.frais,code_promo:pendingOrder.code_promo||null,reduction:pendingOrder.reduction||0}).select().single();
   if(error){ // repli si la colonne frais_livraison n'existe pas encore
     ({data:cmd,error}=await sb.from('commandes').insert({client_id:currentUser.id,total:pendingOrder.total,adresse_livraison:pendingOrder.adresse,zone_id:pendingOrder.zone_id,notes:pendingOrder.notes,statut:'confirmee'}).select().single());
   }
@@ -1856,6 +1898,8 @@ async function onKKiapaySuccess(response){
   }
   await sb.from('paiements').insert({commande_id:cmd.id,montant:pendingOrder.total,methode:'mobile_money',telephone:pendingOrder.momo,statut:'confirme',reference:response.transactionId||''});
   pendingOrder=null;cart={};updateCartBadge();
+  if(_promoData){try{await sb.from('promotions').update({utilisations:(_promoData.utilisations||0)+1}).eq('id',_promoData.id);}catch(e){}}
+  _promoCode=null;_promoReduction=0;_promoData=null;
   toast('🎉 Commande confirmée !','ok');goPage('orders');
 }
 
