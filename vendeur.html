@@ -11,8 +11,7 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --vd:#1a6b3c;--vl:#e8f5e9;--v:#2d8653;
-  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g400:#9ca3af;--g600:#4b5563;--g900:#111827;
+  --vd:#1a6b3c;--vl:#e8f5e9;--v:#2d8653;  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;--g400:#9ca3af;--g600:#4b5563;--g900:#111827;
   --r:#dc2626;--rl:#fef2f2;--or:#d97706;--orl:#fffbeb;--bl:#2563eb;--bll:#eff6ff;
   --gr:#16a34a;--grl:#f0fdf4;
   --shadow:0 1px 3px rgba(0,0,0,.1);--shadow-md:0 4px 12px rgba(0,0,0,.1);
@@ -242,6 +241,17 @@ tr:hover td{background:var(--g50)}
 .var-row .var-del{width:30px;height:30px;border:none;background:var(--rl);color:var(--r);border-radius:8px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;padding:0}
 .var-add-btn{background:var(--vl);color:var(--vd);border:1px dashed var(--vd);border-radius:10px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;width:100%}
 .var-head{display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:6px;font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.3px;padding:0 8px}
+.pm-btn{width:100%;display:flex;align-items:center;gap:9px;padding:9px 11px;border:none;background:none;font-size:13px;font-weight:500;color:var(--g600);border-radius:8px;cursor:pointer;font-family:inherit;text-align:left;margin-bottom:1px}
+.pm-btn:hover{background:var(--g50)}
+.pm-btn.active{background:var(--vl);color:var(--vd);font-weight:700}
+.pm-soon{display:inline-block;font-size:9px;font-weight:700;background:var(--orl);color:var(--or);padding:1px 6px;border-radius:99px;margin-left:auto}
+.ptoggle{width:42px;height:24px;border-radius:99px;background:var(--g200);position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+.ptoggle.on{background:var(--vd)}
+.ptoggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.ptoggle.on::after{left:20px}
+.prow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--g100)}
+.prow:last-child{border-bottom:none}
+@media(max-width:768px){.grid-params{grid-template-columns:1fr!important}}
 </style>
 </head>
 <body>
@@ -447,6 +457,9 @@ tr:hover td{background:var(--g50)}
       <button class="sb-btn" onclick="go('paiements',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Paiements
       </button>
+      <button class="sb-btn" onclick="go('parametres',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Paramètres
+      </button>
     </nav>
     <div class="sb-foot">
       <button class="sb-btn" onclick="doLogout()" style="color:rgba(255,120,120,.9)">
@@ -615,6 +628,12 @@ tr:hover td{background:var(--g50)}
         </div>
       </div>
     </div>
+    <div class="sec" id="sec-parametres">
+      <div style="display:grid;grid-template-columns:230px 1fr;gap:16px" class="grid-params">
+        <div class="card" style="margin-bottom:0;height:fit-content"><div class="card-body" style="padding:8px"><div id="pv-menu"></div></div></div>
+        <div id="pv-content"></div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -667,6 +686,97 @@ tr:hover td{background:var(--g50)}
 <div class="toast" id="toast"></div>
 
 <script>
+const PV_SECTIONS=[
+  {id:'infos',ico:'🏪',label:'Informations',soon:false},
+  {id:'securite',ico:'🔐',label:'Sécurité',soon:true},
+  {id:'paiement',ico:'💰',label:'Paiement',soon:false},
+  {id:'notifs',ico:'🔔',label:'Notifications',soon:true},
+  {id:'langue',ico:'🌍',label:'Langue & devise',soon:false},
+  {id:'docs',ico:'📄',label:'Documents légaux',soon:false},
+  {id:'danger',ico:'🗑️',label:'Suppression',soon:false},
+];
+let _pvCur='infos';
+function loadParametres(){
+  document.getElementById('pv-menu').innerHTML=PV_SECTIONS.map(s=>`<button class="pm-btn ${s.id===_pvCur?'active':''}" onclick="showPV('${s.id}',this)"><span>${s.ico}</span> <span>${s.label}</span>${s.soon?'<span class="pm-soon">bientôt</span>':''}</button>`).join('');
+  showPV(_pvCur);
+}
+function showPV(id,btn){
+  _pvCur=id;
+  if(btn){document.querySelectorAll('#pv-menu .pm-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  const c=document.getElementById('pv-content');
+  const b=currentBoutique||{};
+  const soonBox=t=>`<div style="background:var(--orl);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:12.5px;color:var(--g600)">🚧 ${t}</div>`;
+  const card=(title,body)=>`<div class="card" style="margin-bottom:0"><div class="card-head"><h2>${title}</h2></div><div class="card-body">${body}</div></div>`;
+  if(id==='infos'){
+    c.innerHTML=card('🏪 Informations de la boutique',`
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--g100)">
+        <div style="width:72px;height:72px;border-radius:14px;overflow:hidden;background:var(--vl);display:flex;align-items:center;justify-content:center;flex-shrink:0">${b.logo_url?`<img src="${b.logo_url}" style="width:100%;height:100%;object-fit:cover"/>`:'<span style="font-size:32px">🏪</span>'}</div>
+        <div><div style="font-weight:800;font-size:16px">${b.nom||''}</div>
+        <label style="display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:var(--vd);cursor:pointer">🖼️ ${b.logo_url?'Changer le logo':'Ajouter un logo'}<input type="file" accept="image/*" style="display:none" onchange="uploadBoutiqueLogo(this)"/></label>
+        <div id="pv-logo-status" style="font-size:11px;color:var(--g400);margin-top:2px"></div></div>
+      </div>
+      <p style="font-size:13px;color:var(--g600)">Pour modifier le nom, l'adresse ou la description, utilisez la page « Ma boutique ».</p>
+      <button class="btn btn-p" style="margin-top:10px" onclick="go('boutique',document.querySelectorAll('.sb-btn')[3])">Ouvrir Ma boutique</button>`);
+  }
+  else if(id==='securite'){
+    c.innerHTML=card('🔐 Sécurité',`
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Mot de passe</div><div style="font-size:12px;color:var(--g600)">Modifiez votre mot de passe</div></div><button class="btn btn-sm btn-ed" onclick="changePassV()">Modifier</button></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Authentification à deux facteurs</div><div style="font-size:12px;color:var(--g600)">Sécurité renforcée par SMS</div></div><span class="pm-soon">bientôt</span></div>
+      ${soonBox('La 2FA nécessite un service SMS à intégrer. Le changement de mot de passe est fonctionnel.')}`);
+  }
+  else if(id==='paiement'){
+    c.innerHTML=card('💰 Paramètres de paiement',`
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Fréquence & méthode</div><div style="font-size:12px;color:var(--g600)">Gérez vos versements et Mobile Money</div></div><button class="btn btn-sm btn-p" onclick="go('paiements',document.querySelectorAll('.sb-btn')[4])">Ouvrir Paiements</button></div>`);
+  }
+  else if(id==='notifs'){
+    c.innerHTML=card('🔔 Notifications',`
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">📱 SMS</div><div style="font-size:12px;color:var(--g600)">Alertes commandes par SMS</div></div><span class="pm-soon">bientôt</span></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">💬 WhatsApp</div><div style="font-size:12px;color:var(--g600)">Notifications WhatsApp</div></div><span class="pm-soon">bientôt</span></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">🔔 Dans l'application</div><div style="font-size:12px;color:var(--g600)">Notifications internes</div></div><span class="ptoggle on"></span></div>
+      ${soonBox('SMS et WhatsApp nécessitent un service tiers (Twilio, etc.) à intégrer.')}`);
+  }
+  else if(id==='langue'){
+    c.innerHTML=card('🌍 Langue & devise',`
+      <div class="fgm"><label>Langue</label><select><option>Français</option><option disabled>English (bientôt)</option></select></div>
+      <div class="fgm"><label>Devise</label><select><option>FCFA (XOF)</option></select></div>
+      <p style="font-size:12px;color:var(--g400);margin-top:8px">La plateforme opère en Franc CFA (XOF).</p>`);
+  }
+  else if(id==='docs'){
+    c.innerHTML=card('📄 Documents légaux',`
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Conditions générales</div><div style="font-size:12px;color:var(--g600)">CGU vendeur</div></div><a href="/confidentialite.html" target="_blank" class="btn btn-sm btn-ed" style="text-decoration:none">Consulter</a></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Politique de confidentialité</div><div style="font-size:12px;color:var(--g600)">Protection des données</div></div><a href="/confidentialite.html" target="_blank" class="btn btn-sm btn-ed" style="text-decoration:none">Consulter</a></div>`);
+  }
+  else if(id==='danger'){
+    c.innerHTML=card('🗑️ Suppression de la boutique',`
+      <div style="background:var(--rl);border:1px solid #fca5a5;border-radius:12px;padding:16px">
+        <div style="font-weight:700;color:var(--r);margin-bottom:6px">⚠️ Zone dangereuse</div>
+        <p style="font-size:13px;color:var(--g600);margin-bottom:12px">La suppression de votre boutique est définitive : produits, commandes et données seront perdus.</p>
+        <a href="mailto:contact@yeyemarket.com?subject=Demande de suppression de boutique" class="btn btn-del" style="text-decoration:none;display:inline-block">📧 Demander la suppression</a>
+      </div>`);
+  }
+}
+async function uploadBoutiqueLogo(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>3*1024*1024){toast('Image trop lourde (max 3 Mo)','err');return;}
+  const st=document.getElementById('pv-logo-status');if(st)st.textContent='Envoi...';
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+  const path=`logos/boutique_${currentBoutique.id}_${Date.now()}.${ext}`;
+  const {error:upErr}=await sb.storage.from('livreurs').upload(path,file,{upsert:true,contentType:file.type});
+  if(upErr){toast('Erreur : '+upErr.message,'err');if(st)st.textContent='';return;}
+  const {data:pub}=sb.storage.from('livreurs').getPublicUrl(path);
+  const {error}=await sb.from('boutiques').update({logo_url:pub?.publicUrl}).eq('id',currentBoutique.id);
+  if(error){toast('Erreur : '+error.message,'err');if(st)st.textContent='';return;}
+  currentBoutique.logo_url=pub?.publicUrl;
+  toast('✅ Logo mis à jour','ok');showPV('infos');
+}
+async function changePassV(){
+  const np=prompt('Nouveau mot de passe (min. 6 caractères) :');
+  if(!np)return;if(np.length<6){toast('Min. 6 caractères','err');return;}
+  const {error}=await sb.auth.updateUser({password:np});
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  toast('✅ Mot de passe modifié','ok');
+}
+
 const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
 const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -914,14 +1024,14 @@ function showApp(){
 }
 
 // NAVIGATION
-const titles={dashboard:'Vue d\'ensemble',produits:'Mes produits',commandes:'Mes commandes',boutique:'Ma boutique',paiements:'Paiements'};
+const titles={dashboard:'Vue d\'ensemble',produits:'Mes produits',commandes:'Mes commandes',boutique:'Ma boutique',paiements:'Paiements',parametres:'Paramètres'};
 function go(name,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
   btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={produits:loadProds,commandes:loadCmds,boutique:loadBoutiqueForm,paiements:loadPaiementsPage};
+  const loaders={produits:loadProds,commandes:loadCmds,boutique:loadBoutiqueForm,paiements:loadPaiementsPage,parametres:loadParametres};
   if(loaders[name])loaders[name]();
   closeSidebar();
 }
