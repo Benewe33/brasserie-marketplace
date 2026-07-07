@@ -749,7 +749,30 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 </div>
 
 <!-- OVERLAYS -->
-<div class="modal-overlay-bg" id="modal-bg" onclick="closeProdModal()"></div>
+<div class="modal-overlay-bg" id="modal-bg" onclick="closeAnyModal()"></div>
+
+<div class="prod-modal" id="dish-modal">
+  <div class="modal-x-wrap"><button class="modal-close-x" onclick="closeDishModal()" title="Fermer">✕</button></div>
+  <div class="modal-drag"></div>
+  <div class="prod-modal-imgs" id="dish-modal-imgs"><div class="prod-modal-emoji" id="dish-modal-emoji">🍲</div></div>
+  <div class="prod-modal-body">
+    <div id="dish-modal-name" class="prod-modal-name"></div>
+    <div id="dish-modal-resto" class="prod-modal-vendor"></div>
+    <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:6px">
+      <div id="dish-modal-price" class="prod-modal-price" style="margin-bottom:0"></div>
+    </div>
+    <div id="dish-modal-desc" class="prod-modal-desc"></div>
+    <div class="qty-control">
+      <span class="qty-label">Quantité</span>
+      <div class="qty-btns">
+        <button onclick="changeDishQty(-1)">−</button>
+        <span id="dish-modal-qty" style="font-size:16px;font-weight:800;min-width:24px;text-align:center">1</span>
+        <button onclick="changeDishQty(1)">+</button>
+      </div>
+    </div>
+    <button class="btn-main" id="dish-modal-add-btn" onclick="addDishFromModal()">🛒 Ajouter au panier</button>
+  </div>
+</div>
 <div class="notif-overlay" id="notif-overlay" onclick="closeNotifPanel()"></div>
 
 <!-- SÉLECTEUR DE VILLE -->
@@ -1290,7 +1313,7 @@ async function openResto(id){
         const dispo=m.disponible!==false;
         const img=m.image_url?`<img src="${m.image_url}" alt="${m.nom}"/>`:'🍲';
         const addBtn=dispo?`<button class="d-add" onclick="event.stopPropagation();addDishToCart('${m.id}')">+</button>`:'';
-        return `<div class="dish${dispo?'':' indispo'}">
+        return `<div class="dish${dispo?'':' indispo'}" onclick="${dispo?`openDishModal('${m.id}')`:''}" style="${dispo?'cursor:pointer':''}">
           <div class="d-body">
             <div class="d-name">${m.nom}${dispo?'':' <span class="resto-pill-closed">Indisponible</span>'}</div>
             ${m.description?`<div class="d-desc">${m.description}</div>`:''}
@@ -1324,10 +1347,47 @@ async function openResto(id){
 let _restoPlats={};
 function addDishToCart(menuId){
   const m=_restoPlats[menuId];if(!m)return;
-  // Un plat entre dans le même panier. id préfixé pour éviter toute collision avec un produit.
   const cartId='menu_'+m.id;
   const item={id:cartId,_isMenu:true,menu_id:m.id,nom:m.nom,prix:m.prix,prix_promo:null,unite:'plat',image_url:m.image_url||null,boutiques:{nom:m._resto||'Restaurant'}};
   addToCart(cartId,1,item);
+  toast('✅ Ajouté au panier','ok');
+}
+
+let _dishModalQty=1,_currentDish=null;
+function openDishModal(menuId){
+  const m=_restoPlats[menuId];if(!m)return;
+  _currentDish=m;_dishModalQty=1;
+  document.getElementById('dish-modal-qty').textContent='1';
+  document.getElementById('dish-modal-name').textContent=m.nom;
+  document.getElementById('dish-modal-resto').innerHTML='🍽️ <strong>'+(m._resto||'Restaurant')+'</strong>';
+  document.getElementById('dish-modal-price').textContent=fmt(m.prix)+' FCFA';
+  document.getElementById('dish-modal-desc').textContent=m.description||'';
+  const imgsBox=document.getElementById('dish-modal-imgs');
+  if(m.image_url){imgsBox.innerHTML=`<img src="${m.image_url}" alt="${m.nom}" style="width:100%;height:100%;object-fit:cover"/>`;}
+  else{imgsBox.innerHTML='<div class="prod-modal-emoji">🍲</div>';}
+  document.getElementById('dish-modal').classList.add('open');
+  document.getElementById('modal-bg').classList.add('open');
+}
+function closeDishModal(){
+  document.getElementById('dish-modal').classList.remove('open');
+  document.getElementById('modal-bg').classList.remove('open');
+}
+function closeAnyModal(){
+  const dm=document.getElementById('dish-modal');
+  if(dm&&dm.classList.contains('open')){closeDishModal();return;}
+  if(typeof closeProdModal==='function')closeProdModal();
+}
+function changeDishQty(d){
+  _dishModalQty=Math.max(1,_dishModalQty+d);
+  document.getElementById('dish-modal-qty').textContent=_dishModalQty;
+}
+function addDishFromModal(){
+  if(!_currentDish)return;
+  const m=_currentDish;
+  const cartId='menu_'+m.id;
+  const item={id:cartId,_isMenu:true,menu_id:m.id,nom:m.nom,prix:m.prix,prix_promo:null,unite:'plat',image_url:m.image_url||null,boutiques:{nom:m._resto||'Restaurant'}};
+  addToCart(cartId,_dishModalQty,item);
+  closeDishModal();
 }
 // ============================================================
 // BANNIÈRE D'ACCUEIL (lue depuis la table parametres)
