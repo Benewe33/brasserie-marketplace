@@ -87,6 +87,17 @@ body{font-family:'Inter',system-ui,-apple-system,sans-serif;background:var(--g50
 .perf-row .perf-top{display:flex;justify-content:space-between;font-size:13px;font-weight:600;margin-bottom:5px}
 .perf-bar{height:8px;background:var(--g100);border-radius:99px;overflow:hidden}
 .perf-fill{height:100%;border-radius:99px}
+.pm-btn{width:100%;display:flex;align-items:center;gap:9px;padding:9px 11px;border:none;background:none;font-size:13px;font-weight:500;color:var(--g600);border-radius:8px;cursor:pointer;font-family:inherit;text-align:left;margin-bottom:1px}
+.pm-btn:hover{background:var(--g50)}
+.pm-btn.active{background:var(--vl);color:var(--vd);font-weight:700}
+.pm-soon{display:inline-block;font-size:9px;font-weight:700;background:var(--orl);color:var(--or);padding:1px 6px;border-radius:99px;margin-left:auto}
+.ptoggle{width:42px;height:24px;border-radius:99px;background:var(--g200);position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+.ptoggle.on{background:var(--gr)}
+.ptoggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.ptoggle.on::after{left:20px}
+.prow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--g100)}
+.prow:last-child{border-bottom:none}
+@media(max-width:768px){.grid-params{grid-template-columns:1fr!important}}
 .mini-fin{background:#fff;border-radius:14px;padding:14px 16px;box-shadow:var(--shadow);display:flex;align-items:center;gap:12px}
 .mf-ico{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
 .mf-lab{font-size:11px;color:var(--g600);font-weight:600}
@@ -182,7 +193,7 @@ code{background:var(--g100);padding:2px 6px;border-radius:5px;font-size:12px}
       <button class="sb-btn" onclick="go('courses',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 16v-8a2 2 0 00-2-2H6a2 2 0 00-2 2v8m12 0h4l-2-4m-2 4H4"/></svg>Courses reçues</button>
       <button class="sb-btn" onclick="go('historique',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 106 5.3L3 8"/><path d="M12 7v5l3 3"/></svg>Historique</button>
       <div class="sb-cat">PARAMÈTRES</div>
-      <button class="sb-btn" onclick="go('agence',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h1m4 0h1m-6 4h1m4 0h1m-6 4h1m4 0h1"/></svg>Mon agence</button>
+      <button class="sb-btn" onclick="go('agence',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Paramètres</button>
       <button class="sb-btn" onclick="go('finances',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Finances</button>
       <button class="sb-btn" onclick="go('paiements',this)"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Paiements</button>
     </nav>
@@ -306,9 +317,13 @@ code{background:var(--g100);padding:2px 6px;border-radius:5px;font-size:12px}
 
     <!-- MON AGENCE -->
     <div class="sec" id="sec-agence">
-      <div class="card" style="max-width:600px">
-        <div class="card-head"><h2>🏢 Informations de l'agence</h2></div>
-        <div class="card-body" id="agence-form"></div>
+      <div style="display:grid;grid-template-columns:230px 1fr;gap:16px" class="grid-params">
+        <div class="card" style="margin-bottom:0;height:fit-content">
+          <div class="card-body" style="padding:8px">
+            <div id="param-menu"></div>
+          </div>
+        </div>
+        <div id="param-content"></div>
       </div>
     </div>
 
@@ -342,12 +357,56 @@ code{background:var(--g100);padding:2px 6px;border-radius:5px;font-size:12px}
 
     <!-- PAIEMENTS -->
     <div class="sec" id="sec-paiements">
-      <div class="card" style="max-width:600px">
-        <div class="card-head"><h2>🏦 Paramètres de paiement</h2></div>
-        <div class="card-body" id="paiements-content"><p style="color:var(--g400);text-align:center;padding:24px">Chargement...</p></div>
+      <!-- Aperçu du Wallet -->
+      <div class="card">
+        <div class="card-head"><h2>👛 Aperçu du Wallet</h2></div>
+        <div class="card-body">
+          <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+            <div class="stat"><div class="stat-ico si-g">💰</div><div class="stat-label">Solde disponible</div><div class="stat-val" id="w-dispo">—</div><span style="font-size:11px;color:var(--gr);font-weight:600">Disponible pour paiements</span></div>
+            <div class="stat"><div class="stat-ico si-o">⏳</div><div class="stat-label">Solde en attente</div><div class="stat-val" id="w-attente">—</div><span style="font-size:11px;color:var(--or);font-weight:600">En attente (48h)</span></div>
+            <div class="stat"><div class="stat-ico si-b">🏦</div><div class="stat-label">Solde total</div><div class="stat-val" id="w-total">—</div><span style="font-size:11px;color:var(--g400)">Dispo + en attente</span></div>
+            <div class="stat"><div class="stat-ico" style="background:#f3e8ff">📤</div><div class="stat-label">Total versé</div><div class="stat-val" id="w-verse">—</div><span style="font-size:11px;color:var(--g400)">Aux livreurs</span></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-p" onclick="walletBientot('approvisionner')">➕ Approvisionner le wallet</button>
+            <button class="btn btn-ed" onclick="walletBientot('retirer')">📤 Retirer des fonds</button>
+            <button class="btn btn-ed" onclick="go('historique',document.querySelectorAll('.sb-btn')[4])">📋 Historique des retraits</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px" class="grid-2">
+        <!-- Transactions -->
+        <div class="card" style="margin-bottom:0">
+          <div class="card-head"><h2>🧾 Transactions récentes</h2></div>
+          <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Montant</th></tr></thead><tbody id="w-tx-body"></tbody></table></div></div>
+        </div>
+        <!-- Méthode de paiement + fréquence -->
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="card" style="margin-bottom:0">
+            <div class="card-head"><h2>💳 Méthode de paiement</h2></div>
+            <div class="card-body" id="w-methode"></div>
+          </div>
+          <div class="card" style="margin-bottom:0">
+            <div class="card-head"><h2>🔁 Fréquence des versements</h2></div>
+            <div class="card-body" id="w-freq"></div>
+          </div>
+        </div>
       </div>
     </div>
   </main>
+</div>
+
+<!-- MODAL MÉTHODE DE PAIEMENT -->
+<div class="overlay" id="m-wmethode">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-head"><h3>💳 Méthode de paiement</h3><button class="modal-x" onclick="closeModal('m-wmethode')">✕</button></div>
+    <div class="modal-body">
+      <div class="fgm"><label>Opérateur Mobile Money</label><select id="wm-operateur"><option value="MTN">MTN MoMo</option><option value="Moov">Moov Money</option><option value="Celtiis">Celtiis Cash</option></select></div>
+      <div class="fgm"><label>Numéro de réception</label><input type="tel" id="wm-numero" placeholder="97 00 00 00"/></div>
+      <button class="btn btn-p" style="width:100%;margin-top:6px" onclick="saveWalletMethode()">💾 Enregistrer</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL AJOUT LIVREUR -->
@@ -861,30 +920,155 @@ async function loadHistorique(){
 }
 
 // ============ MON AGENCE ============
+const PARAM_SECTIONS=[
+  {id:'infos',ico:'👤',label:"Informations",soon:false},
+  {id:'securite',ico:'🔐',label:'Sécurité',soon:true},
+  {id:'users',ico:'👥',label:'Utilisateurs',soon:true},
+  {id:'livreurs',ico:'🚚',label:'Param. livreurs',soon:false},
+  {id:'paiement',ico:'💰',label:'Paiement',soon:false},
+  {id:'zones',ico:'📍',label:'Zones',soon:false},
+  {id:'types',ico:'📦',label:'Types de livraison',soon:true},
+  {id:'tarif',ico:'💵',label:'Tarification',soon:false},
+  {id:'notifs',ico:'🔔',label:'Notifications',soon:true},
+  {id:'langue',ico:'🌍',label:'Langue & devise',soon:false},
+  {id:'docs',ico:'📄',label:'Documents légaux',soon:false},
+  {id:'api',ico:'🔌',label:'Intégrations API',soon:true},
+  {id:'audit',ico:'📝',label:"Journal d'activités",soon:true},
+  {id:'danger',ico:'🗑️',label:'Suppression',soon:false},
+];
+let _paramCur='infos';
 function loadAgenceForm(){
+  const menu=document.getElementById('param-menu');
+  menu.innerHTML=PARAM_SECTIONS.map(s=>`<button class="pm-btn ${s.id===_paramCur?'active':''}" onclick="showParam('${s.id}',this)"><span>${s.ico}</span> <span>${s.label}</span>${s.soon?'<span class="pm-soon">bientôt</span>':''}</button>`).join('');
+  showParam(_paramCur);
+}
+function showParam(id,btn){
+  _paramCur=id;
+  if(btn){document.querySelectorAll('.pm-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  const c=document.getElementById('param-content');
   const a=currentAgence;
-  document.getElementById('agence-form').innerHTML=`
-    <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--g100)">
-      <div style="width:72px;height:72px;border-radius:14px;overflow:hidden;background:var(--vl);display:flex;align-items:center;justify-content:center;flex-shrink:0" id="ag-logo-preview">
-        ${a.logo_url?`<img src="${a.logo_url}" style="width:100%;height:100%;object-fit:cover"/>`:'<span style="font-size:32px">🏢</span>'}
+  const soonBox=(txt)=>`<div style="background:var(--orl);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:12.5px;color:var(--g600)">🚧 ${txt}</div>`;
+  const card=(title,body)=>`<div class="card" style="margin-bottom:0"><div class="card-head"><h2>${title}</h2></div><div class="card-body">${body}</div></div>`;
+
+  if(id==='infos'){
+    c.innerHTML=card('👤 Informations de l\'agence',`
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--g100)">
+        <div style="width:72px;height:72px;border-radius:14px;overflow:hidden;background:var(--vl);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          ${a.logo_url?`<img src="${a.logo_url}" style="width:100%;height:100%;object-fit:cover"/>`:'<span style="font-size:32px">🏢</span>'}
+        </div>
+        <div>
+          <div style="font-weight:800;font-size:16px">${a.nom}</div>
+          <label style="display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:var(--vd);cursor:pointer">🖼️ ${a.logo_url?'Changer le logo':'Ajouter un logo'}<input type="file" accept="image/*" style="display:none" onchange="uploadAgLogo(this)"/></label>
+          <div id="ag-logo-status" style="font-size:11px;color:var(--g400);margin-top:2px"></div>
+        </div>
       </div>
-      <div>
-        <div style="font-weight:800;font-size:16px">${a.nom}</div>
-        <label style="display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:var(--vd);cursor:pointer">
-          🖼️ ${a.logo_url?'Changer le logo':'Ajouter un logo'}
-          <input type="file" accept="image/*" style="display:none" onchange="uploadAgLogo(this)"/>
-        </label>
-        <div id="ag-logo-status" style="font-size:11px;color:var(--g400);margin-top:2px"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="fgm"><label>Nom de l'agence</label><input id="pi-nom" value="${a.nom||''}"/></div>
+        <div class="fgm"><label>Responsable</label><input id="pi-resp" value="${a.responsable||''}"/></div>
+        <div class="fgm"><label>Email</label><input value="${a.email||''}" readonly style="background:var(--g50)"/></div>
+        <div class="fgm"><label>Téléphone</label><input id="pi-tel" value="${a.telephone||''}"/></div>
+        <div class="fgm" style="grid-column:1/-1"><label>Adresse</label><input id="pi-adr" value="${a.adresse||''}"/></div>
       </div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div class="fgm"><label>Nom de l'agence</label><input value="${a.nom||''}" readonly style="background:var(--g50)"/></div>
-      <div class="fgm"><label>Responsable</label><input value="${a.responsable||''}" readonly style="background:var(--g50)"/></div>
-      <div class="fgm"><label>Email</label><input value="${a.email||''}" readonly style="background:var(--g50)"/></div>
-      <div class="fgm"><label>Téléphone</label><input value="${a.telephone||''}" readonly style="background:var(--g50)"/></div>
-      <div class="fgm" style="grid-column:1/-1"><label>Zones de couverture</label><input value="${(a.zones_couverture||[]).join(', ')}" readonly style="background:var(--g50)"/></div>
-      <div class="fgm"><label>Statut</label><input value="${a.statut}" readonly style="background:var(--g50)"/></div>
-    </div>`;
+      <button class="btn btn-p" style="margin-top:8px" onclick="saveInfos()">💾 Enregistrer</button>`);
+  }
+  else if(id==='securite'){
+    c.innerHTML=card('🔐 Sécurité',`
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Mot de passe</div><div style="font-size:12px;color:var(--g600)">Modifiez votre mot de passe de connexion</div></div><button class="btn btn-sm btn-ed" onclick="changePass()">Modifier</button></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Authentification à deux facteurs (2FA)</div><div style="font-size:12px;color:var(--g600)">Sécurité renforcée par code SMS</div></div><span class="pm-soon">bientôt</span></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Appareils connectés</div><div style="font-size:12px;color:var(--g600)">Gérer les sessions actives</div></div><span class="pm-soon">bientôt</span></div>
+      ${soonBox('La 2FA et la gestion des appareils nécessitent un service SMS (à intégrer). Le changement de mot de passe est fonctionnel.')}`);
+  }
+  else if(id==='users'){
+    c.innerHTML=card('👥 Gestion des utilisateurs',`<p style="font-size:13px;color:var(--g600)">Ajoutez des administrateurs ou managers qui pourront gérer l'agence avec vous, chacun avec ses permissions.</p>${soonBox('La gestion multi-utilisateurs avec rôles et permissions sera disponible prochainement. Pour l\'instant, seul le compte principal de l\'agence gère tout.')}`);
+  }
+  else if(id==='livreurs'){
+    c.innerHTML=card('🚚 Paramètres des livreurs',`
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Nombre de livreurs</div><div style="font-size:12px;color:var(--g600)">Total dans votre agence</div></div><strong id="pl-nb">—</strong></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Commission de la plateforme</div><div style="font-size:12px;color:var(--g600)">Prélevée par YéyéMarket sur les livraisons</div></div><strong id="pl-comm">—</strong></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Gérer mes livreurs</div><div style="font-size:12px;color:var(--g600)">Ajouter, voir, retirer</div></div><button class="btn btn-sm btn-p" onclick="go('livreurs',document.querySelectorAll('.sb-btn')[1])">Ouvrir</button></div>`);
+    (async()=>{const {data:l}=await sb.from('livreurs').select('id').eq('agence_id',a.id);document.getElementById('pl-nb').textContent=(l||[]).length;let cm=8;try{const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_liv').single();if(pc)cm=pc.valeur;}catch(e){}document.getElementById('pl-comm').textContent=cm+' %';})();
+  }
+  else if(id==='paiement'){
+    c.innerHTML=card('💰 Paramètres de paiement',`
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Méthode de réception</div><div style="font-size:12px;color:var(--g600)">${a.paiement_operateur||'Non défini'} · ${a.paiement_numero||'Aucun numéro'}</div></div><button class="btn btn-sm btn-ed" onclick="openWalletMethode()">Modifier</button></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Fréquence des versements</div><div style="font-size:12px;color:var(--g600)">Actuellement : ${a.freq_paiement||'2jours'}</div></div><button class="btn btn-sm btn-ed" onclick="go('paiements',document.querySelectorAll('.sb-btn')[6])">Gérer</button></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Wallet & transactions</div><div style="font-size:12px;color:var(--g600)">Soldes et historique</div></div><button class="btn btn-sm btn-p" onclick="go('paiements',document.querySelectorAll('.sb-btn')[6])">Ouvrir</button></div>`);
+  }
+  else if(id==='zones'){
+    c.innerHTML=card('📍 Zones de couverture',`
+      <p style="font-size:13px;color:var(--g600);margin-bottom:12px">Zones que votre agence dessert :</p>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">${(a.zones_couverture||[]).map(z=>`<span class="badge bb" style="font-size:12px;padding:6px 12px">${z}</span>`).join('')||'<span style="color:var(--g400)">Aucune zone</span>'}</div>
+      ${soonBox('La modification des zones de couverture après inscription sera bientôt possible. Contactez l\'administration YéyéMarket pour tout changement urgent.')}`);
+  }
+  else if(id==='types'){
+    c.innerHTML=card('📦 Types de livraisons',`
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">⚡ Express</div><div style="font-size:12px;color:var(--g600)">Livraison prioritaire rapide</div></div><span class="ptoggle on"></span></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">📦 Standard</div><div style="font-size:12px;color:var(--g600)">Livraison classique</div></div><span class="ptoggle on"></span></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">🗓️ Programmée</div><div style="font-size:12px;color:var(--g600)">À une heure choisie</div></div><span class="ptoggle"></span></div>
+      ${soonBox('La gestion des types de livraison avec tarifs différenciés sera activée prochainement.')}`);
+  }
+  else if(id==='tarif'){
+    c.innerHTML=card('💵 Tarification des livraisons',`
+      <p style="font-size:13px;color:var(--g600);margin-bottom:8px">Les frais de livraison sont définis par YéyéMarket selon les zones. Voici la grille en vigueur :</p>
+      <div id="tarif-zones"><p style="color:var(--g400);font-size:13px">Chargement...</p></div>`);
+    (async()=>{const {data:z}=await sb.from('zones').select('nom,frais_livraison,delai_estime').eq('actif',true).order('frais_livraison');document.getElementById('tarif-zones').innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>Zone</th><th>Frais</th><th>Délai</th></tr></thead><tbody>${(z||[]).map(x=>`<tr><td>${x.nom}</td><td><strong>${fmt(x.frais_livraison||0)} F</strong></td><td>${x.delai_estime||'—'}</td></tr>`).join('')||'<tr><td colspan=3 style="color:var(--g400)">Aucune zone</td></tr>'}</tbody></table></div>`;})();
+  }
+  else if(id==='notifs'){
+    c.innerHTML=card('🔔 Notifications',`
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">📱 SMS</div><div style="font-size:12px;color:var(--g600)">Alertes par SMS</div></div><span class="pm-soon">bientôt</span></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">💬 WhatsApp</div><div style="font-size:12px;color:var(--g600)">Notifications WhatsApp</div></div><span class="pm-soon">bientôt</span></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">📧 Email</div><div style="font-size:12px;color:var(--g600)">Récapitulatifs par email</div></div><span class="ptoggle on"></span></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">🔔 Push (dans l'app)</div><div style="font-size:12px;color:var(--g600)">Notifications internes</div></div><span class="ptoggle on"></span></div>
+      ${soonBox('SMS et WhatsApp nécessitent un service de messagerie tiers (Twilio, etc.) qui sera intégré prochainement.')}`);
+  }
+  else if(id==='langue'){
+    c.innerHTML=card('🌍 Langue & devise',`
+      <div class="fgm"><label>Langue de l'interface</label><select><option>Français</option><option disabled>English (bientôt)</option></select></div>
+      <div class="fgm"><label>Devise</label><select><option>FCFA (XOF)</option></select></div>
+      <p style="font-size:12px;color:var(--g400);margin-top:8px">La plateforme opère en Franc CFA (XOF), devise du Bénin.</p>`);
+  }
+  else if(id==='docs'){
+    c.innerHTML=card('📄 Documents légaux & contrats',`
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Contrat de partenariat</div><div style="font-size:12px;color:var(--g600)">Votre contrat avec YéyéMarket</div></div><span class="badge bg">Signé</span></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Conditions générales</div><div style="font-size:12px;color:var(--g600)">CGU de la plateforme</div></div><a href="/confidentialite.html" target="_blank" class="btn btn-sm btn-ed" style="text-decoration:none">Consulter</a></div>
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Politique de confidentialité</div><div style="font-size:12px;color:var(--g600)">Protection des données</div></div><a href="/confidentialite.html" target="_blank" class="btn btn-sm btn-ed" style="text-decoration:none">Consulter</a></div>`);
+  }
+  else if(id==='api'){
+    c.innerHTML=card('🔌 Intégrations API',`<p style="font-size:13px;color:var(--g600)">Connectez votre agence à des outils externes (comptabilité, CRM, suivi GPS tiers) via API.</p>${soonBox('L\'accès API et les webhooks seront proposés aux agences avancées prochainement.')}`);
+  }
+  else if(id==='audit'){
+    c.innerHTML=card('📝 Journal d\'activités',`<p style="font-size:13px;color:var(--g600)">Historique de toutes les actions effectuées dans votre agence (connexions, ajouts de livreurs, versements...).</p>${soonBox('Le journal d\'audit détaillé sera disponible prochainement.')}`);
+  }
+  else if(id==='danger'){
+    c.innerHTML=card('🗑️ Suppression de l\'agence',`
+      <div style="background:var(--rl);border:1px solid #fca5a5;border-radius:12px;padding:16px">
+        <div style="font-weight:700;color:var(--r);margin-bottom:6px">⚠️ Zone dangereuse</div>
+        <p style="font-size:13px;color:var(--g600);margin-bottom:12px">La suppression de votre agence est définitive. Tous vos livreurs et leurs comptes seront supprimés. Cette action ne peut pas être annulée.</p>
+        <p style="font-size:12.5px;color:var(--g600);margin-bottom:12px">Pour supprimer votre agence, contactez l'administration YéyéMarket. Cette sécurité évite les suppressions accidentelles.</p>
+        <a href="mailto:contact@yeyemarket.com?subject=Demande de suppression d'agence" class="btn btn-del" style="text-decoration:none;display:inline-block">📧 Demander la suppression</a>
+      </div>`);
+  }
+}
+
+async function saveInfos(){
+  const nom=document.getElementById('pi-nom').value.trim();
+  const resp=document.getElementById('pi-resp').value.trim();
+  const tel=document.getElementById('pi-tel').value.trim();
+  const adr=document.getElementById('pi-adr').value.trim();
+  if(!nom){toast('Le nom est requis','err');return;}
+  const {error}=await sb.from('agences').update({nom,responsable:resp,telephone:tel,adresse:adr}).eq('id',currentAgence.id);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  Object.assign(currentAgence,{nom,responsable:resp,telephone:tel,adresse:adr});
+  document.getElementById('sb-nom').textContent=nom;
+  toast('✅ Informations enregistrées','ok');
+}
+async function changePass(){
+  const np=prompt('Nouveau mot de passe (min. 6 caractères) :');
+  if(!np)return;
+  if(np.length<6){toast('Min. 6 caractères','err');return;}
+  const {error}=await sb.auth.updateUser({password:np});
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  toast('✅ Mot de passe modifié','ok');
 }
 
 async function uploadAgLogo(input){
@@ -911,38 +1095,86 @@ function applyAgenceLogo(){
   if(box&&currentAgence?.logo_url){box.innerHTML=`<img src="${currentAgence.logo_url}" style="width:100%;height:100%;object-fit:cover;border-radius:9px"/>`;}
 }
 
-// ============ PAIEMENTS ============
+// ============ WALLET & PAIEMENTS ============
 async function loadPaiementsPage(){
-  const {data:livreurs}=await sb.from('livreurs').select('id').eq('agence_id',currentAgence.id);
-  const livIds=(livreurs||[]).map(l=>l.id);
-  let livrees=[];
+  const {data:livreurs}=await sb.from('livreurs').select('id,prenom,nom').eq('agence_id',currentAgence.id);
+  const livMap={};(livreurs||[]).forEach(l=>livMap[l.id]=(l.prenom||'')+' '+(l.nom||''));
+  const livIds=Object.keys(livMap);
+  let livs=[];
   if(livIds.length){
-    const {data}=await sb.from('livraisons').select('statut,heure_livraison,created_at,commandes(frais_livraison)').in('livreur_id',livIds).eq('statut','livree');
-    livrees=(data||[]).map(l=>({date:l.heure_livraison||l.created_at,gain:l.commandes?.frais_livraison||500}));
+    const {data}=await sb.from('livraisons').select('livreur_id,statut,heure_livraison,created_at,commandes(id,frais_livraison)').in('livreur_id',livIds).eq('statut','livree');
+    livs=data||[];
   }
   let txCom=8;try{const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_liv').single();if(pc&&pc.valeur)txCom=parseFloat(pc.valeur)||8;}catch(e){}
   const net=g=>Math.round(g*(100-txCom)/100);
-  const gainsNet=livrees.reduce((s,l)=>s+net(l.gain),0);
+  const dateL=l=>l.heure_livraison||l.created_at;
+  const gainsNet=livs.reduce((s,l)=>s+net(l.commandes?.frais_livraison||500),0);
   const h48=new Date(Date.now()-48*3600*1000);
-  const dispoBrut=livrees.filter(l=>new Date(l.date)<h48).reduce((s,l)=>s+net(l.gain),0);
-  const attente=livrees.filter(l=>new Date(l.date)>=h48).reduce((s,l)=>s+net(l.gain),0);
-  let totalVerse=0,dernier=null;
-  try{const {data:vers}=await sb.from('versements').select('montant,created_at').eq('beneficiaire_type','agence').eq('beneficiaire_id',currentAgence.id).order('created_at',{ascending:false});if(vers){totalVerse=vers.reduce((s,v)=>s+(v.montant||0),0);dernier=vers[0]||null;}}catch(e){}
+  const dispoBrut=livs.filter(l=>new Date(dateL(l))<h48).reduce((s,l)=>s+net(l.commandes?.frais_livraison||500),0);
+  const attente=livs.filter(l=>new Date(dateL(l))>=h48).reduce((s,l)=>s+net(l.commandes?.frais_livraison||500),0);
+
+  // Versements enregistrés (sorties)
+  let vers=[];
+  try{const {data}=await sb.from('versements').select('*').in('beneficiaire_id',[...livIds,currentAgence.id]).order('created_at',{ascending:false});vers=data||[];}catch(e){}
+  const totalVerse=vers.reduce((s,v)=>s+(v.montant||0),0);
   const dispo=Math.max(0,dispoBrut-totalVerse);
-  document.getElementById('paiements-content').innerHTML=`
-    <p style="font-size:12px;color:var(--g600);margin-bottom:12px">Fréquence des paiements</p>
-    <label style="display:flex;gap:8px;padding:9px 10px;border:1.5px solid var(--g200);border-radius:9px;margin-bottom:7px;cursor:pointer"><input type="radio" name="freq" value="2jours" ${(currentAgence.freq_paiement||'2jours')==='2jours'?'checked':''} onchange="saveFreq(this.value)"/> <div><strong style="font-size:13px">Chaque 2 jours</strong> <span style="font-size:11px;color:var(--gr);font-weight:700">Recommandé</span></div></label>
-    <label style="display:flex;gap:8px;padding:9px 10px;border:1.5px solid var(--g200);border-radius:9px;margin-bottom:7px;cursor:pointer"><input type="radio" name="freq" value="semaine" ${currentAgence.freq_paiement==='semaine'?'checked':''} onchange="saveFreq(this.value)"/> <strong style="font-size:13px">Chaque semaine</strong></label>
-    <label style="display:flex;gap:8px;padding:9px 10px;border:1.5px solid var(--g200);border-radius:9px;margin-bottom:14px;cursor:pointer"><input type="radio" name="freq" value="mois" ${currentAgence.freq_paiement==='mois'?'checked':''} onchange="saveFreq(this.value)"/> <strong style="font-size:13px">Chaque mois</strong></label>
-    <div style="border-top:1px solid var(--g100);padding-top:12px">
-      <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span>Gains totaux (net ${txCom}%)</span><strong>${fmt(gainsNet)} FCFA</strong></div>
-      <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span>Solde disponible</span><strong style="color:var(--gr)">${fmt(dispo)} FCFA</strong></div>
-      <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span>Solde en attente</span><strong style="color:var(--or)">${fmt(attente)} FCFA</strong></div>
-      <div style="display:flex;justify-content:space-between;padding:7px 0;font-size:13px"><span>Dernier versement</span><span>${dernier?fdate(dernier.created_at)+' · '+fmt(dernier.montant)+' F':'Aucun'}</span></div>
-    </div>
-    <div style="background:var(--orl);border-radius:10px;padding:11px 13px;margin-top:12px;font-size:11.5px;color:var(--g600)">
-      ⚠️ Les gains de tous vos livreurs sont regroupés et versés à l'agence, qui les répartit ensuite. Délai de 48h après livraison. Seuil minimum : 10 000 FCFA.
+
+  document.getElementById('w-dispo').textContent=fmt(dispo)+' F';
+  document.getElementById('w-attente').textContent=fmt(attente)+' F';
+  document.getElementById('w-total').textContent=fmt(dispo+attente)+' F';
+  document.getElementById('w-verse').textContent=fmt(totalVerse)+' F';
+
+  // Transactions récentes : entrées (livraisons) + sorties (versements) fusionnées
+  const entrees=livs.map(l=>({date:dateL(l),type:'Entrée',desc:'Gain livraison #'+(l.commandes?.id?.substring(0,6)||'—'),montant:net(l.commandes?.frais_livraison||500)}));
+  const sorties=vers.map(v=>({date:v.created_at,type:'Versement',desc:(livMap[v.beneficiaire_id]?'Paiement '+livMap[v.beneficiaire_id].trim():'Versement'),montant:-(v.montant||0)}));
+  const tx=[...entrees,...sorties].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,15);
+  const tb=document.getElementById('w-tx-body');
+  tb.innerHTML=tx.length?tx.map(t=>`<tr>
+    <td style="font-size:12px">${fdate(t.date)}</td>
+    <td>${t.montant>=0?'<span class="badge bg">↓ Entrée</span>':'<span class="badge bo">↑ Sortie</span>'}</td>
+    <td style="font-size:12.5px">${t.desc}</td>
+    <td><strong style="color:${t.montant>=0?'var(--gr)':'var(--r)'}">${t.montant>=0?'+':''}${fmt(t.montant)} F</strong></td>
+  </tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:24px">Aucune transaction</td></tr>';
+
+  // Méthode de paiement
+  const wm=document.getElementById('w-methode');
+  wm.innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--g200);border-radius:10px">
+      <div style="width:40px;height:40px;border-radius:9px;background:var(--orl);display:flex;align-items:center;justify-content:center;font-size:18px">📱</div>
+      <div style="flex:1"><div style="font-weight:700;font-size:13px">${currentAgence.paiement_operateur||'Non défini'}</div><div style="font-size:12px;color:var(--g600)">${currentAgence.paiement_numero||'Aucun numéro'}</div></div>
+      <button class="btn btn-sm btn-ed" onclick="openWalletMethode()">Modifier</button>
     </div>`;
+
+  // Fréquence
+  const wf=document.getElementById('w-freq');
+  const freq=currentAgence.freq_paiement||'2jours';
+  wf.innerHTML=`
+    <label style="display:flex;gap:8px;padding:8px 10px;border:1.5px solid var(--g200);border-radius:9px;margin-bottom:6px;cursor:pointer"><input type="radio" name="wfreq" value="2jours" ${freq==='2jours'?'checked':''} onchange="saveFreq(this.value)"/> <div><strong style="font-size:13px">Chaque 2 jours</strong> <span style="font-size:11px;color:var(--gr);font-weight:700">Recommandé</span></div></label>
+    <label style="display:flex;gap:8px;padding:8px 10px;border:1.5px solid var(--g200);border-radius:9px;margin-bottom:6px;cursor:pointer"><input type="radio" name="wfreq" value="semaine" ${freq==='semaine'?'checked':''} onchange="saveFreq(this.value)"/> <strong style="font-size:13px">Chaque semaine</strong></label>
+    <label style="display:flex;gap:8px;padding:8px 10px;border:1.5px solid var(--g200);border-radius:9px;cursor:pointer"><input type="radio" name="wfreq" value="mois" ${freq==='mois'?'checked':''} onchange="saveFreq(this.value)"/> <strong style="font-size:13px">Chaque mois</strong></label>
+    <div style="background:var(--orl);border-radius:10px;padding:10px 12px;margin-top:10px;font-size:11px;color:var(--g600)">⚠️ Délai de 48h après livraison. Seuil minimum : 10 000 FCFA.</div>`;
+}
+
+function walletBientot(action){
+  const msg=action==='approvisionner'
+    ? '💳 L\'approvisionnement automatique du wallet par Mobile Money sera disponible prochainement (intégration KKiaPay en cours).'
+    : '📤 Le retrait automatique vers votre compte sera disponible prochainement (intégration KKiaPay en cours).';
+  toast(msg,'info');
+}
+function openWalletMethode(){
+  document.getElementById('wm-operateur').value=currentAgence.paiement_operateur||'MTN';
+  document.getElementById('wm-numero').value=currentAgence.paiement_numero||'';
+  openModal('m-wmethode');
+}
+async function saveWalletMethode(){
+  const op=document.getElementById('wm-operateur').value;
+  const num=document.getElementById('wm-numero').value.trim();
+  if(!num){toast('Entrez un numéro','err');return;}
+  const {error}=await sb.from('agences').update({paiement_operateur:op,paiement_numero:num}).eq('id',currentAgence.id);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  currentAgence.paiement_operateur=op;currentAgence.paiement_numero=num;
+  closeModal('m-wmethode');toast('✅ Méthode enregistrée','ok');
+  loadPaiementsPage();
 }
 async function saveFreq(v){
   await sb.from('agences').update({freq_paiement:v}).eq('id',currentAgence.id);
