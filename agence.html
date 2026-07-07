@@ -1194,7 +1194,12 @@ async function start2fa(){
   const {data,error}=await sb.auth.mfa.enroll({factorType:'totp'});
   if(error){toast('Erreur : '+error.message,'err');return;}
   _mfaFactorId=data.id;
-  document.getElementById('qr-2fa').innerHTML=`<img src="${data.totp.qr_code}" style="width:180px;height:180px"/>`;
+  const qrBox=document.getElementById('qr-2fa');
+  qrBox.innerHTML='';
+  const qrImg=document.createElement('img');
+  qrImg.src=data.totp.qr_code;
+  qrImg.style.width='180px';qrImg.style.height='180px';
+  qrBox.appendChild(qrImg);
   document.getElementById('secret-2fa').textContent=data.totp.secret;
   document.getElementById('code-2fa').value='';
   document.getElementById('err-2fa').style.display='none';
