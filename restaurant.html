@@ -736,7 +736,10 @@ async function loadClients(){
   const list=Object.values(clients).sort((a,b)=>b.total-a.total);
   document.getElementById('cl-nb').textContent=list.length;
   document.getElementById('cl-cmd').textContent=list.reduce((s,c)=>s+c.cmds.size,0);
-  const {data:avis}=await sb.from('avis').select('note,commentaire,created_at,utilisateurs(nom)').eq('restaurant_id',currentResto.id).order('created_at',{ascending:false});
+  const {data:mesMenusAvis}=await sb.from('menus').select('id').eq('restaurant_id',currentResto.id);
+  const menuIdsAvis=(mesMenusAvis||[]).map(m=>m.id);
+  let avis=[];
+  if(menuIdsAvis.length){const {data}=await sb.from('avis').select('note,commentaire,created_at,client_id,utilisateurs(nom)').in('produit_id',menuIdsAvis).order('created_at',{ascending:false});avis=data||[];}
   const notes=(avis||[]).map(a=>a.note).filter(n=>n);
   document.getElementById('cl-note').textContent=notes.length?(notes.reduce((a,b)=>a+b,0)/notes.length).toFixed(1)+'/5':'—';
   document.getElementById('cl-avis').textContent=(avis||[]).length;
@@ -1165,7 +1168,10 @@ async function loadDashboard(){
   const caT=cT.filter(c=>c.statut==='livree').reduce((s,c)=>s+c.total,0),caY=cY.filter(c=>c.statut==='livree').reduce((s,c)=>s+c.total,0);
   setTrend('t-ca',pctTrend(caT,caY));
 
-  const {data:avis}=await sb.from('avis').select('note').eq('restaurant_id',currentResto.id);
+  const {data:menusN1}=await sb.from('menus').select('id').eq('restaurant_id',currentResto.id);
+  const menuIdsN1=(menusN1||[]).map(m=>m.id);
+  let avis=[];
+  if(menuIdsN1.length){const {data}=await sb.from('avis').select('note').in('produit_id',menuIdsN1);avis=data||[];}
   const s_note=document.getElementById('s-note');
   if(s_note)s_note.textContent=avis?.length?(avis.reduce((s,a)=>s+(a.note||0),0)/avis.length).toFixed(1)+' / 5':'—';
   const tN=document.getElementById('t-note');if(tN&&avis?.length){tN.className='trend up';tN.textContent='↗ '+avis.length+' avis';}
@@ -1521,7 +1527,10 @@ async function loadDashboard(){
   document.getElementById('s-cmds').textContent=cmds.length;
   document.getElementById('s-ca').textContent=fmt(ca)+' FCFA';
 
-  const {data:avis}=await sb.from('avis').select('note').eq('restaurant_id',currentResto.id);
+  const {data:menusN2}=await sb.from('menus').select('id').eq('restaurant_id',currentResto.id);
+  const menuIdsN2=(menusN2||[]).map(m=>m.id);
+  let avis=[];
+  if(menuIdsN2.length){const {data}=await sb.from('avis').select('note').in('produit_id',menuIdsN2);avis=data||[];}
   const s_note=document.getElementById('s-note');
   if(s_note)s_note.textContent=avis?.length?(avis.reduce((s,a)=>s+(a.note||0),0)/avis.length).toFixed(1)+' ⭐':'—';
 

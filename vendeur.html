@@ -880,7 +880,10 @@ async function loadClients(){
   const list=Object.values(clients).sort((a,b)=>b.total-a.total);
   document.getElementById('cl-nb').textContent=list.length;
   document.getElementById('cl-cmd').textContent=list.reduce((s,c)=>s+c.cmds.size,0);
-  const {data:avis}=await sb.from('avis').select('note,commentaire,created_at,utilisateurs(nom)').eq('boutique_id',currentBoutique.id).order('created_at',{ascending:false});
+  const {data:mesProds}=await sb.from('produits').select('id').eq('boutique_id',currentBoutique.id);
+  const prodIdsForAvis=(mesProds||[]).map(p=>p.id);
+  let avis=[];
+  if(prodIdsForAvis.length){const {data}=await sb.from('avis').select('note,commentaire,created_at,client_id,utilisateurs(nom)').in('produit_id',prodIdsForAvis).order('created_at',{ascending:false});avis=data||[];}
   const notes=(avis||[]).map(a=>a.note).filter(n=>n);
   document.getElementById('cl-note').textContent=notes.length?(notes.reduce((a,b)=>a+b,0)/notes.length).toFixed(1)+'/5':'—';
   document.getElementById('cl-avis').textContent=(avis||[]).length;
@@ -1484,7 +1487,10 @@ async function loadDashboard(){
   setTrend('t-ca',pctTrend(caToday,caYest));
 
   // Note moyenne
-  const {data:avis}=await sb.from('avis').select('note').eq('boutique_id',currentBoutique.id);
+  const {data:prodsForNote}=await sb.from('produits').select('id').eq('boutique_id',currentBoutique.id);
+  const prodIdsNote=(prodsForNote||[]).map(p=>p.id);
+  let avis=[];
+  if(prodIdsNote.length){const {data}=await sb.from('avis').select('note').in('produit_id',prodIdsNote);avis=data||[];}
   const s_note=document.getElementById('s-note');
   if(s_note) s_note.textContent=avis?.length?(avis.reduce((s,a)=>s+(a.note||0),0)/avis.length).toFixed(1)+' / 5':'—';
   const tNote=document.getElementById('t-note');
