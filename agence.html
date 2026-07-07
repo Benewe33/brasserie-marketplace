@@ -824,7 +824,7 @@ async function virerGainLivreur(livreurId,nom,montant){
   if(!confirm(`Verser ${fmt(montant)} FCFA à ${nom.trim()} ?\n\n⚠️ Effectuez d'abord le transfert Mobile Money, puis confirmez ici pour l'enregistrer.`))return;
   const {error}=await sb.from('versements').insert({beneficiaire_type:'livreur',beneficiaire_id:livreurId,montant,reference:'Versement agence'});
   if(error){toast('Erreur : '+error.message,'err');return;}
-  toast('✅ Versement enregistré pour '+nom.trim(),'ok');
+  toast('✅ Versement enregistré pour '+nom.trim(),'ok');logAudit('Versement livreur',nom.trim()+' : '+fmt(montant)+' F');
   loadFinances();
 }
 
@@ -882,7 +882,7 @@ async function dispatchCourse(livId){
     const {data:l}=await sb.from('livreurs').select('user_id').eq('id',livreurId).single();
     if(l?.user_id)await sb.from('notifications').insert({user_id:l.user_id,titre:'Nouvelle course 🚴',message:'Votre agence vous a assigné une livraison.',type:'livraison',lu:false});
   }catch(e){}
-  toast('✅ Course assignée au livreur','ok');
+  toast('✅ Course assignée au livreur','ok');logAudit('Course redispatchée à un livreur');
   loadDashboard();loadCourses();
 }
 
@@ -992,7 +992,7 @@ async function createLivreur(){
 
   btn.disabled=false;btn.textContent='✅ Créer le compte livreur';
   closeModal('m-livreur');
-  toast('🎉 Livreur créé ! Il peut se connecter avec '+email,'ok');
+  toast('🎉 Livreur créé ! Il peut se connecter avec '+email,'ok');logAudit('Livreur ajouté',nom+' '+prenom);
   loadLivreurs();loadDashboard();
 }
 
@@ -1022,13 +1022,13 @@ const PARAM_SECTIONS=[
   {id:'livreurs',ico:'🚚',label:'Param. livreurs',soon:false},
   {id:'paiement',ico:'💰',label:'Paiement',soon:false},
   {id:'zones',ico:'📍',label:'Zones',soon:false},
-  {id:'types',ico:'📦',label:'Types de livraison',soon:true},
+  {id:'types',ico:'📦',label:'Types de livraison',soon:false},
   {id:'tarif',ico:'💵',label:'Tarification',soon:false},
   {id:'notifs',ico:'🔔',label:'Notifications',soon:true},
   {id:'langue',ico:'🌍',label:'Langue & devise',soon:false},
   {id:'docs',ico:'📄',label:'Documents légaux',soon:false},
   {id:'api',ico:'🔌',label:'Intégrations API',soon:true},
-  {id:'audit',ico:'📝',label:"Journal d'activités",soon:true},
+  {id:'audit',ico:'📝',label:"Journal d'activités",soon:false},
   {id:'danger',ico:'🗑️',label:'Suppression',soon:false},
 ];
 let _paramCur='infos';
@@ -1100,10 +1100,10 @@ function showParam(id,btn){
   }
   else if(id==='types'){
     c.innerHTML=card('📦 Types de livraisons',`
-      <div class="prow"><div><div style="font-weight:600;font-size:13px">⚡ Express</div><div style="font-size:12px;color:var(--g600)">Livraison prioritaire rapide</div></div><span class="ptoggle on"></span></div>
-      <div class="prow"><div><div style="font-weight:600;font-size:13px">📦 Standard</div><div style="font-size:12px;color:var(--g600)">Livraison classique</div></div><span class="ptoggle on"></span></div>
-      <div class="prow"><div><div style="font-weight:600;font-size:13px">🗓️ Programmée</div><div style="font-size:12px;color:var(--g600)">À une heure choisie</div></div><span class="ptoggle"></span></div>
-      ${soonBox('La gestion des types de livraison avec tarifs différenciés sera activée prochainement.')}`);
+      <p style="font-size:13px;color:var(--g600);margin-bottom:12px">Activez les types de livraison que votre agence propose et définissez un supplément pour l'Express.</p>
+      <div id="types-liv-zone"><p style="color:var(--g400);font-size:13px">Chargement...</p></div>
+      <div style="background:var(--orl);border-radius:10px;padding:11px 13px;margin-top:12px;font-size:11.5px;color:var(--g600)">ℹ️ Ces réglages sont enregistrés. Leur application automatique au tarif payé par le client arrivera dans une prochaine mise à jour.</div>`);
+    loadTypesLivraison();
   }
   else if(id==='tarif'){
     c.innerHTML=card('💵 Tarification des livraisons',`
@@ -1135,7 +1135,10 @@ function showParam(id,btn){
     c.innerHTML=card('🔌 Intégrations API',`<p style="font-size:13px;color:var(--g600)">Connectez votre agence à des outils externes (comptabilité, CRM, suivi GPS tiers) via API.</p>${soonBox('L\'accès API et les webhooks seront proposés aux agences avancées prochainement.')}`);
   }
   else if(id==='audit'){
-    c.innerHTML=card('📝 Journal d\'activités',`<p style="font-size:13px;color:var(--g600)">Historique de toutes les actions effectuées dans votre agence (connexions, ajouts de livreurs, versements...).</p>${soonBox('Le journal d\'audit détaillé sera disponible prochainement.')}`);
+    c.innerHTML=card('📝 Journal d\'activités',`
+      <p style="font-size:13px;color:var(--g600);margin-bottom:12px">Historique des actions importantes dans votre agence.</p>
+      <div id="audit-zone"><p style="color:var(--g400);font-size:13px">Chargement...</p></div>`);
+    loadAudit();
   }
   else if(id==='danger'){
     c.innerHTML=card('🗑️ Suppression de l\'agence',`
@@ -1146,6 +1149,60 @@ function showParam(id,btn){
         <a href="mailto:contact@yeyemarket.com?subject=Demande de suppression d'agence" class="btn btn-del" style="text-decoration:none;display:inline-block">📧 Demander la suppression</a>
       </div>`);
   }
+}
+
+// ============ TYPES DE LIVRAISON ============
+const TYPES_DEF=[
+  {code:'express',ico:'⚡',nom:'Express',desc:'Livraison prioritaire rapide',hasSupp:true},
+  {code:'standard',ico:'📦',nom:'Standard',desc:'Livraison classique',hasSupp:false},
+  {code:'programmee',ico:'🗓️',nom:'Programmée',desc:'À une heure choisie',hasSupp:true},
+];
+async function loadTypesLivraison(){
+  const zone=document.getElementById('types-liv-zone');if(!zone)return;
+  const {data,error}=await sb.from('types_livraison').select('*').eq('agence_id',currentAgence.id);
+  if(error){zone.innerHTML='<p style="color:var(--r);font-size:13px">Table absente — exécutez la migration.</p>';return;}
+  const byCode={};(data||[]).forEach(t=>byCode[t.code]=t);
+  zone.innerHTML=TYPES_DEF.map(t=>{
+    const cur=byCode[t.code];const actif=cur?cur.actif:(t.code!=='programmee');
+    const supp=cur?cur.supplement:0;
+    return `<div class="prow">
+      <div><div style="font-weight:600;font-size:13px">${t.ico} ${t.nom}</div><div style="font-size:12px;color:var(--g600)">${t.desc}</div></div>
+      <div style="display:flex;align-items:center;gap:10px">
+        ${t.hasSupp?`<div style="display:flex;align-items:center;gap:4px"><span style="font-size:11px;color:var(--g400)">+</span><input type="number" id="supp-${t.code}" value="${supp}" style="width:70px;padding:5px;border:1.5px solid var(--g200);border-radius:6px;font-family:inherit;font-size:12px" placeholder="0"/><span style="font-size:11px;color:var(--g400)">F</span></div>`:''}
+        <span class="ptoggle ${actif?'on':''}" onclick="toggleType('${t.code}',this)"></span>
+      </div>
+    </div>`;
+  }).join('')+'<button class="btn btn-p btn-sm" style="margin-top:12px" onclick="saveTypes()">💾 Enregistrer</button>';
+}
+function toggleType(code,el){el.classList.toggle('on');}
+async function saveTypes(){
+  for(const t of TYPES_DEF){
+    const row=document.querySelector(`#types-liv-zone span.ptoggle[onclick*="'${t.code}'"]`);
+    const actif=row?row.classList.contains('on'):false;
+    const suppEl=document.getElementById('supp-'+t.code);
+    const supp=suppEl?parseInt(suppEl.value)||0:0;
+    await sb.from('types_livraison').upsert({agence_id:currentAgence.id,code:t.code,actif,supplement:supp},{onConflict:'agence_id,code'});
+  }
+  toast('✅ Types de livraison enregistrés','ok');
+  logAudit('Types de livraison modifiés');
+}
+
+// ============ JOURNAL D'AUDIT ============
+async function logAudit(action,details){
+  try{
+    await sb.from('journal_audit').insert({
+      agence_id:currentAgence.id,
+      acteur:currentMembre?currentMembre.nom:(currentAgence.responsable||currentUser.email),
+      action,details:details||null
+    });
+  }catch(e){}
+}
+async function loadAudit(){
+  const zone=document.getElementById('audit-zone');if(!zone)return;
+  const {data,error}=await sb.from('journal_audit').select('*').eq('agence_id',currentAgence.id).order('created_at',{ascending:false}).limit(50);
+  if(error){zone.innerHTML='<p style="color:var(--r);font-size:13px">Table absente — exécutez la migration.</p>';return;}
+  if(!data?.length){zone.innerHTML='<p style="color:var(--g400);text-align:center;padding:24px;font-size:13px">Aucune activité enregistrée pour le moment.<br>Les actions importantes apparaîtront ici.</p>';return;}
+  zone.innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Acteur</th><th>Action</th></tr></thead><tbody>${data.map(a=>`<tr><td style="font-size:12px">${fdate(a.created_at)}</td><td style="font-size:12.5px">${a.acteur||'—'}</td><td style="font-size:12.5px">${a.action||''}${a.details?' · '+a.details:''}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
 async function saveInfos(){
@@ -1273,7 +1330,7 @@ async function createMembre(){
   }
   btn.disabled=false;btn.textContent='✅ Créer le compte';
   closeModal('m-membre');
-  toast('🎉 Membre créé ! Il peut se connecter avec '+email,'ok');
+  toast('🎉 Membre créé ! Il peut se connecter avec '+email,'ok');logAudit('Membre ajouté',nom+' ('+role+')');
   loadMembres();
 }
 async function delMembre(id,userId,nom){
