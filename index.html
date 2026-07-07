@@ -970,7 +970,7 @@ async function appliquerPromo(){
 }
 
 // NAVIGATION
-function goPage(name){
+function goPage(name,skipAutoLoad){
   if(typeof _trackPage!=='undefined'){_trackPage=name;if(typeof trackPing==='function')trackPing();}
   // Quitte le suivi : on coupe la carte et l'abonnement position
   if(name!=='tracking'){
@@ -981,6 +981,7 @@ function goPage(name){
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('page-'+name).classList.add('active');
   const nb=document.getElementById('nav-'+name);if(nb)nb.classList.add('active');
+  if(skipAutoLoad){window.scrollTo(0,0);return;}
   if(name==='orders')loadOrders();
   if(name==='cart')renderCart();
   if(name==='catalogue')loadCatalogue();
@@ -1490,12 +1491,25 @@ async function loadHomeSections(){
   }catch(e){fillRow('row-recommande',[],'Indisponible');}
 }
 
-function doSearch(q){
-  if(!q.trim()){renderProducts(allProducts,'products-grid');return;}
-  const f=allProducts.filter(p=>p.nom.toLowerCase().includes(q.toLowerCase())||(p.description||'').toLowerCase().includes(q.toLowerCase()));
-  renderProducts(f,'products-grid');
-  clearTimeout(window._searchTrackT);
-  window._searchTrackT=setTimeout(()=>{if(q.trim().length>=2&&typeof trackEvent==='function')trackEvent('recherche',{valeur:q.trim().slice(0,80)});},1200);
+async function doSearch(q){
+  q=(q||'').trim();
+  clearTimeout(window._searchDebT);
+  window._searchDebT=setTimeout(async()=>{
+    if(!q){ if(document.getElementById('page-catalogue')?.classList.contains('active'))loadCatalogue(); return; }
+    goPage('catalogue',true);
+    const grid=document.getElementById('catalogue-grid');
+    if(grid)grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Recherche...</div>';
+    const _vIds=await villeIds();
+    // Un seul .or() par requête (recherche nom/description) ; le filtre ville est appliqué ensuite côté JS
+    const {data,error}=await sb.from('produits').select('id,nom,description,prix,prix_promo,unite,stock,image_url,image_url_2,actif,boutique_id,categorie_id,categories(nom),boutiques(nom)').eq('actif',true).gt('stock',0).or(`nom.ilike.%${q}%,description.ilike.%${q}%`).order('created_at',{ascending:false}).limit(60);
+    if(error){console.error('Erreur recherche:',error.message);if(grid)grid.innerHTML='<div style="grid-column:1/-1;text-align:center;padding:32px;color:var(--g400)">Erreur de recherche, réessayez.</div>';return;}
+    let results=data||[];
+    if(_vIds!=='all'&&Array.isArray(_vIds)){
+      results=results.filter(p=>!p.boutique_id||_vIds.includes(p.boutique_id));
+    }
+    renderProducts(results,'catalogue-grid');
+    if(q.length>=2&&typeof trackEvent==='function')trackEvent('recherche',{valeur:q.slice(0,80)});
+  },350);
 }
 
 function doSearchCat(q){
@@ -2257,7 +2271,11 @@ async function villeIds(){
   return _villeBIds;
 }
 function applyVilleFilter(q,ids){
-  if(ids!=='all'&&Array.isArray(ids))q=q.in('boutique_id',ids);
+  if(ids!=='all'&&Array.isArray(ids)){
+    // Toujours inclure les produits "officiels" (sans boutique, ex: ajoutés depuis l'admin)
+    const list=ids.length?ids.join(','):'00000000-0000-0000-0000-000000000000';
+    q=q.or(`boutique_id.in.(${list}),boutique_id.is.null`);
+  }
   return q;
 }
 // Requête restaurants filtrée par ville, avec repli si colonne absente
