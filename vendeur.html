@@ -1007,9 +1007,9 @@ function showPV(id,btn){
   }
   else if(id==='securite'){
     c.innerHTML=card('🔐 Sécurité',`
-      <div class="prow"><div><div style="font-weight:600;font-size:13px">Mot de passe</div><div style="font-size:12px;color:var(--g600)">Modifiez votre mot de passe</div></div><button class="btn btn-sm btn-ed" onclick="changePassV()">Modifier</button></div>
-      <div class="prow"><div><div style="font-weight:600;font-size:13px">Authentification à deux facteurs</div><div style="font-size:12px;color:var(--g600)">Sécurité renforcée par SMS</div></div><span class="pm-soon">bientôt</span></div>
-      ${soonBox('La 2FA nécessite un service SMS à intégrer. Le changement de mot de passe est fonctionnel.')}`);
+      <div class="prow"><div><div style="font-weight:600;font-size:13px">Mot de passe</div><div style="font-size:12px;color:var(--g600)">Modifiez votre mot de passe</div></div><button class="btn btn-sm btn-ed" onclick="openChangePass()">Modifier</button></div>
+      <div id="mfa-zone" style="padding:12px 0"><p style="color:var(--g400);font-size:13px">Chargement...</p></div>`);
+    loadMfaStatus();
   }
   else if(id==='paiement'){
     c.innerHTML=card('💰 Paramètres de paiement',`
@@ -1062,6 +1062,82 @@ async function changePassV(){
   const {error}=await sb.auth.updateUser({password:np});
   if(error){toast('Erreur : '+error.message,'err');return;}
   toast('✅ Mot de passe modifié','ok');
+}
+
+
+// ============ SÉCURITÉ : mot de passe + 2FA (TOTP) ============
+function openChangePass(){
+  document.getElementById('np-pass').value='';document.getElementById('np-confirm').value='';
+  document.getElementById('np-err').style.display='none';openModal('m-pass');
+}
+async function doChangePass(){
+  const p1=document.getElementById('np-pass').value;const p2=document.getElementById('np-confirm').value;
+  const err=document.getElementById('np-err');err.style.display='none';
+  if(p1.length<6){err.textContent='❌ Min. 6 caractères';err.style.display='block';return;}
+  if(p1!==p2){err.textContent='❌ Les mots de passe ne correspondent pas';err.style.display='block';return;}
+  const {error}=await sb.auth.updateUser({password:p1});
+  if(error){err.textContent='❌ '+error.message;err.style.display='block';return;}
+  closeModal('m-pass');toast('✅ Mot de passe modifié','ok');
+}
+let _mfaFactorId=null;
+async function loadMfaStatus(){
+  const zone=document.getElementById('mfa-zone');if(!zone)return;
+  const {data,error}=await sb.auth.mfa.listFactors();
+  if(error){zone.innerHTML='<p style="color:var(--g400);font-size:13px">2FA indisponible.</p>';return;}
+  const verified=(data?.totp||[]).filter(f=>f.status==='verified');
+  if(verified.length){
+    zone.innerHTML=`<div class="prow"><div><div style="font-weight:600;font-size:13px">Authentification à deux facteurs (2FA) <span class="badge bg" style="margin-left:4px">Activée</span></div><div style="font-size:12px;color:var(--g600)">Votre compte est protégé par une application d'authentification</div></div><button class="btn btn-sm btn-del" onclick="disable2fa('${verified[0].id}')">Désactiver</button></div>`;
+  } else {
+    zone.innerHTML=`<div class="prow"><div><div style="font-weight:600;font-size:13px">Authentification à deux facteurs (2FA)</div><div style="font-size:12px;color:var(--g600)">Ajoutez une couche de sécurité avec Google Authenticator ou Authy</div></div><button class="btn btn-sm btn-p" onclick="start2fa()">Activer</button></div><div style="background:var(--vl);border-radius:10px;padding:11px 13px;margin-top:8px;font-size:12px;color:var(--g600)"> La 2FA par application est gratuite et plus sûre que le SMS.</div>`;
+  }
+}
+async function start2fa(){
+  try{const {data:list}=await sb.auth.mfa.listFactors();for(const f of (list?.all||[])){if(f.status==='unverified')await sb.auth.mfa.unenroll({factorId:f.id});}}catch(e){}
+  const {data,error}=await sb.auth.mfa.enroll({factorType:'totp'});
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  _mfaFactorId=data.id;
+  const qrBox=document.getElementById('qr-2fa');qrBox.innerHTML='';
+  const qrImg=document.createElement('img');qrImg.src=data.totp.qr_code;qrImg.style.width='180px';qrImg.style.height='180px';qrBox.appendChild(qrImg);
+  document.getElementById('secret-2fa').textContent=data.totp.secret;
+  document.getElementById('code-2fa').value='';document.getElementById('err-2fa').style.display='none';
+  openModal('m-2fa');
+}
+async function verify2fa(){
+  const code=document.getElementById('code-2fa').value.trim();
+  const err=document.getElementById('err-2fa');err.style.display='none';
+  if(code.length!==6){err.textContent='❌ Entrez les 6 chiffres';err.style.display='block';return;}
+  const {data:ch,error:e1}=await sb.auth.mfa.challenge({factorId:_mfaFactorId});
+  if(e1){err.textContent='❌ '+e1.message;err.style.display='block';return;}
+  const {error:e2}=await sb.auth.mfa.verify({factorId:_mfaFactorId,challengeId:ch.id,code});
+  if(e2){err.textContent='❌ Code incorrect, réessayez';err.style.display='block';return;}
+  closeModal('m-2fa');toast(' 2FA activée !','ok');loadMfaStatus();
+}
+async function cancel2fa(){
+  if(_mfaFactorId){try{await sb.auth.mfa.unenroll({factorId:_mfaFactorId});}catch(e){}_mfaFactorId=null;}
+  closeModal('m-2fa');
+}
+async function disable2fa(factorId){
+  if(!confirm('Désactiver la 2FA ?'))return;
+  const {error}=await sb.auth.mfa.unenroll({factorId});
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  toast('2FA désactivée','ok');loadMfaStatus();
+}
+function show2faPrompt(){
+  document.getElementById('form-login').innerHTML=`<div class="fg" style="text-align:center;margin-bottom:8px"><div style="font-size:36px"></div><p style="font-size:14px;font-weight:700;margin-top:8px">Vérification en deux étapes</p><p style="font-size:12px;color:var(--g400)">Entrez le code de votre application</p></div><div class="fg"><input type="text" id="login-2fa" placeholder="000000" maxlength="6" style="letter-spacing:6px;text-align:center;font-size:22px"/></div><button class="btn-main" onclick="submitLogin2fa()">✅ Valider</button><div class="auth-err" id="l-err" style="display:none"></div><p style="font-size:12px;text-align:center;margin-top:12px"><a href="#" onclick="location.reload();return false" style="color:var(--vd)">← Annuler</a></p>`;
+  setTimeout(()=>document.getElementById('login-2fa')?.focus(),100);
+}
+async function submitLogin2fa(){
+  const code=document.getElementById('login-2fa').value.trim();
+  const err=document.getElementById('l-err');err.style.display='none';
+  if(code.length!==6){err.textContent='Entrez les 6 chiffres';err.style.display='block';return;}
+  const {data:factors}=await sb.auth.mfa.listFactors();
+  const factor=(factors?.totp||[])[0];
+  if(!factor){loadBoutique();return;}
+  const {data:ch,error:e1}=await sb.auth.mfa.challenge({factorId:factor.id});
+  if(e1){err.textContent='❌ '+e1.message;err.style.display='block';return;}
+  const {error:e2}=await sb.auth.mfa.verify({factorId:factor.id,challengeId:ch.id,code});
+  if(e2){err.textContent='❌ Code incorrect';err.style.display='block';return;}
+  loadBoutique();
 }
 
 const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
@@ -1192,6 +1268,8 @@ async function doLogin(){
   if(error){err.textContent='❌ '+error.message;err.style.display='block';return;}
   const {data:{user}}=await sb.auth.getUser();
   currentUser=user;
+  const {data:aal}=await sb.auth.mfa.getAuthenticatorAssuranceLevel();
+  if(aal&&aal.nextLevel==='aal2'&&aal.nextLevel!==aal.currentLevel){show2faPrompt();return;}
   await loadBoutique();
 }
 
@@ -1998,5 +2076,29 @@ function getSignatureData() {
 }
 
 </script>
+<div class="overlay" id="m-pass">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-head"><h3> Changer le mot de passe</h3><button class="modal-x" onclick="closeModal('m-pass')">✕</button></div>
+    <div class="modal-body">
+      <div class="fgm"><label>Nouveau mot de passe *</label><input type="password" id="np-pass" placeholder="Min. 6 caractères"/></div>
+      <div class="fgm"><label>Confirmer *</label><input type="password" id="np-confirm" placeholder="Retapez"/></div>
+      <button class="btn btn-p" style="width:100%;margin-top:6px" onclick="doChangePass()"> Enregistrer</button>
+      <div id="np-err" style="color:var(--r);font-size:13px;margin-top:10px;display:none"></div>
+    </div>
+  </div>
+</div>
+<div class="overlay" id="m-2fa">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-head"><h3> Activer la 2FA</h3><button class="modal-x" onclick="cancel2fa()">✕</button></div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--g600);margin-bottom:14px">1. Scannez ce QR code avec <strong>Google Authenticator</strong> ou <strong>Authy</strong> :</p>
+      <div id="qr-2fa" style="text-align:center;margin-bottom:14px;min-height:180px;display:flex;align-items:center;justify-content:center"></div>
+      <p style="font-size:12px;color:var(--g400);margin-bottom:14px">Ou entrez ce code : <br><code id="secret-2fa" style="font-size:11px;word-break:break-all"></code></p>
+      <div class="fgm"><label>2. Code à 6 chiffres *</label><input type="text" id="code-2fa" placeholder="000000" maxlength="6" style="letter-spacing:4px;text-align:center;font-size:18px"/></div>
+      <button class="btn btn-p" style="width:100%" onclick="verify2fa()">✅ Activer la 2FA</button>
+      <div id="err-2fa" style="color:var(--r);font-size:13px;margin-top:10px;display:none"></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
