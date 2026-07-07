@@ -7,6 +7,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚴</text></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -200,6 +201,17 @@ tr:hover td{background:var(--g50)}
   .stats{grid-template-columns:1fr 1fr}
   .hb-btn{display:block}
 }
+.pm-btn{width:100%;display:flex;align-items:center;gap:9px;padding:9px 11px;border:none;background:none;font-size:13px;font-weight:500;color:var(--g600);border-radius:8px;cursor:pointer;font-family:inherit;text-align:left;margin-bottom:1px}
+.pm-btn:hover{background:var(--g50)}
+.pm-btn.active{background:var(--vl);color:var(--vd);font-weight:700}
+.pm-soon{display:inline-block;font-size:9px;font-weight:700;background:var(--orl);color:var(--or);padding:1px 6px;border-radius:99px;margin-left:auto}
+.ptoggle{width:42px;height:24px;border-radius:99px;background:var(--g200);position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+.ptoggle.on{background:var(--vd)}
+.ptoggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.ptoggle.on::after{left:20px}
+.prow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--g100)}
+.prow:last-child{border-bottom:none}
+@media(max-width:768px){.grid-params{grid-template-columns:1fr!important}}
 </style>
 </head>
 <body>
@@ -473,9 +485,17 @@ tr:hover td{background:var(--g50)}
       <button class="sb-btn" onclick="go('historique',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/></svg>Historique
       </button>
+      <button class="sb-btn" onclick="go('wallet',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 010-4h14v4"/><path d="M3 5v14a2 2 0 002 2h16v-5"/><path d="M18 12a2 2 0 000 4h4v-4z"/></svg>Wallet
+      </button>
+      <button class="sb-btn" onclick="go('rapports',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>Rapports
+      </button>
       <div class="sb-sec">Paramètres</div>
       <button class="sb-btn" onclick="go('profil',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Mon profil</button>
+      <button class="sb-btn" onclick="go('parametres',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Paramètres</button>
       <button class="sb-btn" onclick="go('paiements',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Paiements
       </button>
@@ -577,12 +597,140 @@ tr:hover td{background:var(--g50)}
         </div>
       </div>
     </div>
+    <!-- WALLET -->
+    <div class="sec" id="sec-wallet">
+      <div class="card"><div class="card-head"><h2>👛 Mon Wallet</h2></div><div class="card-body">
+        <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+          <div class="stat"><div class="stat-ico si-g">💰</div><div class="stat-label">Solde disponible</div><div class="stat-val" id="wv-dispo">—</div></div>
+          <div class="stat"><div class="stat-ico si-o">⏳</div><div class="stat-label">En attente (48h)</div><div class="stat-val" id="wv-attente">—</div></div>
+          <div class="stat"><div class="stat-ico si-b">🏦</div><div class="stat-label">Solde total</div><div class="stat-val" id="wv-total">—</div></div>
+          <div class="stat"><div class="stat-ico" style="background:#f3e8ff">📤</div><div class="stat-label">Total reçu</div><div class="stat-val" id="wv-recu">—</div></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-p" onclick="walletVBientot()">📤 Demander un retrait</button><button class="btn btn-ed" onclick="go('paiements',document.querySelector('.sb-btn:last-child'))">⚙️ Méthode de paiement</button></div>
+      </div></div>
+      <div class="card"><div class="card-head"><h2>🧾 Historique des gains</h2></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Montant</th></tr></thead><tbody id="wv-tx"></tbody></table></div></div></div>
+    </div>
+
+    <!-- RAPPORTS -->
+    <div class="sec" id="sec-rapports">
+      <div class="card"><div class="card-head" style="flex-wrap:wrap;gap:10px"><h2>📊 Mes statistiques</h2><button class="btn btn-sm btn-ed" onclick="exportRapport()">⬇️ Export CSV</button></div><div class="card-body">
+        <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+          <div class="stat"><div class="stat-ico si-g">✅</div><div class="stat-label">Courses livrées</div><div class="stat-val" id="rp-livrees">—</div></div>
+          <div class="stat"><div class="stat-ico si-b">💰</div><div class="stat-label">Gains totaux</div><div class="stat-val" id="rp-gains">—</div></div>
+          <div class="stat"><div class="stat-ico si-o">🎯</div><div class="stat-label">Taux de réussite</div><div class="stat-val" id="rp-taux">—</div></div>
+          <div class="stat"><div class="stat-ico si-y">📅</div><div class="stat-label">Cette semaine</div><div class="stat-val" id="rp-semaine">—</div></div>
+        </div>
+        <canvas id="rp-chart" height="90"></canvas>
+      </div></div>
+    </div>
+
+    <!-- PARAMÈTRES -->
+    <div class="sec" id="sec-parametres">
+      <div style="display:grid;grid-template-columns:230px 1fr;gap:16px" class="grid-params">
+        <div class="card" style="margin-bottom:0;height:fit-content"><div class="card-body" style="padding:8px"><div id="pv-menu"></div></div></div>
+        <div id="pv-content"></div>
+      </div>
+    </div>
   </main>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
+// ============ WALLET LIVREUR ============
+async function loadWalletV(){
+  const {data:livs}=await sb.from('livraisons').select('statut,heure_livraison,created_at,commandes(id,frais_livraison)').eq('livreur_id',currentLivreur.id).eq('statut','livree');
+  let txCom=8;try{const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_liv').single();if(pc&&pc.valeur)txCom=parseFloat(pc.valeur)||8;}catch(e){}
+  const net=g=>Math.round(g*(100-txCom)/100);
+  const dateL=l=>l.heure_livraison||l.created_at;
+  const rows=(livs||[]).map(l=>({date:dateL(l),gain:net(l.commandes?.frais_livraison||500),cid:l.commandes?.id}));
+  const h48=new Date(Date.now()-48*3600*1000);
+  const dispoBrut=rows.filter(r=>new Date(r.date)<h48).reduce((s,r)=>s+r.gain,0);
+  const attente=rows.filter(r=>new Date(r.date)>=h48).reduce((s,r)=>s+r.gain,0);
+  let versements=[];try{const {data:v}=await sb.from('versements').select('*').eq('beneficiaire_type','livreur').eq('beneficiaire_id',currentLivreur.id).order('created_at',{ascending:false});versements=v||[];}catch(e){}
+  const totalVerse=versements.reduce((s,v)=>s+(v.montant||0),0);
+  const dispo=Math.max(0,dispoBrut-totalVerse);
+  document.getElementById('wv-dispo').textContent=fmt(dispo)+' F';
+  document.getElementById('wv-attente').textContent=fmt(attente)+' F';
+  document.getElementById('wv-total').textContent=fmt(dispo+attente)+' F';
+  document.getElementById('wv-recu').textContent=fmt(totalVerse)+' F';
+  const entrees=rows.map(r=>({date:r.date,desc:'Course #'+(r.cid?String(r.cid).substring(0,6):'—'),montant:r.gain}));
+  const sorties=versements.map(v=>({date:v.created_at,desc:v.reference||'Paiement reçu',montant:-(v.montant||0)}));
+  const tx=[...entrees,...sorties].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,15);
+  document.getElementById('wv-tx').innerHTML=tx.length?tx.map(t=>`<tr><td style="font-size:12px">${fdate(t.date)}</td><td>${t.montant>=0?'<span class="badge bg">↓ Gain</span>':'<span class="badge bo">↑ Reçu</span>'}</td><td style="font-size:12.5px">${t.desc}</td><td><strong style="color:${t.montant>=0?'var(--vd)':'var(--or)'}">${t.montant>=0?'+':''}${fmt(t.montant)} F</strong></td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:24px">Aucune transaction</td></tr>';
+}
+function walletVBientot(){toast('📤 Le retrait automatique sera disponible prochainement (intégration KKiaPay en cours).','info');}
+
+// ============ RAPPORTS LIVREUR ============
+let _rapportData=[];
+async function loadRapports(){
+  const {data:all}=await sb.from('livraisons').select('statut,heure_livraison,created_at,commandes(frais_livraison)').eq('livreur_id',currentLivreur.id);
+  const livs=all||[];_rapportData=livs;
+  const livrees=livs.filter(l=>l.statut==='livree');
+  let txCom=8;try{const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_liv').single();if(pc&&pc.valeur)txCom=parseFloat(pc.valeur)||8;}catch(e){}
+  const net=g=>Math.round(g*(100-txCom)/100);
+  const gains=livrees.reduce((s,l)=>s+net(l.commandes?.frais_livraison||500),0);
+  const taux=livs.length?Math.round(livrees.length/livs.length*100):0;
+  const semDebut=new Date();semDebut.setDate(semDebut.getDate()-semDebut.getDay());
+  const semaine=livrees.filter(l=>new Date(l.heure_livraison||l.created_at)>=semDebut).length;
+  document.getElementById('rp-livrees').textContent=livrees.length;
+  document.getElementById('rp-gains').textContent=fmt(gains)+' F';
+  document.getElementById('rp-taux').textContent=taux+'%';
+  document.getElementById('rp-semaine').textContent=semaine+' courses';
+  const days=[],vals=[];
+  for(let i=13;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];days.push(d.getDate());vals.push(livrees.filter(l=>(l.heure_livraison||l.created_at||'').startsWith(ds)).length);}
+  const ctx=document.getElementById('rp-chart')?.getContext('2d');
+  if(ctx){if(window._rpChart)window._rpChart.destroy();window._rpChart=new Chart(ctx,{type:'bar',data:{labels:days,datasets:[{label:'Courses',data:vals,backgroundColor:'#2563eb',borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}},x:{grid:{display:false}}}}});}
+}
+function exportRapport(){
+  if(!_rapportData.length){toast('Aucune donnée à exporter','err');return;}
+  const rows=[['Statut','Frais','Date livraison']];
+  _rapportData.forEach(l=>rows.push([l.statut,l.commandes?.frais_livraison||'',l.heure_livraison||l.created_at||'']));
+  const blob=new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mes-courses-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  toast('✅ Export téléchargé','ok');
+}
+
+// ============ PARAMÈTRES LIVREUR ============
+const PV_SECTIONS=[
+  {id:'profil',ico:'🚴',label:'Mon profil',soon:false},
+  {id:'securite',ico:'🔐',label:'Sécurité',soon:true},
+  {id:'paiement',ico:'💰',label:'Paiement',soon:false},
+  {id:'notifs',ico:'🔔',label:'Notifications',soon:true},
+  {id:'langue',ico:'🌍',label:'Langue & devise',soon:false},
+  {id:'docs',ico:'📄',label:'Documents légaux',soon:false},
+];
+let _pvCur='profil';
+function loadParametres(){
+  document.getElementById('pv-menu').innerHTML=PV_SECTIONS.map(s=>`<button class="pm-btn ${s.id===_pvCur?'active':''}" onclick="showPV('${s.id}',this)"><span>${s.ico}</span> <span>${s.label}</span>${s.soon?'<span class="pm-soon">bientôt</span>':''}</button>`).join('');
+  showPV(_pvCur);
+}
+function showPV(id,btn){
+  _pvCur=id;
+  if(btn){document.querySelectorAll('#pv-menu .pm-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  const c=document.getElementById('pv-content');const l=currentLivreur||{};
+  const soonBox=t=>`<div style="background:var(--orl);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:12.5px;color:var(--g600)">🚧 ${t}</div>`;
+  const card=(title,body)=>`<div class="card" style="margin-bottom:0"><div class="card-head"><h2>${title}</h2></div><div class="card-body">${body}</div></div>`;
+  if(id==='profil'){
+    c.innerHTML=card('🚴 Mon profil',`
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--g100)">
+        <div style="width:72px;height:72px;border-radius:50%;overflow:hidden;background:var(--vl);display:flex;align-items:center;justify-content:center;flex-shrink:0">${l.photo_url?`<img src="${l.photo_url}" style="width:100%;height:100%;object-fit:cover"/>`:'<span style="font-size:32px">🚴</span>'}</div>
+        <div><div style="font-weight:800;font-size:16px">${l.prenom||''} ${l.nom||''}</div><div style="font-size:12px;color:var(--g600)">${l.vehicule||''}${l.matricule_vehicule?' · '+l.matricule_vehicule:''}</div></div>
+      </div>
+      <p style="font-size:13px;color:var(--g600)">Pour modifier vos informations et votre photo, utilisez la page « Mon profil ».</p>
+      <button class="btn btn-p" style="margin-top:10px" onclick="go('profil',document.querySelectorAll('.sb-btn')[5])">Ouvrir Mon profil</button>`);
+  }
+  else if(id==='securite'){c.innerHTML=card('🔐 Sécurité',`<div class="prow"><div><div style="font-weight:600;font-size:13px">Mot de passe</div><div style="font-size:12px;color:var(--g600)">Modifiez votre mot de passe</div></div><button class="btn btn-sm btn-ed" onclick="changePassV()">Modifier</button></div><div class="prow"><div><div style="font-weight:600;font-size:13px">2FA</div></div><span class="pm-soon">bientôt</span></div>${soonBox('La 2FA nécessite un service SMS. Le changement de mot de passe est fonctionnel.')}`);}
+  else if(id==='paiement'){c.innerHTML=card('💰 Paiement',`<div class="prow"><div><div style="font-weight:600;font-size:13px">Fréquence & Mobile Money</div><div style="font-size:12px;color:var(--g600)">Gérez vos versements</div></div><button class="btn btn-sm btn-p" onclick="go('paiements',document.querySelector('.sb-btn:last-child'))">Ouvrir Paiements</button></div>`);}
+  else if(id==='notifs'){c.innerHTML=card('🔔 Notifications',`<div class="prow"><div><div style="font-weight:600;font-size:13px">📱 SMS</div></div><span class="pm-soon">bientôt</span></div><div class="prow"><div><div style="font-weight:600;font-size:13px">🔔 Dans l'app</div></div><span class="ptoggle on"></span></div>${soonBox('SMS nécessite un service tiers.')}`);}
+  else if(id==='langue'){c.innerHTML=card('🌍 Langue & devise',`<div class="fgm"><label>Langue</label><select><option>Français</option></select></div><div class="fgm"><label>Devise</label><select><option>FCFA (XOF)</option></select></div>`);}
+  else if(id==='docs'){c.innerHTML=card('📄 Documents légaux',`<div class="prow"><div><div style="font-weight:600;font-size:13px">Contrat livreur</div></div><span class="badge bg">Signé</span></div><div class="prow"><div><div style="font-weight:600;font-size:13px">Confidentialité</div></div><a href="/confidentialite.html" target="_blank" class="btn btn-sm btn-ed" style="text-decoration:none">Consulter</a></div>`);}
+}
+async function changePassV(){
+  const np=prompt('Nouveau mot de passe (min. 6 caractères) :');if(!np)return;if(np.length<6){toast('Min. 6 caractères','err');return;}
+  const {error}=await sb.auth.updateUser({password:np});if(error){toast('Erreur : '+error.message,'err');return;}toast('✅ Mot de passe modifié','ok');
+}
+
 const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
 const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -795,7 +943,7 @@ function showApp(){
   loadDashboard();
 }
 
-const titles={dashboard:'Tableau de bord',dispo:'Commandes disponibles',livraisons:'Mes livraisons',historique:'Historique',profil:'Mon profil',paiements:'Paiements'};
+const titles={dashboard:'Tableau de bord',dispo:'Commandes disponibles',livraisons:'Mes livraisons',historique:'Historique',profil:'Mon profil',paiements:'Paiements',wallet:'Wallet',rapports:'Rapports',parametres:'Paramètres'};
 function openSidebar(){document.getElementById('sidebar').classList.add('open');document.getElementById('sb-overlay').classList.add('open');}
 function closeSidebar(){document.getElementById('sidebar').classList.remove('open');document.getElementById('sb-overlay').classList.remove('open');}
 function go(name,btn){
@@ -804,7 +952,7 @@ function go(name,btn){
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={dispo:loadDispoCommandes,livraisons:loadLivraisons,historique:loadHistorique,profil:loadProfil,paiements:loadPaiementsPage};
+  const loaders={dispo:loadDispoCommandes,livraisons:loadLivraisons,historique:loadHistorique,profil:loadProfil,paiements:loadPaiementsPage,wallet:loadWalletV,rapports:loadRapports,parametres:loadParametres};
   if(loaders[name])loaders[name]();
 }
 
