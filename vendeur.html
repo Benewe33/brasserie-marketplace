@@ -454,6 +454,15 @@ tr:hover td{background:var(--g50)}
       <button class="sb-btn" onclick="go('boutique',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>Ma boutique
       </button>
+      <button class="sb-btn" onclick="go('clients',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>Clients
+      </button>
+      <button class="sb-btn" onclick="go('wallet',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 010-4h14v4"/><path d="M3 5v14a2 2 0 002 2h16v-5"/><path d="M18 12a2 2 0 000 4h4v-4z"/></svg>Wallet
+      </button>
+      <button class="sb-btn" onclick="go('rapports',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>Rapports
+      </button>
       <button class="sb-btn" onclick="go('paiements',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>Paiements
       </button>
@@ -628,6 +637,69 @@ tr:hover td{background:var(--g50)}
         </div>
       </div>
     </div>
+    <div class="sec" id="sec-clients">
+      <div class="stats" style="margin-bottom:16px">
+        <div class="stat"><div class="stat-ico si-b">👥</div><div class="stat-label">Clients uniques</div><div class="stat-val" id="cl-nb">—</div></div>
+        <div class="stat"><div class="stat-ico si-g">🛒</div><div class="stat-label">Commandes totales</div><div class="stat-val" id="cl-cmd">—</div></div>
+        <div class="stat"><div class="stat-ico si-o">⭐</div><div class="stat-label">Note moyenne</div><div class="stat-val" id="cl-note">—</div></div>
+        <div class="stat"><div class="stat-ico si-y">💬</div><div class="stat-label">Avis reçus</div><div class="stat-val" id="cl-avis">—</div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>👥 Mes clients</h2></div>
+        <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Client</th><th>Téléphone</th><th>Commandes</th><th>Total dépensé</th><th>Dernière commande</th></tr></thead><tbody id="cl-body"></tbody></table></div></div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>⭐ Avis clients</h2></div>
+        <div class="card-body" id="cl-avis-list"></div>
+      </div>
+    </div>
+
+    <div class="sec" id="sec-wallet">
+      <div class="card">
+        <div class="card-head"><h2>👛 Aperçu du Wallet</h2></div>
+        <div class="card-body">
+          <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+            <div class="stat"><div class="stat-ico si-g">💰</div><div class="stat-label">Solde disponible</div><div class="stat-val" id="wv-dispo">—</div></div>
+            <div class="stat"><div class="stat-ico si-o">⏳</div><div class="stat-label">En attente (48h)</div><div class="stat-val" id="wv-attente">—</div></div>
+            <div class="stat"><div class="stat-ico si-b">🏦</div><div class="stat-label">Solde total</div><div class="stat-val" id="wv-total">—</div></div>
+            <div class="stat"><div class="stat-ico" style="background:#f3e8ff">📤</div><div class="stat-label">Total reçu</div><div class="stat-val" id="wv-recu">—</div></div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-p" onclick="walletVBientot()">📤 Demander un retrait</button>
+            <button class="btn btn-ed" onclick="go('paiements',document.querySelectorAll('.sb-btn')[7])">⚙️ Méthode de paiement</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>🧾 Historique des transactions</h2></div>
+        <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Montant</th></tr></thead><tbody id="wv-tx"></tbody></table></div></div>
+      </div>
+    </div>
+
+    <div class="sec" id="sec-rapports">
+      <div class="card">
+        <div class="card-head" style="flex-wrap:wrap;gap:10px"><h2>📊 Rapports & Analyses</h2>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm btn-ed" onclick="exportRapport('csv')">⬇️ Export CSV</button>
+            <button class="btn btn-sm btn-ed" onclick="window.print()">🖨️ Imprimer / PDF</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+            <div class="stat"><div class="stat-ico si-g">💵</div><div class="stat-label">CA total livré</div><div class="stat-val" id="rp-ca">—</div></div>
+            <div class="stat"><div class="stat-ico si-b">📦</div><div class="stat-label">Commandes livrées</div><div class="stat-val" id="rp-cmd">—</div></div>
+            <div class="stat"><div class="stat-ico si-o">🎯</div><div class="stat-label">Panier moyen</div><div class="stat-val" id="rp-panier">—</div></div>
+            <div class="stat"><div class="stat-ico si-y">🏆</div><div class="stat-label">Produits vendus</div><div class="stat-val" id="rp-vendus">—</div></div>
+          </div>
+          <canvas id="rp-chart" height="90"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h2>🏆 Produits les plus vendus</h2></div>
+        <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Rang</th><th>Produit</th><th>Quantité vendue</th><th>Revenu généré</th></tr></thead><tbody id="rp-top"></tbody></table></div></div>
+      </div>
+    </div>
+
     <div class="sec" id="sec-parametres">
       <div style="display:grid;grid-template-columns:230px 1fr;gap:16px" class="grid-params">
         <div class="card" style="margin-bottom:0;height:fit-content"><div class="card-body" style="padding:8px"><div id="pv-menu"></div></div></div>
@@ -686,6 +758,118 @@ tr:hover td{background:var(--g50)}
 <div class="toast" id="toast"></div>
 
 <script>
+// ============ CLIENTS ============
+async function loadClients(){
+  const {data:prods}=await sb.from('produits').select('id').eq('boutique_id',currentBoutique.id);
+  const prodIds=(prods||[]).map(p=>p.id);
+  if(!prodIds.length){document.getElementById('cl-body').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';return;}
+  const {data:ligs}=await sb.from('lignes_commande').select('sous_total,commandes(id,client_id,created_at,statut,utilisateurs(nom,telephone))').in('produit_id',prodIds);
+  // Regrouper par client
+  const clients={};
+  (ligs||[]).forEach(l=>{
+    const cmd=l.commandes;if(!cmd||!cmd.client_id)return;
+    const id=cmd.client_id;
+    if(!clients[id])clients[id]={nom:cmd.utilisateurs?.nom||'Client',tel:cmd.utilisateurs?.telephone||'',cmds:new Set(),total:0,derniere:cmd.created_at};
+    clients[id].cmds.add(cmd.id);
+    clients[id].total+=l.sous_total||0;
+    if(new Date(cmd.created_at)>new Date(clients[id].derniere))clients[id].derniere=cmd.created_at;
+  });
+  const list=Object.values(clients).sort((a,b)=>b.total-a.total);
+  document.getElementById('cl-nb').textContent=list.length;
+  document.getElementById('cl-cmd').textContent=list.reduce((s,c)=>s+c.cmds.size,0);
+  const {data:avis}=await sb.from('avis').select('note,commentaire,created_at,utilisateurs(nom)').eq('boutique_id',currentBoutique.id).order('created_at',{ascending:false});
+  const notes=(avis||[]).map(a=>a.note).filter(n=>n);
+  document.getElementById('cl-note').textContent=notes.length?(notes.reduce((a,b)=>a+b,0)/notes.length).toFixed(1)+'/5':'—';
+  document.getElementById('cl-avis').textContent=(avis||[]).length;
+  document.getElementById('cl-body').innerHTML=list.length?list.map(c=>`<tr>
+    <td><strong>${c.nom}</strong></td><td>${c.tel||'—'}</td><td>${c.cmds.size}</td>
+    <td><strong style="color:var(--vd)">${fmt(c.total)} F</strong></td><td>${fdate(c.derniere)}</td>
+  </tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucun client</td></tr>';
+  document.getElementById('cl-avis-list').innerHTML=(avis||[]).length?(avis||[]).slice(0,10).map(a=>`
+    <div style="padding:10px 0;border-bottom:1px solid var(--g100)">
+      <div style="display:flex;justify-content:space-between"><strong style="font-size:13px">${a.utilisateurs?.nom||'Client'}</strong><span style="color:var(--or)">${'★'.repeat(a.note||0)}${'☆'.repeat(5-(a.note||0))}</span></div>
+      ${a.commentaire?`<div style="font-size:12.5px;color:var(--g600);margin-top:4px">${a.commentaire}</div>`:''}
+      <div style="font-size:11px;color:var(--g400);margin-top:2px">${fdate(a.created_at)}</div>
+    </div>`).join(''):'<p style="color:var(--g400);text-align:center;padding:20px">Aucun avis pour le moment</p>';
+}
+
+// ============ WALLET ============
+let _walletTxCache=[];
+async function loadWalletV(){
+  const {data:prods}=await sb.from('produits').select('id').eq('boutique_id',currentBoutique.id);
+  const prodIds=(prods||[]).map(p=>p.id);
+  let ligs=[];
+  if(prodIds.length){
+    const {data}=await sb.from('lignes_commande').select('sous_total,commandes(id,statut,created_at)').in('produit_id',prodIds);
+    ligs=(data||[]).filter(l=>l.commandes?.statut==='livree');
+  }
+  let txCom=10;try{const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_vend').single();if(pc&&pc.valeur)txCom=parseFloat(pc.valeur)||10;}catch(e){}
+  const net=g=>Math.round(g*(100-txCom)/100);
+  const parCmd={};ligs.forEach(l=>{const c=l.commandes;if(!parCmd[c.id])parCmd[c.id]={date:c.created_at,montant:0};parCmd[c.id].montant+=l.sous_total||0;});
+  const cmds=Object.values(parCmd);
+  const h48=new Date(Date.now()-48*3600*1000);
+  const totalNet=cmds.reduce((s,c)=>s+net(c.montant),0);
+  const dispoBrut=cmds.filter(c=>new Date(c.date)<h48).reduce((s,c)=>s+net(c.montant),0);
+  const attente=cmds.filter(c=>new Date(c.date)>=h48).reduce((s,c)=>s+net(c.montant),0);
+  let versements=[];
+  try{const {data:v}=await sb.from('versements').select('*').eq('beneficiaire_type','vendeur').eq('beneficiaire_id',currentBoutique.id).order('created_at',{ascending:false});versements=v||[];}catch(e){}
+  const totalVerse=versements.reduce((s,v)=>s+(v.montant||0),0);
+  const dispo=Math.max(0,dispoBrut-totalVerse);
+  document.getElementById('wv-dispo').textContent=fmt(dispo)+' F';
+  document.getElementById('wv-attente').textContent=fmt(attente)+' F';
+  document.getElementById('wv-total').textContent=fmt(dispo+attente)+' F';
+  document.getElementById('wv-recu').textContent=fmt(totalVerse)+' F';
+  const entrees=cmds.map(c=>({date:c.date,type:'Vente',desc:'Commande #'+String(Object.keys(parCmd).find(k=>parCmd[k]===c)||'').substring(0,6),montant:net(c.montant)}));
+  const sorties=versements.map(v=>({date:v.created_at,type:'Paiement reçu',desc:v.reference||'Versement YéyéMarket',montant:-(v.montant||0)}));
+  const tx=[...entrees,...sorties].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,15);
+  document.getElementById('wv-tx').innerHTML=tx.length?tx.map(t=>`<tr>
+    <td style="font-size:12px">${fdate(t.date)}</td>
+    <td>${t.montant>=0?'<span class="badge bg">↓ Entrée</span>':'<span class="badge bo">↑ Reçu</span>'}</td>
+    <td style="font-size:12.5px">${t.desc}</td>
+    <td><strong style="color:${t.montant>=0?'var(--vd)':'var(--or)'}">${t.montant>=0?'+':''}${fmt(t.montant)} F</strong></td>
+  </tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:24px">Aucune transaction</td></tr>';
+}
+function walletVBientot(){toast('📤 Le retrait automatique sera disponible prochainement (intégration KKiaPay en cours).','info');}
+
+// ============ RAPPORTS ============
+let _rapportData=[];
+async function loadRapports(){
+  const {data:prods}=await sb.from('produits').select('id,nom').eq('boutique_id',currentBoutique.id);
+  const prodMap={};(prods||[]).forEach(p=>prodMap[p.id]=p.nom);
+  const prodIds=Object.keys(prodMap);
+  if(!prodIds.length){['rp-ca','rp-cmd','rp-panier','rp-vendus'].forEach(id=>document.getElementById(id).textContent='0');return;}
+  const {data:ligs}=await sb.from('lignes_commande').select('produit_id,quantite,sous_total,commandes(id,statut,created_at)').in('produit_id',prodIds);
+  const livrees=(ligs||[]).filter(l=>l.commandes?.statut==='livree');
+  _rapportData=livrees;
+  const ca=livrees.reduce((s,l)=>s+(l.sous_total||0),0);
+  const cmdSet=new Set(livrees.map(l=>l.commandes.id));
+  const qte=livrees.reduce((s,l)=>s+(l.quantite||0),0);
+  document.getElementById('rp-ca').textContent=fmt(ca)+' F';
+  document.getElementById('rp-cmd').textContent=cmdSet.size;
+  document.getElementById('rp-panier').textContent=cmdSet.size?fmt(Math.round(ca/cmdSet.size))+' F':'0 F';
+  document.getElementById('rp-vendus').textContent=qte;
+  // Top produits
+  const parProd={};livrees.forEach(l=>{if(!parProd[l.produit_id])parProd[l.produit_id]={q:0,r:0};parProd[l.produit_id].q+=l.quantite||0;parProd[l.produit_id].r+=l.sous_total||0;});
+  const top=Object.entries(parProd).sort((a,b)=>b[1].q-a[1].q).slice(0,10);
+  document.getElementById('rp-top').innerHTML=top.length?top.map(([pid,d],i)=>`<tr>
+    <td><span class="badge ${i<3?'bg':'bgr'}">#${i+1}</span></td><td><strong>${prodMap[pid]||'—'}</strong></td><td>${d.q}</td><td><strong style="color:var(--vd)">${fmt(d.r)} F</strong></td>
+  </tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:24px">Aucune vente</td></tr>';
+  // Graphique 30 jours
+  const days=[],vals=[];
+  for(let i=29;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];days.push(d.getDate());vals.push(livrees.filter(l=>(l.commandes?.created_at||'').startsWith(ds)).reduce((s,l)=>s+(l.sous_total||0),0));}
+  const ctx=document.getElementById('rp-chart')?.getContext('2d');
+  if(ctx){if(window._rpChart)window._rpChart.destroy();window._rpChart=new Chart(ctx,{type:'bar',data:{labels:days,datasets:[{label:'Ventes (F)',data:vals,backgroundColor:'#2d8653',borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true},x:{grid:{display:false}}}}});}
+}
+function exportRapport(fmt2){
+  if(!_rapportData.length){toast('Aucune donnée à exporter','err');return;}
+  const rows=[['Commande','Produit ID','Quantité','Sous-total','Date']];
+  _rapportData.forEach(l=>rows.push([l.commandes?.id||'',l.produit_id,l.quantite,l.sous_total,l.commandes?.created_at||'']));
+  const csv=rows.map(r=>r.join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='rapport-ventes-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  toast('✅ Export téléchargé','ok');
+}
+
 const PV_SECTIONS=[
   {id:'infos',ico:'🏪',label:'Informations',soon:false},
   {id:'securite',ico:'🔐',label:'Sécurité',soon:true},
@@ -1024,14 +1208,14 @@ function showApp(){
 }
 
 // NAVIGATION
-const titles={dashboard:'Vue d\'ensemble',produits:'Mes produits',commandes:'Mes commandes',boutique:'Ma boutique',paiements:'Paiements',parametres:'Paramètres'};
+const titles={dashboard:'Vue d\'ensemble',produits:'Mes produits',commandes:'Mes commandes',boutique:'Ma boutique',paiements:'Paiements',parametres:'Paramètres',clients:'Clients',wallet:'Wallet & Paiements',rapports:'Rapports'};
 function go(name,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
   btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={produits:loadProds,commandes:loadCmds,boutique:loadBoutiqueForm,paiements:loadPaiementsPage,parametres:loadParametres};
+  const loaders={produits:loadProds,commandes:loadCmds,boutique:loadBoutiqueForm,paiements:loadPaiementsPage,parametres:loadParametres,clients:loadClients,wallet:loadWalletV,rapports:loadRapports};
   if(loaders[name])loaders[name]();
   closeSidebar();
 }
