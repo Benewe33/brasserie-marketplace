@@ -951,8 +951,8 @@ function renderCmdDetail(cmd,lignes,liv){
     <div class="action-card ${idx!==2&&idx!==3?'locked':''}">
       <h4><span class="ac-num">3</span> Mettre en route</h4>
       ${liv?`<p>Livreur assigné : <strong>${liv.livreurs?.nom||'—'}</strong> ${liv.livreurs?.telephone?'· '+liv.livreurs.telephone:''}</p><div class="hint-box">${liv.statut==='assignee'?'📋 Le livreur a été notifié et va récupérer le colis.':liv.statut==='en_cours'?'🚴 Livraison en cours — le client suit le trajet en direct.':'✅ Livraison terminée.'}</div>`
-      :`<p>Sélectionnez un livreur pour livrer la commande.</p>
-      <select id="cd-livreur" style="padding:9px;border:1.5px solid var(--g200);border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:10px"><option value="">Sélectionner un livreur...</option></select>
+      :`<p>Choisissez une agence de livraison ou un livreur indépendant.</p>
+      <select id="cd-livreur" style="padding:9px;border:1.5px solid var(--g200);border-radius:8px;font-family:inherit;font-size:13px;margin-bottom:10px"><option value="">Sélectionner...</option></select>
       <div class="hint-box">ℹ️ Le livreur sera notifié et se rendra chez vous pour récupérer le colis.</div>
       <button class="btn btn-ok" style="margin-top:auto" ${idx!==2?'disabled':''} onclick="assignerLivreur('${cmd.id}')">📨 Mettre en route</button>`}
     </div>
@@ -989,22 +989,42 @@ async function cmdAvance(cmdId,statut,msg){
 
 async function chargerLivreurs(){
   const sel=document.getElementById('cd-livreur');if(!sel)return;
-  const {data}=await sb.from('livreurs').select('id,nom,disponible,statut,zones(nom)').eq('statut','actif').order('nom');
-  const dispos=(data||[]);
-  sel.innerHTML='<option value="">Sélectionner un livreur...</option>'+dispos.map(l=>`<option value="${l.id}">${l.disponible?'🟢':'⚪'} ${l.nom}${l.zones?.nom?' — '+l.zones.nom:''}</option>`).join('');
+  const [ag,liv]=await Promise.all([
+    sb.from('agences').select('id,nom,zones_couverture').eq('statut','actif').order('nom'),
+    sb.from('livreurs').select('id,nom,disponible,statut,agence_id,zones(nom)').eq('statut','actif').is('agence_id',null).order('nom')
+  ]);
+  let html='<option value="">Sélectionner une agence ou un livreur...</option>';
+  if((ag.data||[]).length){
+    html+='<optgroup label="🏢 Agences de livraison">'+ag.data.map(a=>`<option value="agence:${a.id}">${a.nom}${(a.zones_couverture||[]).length?' — '+a.zones_couverture.join(', '):''}</option>`).join('')+'</optgroup>';
+  }
+  const solos=(liv.data||[]);
+  if(solos.length){
+    html+='<optgroup label="🚴 Livreurs indépendants">'+solos.map(l=>`<option value="livreur:${l.id}">${l.disponible?'🟢':'⚪'} ${l.nom}${l.zones?.nom?' — '+l.zones.nom:''}</option>`).join('')+'</optgroup>';
+  }
+  sel.innerHTML=html;
 }
 
 async function assignerLivreur(cmdId){
   const sel=document.getElementById('cd-livreur');
-  const livreurId=sel?.value;
-  if(!livreurId){toast('Sélectionnez un livreur','err');return;}
-  const {error}=await sb.from('livraisons').insert({commande_id:cmdId,livreur_id:livreurId,statut:'assignee'});
+  const val=sel?.value;
+  if(!val){toast('Sélectionnez une agence ou un livreur','err');return;}
+  const [type,id]=val.split(':');
+  let payload={commande_id:cmdId,statut:'assignee'};
+  if(type==='agence')payload.agence_id=id;
+  else payload.livreur_id=id;
+  const {error}=await sb.from('livraisons').insert(payload);
   if(error){toast('Erreur : '+error.message,'err');return;}
   try{
-    const {data:l}=await sb.from('livreurs').select('user_id,nom').eq('id',livreurId).single();
-    if(l?.user_id)await sb.from('notifications').insert({user_id:l.user_id,titre:'Nouvelle course 🚴',message:'Une commande vous a été assignée — récupérez le colis chez '+(currentResto?.nom||'le restaurant')+'.',type:'livraison',lu:false});
+    if(type==='agence'){
+      const {data:a}=await sb.from('agences').select('user_id,nom').eq('id',id).single();
+      if(a?.user_id)await sb.from('notifications').insert({user_id:a.user_id,titre:'Nouvelle course 🏢',message:'Une commande à redispatcher chez '+(currentResto?.nom||'le restaurant')+'. Assignez-la à un de vos livreurs.',type:'livraison',lu:false});
+      toast('📨 Agence '+(a?.nom||'')+' notifiée !','ok');
+    }else{
+      const {data:l}=await sb.from('livreurs').select('user_id,nom').eq('id',id).single();
+      if(l?.user_id)await sb.from('notifications').insert({user_id:l.user_id,titre:'Nouvelle course 🚴',message:'Une commande vous a été assignée — récupérez le colis chez '+(currentResto?.nom||'le restaurant')+'.',type:'livraison',lu:false});
+      toast('📨 Livreur notifié !','ok');
+    }
   }catch(e){}
-  toast('📨 Livreur notifié !','ok');
   openCmdDetail(cmdId);
 }
 
