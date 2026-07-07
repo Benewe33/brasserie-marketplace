@@ -398,6 +398,23 @@ code{background:var(--g100);padding:2px 6px;border-radius:5px;font-size:12px}
 </div>
 
 <!-- MODAL MÉTHODE DE PAIEMENT -->
+<div class="overlay" id="m-membre">
+  <div class="modal" style="max-width:440px">
+    <div class="modal-head"><h3>➕ Ajouter un membre</h3><button class="modal-x" onclick="closeModal('m-membre')">✕</button></div>
+    <div class="modal-body">
+      <div style="background:var(--vl);border-radius:10px;padding:11px 13px;margin-bottom:16px;font-size:12px;color:var(--g600)">Le membre se connectera sur cette même page avec l'email et le mot de passe que vous définissez.</div>
+      <div class="fgm"><label>Nom complet *</label><input type="text" id="mb-nom" placeholder="Awa Traoré"/></div>
+      <div class="fgm"><label>Téléphone</label><input type="tel" id="mb-tel" placeholder="+229 97 00 00 00"/></div>
+      <div class="fgm"><label>Rôle *</label><select id="mb-role"><option value="manager">Manager (livreurs & courses)</option><option value="admin">Admin (accès total)</option></select></div>
+      <hr style="border:none;border-top:1px solid var(--g100);margin:6px 0 14px"/>
+      <div class="fgm"><label>Email de connexion *</label><input type="email" id="mb-email" placeholder="awa@exemple.com"/></div>
+      <div class="fgm"><label>Mot de passe *</label><input type="text" id="mb-pass" placeholder="Min. 6 caractères — à communiquer au membre"/></div>
+      <button class="btn btn-p" style="width:100%;margin-top:6px" id="mb-submit" onclick="createMembre()">✅ Créer le compte</button>
+      <div class="auth-err" id="mb-err" style="color:var(--r);font-size:13px;margin-top:10px;display:none"></div>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="m-wmethode">
   <div class="modal" style="max-width:420px">
     <div class="modal-head"><h3>💳 Méthode de paiement</h3><button class="modal-x" onclick="closeModal('m-wmethode')">✕</button></div>
@@ -489,22 +506,45 @@ async function checkSession(){
   currentUser=session.user;await loadAgence();
 }
 
+let currentMembre=null; // non-null si l'utilisateur connecté est un membre (pas le propriétaire)
 async function loadAgence(){
-  const {data,error}=await sb.from('agences').select('*').eq('user_id',currentUser.id).single();
+  let {data,error}=await sb.from('agences').select('*').eq('user_id',currentUser.id).single();
   if(error||!data){
-    toast('Compte agence introuvable','err');
-    await sb.auth.signOut();showAuth();return;
+    // Peut-être un membre d'agence ?
+    const {data:membre}=await sb.from('membres_agence').select('*').eq('user_id',currentUser.id).eq('statut','actif').maybeSingle();
+    if(membre){
+      currentMembre=membre;
+      const {data:ag}=await sb.from('agences').select('*').eq('id',membre.agence_id).single();
+      if(ag)data=ag;
+    }
+    if(!data){
+      toast('Compte agence introuvable','err');
+      await sb.auth.signOut();showAuth();return;
+    }
   }
   currentAgence=data;
   showApp();
+  applyMembreRestrictions();
   document.getElementById('sb-nom').textContent=currentAgence.nom;
-  document.getElementById('sb-email').textContent=currentUser.email;
+  document.getElementById('sb-email').textContent=currentMembre?(currentMembre.nom+' · '+(currentMembre.role_membre==='admin'?'Admin':'Manager')):currentUser.email;
   document.getElementById('wb-nom').textContent=currentAgence.nom;
   applyAgenceLogo();
   const badge=document.getElementById('statut-badge');
   if(currentAgence.statut==='en_attente'){badge.textContent='⏳ En attente de validation';badge.style.background='var(--orl)';badge.style.color='var(--or)';}
   else if(currentAgence.statut==='suspendu'){badge.textContent='⛔ Suspendu';badge.style.background='var(--rl)';badge.style.color='var(--r)';}
   loadDashboard();
+}
+
+// Masque Finances + Paramètres pour les Managers (accès restreint)
+function applyMembreRestrictions(){
+  if(currentMembre&&currentMembre.role_membre==='manager'){
+    document.querySelectorAll('.sb-btn').forEach(btn=>{
+      const oc=btn.getAttribute('onclick')||'';
+      if(oc.includes("go('finances'")||oc.includes("go('agence'")||oc.includes("go('paiements'")){
+        btn.style.display='none';
+      }
+    });
+  }
 }
 
 // ============ DASHBOARD ============
@@ -923,7 +963,7 @@ async function loadHistorique(){
 const PARAM_SECTIONS=[
   {id:'infos',ico:'👤',label:"Informations",soon:false},
   {id:'securite',ico:'🔐',label:'Sécurité',soon:true},
-  {id:'users',ico:'👥',label:'Utilisateurs',soon:true},
+  {id:'users',ico:'👥',label:'Utilisateurs',soon:false},
   {id:'livreurs',ico:'🚚',label:'Param. livreurs',soon:false},
   {id:'paiement',ico:'💰',label:'Paiement',soon:false},
   {id:'zones',ico:'📍',label:'Zones',soon:false},
@@ -979,7 +1019,11 @@ function showParam(id,btn){
       ${soonBox('La 2FA et la gestion des appareils nécessitent un service SMS (à intégrer). Le changement de mot de passe est fonctionnel.')}`);
   }
   else if(id==='users'){
-    c.innerHTML=card('👥 Gestion des utilisateurs',`<p style="font-size:13px;color:var(--g600)">Ajoutez des administrateurs ou managers qui pourront gérer l'agence avec vous, chacun avec ses permissions.</p>${soonBox('La gestion multi-utilisateurs avec rôles et permissions sera disponible prochainement. Pour l\'instant, seul le compte principal de l\'agence gère tout.')}`);
+    c.innerHTML=card('👥 Gestion des utilisateurs',`
+      <p style="font-size:13px;color:var(--g600);margin-bottom:14px">Ajoutez des membres à votre équipe. Les <strong>Admins</strong> ont accès à tout ; les <strong>Managers</strong> gèrent les livreurs et les courses, mais pas les finances ni les paramètres.</p>
+      <button class="btn btn-p" onclick="openMembreModal()" style="margin-bottom:16px">➕ Ajouter un membre</button>
+      <div id="membres-list"></div>`);
+    loadMembres();
   }
   else if(id==='livreurs'){
     c.innerHTML=card('🚚 Paramètres des livreurs',`
@@ -1069,6 +1113,66 @@ async function changePass(){
   const {error}=await sb.auth.updateUser({password:np});
   if(error){toast('Erreur : '+error.message,'err');return;}
   toast('✅ Mot de passe modifié','ok');
+}
+
+// ============ MEMBRES DE L'AGENCE ============
+async function loadMembres(){
+  const el=document.getElementById('membres-list');if(!el)return;
+  const {data,error}=await sb.from('membres_agence').select('*').eq('agence_id',currentAgence.id).order('created_at',{ascending:false});
+  if(error){el.innerHTML='<p style="color:var(--r);font-size:13px">Table membres absente — exécutez la migration.</p>';return;}
+  // Le compte principal (le propriétaire) affiché en premier
+  let html=`<div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--g200);border-radius:10px;margin-bottom:8px;background:var(--vl)">
+    <div style="width:38px;height:38px;border-radius:50%;background:var(--vd);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">${(currentAgence.responsable||currentAgence.nom||'?')[0]}</div>
+    <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px">${currentAgence.responsable||currentAgence.nom} <span class="badge bg" style="margin-left:4px">Propriétaire</span></div><div style="font-size:12px;color:var(--g600)">${currentAgence.email||currentUser.email}</div></div>
+  </div>`;
+  html+=(data||[]).map(m=>`
+    <div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--g200);border-radius:10px;margin-bottom:8px">
+      <div style="width:38px;height:38px;border-radius:50%;background:var(--vl);color:var(--vd);display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0">${(m.nom||'?')[0]}</div>
+      <div style="flex:1;min-width:0"><div style="font-weight:700;font-size:13px">${m.nom} <span class="badge ${m.role_membre==='admin'?'bb':'bo'}" style="margin-left:4px">${m.role_membre==='admin'?'Admin':'Manager'}</span></div><div style="font-size:12px;color:var(--g600)">${m.email||''}${m.telephone?' · '+m.telephone:''}</div></div>
+      <button class="btn btn-sm btn-del" onclick="delMembre('${m.id}','${m.user_id||''}','${(m.nom||'').replace(/'/g,'')}')">🗑️</button>
+    </div>`).join('');
+  el.innerHTML=html;
+}
+function openMembreModal(){
+  ['mb-nom','mb-tel','mb-email','mb-pass'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mb-role').value='manager';
+  document.getElementById('mb-err').style.display='none';
+  openModal('m-membre');
+}
+async function createMembre(){
+  const nom=document.getElementById('mb-nom').value.trim();
+  const tel=document.getElementById('mb-tel').value.trim();
+  const role=document.getElementById('mb-role').value;
+  const email=document.getElementById('mb-email').value.trim();
+  const pass=document.getElementById('mb-pass').value;
+  const err=document.getElementById('mb-err');err.style.display='none';
+  if(!nom||!email||!pass){err.textContent='❌ Remplissez tous les champs obligatoires';err.style.display='block';return;}
+  if(pass.length<6){err.textContent='❌ Mot de passe : min. 6 caractères';err.style.display='block';return;}
+  const btn=document.getElementById('mb-submit');btn.disabled=true;btn.textContent='⏳ Création...';
+  try{
+    const res=await fetch(`${SUPA_URL}/functions/v1/create-account`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPA_KEY}`,'apikey':SUPA_KEY},
+      body:JSON.stringify({type:'membre',email,password:pass,nom,telephone:tel,role_membre:role,agence_id:currentAgence.id})
+    });
+    const out=await res.json();
+    if(!out.ok)throw new Error(out.error||'Erreur inconnue');
+  }catch(e){
+    err.textContent='❌ '+e.message;err.style.display='block';btn.disabled=false;btn.textContent='✅ Créer le compte';return;
+  }
+  btn.disabled=false;btn.textContent='✅ Créer le compte';
+  closeModal('m-membre');
+  toast('🎉 Membre créé ! Il peut se connecter avec '+email,'ok');
+  loadMembres();
+}
+async function delMembre(id,userId,nom){
+  if(!confirm(`Retirer ${nom} de l'agence ? Son compte sera supprimé.`))return;
+  await sb.from('membres_agence').delete().eq('id',id);
+  if(userId){
+    await sb.from('utilisateurs').delete().eq('id',userId);
+    try{await fetch(`${SUPA_URL}/functions/v1/create-account`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPA_KEY}`,'apikey':SUPA_KEY},body:JSON.stringify({action:'delete',user_id:userId})});}catch(e){}
+  }
+  toast('🗑️ Membre retiré','err');loadMembres();
 }
 
 async function uploadAgLogo(input){
