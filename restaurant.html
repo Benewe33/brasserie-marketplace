@@ -213,6 +213,23 @@ tr:hover td{background:var(--g50)}
 .resto-logo{width:72px;height:72px;border-radius:14px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;overflow:hidden}
 .resto-logo img{width:100%;height:100%;object-fit:cover}
 @media(max-width:768px){.sidebar{display:none}.main{margin-left:0;padding:16px}.stats{grid-template-columns:1fr 1fr}.fgrid{grid-template-columns:1fr}}
+.pm-btn{width:100%;display:flex;align-items:center;gap:9px;padding:9px 11px;border:none;background:none;font-size:13px;font-weight:500;color:var(--g600);border-radius:8px;cursor:pointer;font-family:inherit;text-align:left;margin-bottom:1px}
+.pm-btn:hover{background:var(--g50)}
+.pm-btn.active{background:var(--vl);color:var(--vd);font-weight:700}
+.pm-soon{display:inline-block;font-size:9px;font-weight:700;background:var(--orl);color:var(--or);padding:1px 6px;border-radius:99px;margin-left:auto}
+.ptoggle{width:42px;height:24px;border-radius:99px;background:var(--g200);position:relative;cursor:pointer;transition:.2s;flex-shrink:0}
+.ptoggle.on{background:var(--vd)}
+.ptoggle::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.ptoggle.on::after{left:20px}
+.prow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--g100)}
+.prow:last-child{border-bottom:none}
+.kds-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.kds-card{border-radius:14px;padding:14px;border:2px solid;box-shadow:var(--shadow)}
+.kds-new{background:#feffc;border-color:#fde047}
+.kds-prep{background:#fff7ed;border-color:#fdba74}
+.kds-ready{background:#f0fdf4;border-color:#86efac}
+.kds-time{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums}
+@media(max-width:768px){.grid-params{grid-template-columns:1fr!important}}
 </style>
 </head>
 <body>
@@ -398,6 +415,21 @@ tr:hover td{background:var(--g50)}
       <button class="sb-btn" onclick="go('restaurant',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20"/></svg>Mon restaurant
       </button>
+      <button class="sb-btn" onclick="go('cuisine',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 2v4M12 2v4M16 2v4M4 10h16M6 10v10a2 2 0 002 2h8a2 2 0 002-2V10"/></svg>Écran Cuisine
+      </button>
+      <button class="sb-btn" onclick="go('clients',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/></svg>Clients & Avis
+      </button>
+      <button class="sb-btn" onclick="go('wallet',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 010-4h14v4"/><path d="M3 5v14a2 2 0 002 2h16v-5"/><path d="M18 12a2 2 0 000 4h4v-4z"/></svg>Wallet
+      </button>
+      <button class="sb-btn" onclick="go('rapports',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9M13 17V5M8 17v-3"/></svg>Rapports
+      </button>
+      <button class="sb-btn" onclick="go('parametres',this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Paramètres
+      </button>
     </nav>
     <div class="sb-foot">
       <button class="sb-btn" onclick="go('paiements',this)">
@@ -519,6 +551,64 @@ tr:hover td{background:var(--g50)}
         </div>
       </div>
     </div>
+    <!-- ÉCRAN CUISINE (KDS) -->
+    <div class="sec" id="sec-cuisine">
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-body" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+          <div><strong style="font-size:15px">👨‍🍳 Écran de production cuisine</strong><div style="font-size:12px;color:var(--g600)">Les commandes à préparer, en temps réel. Cliquez sur « Prête » quand un plat est terminé.</div></div>
+          <button class="btn btn-sm btn-ed" onclick="loadCuisine()">🔄 Actualiser</button>
+        </div>
+      </div>
+      <div id="kds-wrap" class="kds-grid"></div>
+    </div>
+
+    <!-- CLIENTS & AVIS -->
+    <div class="sec" id="sec-clients">
+      <div class="stats" style="margin-bottom:16px">
+        <div class="stat"><div class="stat-ico si-b">👥</div><div class="stat-label">Clients uniques</div><div class="stat-val" id="cl-nb">—</div></div>
+        <div class="stat"><div class="stat-ico si-g">🍽️</div><div class="stat-label">Commandes totales</div><div class="stat-val" id="cl-cmd">—</div></div>
+        <div class="stat"><div class="stat-ico si-o">⭐</div><div class="stat-label">Note moyenne</div><div class="stat-val" id="cl-note">—</div></div>
+        <div class="stat"><div class="stat-ico si-y">💬</div><div class="stat-label">Avis reçus</div><div class="stat-val" id="cl-avis">—</div></div>
+      </div>
+      <div class="card"><div class="card-head"><h2>👥 Mes clients</h2></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Client</th><th>Téléphone</th><th>Commandes</th><th>Total dépensé</th><th>Dernière</th></tr></thead><tbody id="cl-body"></tbody></table></div></div></div>
+      <div class="card"><div class="card-head"><h2>⭐ Avis clients</h2></div><div class="card-body" id="cl-avis-list"></div></div>
+    </div>
+
+    <!-- WALLET -->
+    <div class="sec" id="sec-wallet">
+      <div class="card"><div class="card-head"><h2>👛 Aperçu du Wallet</h2></div><div class="card-body">
+        <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+          <div class="stat"><div class="stat-ico si-g">💰</div><div class="stat-label">Solde disponible</div><div class="stat-val" id="wv-dispo">—</div></div>
+          <div class="stat"><div class="stat-ico si-o">⏳</div><div class="stat-label">En attente (48h)</div><div class="stat-val" id="wv-attente">—</div></div>
+          <div class="stat"><div class="stat-ico si-b">🏦</div><div class="stat-label">Solde total</div><div class="stat-val" id="wv-total">—</div></div>
+          <div class="stat"><div class="stat-ico" style="background:#f3e8ff">📤</div><div class="stat-label">Total reçu</div><div class="stat-val" id="wv-recu">—</div></div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn btn-p" onclick="walletVBientot()">📤 Demander un retrait</button><button class="btn btn-ed" onclick="go('paiements',document.querySelectorAll('.sb-btn')[8])">⚙️ Méthode de paiement</button></div>
+      </div></div>
+      <div class="card"><div class="card-head"><h2>🧾 Historique des transactions</h2></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Description</th><th>Montant</th></tr></thead><tbody id="wv-tx"></tbody></table></div></div></div>
+    </div>
+
+    <!-- RAPPORTS -->
+    <div class="sec" id="sec-rapports">
+      <div class="card"><div class="card-head" style="flex-wrap:wrap;gap:10px"><h2>📊 Rapports & Analyses</h2><div style="display:flex;gap:8px"><button class="btn btn-sm btn-ed" onclick="exportRapport()">⬇️ Export CSV</button><button class="btn btn-sm btn-ed" onclick="window.print()">🖨️ PDF</button></div></div><div class="card-body">
+        <div class="stats" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+          <div class="stat"><div class="stat-ico si-g">💵</div><div class="stat-label">CA total livré</div><div class="stat-val" id="rp-ca">—</div></div>
+          <div class="stat"><div class="stat-ico si-b">🍽️</div><div class="stat-label">Commandes livrées</div><div class="stat-val" id="rp-cmd">—</div></div>
+          <div class="stat"><div class="stat-ico si-o">🎯</div><div class="stat-label">Panier moyen</div><div class="stat-val" id="rp-panier">—</div></div>
+          <div class="stat"><div class="stat-ico si-y">🏆</div><div class="stat-label">Plats vendus</div><div class="stat-val" id="rp-vendus">—</div></div>
+        </div>
+        <canvas id="rp-chart" height="90"></canvas>
+      </div></div>
+      <div class="card"><div class="card-head"><h2>🏆 Plats les plus vendus</h2></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Rang</th><th>Plat</th><th>Quantité</th><th>Revenu</th></tr></thead><tbody id="rp-top"></tbody></table></div></div></div>
+    </div>
+
+    <!-- PARAMÈTRES -->
+    <div class="sec" id="sec-parametres">
+      <div style="display:grid;grid-template-columns:230px 1fr;gap:16px" class="grid-params">
+        <div class="card" style="margin-bottom:0;height:fit-content"><div class="card-body" style="padding:8px"><div id="pv-menu"></div></div></div>
+        <div id="pv-content"></div>
+      </div>
+    </div>
   </main>
 </div>
 
@@ -551,6 +641,175 @@ tr:hover td{background:var(--g50)}
 <div class="toast" id="toast"></div>
 
 <script>
+// ============ ÉCRAN CUISINE (KDS) ============
+async function loadCuisine(){
+  const {data:menus}=await sb.from('menus').select('id').eq('restaurant_id',currentResto.id);
+  const menuIds=(menus||[]).map(m=>m.id);
+  const wrap=document.getElementById('kds-wrap');
+  if(!menuIds.length){wrap.innerHTML='<p style="color:var(--g400);padding:24px">Aucun plat au menu</p>';return;}
+  // Commandes acceptées/en préparation/prêtes contenant mes plats
+  const {data:ligs}=await sb.from('lignes_commande').select('quantite,nom_item,commandes(id,statut,created_at,utilisateurs(nom))').in('menu_id',menuIds);
+  const parCmd={};
+  (ligs||[]).forEach(l=>{const c=l.commandes;if(!c)return;if(!['en_preparation','prete','acceptee','confirmee'].includes(c.statut))return;if(!parCmd[c.id])parCmd[c.id]={id:c.id,statut:c.statut,date:c.created_at,client:c.utilisateurs?.nom||'Client',items:[]};parCmd[c.id].items.push(`${l.quantite||1}× ${l.nom_item||'Plat'}`);});
+  const cmds=Object.values(parCmd).sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(!cmds.length){wrap.innerHTML='<div class="card"><div class="card-body" style="text-align:center;color:var(--g400);padding:40px">✅ Aucune commande en cuisine pour le moment</div></div>';return;}
+  wrap.innerHTML=cmds.map(c=>{
+    const min=Math.floor((Date.now()-new Date(c.date))/60000);
+    const urgent=min>20;
+    const cls=c.statut==='prete'?'kds-ready':(c.statut==='en_preparation'?'kds-prep':'kds-new');
+    const label=c.statut==='prete'?'🟢 Prête':(c.statut==='en_preparation'?'🟠 En préparation':'🟡 Nouvelle');
+    return `<div class="kds-card ${cls}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <strong style="font-size:15px">#${c.id.substring(0,6)}</strong>
+        <span class="kds-time" style="color:${urgent?'#dc2626':'#111'}">${min}min</span>
+      </div>
+      <div style="font-size:12px;color:#444;margin-bottom:2px">${label} ${urgent?'· ⚠️ URGENT':''}</div>
+      <div style="font-size:12px;color:#444;margin-bottom:8px">👤 ${c.client}</div>
+      <ul style="font-size:13px;font-weight:600;margin:0 0 12px 16px">${c.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+      ${c.statut!=='prete'?`<button class="btn btn-p" style="width:100%" onclick="kdsPrete('${c.id}')">✅ Commande prête</button>`:'<div style="text-align:center;font-size:12px;color:#16a34a;font-weight:700">✓ Prête — en attente du livreur</div>'}
+    </div>`;
+  }).join('');
+}
+async function kdsPrete(cmdId){
+  const {error}=await sb.from('commandes').update({statut:'prete'}).eq('id',cmdId);
+  if(error){toast('Erreur : '+error.message,'err');return;}
+  try{const {data:c}=await sb.from('commandes').select('client_id').eq('id',cmdId).single();if(c?.client_id)await sb.from('notifications').insert({user_id:c.client_id,titre:'Commande prête 📦',message:'Votre commande est prête, un livreur va la récupérer.',type:'commande',lu:false});}catch(e){}
+  toast('✅ Commande marquée prête','ok');loadCuisine();
+}
+
+// ============ CLIENTS & AVIS ============
+async function loadClients(){
+  const {data:menus}=await sb.from('menus').select('id').eq('restaurant_id',currentResto.id);
+  const menuIds=(menus||[]).map(m=>m.id);
+  if(!menuIds.length){document.getElementById('cl-body').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucune commande</td></tr>';return;}
+  const {data:ligs}=await sb.from('lignes_commande').select('sous_total,commandes(id,client_id,created_at,utilisateurs(nom,telephone))').in('menu_id',menuIds);
+  const clients={};
+  (ligs||[]).forEach(l=>{const cmd=l.commandes;if(!cmd||!cmd.client_id)return;const id=cmd.client_id;if(!clients[id])clients[id]={nom:cmd.utilisateurs?.nom||'Client',tel:cmd.utilisateurs?.telephone||'',cmds:new Set(),total:0,derniere:cmd.created_at};clients[id].cmds.add(cmd.id);clients[id].total+=l.sous_total||0;if(new Date(cmd.created_at)>new Date(clients[id].derniere))clients[id].derniere=cmd.created_at;});
+  const list=Object.values(clients).sort((a,b)=>b.total-a.total);
+  document.getElementById('cl-nb').textContent=list.length;
+  document.getElementById('cl-cmd').textContent=list.reduce((s,c)=>s+c.cmds.size,0);
+  const {data:avis}=await sb.from('avis').select('note,commentaire,created_at,utilisateurs(nom)').eq('restaurant_id',currentResto.id).order('created_at',{ascending:false});
+  const notes=(avis||[]).map(a=>a.note).filter(n=>n);
+  document.getElementById('cl-note').textContent=notes.length?(notes.reduce((a,b)=>a+b,0)/notes.length).toFixed(1)+'/5':'—';
+  document.getElementById('cl-avis').textContent=(avis||[]).length;
+  document.getElementById('cl-body').innerHTML=list.length?list.map(c=>`<tr><td><strong>${c.nom}</strong></td><td>${c.tel||'—'}</td><td>${c.cmds.size}</td><td><strong style="color:var(--vd)">${fmt(c.total)} F</strong></td><td>${fdate(c.derniere)}</td></tr>`).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--g400);padding:24px">Aucun client</td></tr>';
+  document.getElementById('cl-avis-list').innerHTML=(avis||[]).length?(avis||[]).slice(0,10).map(a=>`<div style="padding:10px 0;border-bottom:1px solid var(--g100)"><div style="display:flex;justify-content:space-between"><strong style="font-size:13px">${a.utilisateurs?.nom||'Client'}</strong><span style="color:var(--or)">${'★'.repeat(a.note||0)}${'☆'.repeat(5-(a.note||0))}</span></div>${a.commentaire?`<div style="font-size:12.5px;color:var(--g600);margin-top:4px">${a.commentaire}</div>`:''}<div style="font-size:11px;color:var(--g400);margin-top:2px">${fdate(a.created_at)}</div></div>`).join(''):'<p style="color:var(--g400);text-align:center;padding:20px">Aucun avis</p>';
+}
+
+// ============ WALLET ============
+async function loadWalletV(){
+  const {data:menus}=await sb.from('menus').select('id').eq('restaurant_id',currentResto.id);
+  const menuIds=(menus||[]).map(m=>m.id);
+  let ligs=[];
+  if(menuIds.length){const {data}=await sb.from('lignes_commande').select('sous_total,commandes(id,statut,created_at)').in('menu_id',menuIds);ligs=(data||[]).filter(l=>l.commandes?.statut==='livree');}
+  let txCom=10;try{const {data:pc}=await sb.from('parametres').select('valeur').eq('cle','comm_rest').single();if(pc&&pc.valeur)txCom=parseFloat(pc.valeur)||10;}catch(e){}
+  const net=g=>Math.round(g*(100-txCom)/100);
+  const parCmd={};ligs.forEach(l=>{const c=l.commandes;if(!parCmd[c.id])parCmd[c.id]={date:c.created_at,montant:0};parCmd[c.id].montant+=l.sous_total||0;});
+  const cmds=Object.values(parCmd);
+  const h48=new Date(Date.now()-48*3600*1000);
+  const dispoBrut=cmds.filter(c=>new Date(c.date)<h48).reduce((s,c)=>s+net(c.montant),0);
+  const attente=cmds.filter(c=>new Date(c.date)>=h48).reduce((s,c)=>s+net(c.montant),0);
+  let versements=[];try{const {data:v}=await sb.from('versements').select('*').eq('beneficiaire_type','restaurant').eq('beneficiaire_id',currentResto.id).order('created_at',{ascending:false});versements=v||[];}catch(e){}
+  const totalVerse=versements.reduce((s,v)=>s+(v.montant||0),0);
+  const dispo=Math.max(0,dispoBrut-totalVerse);
+  document.getElementById('wv-dispo').textContent=fmt(dispo)+' F';
+  document.getElementById('wv-attente').textContent=fmt(attente)+' F';
+  document.getElementById('wv-total').textContent=fmt(dispo+attente)+' F';
+  document.getElementById('wv-recu').textContent=fmt(totalVerse)+' F';
+  const entrees=Object.entries(parCmd).map(([id,c])=>({date:c.date,desc:'Commande #'+id.substring(0,6),montant:net(c.montant)}));
+  const sorties=versements.map(v=>({date:v.created_at,desc:v.reference||'Versement YéyéMarket',montant:-(v.montant||0)}));
+  const tx=[...entrees,...sorties].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,15);
+  document.getElementById('wv-tx').innerHTML=tx.length?tx.map(t=>`<tr><td style="font-size:12px">${fdate(t.date)}</td><td>${t.montant>=0?'<span class="badge bg">↓ Entrée</span>':'<span class="badge bo">↑ Reçu</span>'}</td><td style="font-size:12.5px">${t.desc}</td><td><strong style="color:${t.montant>=0?'var(--vd)':'var(--or)'}">${t.montant>=0?'+':''}${fmt(t.montant)} F</strong></td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:24px">Aucune transaction</td></tr>';
+}
+function walletVBientot(){toast('📤 Le retrait automatique sera disponible prochainement (intégration KKiaPay en cours).','info');}
+
+// ============ RAPPORTS ============
+let _rapportData=[];
+async function loadRapports(){
+  const {data:menus}=await sb.from('menus').select('id,nom').eq('restaurant_id',currentResto.id);
+  const menuMap={};(menus||[]).forEach(m=>menuMap[m.id]=m.nom);
+  const menuIds=Object.keys(menuMap);
+  if(!menuIds.length){['rp-ca','rp-cmd','rp-panier','rp-vendus'].forEach(id=>document.getElementById(id).textContent='0');return;}
+  const {data:ligs}=await sb.from('lignes_commande').select('menu_id,quantite,sous_total,commandes(id,statut,created_at)').in('menu_id',menuIds);
+  const livrees=(ligs||[]).filter(l=>l.commandes?.statut==='livree');
+  _rapportData=livrees;
+  const ca=livrees.reduce((s,l)=>s+(l.sous_total||0),0);
+  const cmdSet=new Set(livrees.map(l=>l.commandes.id));
+  const qte=livrees.reduce((s,l)=>s+(l.quantite||0),0);
+  document.getElementById('rp-ca').textContent=fmt(ca)+' F';
+  document.getElementById('rp-cmd').textContent=cmdSet.size;
+  document.getElementById('rp-panier').textContent=cmdSet.size?fmt(Math.round(ca/cmdSet.size))+' F':'0 F';
+  document.getElementById('rp-vendus').textContent=qte;
+  const parPlat={};livrees.forEach(l=>{if(!parPlat[l.menu_id])parPlat[l.menu_id]={q:0,r:0};parPlat[l.menu_id].q+=l.quantite||0;parPlat[l.menu_id].r+=l.sous_total||0;});
+  const top=Object.entries(parPlat).sort((a,b)=>b[1].q-a[1].q).slice(0,10);
+  document.getElementById('rp-top').innerHTML=top.length?top.map(([mid,d],i)=>`<tr><td><span class="badge ${i<3?'bg':'bgr'}">#${i+1}</span></td><td><strong>${menuMap[mid]||'—'}</strong></td><td>${d.q}</td><td><strong style="color:var(--vd)">${fmt(d.r)} F</strong></td></tr>`).join(''):'<tr><td colspan="4" style="text-align:center;color:var(--g400);padding:24px">Aucune vente</td></tr>';
+  const days=[],vals=[];
+  for(let i=29;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);const ds=d.toISOString().split('T')[0];days.push(d.getDate());vals.push(livrees.filter(l=>(l.commandes?.created_at||'').startsWith(ds)).reduce((s,l)=>s+(l.sous_total||0),0));}
+  const ctx=document.getElementById('rp-chart')?.getContext('2d');
+  if(ctx){if(window._rpChart)window._rpChart.destroy();window._rpChart=new Chart(ctx,{type:'bar',data:{labels:days,datasets:[{label:'Ventes',data:vals,backgroundColor:'#c2410c',borderRadius:4}]},options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true},x:{grid:{display:false}}}}});}
+}
+function exportRapport(){
+  if(!_rapportData.length){toast('Aucune donnée à exporter','err');return;}
+  const rows=[['Commande','Plat ID','Quantité','Sous-total','Date']];
+  _rapportData.forEach(l=>rows.push([l.commandes?.id||'',l.menu_id,l.quantite,l.sous_total,l.commandes?.created_at||'']));
+  const blob=new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='rapport-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  toast('✅ Export téléchargé','ok');
+}
+
+// ============ PARAMÈTRES ============
+const PV_SECTIONS=[
+  {id:'infos',ico:'🍽️',label:'Informations',soon:false},
+  {id:'securite',ico:'🔐',label:'Sécurité',soon:true},
+  {id:'paiement',ico:'💰',label:'Paiement',soon:false},
+  {id:'notifs',ico:'🔔',label:'Notifications',soon:true},
+  {id:'langue',ico:'🌍',label:'Langue & devise',soon:false},
+  {id:'docs',ico:'📄',label:'Documents légaux',soon:false},
+  {id:'danger',ico:'🗑️',label:'Suppression',soon:false},
+];
+let _pvCur='infos';
+function loadParametres(){
+  document.getElementById('pv-menu').innerHTML=PV_SECTIONS.map(s=>`<button class="pm-btn ${s.id===_pvCur?'active':''}" onclick="showPV('${s.id}',this)"><span>${s.ico}</span> <span>${s.label}</span>${s.soon?'<span class="pm-soon">bientôt</span>':''}</button>`).join('');
+  showPV(_pvCur);
+}
+function showPV(id,btn){
+  _pvCur=id;
+  if(btn){document.querySelectorAll('#pv-menu .pm-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+  const c=document.getElementById('pv-content');const r=currentResto||{};
+  const soonBox=t=>`<div style="background:var(--orl);border-radius:10px;padding:14px 16px;margin-top:14px;font-size:12.5px;color:var(--g600)">🚧 ${t}</div>`;
+  const card=(title,body)=>`<div class="card" style="margin-bottom:0"><div class="card-head"><h2>${title}</h2></div><div class="card-body">${body}</div></div>`;
+  if(id==='infos'){
+    c.innerHTML=card('🍽️ Informations du restaurant',`
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--g100)">
+        <div style="width:72px;height:72px;border-radius:14px;overflow:hidden;background:var(--vl);display:flex;align-items:center;justify-content:center;flex-shrink:0">${r.logo_url?`<img src="${r.logo_url}" style="width:100%;height:100%;object-fit:cover"/>`:'<span style="font-size:32px">🍽️</span>'}</div>
+        <div><div style="font-weight:800;font-size:16px">${r.nom||''}</div><label style="display:inline-block;margin-top:6px;font-size:12px;font-weight:700;color:var(--vd);cursor:pointer">🖼️ ${r.logo_url?'Changer le logo':'Ajouter un logo'}<input type="file" accept="image/*" style="display:none" onchange="uploadRestoLogo(this)"/></label><div id="pv-logo-status" style="font-size:11px;color:var(--g400);margin-top:2px"></div></div>
+      </div>
+      <p style="font-size:13px;color:var(--g600)">Pour modifier nom, adresse, horaires ou description, utilisez la page « Mon restaurant ».</p>
+      <button class="btn btn-p" style="margin-top:10px" onclick="go('restaurant',document.querySelectorAll('.sb-btn')[3])">Ouvrir Mon restaurant</button>`);
+  }
+  else if(id==='securite'){c.innerHTML=card('🔐 Sécurité',`<div class="prow"><div><div style="font-weight:600;font-size:13px">Mot de passe</div><div style="font-size:12px;color:var(--g600)">Modifiez votre mot de passe</div></div><button class="btn btn-sm btn-ed" onclick="changePassV()">Modifier</button></div><div class="prow"><div><div style="font-weight:600;font-size:13px">2FA</div><div style="font-size:12px;color:var(--g600)">Sécurité par SMS</div></div><span class="pm-soon">bientôt</span></div>${soonBox('La 2FA nécessite un service SMS. Le changement de mot de passe est fonctionnel.')}`);}
+  else if(id==='paiement'){c.innerHTML=card('💰 Paramètres de paiement',`<div class="prow"><div><div style="font-weight:600;font-size:13px">Fréquence & méthode</div><div style="font-size:12px;color:var(--g600)">Versements et Mobile Money</div></div><button class="btn btn-sm btn-p" onclick="go('paiements',document.querySelectorAll('.sb-btn')[8])">Ouvrir Paiements</button></div>`);}
+  else if(id==='notifs'){c.innerHTML=card('🔔 Notifications',`<div class="prow"><div><div style="font-weight:600;font-size:13px">📱 SMS</div><div style="font-size:12px;color:var(--g600)">Alertes commandes</div></div><span class="pm-soon">bientôt</span></div><div class="prow"><div><div style="font-weight:600;font-size:13px">💬 WhatsApp</div></div><span class="pm-soon">bientôt</span></div><div class="prow"><div><div style="font-weight:600;font-size:13px">🔔 Dans l'app</div></div><span class="ptoggle on"></span></div>${soonBox('SMS et WhatsApp nécessitent un service tiers à intégrer.')}`);}
+  else if(id==='langue'){c.innerHTML=card('🌍 Langue & devise',`<div class="fgm"><label>Langue</label><select><option>Français</option></select></div><div class="fgm"><label>Devise</label><select><option>FCFA (XOF)</option></select></div>`);}
+  else if(id==='docs'){c.innerHTML=card('📄 Documents légaux',`<div class="prow"><div><div style="font-weight:600;font-size:13px">Conditions générales</div></div><a href="/confidentialite.html" target="_blank" class="btn btn-sm btn-ed" style="text-decoration:none">Consulter</a></div><div class="prow"><div><div style="font-weight:600;font-size:13px">Confidentialité</div></div><a href="/confidentialite.html" target="_blank" class="btn btn-sm btn-ed" style="text-decoration:none">Consulter</a></div>`);}
+  else if(id==='danger'){c.innerHTML=card('🗑️ Suppression',`<div style="background:var(--rl);border:1px solid #fca5a5;border-radius:12px;padding:16px"><div style="font-weight:700;color:var(--r);margin-bottom:6px">⚠️ Zone dangereuse</div><p style="font-size:13px;color:var(--g600);margin-bottom:12px">La suppression du restaurant est définitive.</p><a href="mailto:contact@yeyemarket.com?subject=Suppression restaurant" class="btn btn-del" style="text-decoration:none;display:inline-block">📧 Demander la suppression</a></div>`);}
+}
+async function uploadRestoLogo(input){
+  const file=input.files[0];if(!file)return;
+  if(file.size>3*1024*1024){toast('Image trop lourde (max 3 Mo)','err');return;}
+  const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+  const path=`logos/resto_${currentResto.id}_${Date.now()}.${ext}`;
+  const {error:upErr}=await sb.storage.from('livreurs').upload(path,file,{upsert:true,contentType:file.type});
+  if(upErr){toast('Erreur : '+upErr.message,'err');return;}
+  const {data:pub}=sb.storage.from('livreurs').getPublicUrl(path);
+  await sb.from('restaurants').update({logo_url:pub?.publicUrl}).eq('id',currentResto.id);
+  currentResto.logo_url=pub?.publicUrl;toast('✅ Logo mis à jour','ok');showPV('infos');
+}
+async function changePassV(){
+  const np=prompt('Nouveau mot de passe (min. 6 caractères) :');if(!np)return;if(np.length<6){toast('Min. 6 caractères','err');return;}
+  const {error}=await sb.auth.updateUser({password:np});if(error){toast('Erreur : '+error.message,'err');return;}toast('✅ Mot de passe modifié','ok');
+}
+
 const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
 const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -725,13 +984,13 @@ function showApp(){
   loadDashboard();loadCatSelect();
 }
 
-const titles={dashboard:'Vue d\'ensemble',menus:'Mes menus',commandes:'Commandes',restaurant:'Mon restaurant',paiements:'Paiements'};
+const titles={dashboard:'Vue d\'ensemble',menus:'Mes menus',commandes:'Commandes',restaurant:'Mon restaurant',paiements:'Paiements',cuisine:'Écran Cuisine',clients:'Clients & Avis',wallet:'Wallet & Paiements',rapports:'Rapports',parametres:'Paramètres'};
 function go(name,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={menus:loadMenus,commandes:loadCmds,restaurant:loadRestoForm,paiements:loadPaiementsPage};
+  const loaders={menus:loadMenus,commandes:loadCmds,restaurant:loadRestoForm,paiements:loadPaiementsPage,cuisine:loadCuisine,clients:loadClients,wallet:loadWalletV,rapports:loadRapports,parametres:loadParametres};
   if(loaders[name])loaders[name]();
 }
 
@@ -1103,7 +1362,7 @@ function go(name,btn){
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={menus:loadMenus,commandes:loadCmds,restaurant:loadRestoForm,paiements:loadPaiementsPage};
+  const loaders={menus:loadMenus,commandes:loadCmds,restaurant:loadRestoForm,paiements:loadPaiementsPage,cuisine:loadCuisine,clients:loadClients,wallet:loadWalletV,rapports:loadRapports,parametres:loadParametres};
   if(loaders[name])loaders[name]();
 }
 
