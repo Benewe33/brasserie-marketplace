@@ -15,6 +15,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-compat.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.kkiapay.me/k.js"></script>
@@ -895,6 +897,48 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 <script>
 const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
 const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
+
+// ============ NOTIFICATIONS PUSH (Firebase Cloud Messaging) ============
+// ⚠️ Remplace ces 2 valeurs par celles de TON projet Firebase :
+//    1. FIREBASE_CONFIG : copié depuis Firebase Console > Paramètres du projet > app Web
+//    2. VAPID_KEY : depuis Firebase Console > Cloud Messaging > Certificats Web Push
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyB2AhjG3Zw46zO3C_GPaqBHuTVvjJJESe8",
+  authDomain: "yeyemarket-a3d09.firebaseapp.com",
+  projectId: "yeyemarket-a3d09",
+  storageBucket: "yeyemarket-a3d09.firebasestorage.app",
+  messagingSenderId: "232655346156",
+  appId: "1:232655346156:web:631ba36770df0415c548c9"
+};
+const VAPID_KEY = "BNaK8lgYGypmUepu9q-susZL8y3nRrkLa-uLB8kiWALgtLa78CXpwkLzuJtzM0hEcZytxnaMSBcIYIvsNghvrYw";
+
+let _fcmMessaging=null;
+function initFirebaseApp(){
+  if(VAPID_KEY==='À_REMPLACER')return; // clé VAPID pas encore configurée, on n'initialise rien
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+    _fcmMessaging=firebase.messaging();
+    // Notification reçue pendant que l'app est ouverte au premier plan
+    _fcmMessaging.onMessage(payload=>{
+      const n=payload.notification||{};
+      toast('🔔 '+(n.title||'Notification')+(n.body?' — '+n.body:''),'info');
+      if(typeof loadNotifs==='function')loadNotifs();
+    });
+  }catch(e){console.warn('Firebase init:',e.message);}
+}
+async function initPushNotifications(){
+  if(!currentUser)return;
+  if(!('Notification' in window)||!('serviceWorker' in navigator))return;
+  if(!_fcmMessaging)return; // Firebase pas configuré
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted')return;
+    const reg=await navigator.serviceWorker.ready;
+    const token=await _fcmMessaging.getToken({vapidKey:VAPID_KEY,serviceWorkerRegistration:reg});
+    if(!token)return;
+    await sb.from('push_tokens').upsert({user_id:currentUser.id,token,plateforme:'web',actif:true,updated_at:new Date().toISOString()},{onConflict:'token'});
+  }catch(e){console.warn('Push notif non activée:',e.message);}
+}
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 
 let cart={},allProducts=[],currentProduct=null,currentUser=null;
@@ -1022,6 +1066,7 @@ async function checkSession(){
   if(!profile||profile.role!=='client'){await sb.auth.signOut();return;}
   currentUser=session.user;
   showProfile();
+  initPushNotifications();
 }
 
 async function doLogin(){
@@ -1036,6 +1081,7 @@ async function doLogin(){
   const {data:{user}}=await sb.auth.getUser();
   currentUser=user;showProfile();
   toast('✅ Connexion réussie !','ok');
+  initPushNotifications();
 }
 
 async function doRegister(){
@@ -1077,6 +1123,7 @@ async function doRegister(){
   currentUser=data.user;showProfile();
   toast('✅ Bienvenue '+nom+' !','ok');
   btn.disabled=false;btn.textContent='✅ Créer mon compte';
+  initPushNotifications();
 }
 
 async function doLogout(){
@@ -2423,6 +2470,7 @@ document.addEventListener('keydown',e=>{
 // ASSISTANT POPUP
 
 
+initFirebaseApp();
 checkSession();
 loadCategories();
 loadHomeSections();
