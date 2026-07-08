@@ -168,6 +168,9 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .checkout-section{background:#fff;border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
 .checkout-section h3{font-size:14px;font-weight:700;margin-bottom:14px;color:var(--g900);display:flex;align-items:center;gap:8px}
 .fg{margin-bottom:13px}
+.pw-wrap{position:relative}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:var(--g400);display:flex;align-items:center}
+.pw-toggle:hover{color:var(--g600)}
 .fg label{display:block;font-size:12px;font-weight:600;color:var(--g400);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
 .fg input,.fg select,.fg textarea{width:100%;padding:11px 14px;border:1.5px solid var(--g200);border-radius:10px;font-size:14px;font-family:inherit;outline:none;transition:border .2s;background:#fff}
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--v)}
@@ -636,7 +639,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
         </div>
         <div class="auth-form active" id="form-login">
           <div class="fg"><label>Email</label><input type="email" id="l-email" placeholder="email@exemple.com" autocomplete="username"/></div>
-          <div class="fg"><label>Mot de passe</label><input type="password" id="l-pass" autocomplete="current-password" placeholder="••••••••"/></div>
+          <div class="fg"><label>Mot de passe</label><div class="pw-wrap"><input type="password" id="l-pass" autocomplete="current-password" placeholder="••••••••" style="padding-right:40px"/><button type="button" class="pw-toggle" onclick="togglePwVisibility('l-pass',this)">👁️</button></div></div>
           <button class="btn-main" onclick="doLogin()">🔐 Se connecter</button>
         </div>
         <div class="auth-form" id="form-register">
@@ -653,7 +656,7 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
           <div class="fg"><label>Nom complet *</label><input type="text" id="r-nom" placeholder="Kofi Mensah"/></div>
           <div class="fg"><label>Email *</label><input type="email" id="r-email" placeholder="email@exemple.com" autocomplete="off"/></div>
           <div class="fg"><label>Téléphone *</label><input type="tel" id="r-tel" placeholder="97 00 00 00"/></div>
-          <div class="fg"><label>Mot de passe *</label><input type="password" id="r-pass" autocomplete="new-password" placeholder="Min. 6 caractères"/></div>
+          <div class="fg"><label>Mot de passe *</label><div class="pw-wrap"><input type="password" id="r-pass" autocomplete="new-password" placeholder="Min. 6 caractères" style="padding-right:40px"/><button type="button" class="pw-toggle" onclick="togglePwVisibility('r-pass',this)">👁️</button></div></div>
           <button class="btn-main" id="r-btn" onclick="doRegister()">✅ Créer mon compte</button>
         </div>
       </div>
@@ -927,6 +930,13 @@ function initFirebaseApp(){
     });
   }catch(e){console.warn('Firebase init:',e.message);}
 }
+function togglePwVisibility(inputId,btn){
+  const input=document.getElementById(inputId);
+  if(!input)return;
+  const isHidden=input.type==='password';
+  input.type=isHidden?'text':'password';
+  btn.textContent=isHidden?'🙈':'👁️';
+}
 let _audioCtx=null;
 function getAudioCtx(){
   if(!_audioCtx)_audioCtx=new (window.AudioContext||window.webkitAudioContext)();
@@ -935,7 +945,6 @@ function getAudioCtx(){
 function playNotifSound(){
   try{
     const ctx=getAudioCtx();
-    toast('🔊 Audio: '+ctx.state,'info'); // DEBUG TEMPORAIRE — à retirer une fois le son validé
     const doPlay=()=>{
       const o=ctx.createOscillator();const g=ctx.createGain();
       o.connect(g);g.connect(ctx.destination);
@@ -944,9 +953,9 @@ function playNotifSound(){
       g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);
       o.start();o.stop(ctx.currentTime+0.3);
     };
-    if(ctx.state==='suspended')ctx.resume().then(doPlay).catch(e=>toast('🔇 resume() a échoué: '+e.message,'err'));
+    if(ctx.state==='suspended')ctx.resume().then(doPlay).catch(()=>{});
     else doPlay();
-  }catch(e){toast('🔇 Erreur son: '+e.message,'err');}
+  }catch(e){console.warn('Son notif:',e.message);}
 }
 // Débloque l'audio dès la première interaction (politique des navigateurs)
 // Se redéclenche à CHAQUE interaction (pas juste une fois) car sur mobile
