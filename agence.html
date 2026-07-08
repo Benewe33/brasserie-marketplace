@@ -485,6 +485,18 @@ code{background:var(--g100);padding:2px 6px;border-radius:5px;font-size:12px}
 <div class="toast" id="toast"></div>
 
 <script>
+// ============ ENVOI DE NOTIFICATION PUSH RÉELLE ============
+async function sendPush(userId,title,body,data){
+  if(!userId)return;
+  try{
+    await fetch(`${SUPA_URL}/functions/v1/send-push`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPA_KEY}`,'apikey':SUPA_KEY},
+      body:JSON.stringify({user_id:userId,title,body,data:data||{}})
+    });
+  }catch(e){console.warn('Push non envoyé:',e.message);}
+}
+
 const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
 const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -880,7 +892,11 @@ async function dispatchCourse(livId){
   if(error){toast('Erreur : '+error.message,'err');return;}
   try{
     const {data:l}=await sb.from('livreurs').select('user_id').eq('id',livreurId).single();
-    if(l?.user_id)await sb.from('notifications').insert({user_id:l.user_id,titre:'Nouvelle course 🚴',message:'Votre agence vous a assigné une livraison.',type:'livraison',lu:false});
+    if(l?.user_id){
+      const msg='Votre agence vous a assigné une livraison.';
+      await sb.from('notifications').insert({user_id:l.user_id,titre:'Nouvelle course 🚴',message:msg,type:'livraison',lu:false});
+      sendPush(l.user_id,'Nouvelle course 🚴',msg,{type:'livraison'});
+    }
   }catch(e){}
   toast('✅ Course assignée au livreur','ok');logAudit('Course redispatchée à un livreur');
   loadDashboard();loadCourses();

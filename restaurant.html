@@ -1426,11 +1426,19 @@ async function assignerLivreur(cmdId){
   try{
     if(type==='agence'){
       const {data:a}=await sb.from('agences').select('user_id,nom').eq('id',id).single();
-      if(a?.user_id)await sb.from('notifications').insert({user_id:a.user_id,titre:'Nouvelle course 🏢',message:'Une commande à redispatcher chez '+(currentResto?.nom||'le restaurant')+'. Assignez-la à un de vos livreurs.',type:'livraison',lu:false});
+      if(a?.user_id){
+        const msg='Une commande à redispatcher chez '+(currentResto?.nom||'le restaurant')+'. Assignez-la à un de vos livreurs.';
+        await sb.from('notifications').insert({user_id:a.user_id,titre:'Nouvelle course 🏢',message:msg,type:'livraison',lu:false});
+        sendPush(a.user_id,'Nouvelle course 🏢',msg,{type:'livraison'});
+      }
       toast('📨 Agence '+(a?.nom||'')+' notifiée !','ok');
     }else{
       const {data:l}=await sb.from('livreurs').select('user_id,nom').eq('id',id).single();
-      if(l?.user_id)await sb.from('notifications').insert({user_id:l.user_id,titre:'Nouvelle course 🚴',message:'Une commande vous a été assignée — récupérez le colis chez '+(currentResto?.nom||'le restaurant')+'.',type:'livraison',lu:false});
+      if(l?.user_id){
+        const msg='Une commande vous a été assignée — récupérez le colis chez '+(currentResto?.nom||'le restaurant')+'.';
+        await sb.from('notifications').insert({user_id:l.user_id,titre:'Nouvelle course 🚴',message:msg,type:'livraison',lu:false});
+        sendPush(l.user_id,'Nouvelle course 🚴',msg,{type:'livraison'});
+      }
       toast('📨 Livreur notifié !','ok');
     }
   }catch(e){}

@@ -2048,8 +2048,35 @@ async function onKKiapaySuccess(response){
     ({data:cmd,error}=await sb.from('commandes').insert({client_id:currentUser.id,total:pendingOrder.total,adresse_livraison:pendingOrder.adresse,zone_id:pendingOrder.zone_id,notes:pendingOrder.notes,statut:'confirmee'}).select().single());
   }
   if(error){toast('Erreur: '+error.message,'err');return;}
-  const lignes=pendingOrder.items.map(i=>({commande_id:cmd.id,produit_id:i._isMenu?null:(i.produit_id||i.id),variante_id:i._variantId||null,variante_nom:i.variante_nom||null,nom_item:i.nom,prix_unitaire:i.prix_promo||i.prix,quantite:i.qty,sous_total:(i.prix_promo||i.prix)*i.qty}));
+  const lignes=pendingOrder.items.map(i=>({commande_id:cmd.id,produit_id:i._isMenu?null:(i.produit_id||i.id),menu_id:i._isMenu?(i.menu_id||null):null,variante_id:i._variantId||null,variante_nom:i.variante_nom||null,nom_item:i.nom,prix_unitaire:i.prix_promo||i.prix,quantite:i.qty,sous_total:(i.prix_promo||i.prix)*i.qty}));
   await sb.from('lignes_commande').insert(lignes);
+  // Notifie chaque vendeur/restaurant concerné par cette commande
+  try{
+    const produitIds=[...new Set(lignes.filter(l=>l.produit_id).map(l=>l.produit_id))];
+    const menuIds=[...new Set(lignes.filter(l=>l.menu_id).map(l=>l.menu_id))];
+    const boutiqueUserIds=new Set(),restoUserIds=new Set();
+    if(produitIds.length){
+      const {data:prods}=await sb.from('produits').select('boutique_id,boutiques(user_id,nom)').in('id',produitIds);
+      (prods||[]).forEach(p=>{if(p.boutiques?.user_id)boutiqueUserIds.add(JSON.stringify({id:p.boutiques.user_id,nom:p.boutiques.nom}));});
+    }
+    if(menuIds.length){
+      const {data:menus}=await sb.from('menus').select('restaurant_id,restaurants(user_id,nom)').in('id',menuIds);
+      (menus||[]).forEach(m=>{if(m.restaurants?.user_id)restoUserIds.add(JSON.stringify({id:m.restaurants.user_id,nom:m.restaurants.nom}));});
+    }
+    const notifTitre='Nouvelle commande 🛒';
+    for(const s of boutiqueUserIds){
+      const v=JSON.parse(s);
+      const msg=`Vous avez reçu une nouvelle commande de ${fmt(pendingOrder.total)} FCFA.`;
+      await sb.from('notifications').insert({user_id:v.id,titre:notifTitre,message:msg,type:'commande',lu:false});
+      fetch(`${SUPA_URL}/functions/v1/send-push`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPA_KEY}`,'apikey':SUPA_KEY},body:JSON.stringify({user_id:v.id,title:notifTitre,body:msg,data:{type:'commande'}})}).catch(()=>{});
+    }
+    for(const s of restoUserIds){
+      const v=JSON.parse(s);
+      const msg=`Vous avez reçu une nouvelle commande de ${fmt(pendingOrder.total)} FCFA.`;
+      await sb.from('notifications').insert({user_id:v.id,titre:notifTitre,message:msg,type:'commande',lu:false});
+      fetch(`${SUPA_URL}/functions/v1/send-push`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPA_KEY}`,'apikey':SUPA_KEY},body:JSON.stringify({user_id:v.id,title:notifTitre,body:msg,data:{type:'commande'}})}).catch(()=>{});
+    }
+  }catch(e){console.warn('Notification vendeur non envoyée:',e.message);}
   // Décrémenter le stock des variantes commandées
   for(const i of pendingOrder.items){
     if(i._variantId){
