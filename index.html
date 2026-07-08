@@ -948,15 +948,16 @@ function playNotifSound(){
   }catch(e){console.warn('Son notif:',e.message);}
 }
 // Débloque l'audio dès la première interaction (politique des navigateurs)
+// Se redéclenche à CHAQUE interaction (pas juste une fois) car sur mobile
+// (surtout iOS Safari), le verrou peut se réactiver après une mise en arrière-plan.
 function _unlockAudioOnce(){
   try{const ctx=getAudioCtx();if(ctx.state==='suspended')ctx.resume();}catch(e){}
-  document.removeEventListener('click',_unlockAudioOnce);
-  document.removeEventListener('touchstart',_unlockAudioOnce);
-  document.removeEventListener('keydown',_unlockAudioOnce);
 }
 document.addEventListener('click',_unlockAudioOnce);
 document.addEventListener('touchstart',_unlockAudioOnce);
+document.addEventListener('touchend',_unlockAudioOnce);
 document.addEventListener('keydown',_unlockAudioOnce);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')_unlockAudioOnce();});
 async function initPushNotifications(){
   if(!currentUser)return;
   if(!('Notification' in window)||!('serviceWorker' in navigator))return;
