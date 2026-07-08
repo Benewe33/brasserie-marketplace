@@ -935,6 +935,7 @@ function getAudioCtx(){
 function playNotifSound(){
   try{
     const ctx=getAudioCtx();
+    toast('🔊 Audio: '+ctx.state,'info'); // DEBUG TEMPORAIRE — à retirer une fois le son validé
     const doPlay=()=>{
       const o=ctx.createOscillator();const g=ctx.createGain();
       o.connect(g);g.connect(ctx.destination);
@@ -943,9 +944,9 @@ function playNotifSound(){
       g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);
       o.start();o.stop(ctx.currentTime+0.3);
     };
-    if(ctx.state==='suspended')ctx.resume().then(doPlay).catch(()=>{});
+    if(ctx.state==='suspended')ctx.resume().then(doPlay).catch(e=>toast('🔇 resume() a échoué: '+e.message,'err'));
     else doPlay();
-  }catch(e){console.warn('Son notif:',e.message);}
+  }catch(e){toast('🔇 Erreur son: '+e.message,'err');}
 }
 // Débloque l'audio dès la première interaction (politique des navigateurs)
 // Se redéclenche à CHAQUE interaction (pas juste une fois) car sur mobile
