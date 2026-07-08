@@ -927,9 +927,36 @@ function initFirebaseApp(){
     });
   }catch(e){console.warn('Firebase init:',e.message);}
 }
-function playNotifSound(){
-  try{const ctx=new (window.AudioContext||window.webkitAudioContext)();const o=ctx.createOscillator();const g=ctx.createGain();o.connect(g);g.connect(ctx.destination);o.frequency.value=880;g.gain.setValueAtTime(0.3,ctx.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);o.start();o.stop(ctx.currentTime+0.3);}catch(e){}
+let _audioCtx=null;
+function getAudioCtx(){
+  if(!_audioCtx)_audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+  return _audioCtx;
 }
+function playNotifSound(){
+  try{
+    const ctx=getAudioCtx();
+    const doPlay=()=>{
+      const o=ctx.createOscillator();const g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.frequency.value=880;
+      g.gain.setValueAtTime(0.3,ctx.currentTime);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.3);
+      o.start();o.stop(ctx.currentTime+0.3);
+    };
+    if(ctx.state==='suspended')ctx.resume().then(doPlay).catch(()=>{});
+    else doPlay();
+  }catch(e){console.warn('Son notif:',e.message);}
+}
+// Débloque l'audio dès la première interaction (politique des navigateurs)
+function _unlockAudioOnce(){
+  try{const ctx=getAudioCtx();if(ctx.state==='suspended')ctx.resume();}catch(e){}
+  document.removeEventListener('click',_unlockAudioOnce);
+  document.removeEventListener('touchstart',_unlockAudioOnce);
+  document.removeEventListener('keydown',_unlockAudioOnce);
+}
+document.addEventListener('click',_unlockAudioOnce);
+document.addEventListener('touchstart',_unlockAudioOnce);
+document.addEventListener('keydown',_unlockAudioOnce);
 async function initPushNotifications(){
   if(!currentUser)return;
   if(!('Notification' in window)||!('serviceWorker' in navigator))return;
