@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Espace Agence — Yéyé Market</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
 :root{
@@ -498,6 +500,42 @@ async function sendPush(userId,title,body,data){
 }
 
 const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
+
+// ============ NOTIFICATIONS PUSH (Firebase Cloud Messaging) ============
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyB2AhjG3Zw46zO3C_GPaqBHuTVvjJJESe8",
+  authDomain: "yeyemarket-a3d09.firebaseapp.com",
+  projectId: "yeyemarket-a3d09",
+  storageBucket: "yeyemarket-a3d09.firebasestorage.app",
+  messagingSenderId: "232655346156",
+  appId: "1:232655346156:web:631ba36770df0415c548c9"
+};
+const VAPID_KEY = "BNaK8lgYGypmUepu9q-susZL8y3nRrkLa-uLB8kiWALgtLa78CXpwkLzuJtzM0hEcZytxnaMSBcIYIvsNghvrYw";
+
+let _fcmMessaging=null;
+function initFirebaseApp(){
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+    _fcmMessaging=firebase.messaging();
+    _fcmMessaging.onMessage(payload=>{
+      const n=payload.notification||{};
+      toast('🔔 '+(n.title||'Notification')+(n.body?' — '+n.body:''),'info');
+    });
+  }catch(e){console.warn('Firebase init:',e.message);}
+}
+async function initPushNotifications(){
+  if(!currentUser)return;
+  if(!('Notification' in window)||!('serviceWorker' in navigator))return;
+  if(!_fcmMessaging)return;
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted')return;
+    const reg=await navigator.serviceWorker.ready;
+    const token=await _fcmMessaging.getToken({vapidKey:VAPID_KEY,serviceWorkerRegistration:reg});
+    if(!token)return;
+    await sb.from('push_tokens').upsert({user_id:currentUser.id,token,plateforme:'web',actif:true,updated_at:new Date().toISOString()},{onConflict:'token'});
+  }catch(e){console.warn('Push notif non activée:',e.message);}
+}
 const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 let currentUser=null,currentAgence=null;
@@ -600,6 +638,7 @@ async function loadAgence(){
   if(currentAgence.statut==='en_attente'){badge.textContent='⏳ En attente de validation';badge.style.background='var(--orl)';badge.style.color='var(--or)';}
   else if(currentAgence.statut==='suspendu'){badge.textContent='⛔ Suspendu';badge.style.background='var(--rl)';badge.style.color='var(--r)';}
   loadDashboard();
+  initPushNotifications();
 }
 
 // Masque Finances + Paramètres pour les Managers (accès restreint)
@@ -1469,6 +1508,7 @@ async function saveFreq(v){
   currentAgence.freq_paiement=v;toast('✅ Fréquence enregistrée','ok');
 }
 
+initFirebaseApp();
 checkSession();
 </script>
 </body>
