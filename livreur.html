@@ -807,6 +807,18 @@ async function submitLogin2fa(){
   loadLivreur();
 }
 
+// ============ ENVOI DE NOTIFICATION PUSH RÉELLE ============
+async function sendPush(userId,title,body,data){
+  if(!userId)return;
+  try{
+    await fetch(`${SUPA_URL}/functions/v1/send-push`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPA_KEY}`,'apikey':SUPA_KEY},
+      body:JSON.stringify({user_id:userId,title,body,data:data||{}})
+    });
+  }catch(e){console.warn('Push non envoyé:',e.message);}
+}
+
 const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
 const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
@@ -1088,6 +1100,15 @@ async function updateLivraison(id,statut){
     // La commande passe "en route" => déclenche la carte côté client
     if(liv)await sb.from('commandes').update({statut:'en_livraison'}).eq('id',liv.commande_id);
     if(liv)demarrerSuiviGPS(liv.commande_id);
+    if(liv){
+      const {data:cmdEnRoute}=await sb.from('commandes').select('client_id').eq('id',liv.commande_id).single();
+      if(cmdEnRoute?.client_id){
+        const titre='Livreur en route 🚴';
+        const message='Votre livreur a récupéré le colis et est en chemin.';
+        await sb.from('notifications').insert({user_id:cmdEnRoute.client_id,titre,message,type:'livraison',lu:false});
+        sendPush(cmdEnRoute.client_id,titre,message,{type:'livraison'});
+      }
+    }
     toast('🚴 Livraison démarrée !','ok');
   } else if(statut==='livree'){
     if(liv)await sb.from('commandes').update({statut:'livree'}).eq('id',liv.commande_id);
@@ -1180,7 +1201,12 @@ async function confirmerLivraisonAvecPhoto(input){
   if(liv)await sb.from('commandes').update({statut:'livree'}).eq('id',liv.commande_id);
   try{
     const {data:cmd}=await sb.from('commandes').select('client_id').eq('id',liv.commande_id).single();
-    if(cmd?.client_id)await sb.from('notifications').insert({user_id:cmd.client_id,titre:'Colis livré 🎉',message:'Votre commande a été livrée. Une photo de preuve est disponible dans le suivi.',type:'livraison',lu:false});
+    if(cmd?.client_id){
+      const titre='Colis livré 🎉';
+      const message='Votre commande a été livrée. Une photo de preuve est disponible dans le suivi.';
+      await sb.from('notifications').insert({user_id:cmd.client_id,titre,message,type:'livraison',lu:false});
+      sendPush(cmd.client_id,titre,message,{type:'livraison'});
+    }
   }catch(e){}
   arreterSuiviGPS();
   st.textContent='';closeModal('m-preuve');
