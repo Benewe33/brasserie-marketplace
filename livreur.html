@@ -7,6 +7,8 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚴</text></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -820,6 +822,42 @@ async function sendPush(userId,title,body,data){
 }
 
 const SUPA_URL='https://omkmmlbdkzhorrrbeabm.supabase.co';
+
+// ============ NOTIFICATIONS PUSH (Firebase Cloud Messaging) ============
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyB2AhjG3Zw46zO3C_GPaqBHuTVvjJJESe8",
+  authDomain: "yeyemarket-a3d09.firebaseapp.com",
+  projectId: "yeyemarket-a3d09",
+  storageBucket: "yeyemarket-a3d09.firebasestorage.app",
+  messagingSenderId: "232655346156",
+  appId: "1:232655346156:web:631ba36770df0415c548c9"
+};
+const VAPID_KEY = "BNaK8lgYGypmUepu9q-susZL8y3nRrkLa-uLB8kiWALgtLa78CXpwkLzuJtzM0hEcZytxnaMSBcIYIvsNghvrYw";
+
+let _fcmMessaging=null;
+function initFirebaseApp(){
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+    _fcmMessaging=firebase.messaging();
+    _fcmMessaging.onMessage(payload=>{
+      const n=payload.notification||{};
+      toast('🔔 '+(n.title||'Notification')+(n.body?' — '+n.body:''),'info');
+    });
+  }catch(e){console.warn('Firebase init:',e.message);}
+}
+async function initPushNotifications(){
+  if(!currentUser)return;
+  if(!('Notification' in window)||!('serviceWorker' in navigator))return;
+  if(!_fcmMessaging)return;
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted')return;
+    const reg=await navigator.serviceWorker.ready;
+    const token=await _fcmMessaging.getToken({vapidKey:VAPID_KEY,serviceWorkerRegistration:reg});
+    if(!token)return;
+    await sb.from('push_tokens').upsert({user_id:currentUser.id,token,plateforme:'web',actif:true,updated_at:new Date().toISOString()},{onConflict:'token'});
+  }catch(e){console.warn('Push notif non activée:',e.message);}
+}
 const SUPA_KEY='sb_publishable_iRVe8__SUK3ol0UGdo9FDA_B-6iovQs';
 const sb=supabase.createClient(SUPA_URL,SUPA_KEY);
 let currentUser=null,currentLivreur=null,uploading=false,uploadCount=0,contratLu=false;
@@ -936,7 +974,7 @@ async function uploadDoc(input,bucket,urlId,prevId,progId,statusId){
 }
 
 // AUTH
-async function checkSession(){const {data:{session}}=await sb.auth.getSession();if(!session){showAuth();return;}currentUser=session.user;await loadLivreur();}
+async function checkSession(){const {data:{session}}=await sb.auth.getSession();if(!session){showAuth();return;}currentUser=session.user;await loadLivreur();initPushNotifications();}
 function showAuth(){document.getElementById('auth-page').style.display='flex';document.getElementById('app').style.display='none';document.getElementById('pending-page').style.display='none';loadZonesSelect();}
 
 async function doLogin(){
@@ -948,6 +986,7 @@ async function doLogin(){
   const {data:aal}=await sb.auth.mfa.getAuthenticatorAssuranceLevel();
   if(aal&&aal.nextLevel==='aal2'&&aal.nextLevel!==aal.currentLevel){show2faPrompt();return;}
   await loadLivreur();
+  initPushNotifications();
 }
 
 async function doRegister(){
@@ -1422,6 +1461,7 @@ function fdate(d){if(!d)return'—';return new Date(d).toLocaleDateString('fr-FR
 function openModal(id){document.getElementById(id).classList.add('open');}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function toast(msg,type='info'){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3500);}
+initFirebaseApp();
 checkSession();
 
 // ============================================================
