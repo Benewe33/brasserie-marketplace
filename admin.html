@@ -288,7 +288,7 @@ tr:hover td{background:var(--g50)}
     <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
   </button>
   <aside class="sidebar" id="sidebar">
-    <div class="sb-head"><div class="ico">🌿</div><h2 class="sb-label">Yéyé Market</h2><p class="sb-label">Administration</p></div>
+    <div class="sb-head"><img id="sb-logo" src="" alt="" style="width:40px;height:40px;object-fit:contain;border-radius:8px;display:none;"><div class="ico" id="sb-ico-fallback">🌿</div><h2 class="sb-label">Yéyé Market</h2><p class="sb-label">Administration</p></div>
     <nav class="sb-nav">
       <div class="sb-sec">Vue d'ensemble</div>
       <button class="sb-btn active" onclick="go('dashboard',this)">
@@ -2128,6 +2128,7 @@ async function loadParametres(){  try{
     const p={};(data||[]).forEach(r=>p[r.cle]=r.valeur);
     // Général
     setVal('set-nom',p.nom_plateforme);setVal('set-logo',p.logo_url);setLogoPreview(p.logo_url);
+    if(p.logo_url){const sbL=document.getElementById('sb-logo');const sbF=document.getElementById('sb-ico-fallback');if(sbL){sbL.src=p.logo_url;sbL.style.display='';if(sbF)sbF.style.display='none';}const fav=document.querySelector("link[rel='icon']");if(fav)fav.href=p.logo_url;}
     setVal('set-contact',p.contact);setVal('set-email',p.email_support);
     // Livraison
     setVal('set-rayon',p.rayon_livraison);setVal('set-frais',p.frais_livraison);setVal('set-temps',p.temps_estime);
