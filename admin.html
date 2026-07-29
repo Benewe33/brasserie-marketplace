@@ -260,6 +260,73 @@ tr:hover td{background:var(--g50)}
 .color-pick::-webkit-color-swatch-wrapper{padding:0}
 .carte-pin{font-size:22px;line-height:1;text-align:center;filter:drop-shadow(0 2px 3px rgba(0,0,0,.3))}
 .stat-neg{color:var(--r)!important}
+
+/* ===== DASHBOARD V2 ===== */
+.topbar{gap:16px}
+.topbar-search{flex:1;max-width:420px;position:relative}
+.topbar-search input{width:100%;padding:10px 14px 10px 38px;border:1.5px solid var(--g200);border-radius:10px;font-size:13px;font-family:inherit;outline:none;background:var(--g50);transition:border .2s}
+.topbar-search input:focus{border-color:var(--v);background:#fff}
+.topbar-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:16px;height:16px;stroke:var(--g400);pointer-events:none}
+.topbar-date{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--g600);background:var(--g50);padding:9px 13px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.topbar-profile{display:flex;align-items:center;gap:8px;background:var(--g50);padding:6px 12px 6px 6px;border-radius:20px;flex-shrink:0}
+.topbar-avatar{width:32px;height:32px;border-radius:50%;background:var(--vd);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
+@media(max-width:900px){.topbar-search{display:none}}
+
+.dash-greet{margin-bottom:22px}
+.dash-greet h1{font-size:21px;font-weight:700}
+.dash-greet p{font-size:13px;color:var(--g400);margin-top:3px}
+
+.kpi2-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+.kpi2{background:#fff;border-radius:14px;padding:18px 20px;box-shadow:var(--shadow)}
+.kpi2-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.kpi2-ico{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.kpi2-label{font-size:12.5px;color:var(--g400);font-weight:500}
+.kpi2-val{font-size:23px;font-weight:700;margin:2px 0 5px}
+.kpi2-trend{font-size:11.5px;font-weight:600}
+.kpi2-trend.up{color:var(--gr)}.kpi2-trend.down{color:var(--r)}.kpi2-trend.flat{color:var(--g400)}
+.kpi2-spark{height:32px;margin-top:6px}
+
+.dash-main-grid{display:grid;grid-template-columns:1fr 300px;gap:16px;margin-bottom:16px;align-items:start}
+.dash-row{display:grid;grid-template-columns:2fr 1fr;gap:16px}
+.dash-row-3{display:grid;grid-template-columns:1.6fr 1fr 1fr;gap:16px;margin-bottom:20px;align-items:start}
+@media(max-width:1100px){
+  .kpi2-grid{grid-template-columns:repeat(2,1fr)}
+  .dash-main-grid,.dash-row,.dash-row-3{grid-template-columns:1fr}
+}
+
+.evo-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap}
+.evo-toggle{display:flex;gap:4px;background:var(--g100);padding:3px;border-radius:9px;flex-shrink:0}
+.evo-toggle button{border:none;background:none;font-size:12px;font-weight:600;padding:6px 12px;border-radius:6px;cursor:pointer;color:var(--g600);font-family:inherit}
+.evo-toggle button.active{background:#fff;color:var(--vd);box-shadow:var(--shadow)}
+
+.side-card{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:18px 20px;margin-bottom:16px}
+.side-card:last-child{margin-bottom:0}
+.side-card h3{font-size:14px;font-weight:600;margin-bottom:12px;color:var(--g900)}
+.today-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--g50);font-size:13px;color:var(--g600)}
+.today-row:last-child{border-bottom:none}
+.today-dot{width:9px;height:9px;border-radius:50%;display:inline-block;margin-right:8px}
+.today-val{font-weight:700;color:var(--g900)}
+
+.qa-btn{display:flex;align-items:center;gap:9px;width:100%;padding:10px 12px;border-radius:9px;border:1px solid var(--g100);background:var(--g50);color:var(--g900);font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;margin-bottom:8px;text-align:left;transition:background .15s}
+.qa-btn:last-child{margin-bottom:0}
+.qa-btn:hover{background:var(--vl)}
+
+.todo-row{display:flex;align-items:center;justify-content:space-between;padding:9px 2px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--g600);transition:background .15s}
+.todo-row:hover{background:var(--g50)}
+.todo-badge{background:var(--rl);color:var(--r);font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;min-width:20px;text-align:center}
+.todo-badge.zero{background:var(--g100);color:var(--g400)}
+
+.donut-legend{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.donut-legend-item{display:flex;align-items:center;justify-content:space-between;font-size:12.5px}
+.donut-legend-left{display:flex;align-items:center;gap:7px;color:var(--g600)}
+.donut-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.donut-total{text-align:center;font-size:12px;color:var(--g400);margin-top:12px;padding-top:10px;border-top:1px solid var(--g50)}
+
+.activity-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--g50)}
+.activity-row:last-child{border-bottom:none}
+.activity-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:var(--g100)}
+.activity-txt{flex:1;font-size:13px;color:var(--g900);min-width:0}
+.activity-time{font-size:11.5px;color:var(--g400);white-space:nowrap;flex-shrink:0}
 </style>
 </head>
 <body>
@@ -376,11 +443,19 @@ tr:hover td{background:var(--g50)}
   <main class="main">
     <div class="topbar">
       <h1 id="ptitle">Tableau de bord</h1>
+      <div class="topbar-search">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input type="text" id="topbar-search-input" placeholder="Rechercher (commandes, clients, produits...)" onkeydown="if(event.key==='Enter')doTopSearch()"/>
+      </div>
       <div style="display:flex;align-items:center;gap:12px">
+        <div class="topbar-date" id="topbar-date">📅 —</div>
         <button onclick="openNotifs()" style="position:relative;background:rgba(255,255,255,.1);border:none;cursor:pointer;width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;transition:background .2s" onmouseover="this.style.background='rgba(0,0,0,.08)'" onmouseout="this.style.background='rgba(255,255,255,.1)'">
           🔔<span id="notif-badge" style="position:absolute;top:-2px;right:-2px;background:var(--r);color:#fff;font-size:10px;font-weight:700;width:18px;height:18px;border-radius:50%;display:none;align-items:center;justify-content:center">0</span>
         </button>
-        <span class="badge-role">🛡️ Administrateur</span>
+        <div class="topbar-profile">
+          <div class="topbar-avatar">A</div>
+          <span style="font-size:13px;font-weight:600;color:var(--g900)">Administrateur</span>
+        </div>
       </div>
     </div>
 
@@ -399,27 +474,96 @@ tr:hover td{background:var(--g50)}
 
     <!-- DASHBOARD -->
     <div class="sec active" id="sec-dashboard">
+      <div class="dash-greet">
+        <h1>Bonjour, Administrateur 👋</h1>
+        <p>Voici un aperçu des performances de Yéyé Market.</p>
+      </div>
+
       <!-- KPIs -->
-      <div class="kpi-grid">
-        <div class="kpi" style="border-color:var(--vd)"><div class="kpi-ico">💰</div><div class="kpi-val" id="kpi-ca">—</div><div class="kpi-label">Chiffre d'affaires</div><div class="kpi-trend trend-up" id="kpi-ca-trend"></div></div>
-        <div class="kpi" style="border-color:#2563eb"><div class="kpi-ico">🛒</div><div class="kpi-val" id="kpi-cmds">—</div><div class="kpi-label">Commandes totales</div><div class="kpi-trend" id="kpi-cmds-trend"></div></div>
-        <div class="kpi" style="border-color:#d97706"><div class="kpi-ico">👥</div><div class="kpi-val" id="kpi-clients">—</div><div class="kpi-label">Clients inscrits</div><div class="kpi-trend trend-up" id="kpi-clients-trend"></div></div>
-        <div class="kpi" style="border-color:#16a34a"><div class="kpi-ico">📦</div><div class="kpi-val" id="kpi-prods">—</div><div class="kpi-label">Produits actifs</div><div class="kpi-trend" id="kpi-prods-trend"></div></div>
+      <div class="kpi2-grid">
+        <div class="kpi2">
+          <div class="kpi2-top"><div class="kpi2-ico" style="background:var(--vl);color:var(--vd)">💰</div><div class="kpi2-label">Chiffre d'affaires</div></div>
+          <div class="kpi2-val" id="kpi-ca">—</div>
+          <div class="kpi2-trend" id="kpi-ca-trend">—</div>
+          <div class="kpi2-spark"><canvas id="spark-ca"></canvas></div>
+        </div>
+        <div class="kpi2">
+          <div class="kpi2-top"><div class="kpi2-ico" style="background:var(--bll);color:var(--bl)">🛒</div><div class="kpi2-label">Commandes</div></div>
+          <div class="kpi2-val" id="kpi-cmds">—</div>
+          <div class="kpi2-trend" id="kpi-cmds-trend">—</div>
+          <div class="kpi2-spark"><canvas id="spark-cmds"></canvas></div>
+        </div>
+        <div class="kpi2">
+          <div class="kpi2-top"><div class="kpi2-ico" style="background:var(--orl);color:var(--or)">👥</div><div class="kpi2-label">Clients</div></div>
+          <div class="kpi2-val" id="kpi-clients">—</div>
+          <div class="kpi2-trend" id="kpi-clients-trend">—</div>
+          <div class="kpi2-spark"><canvas id="spark-clients"></canvas></div>
+        </div>
+        <div class="kpi2">
+          <div class="kpi2-top"><div class="kpi2-ico" style="background:var(--grl);color:var(--gr)">📦</div><div class="kpi2-label">Produits actifs</div></div>
+          <div class="kpi2-val" id="kpi-prods">—</div>
+          <div class="kpi2-trend" id="kpi-prods-trend">—</div>
+          <div class="kpi2-spark"><canvas id="spark-prods"></canvas></div>
+        </div>
       </div>
-      <!-- CHARTS -->
-      <div class="stats-grid-2">
-        <div class="chart-card"><h3>📈 Commandes — 7 derniers jours</h3><div class="chart-wrap"><canvas id="chart-cmds"></canvas></div></div>
-        <div class="chart-card"><h3>💰 Revenus — 7 derniers jours</h3><div class="chart-wrap"><canvas id="chart-ca"></canvas></div></div>
+
+      <!-- EVOLUTION + ACTIONS RAPIDES / A TRAITER -->
+      <div class="dash-main-grid">
+        <div>
+          <div class="dash-row">
+            <div class="chart-card" style="margin-bottom:0">
+              <div class="evo-head">
+                <h3 style="margin:0">📈 Évolution du chiffre d'affaires</h3>
+                <div class="evo-toggle" id="evo-toggle">
+                  <button class="active" onclick="setEvoRange(7,this)">7 jours</button>
+                  <button onclick="setEvoRange(30,this)">30 jours</button>
+                  <button onclick="setEvoRange(90,this)">3 mois</button>
+                </div>
+              </div>
+              <div class="chart-wrap" style="height:280px"><canvas id="chart-evo"></canvas></div>
+            </div>
+            <div class="side-card" style="margin-bottom:0">
+              <h3>📅 Commandes aujourd'hui</h3>
+              <div class="today-row"><span><span class="today-dot" style="background:var(--gr)"></span>Livrées</span><span class="today-val" id="today-livree">—</span></div>
+              <div class="today-row"><span><span class="today-dot" style="background:var(--or)"></span>En préparation</span><span class="today-val" id="today-prep">—</span></div>
+              <div class="today-row"><span><span class="today-dot" style="background:var(--bl)"></span>En livraison</span><span class="today-val" id="today-livraison">—</span></div>
+              <div class="today-row"><span><span class="today-dot" style="background:var(--r)"></span>Annulées</span><span class="today-val" id="today-annulee">—</span></div>
+              <a onclick="goSection('commandes')" style="display:block;text-align:center;margin-top:14px;font-size:12.5px;color:var(--vd);font-weight:600;cursor:pointer">Voir toutes les commandes →</a>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="side-card">
+            <h3>⚡ Actions rapides</h3>
+            <button class="qa-btn" onclick="qaAjouterProduit()"><span>➕</span> Ajouter un produit</button>
+            <button class="qa-btn" onclick="goSection('commandes')"><span>🛒</span> Nouvelle commande</button>
+            <button class="qa-btn" onclick="qaNouveauCompte('vendeur')"><span>🏪</span> Nouveau vendeur</button>
+            <button class="qa-btn" onclick="qaNouveauCompte('restaurant')"><span>🍽️</span> Nouveau restaurant</button>
+            <button class="qa-btn" onclick="goSection('rapports')"><span>📊</span> Voir les rapports</button>
+          </div>
+          <div class="side-card">
+            <h3>🔔 À traiter aujourd'hui</h3>
+            <div class="todo-row" onclick="goSection('commandes')"><span>🛒 Commandes en attente</span><span class="todo-badge" id="todo-cmds">0</span></div>
+            <div class="todo-row" onclick="goSection('vendeurs')"><span>🏪 Vendeurs à valider</span><span class="todo-badge" id="todo-vendeurs">0</span></div>
+            <div class="todo-row" onclick="goSection('restaurants')"><span>🍽️ Restaurants à vérifier</span><span class="todo-badge" id="todo-restaurants">0</span></div>
+            <div class="todo-row" onclick="goSection('paiements')"><span>💳 Paiements en attente</span><span class="todo-badge" id="todo-paiements">0</span></div>
+            <div class="todo-row" onclick="goSection('avis')"><span>⭐ Nouveaux avis</span><span class="todo-badge" id="todo-avis">0</span></div>
+          </div>
+        </div>
       </div>
-      <div class="stats-grid-2">
-        <div class="chart-card"><h3>🏆 Top 5 produits vendus</h3><div id="top-produits"><div style="text-align:center;color:var(--g400);padding:20px">Chargement...</div></div></div>
-        <div class="chart-card"><h3>🥧 Répartition des statuts</h3><div class="chart-wrap"><canvas id="chart-statuts"></canvas></div></div>
+
+      <!-- DERNIERES COMMANDES / PRODUITS VENDUS / REPARTITION -->
+      <div class="dash-row-3">
+        <div class="card" style="margin-bottom:0"><div class="card-head"><h2>📋 Dernières commandes</h2><a onclick="goSection('commandes')" style="font-size:12.5px;color:var(--vd);font-weight:600;cursor:pointer">Voir toutes →</a></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead><tbody id="dash-cmd"></tbody></table></div></div></div>
+        <div class="chart-card" style="margin-bottom:0"><h3 style="display:flex;justify-content:space-between;align-items:center">🏆 Produits les plus vendus <a onclick="goSection('produits')" style="font-size:11.5px;color:var(--vd);font-weight:600;cursor:pointer">Voir tout →</a></h3><div id="top-produits"><div style="text-align:center;color:var(--g400);padding:20px">Chargement...</div></div></div>
+        <div class="chart-card" style="margin-bottom:0"><h3>🥧 Répartition des commandes</h3><div class="chart-wrap" style="height:170px"><canvas id="chart-repartition"></canvas></div><div class="donut-legend" id="repartition-legend"></div><div class="donut-total" id="repartition-total"></div></div>
       </div>
-      <!-- BOTTOM ROW -->
-      <div class="stats-grid-2">
-        <div class="card" style="margin-bottom:0"><div class="card-head"><h2>⏳ Inscriptions en attente</h2></div><div class="card-body" id="pending-wrap"><div class="empty"><span class="eico">✅</span><p>Aucune inscription en attente</p></div></div></div>
-        <div class="card" style="margin-bottom:0"><div class="card-head"><h2>📋 Dernières commandes</h2></div><div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Client</th><th>Total</th><th>Statut</th><th>Date</th></tr></thead><tbody id="dash-cmd"></tbody></table></div></div></div>
-      </div>
+
+      <!-- ACTIVITE RECENTE -->
+      <div class="card"><div class="card-head"><h2>🕓 Activité récente</h2></div><div class="card-body" id="activite-recente"><div style="text-align:center;color:var(--g400);padding:20px">Chargement...</div></div></div>
+
+      <!-- INSCRIPTIONS EN ATTENTE (conservé — actions de validation réelles) -->
+      <div class="card"><div class="card-head"><h2>⏳ Inscriptions en attente</h2></div><div class="card-body" id="pending-wrap"><div class="empty"><span class="eico">✅</span><p>Aucune inscription en attente</p></div></div></div>
     </div>
 
     <!-- CATEGORIES -->
@@ -1262,6 +1406,7 @@ async function checkSession(){
 function showApp(){
   document.getElementById('loginWrap').style.display='none';
   document.getElementById('app').style.display='flex';
+  const td=document.getElementById('topbar-date');if(td)td.textContent='📅 '+new Date().toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'});
   loadDashboard();loadAdvancedStats();
   // Load logo into sidebar at startup
   sb.from('parametres').select('cle,valeur').then(({data})=>{if(!data)return;const p={};data.forEach(r=>p[r.cle]=r.valeur);if(p.logo_url){const sbL=document.getElementById('sb-logo');const sbF=document.getElementById('sb-ico-fallback');if(sbL){sbL.src=p.logo_url;sbL.style.display='';if(sbF)sbF.style.display='none';}const fav=document.querySelector("link[rel='icon']");if(fav)fav.href=p.logo_url;}});
@@ -2490,38 +2635,201 @@ function subscribeToNotifs(userId){
 }
 
 
+// ============================================================
+// DASHBOARD V2 — helpers (navigation, recherche, actions rapides)
+// ============================================================
+function goSection(name){
+  const btn=document.querySelector(`.sb-btn[onclick*="go('${name}'"]`);
+  if(btn)go(name,btn);
+}
+function qaAjouterProduit(){goSection('produits');setTimeout(()=>{if(typeof openProd==='function')openProd();},250);}
+function qaNouveauCompte(type){
+  goSection('comptes');
+  setTimeout(()=>{
+    const id=type==='vendeur'?'cv-nom':type==='restaurant'?'cr-nom':'cl-nom';
+    const el=document.getElementById(id);if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.focus();}
+  },250);
+}
+function doTopSearch(){
+  const v=(document.getElementById('topbar-search-input').value||'').trim();
+  if(!v)return;
+  const isCmd=/^#?[0-9a-f-]{6,}$/i.test(v.replace('#',''));
+  const target=isCmd?'commandes':'clients';
+  goSection(target);
+  if(!isCmd){
+    setTimeout(()=>{
+      const i=document.querySelector('#sec-clients input[type="text"]');
+      if(i){i.value=v;i.dispatchEvent(new Event('input'));}
+    },250);
+  }
+}
+function setTodoBadge(id,n){const b=document.getElementById(id);if(!b)return;b.textContent=n;b.classList.toggle('zero',!n);}
+function timeAgo(d){
+  const s=Math.floor((Date.now()-new Date(d).getTime())/1000);
+  if(s<60)return 'À l\'instant';
+  if(s<3600)return `Il y a ${Math.floor(s/60)} min`;
+  if(s<86400)return `Il y a ${Math.floor(s/3600)} h`;
+  return `Il y a ${Math.floor(s/86400)} j`;
+}
+
+let _evoCmds=[]; // cache des commandes pour le graphique d'évolution
+function setEvoRange(days,btn){
+  document.querySelectorAll('#evo-toggle button').forEach(b=>b.classList.remove('active'));
+  if(btn)btn.classList.add('active');
+  drawEvoChart(days);
+}
+function drawEvoChart(days){
+  const labels=[],ca=[],nbCmds=[];
+  const weekly=days>30;
+  if(!weekly){
+    for(let i=days-1;i>=0;i--){
+      const d=new Date();d.setDate(d.getDate()-i);d.setHours(0,0,0,0);
+      const next=new Date(d);next.setDate(next.getDate()+1);
+      const dc=_evoCmds.filter(c=>{const t=new Date(c.created_at);return t>=d&&t<next;});
+      nbCmds.push(dc.length);
+      ca.push(dc.filter(c=>c.statut==='livree').reduce((s,c)=>s+(c.total||0),0));
+      labels.push(d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}));
+    }
+  }else{
+    const weeks=Math.ceil(days/7);
+    for(let i=weeks-1;i>=0;i--){
+      const end=new Date();end.setHours(0,0,0,0);end.setDate(end.getDate()-i*7);
+      const start=new Date(end);start.setDate(start.getDate()-7);
+      const dc=_evoCmds.filter(c=>{const t=new Date(c.created_at);return t>=start&&t<end;});
+      nbCmds.push(dc.length);
+      ca.push(dc.filter(c=>c.statut==='livree').reduce((s,c)=>s+(c.total||0),0));
+      labels.push(start.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}));
+    }
+  }
+  const old=Chart.getChart('chart-evo');if(old)old.destroy();
+  new Chart(document.getElementById('chart-evo'),{
+    type:'line',
+    data:{labels,datasets:[
+      {label:'Chiffre d\'affaires (FCFA)',data:ca,borderColor:'#1a6b3c',backgroundColor:'rgba(26,107,60,.08)',fill:true,tension:.35,pointRadius:3,yAxisID:'y'},
+      {label:'Commandes',data:nbCmds,borderColor:'#2563eb',backgroundColor:'transparent',borderDash:[5,4],tension:.35,pointRadius:3,yAxisID:'y1'}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'top',labels:{font:{size:11},boxWidth:12}}},
+      scales:{y:{beginAtZero:true,position:'left',ticks:{font:{size:10}}},y1:{beginAtZero:true,position:'right',grid:{drawOnChartArea:false},ticks:{stepSize:1,font:{size:10}}}}}
+  });
+}
+function drawSpark(id,data,color){
+  const old=Chart.getChart(id);if(old)old.destroy();
+  const el=document.getElementById(id);if(!el)return;
+  new Chart(el,{type:'line',data:{labels:data.map(()=>''),datasets:[{data,borderColor:color,backgroundColor:'transparent',tension:.4,pointRadius:0,borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}}}});
+}
+function trendHtml(pct,elId){
+  const e=document.getElementById(elId);if(!e)return;
+  if(!isFinite(pct)||pct===0){e.textContent='— vs 7 derniers jours';e.className='kpi2-trend flat';return;}
+  const up=pct>0;
+  e.textContent=(up?'↑ +':'↓ ')+Math.abs(pct).toFixed(1)+'% vs 7 derniers jours';
+  e.className='kpi2-trend '+(up?'up':'down');
+}
+
 async function loadAdvancedStats(){
-  const {data:cmds}=await sb.from('commandes').select('*,utilisateurs(nom)').order('created_at',{ascending:false});
-  const {data:clients}=await sb.from('utilisateurs').select('id').eq('role','client');
-  const {count:prodsCount}=await sb.from('produits').select('id',{count:'exact',head:true}).eq('actif',true);
+  const {data:cmds}=await sb.from('commandes').select('id,total,statut,created_at').order('created_at',{ascending:false});
+  _evoCmds=cmds||[];
+  const {data:clients}=await sb.from('utilisateurs').select('id,created_at').eq('role','client');
+  const {data:prodsActifs}=await sb.from('produits').select('id,created_at').eq('actif',true);
   const totalCA=(cmds||[]).filter(c=>c.statut==='livree').reduce((s,c)=>s+(c.total||0),0);
   document.getElementById('kpi-ca').textContent=fmt(totalCA)+' FCFA';
   document.getElementById('kpi-cmds').textContent=(cmds||[]).length;
   document.getElementById('kpi-clients').textContent=(clients||[]).length;
-  document.getElementById('kpi-prods').textContent=prodsCount||0;
-  // 7 days
-  const labels7=[],days7=[],ca7=[];
-  for(let i=6;i>=0;i--){
-    const d=new Date();d.setDate(d.getDate()-i);d.setHours(0,0,0,0);
-    const next=new Date(d);next.setDate(next.getDate()+1);
-    const dc=(cmds||[]).filter(c=>new Date(c.created_at)>=d&&new Date(c.created_at)<next);
-    days7.push(dc.length);
-    ca7.push(dc.filter(c=>c.statut==='livree').reduce((s,c)=>s+(c.total||0),0));
-    labels7.push(d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'}));
-  }
-  ['chart-cmds','chart-ca','chart-statuts'].forEach(id=>{const e=Chart.getChart(id);if(e)e.destroy();});
-  new Chart(document.getElementById('chart-cmds'),{type:'bar',data:{labels:labels7,datasets:[{label:'Commandes',data:days7,backgroundColor:'rgba(26,107,60,.7)',borderRadius:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{stepSize:1}}}}});
-  new Chart(document.getElementById('chart-ca'),{type:'line',data:{labels:labels7,datasets:[{label:'FCFA',data:ca7,borderColor:'#2563eb',backgroundColor:'rgba(37,99,235,.1)',fill:true,tension:.4,pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}});
-  const sm={};(cmds||[]).forEach(c=>{sm[c.statut]=(sm[c.statut]||0)+1;});
-  const sl=Object.keys(sm);
-  const sc={'en_attente':'#f59e0b','confirmee':'#3b82f6','en_preparation':'#f97316','en_livraison':'#8b5cf6','livree':'#10b981','annulee':'#ef4444'};
-  new Chart(document.getElementById('chart-statuts'),{type:'doughnut',data:{labels:sl.map(s=>s.replace(/_/g,' ')),datasets:[{data:Object.values(sm),backgroundColor:sl.map(s=>sc[s]||'#9ca3af'),borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}}}});
-  const {data:lignes}=await sb.from('lignes_commande').select('produit_id,nom_item,quantite,produits(image_url)');
-  const pm={};(lignes||[]).forEach(l=>{if(!pm[l.produit_id])pm[l.produit_id]={nom:l.nom_item,qty:0,img:l.produits?.image_url};pm[l.produit_id].qty+=l.quantite;});
+  document.getElementById('kpi-prods').textContent=(prodsActifs||[]).length;
+
+  // ---- Tendances (7 derniers jours vs 7 jours précédents) + sparklines ----
+  const now=new Date();
+  const d7=new Date(now);d7.setDate(d7.getDate()-7);
+  const d14=new Date(now);d14.setDate(d14.getDate()-14);
+  const ca7=(cmds||[]).filter(c=>c.statut==='livree'&&new Date(c.created_at)>=d7).reduce((s,c)=>s+(c.total||0),0);
+  const caPrev7=(cmds||[]).filter(c=>c.statut==='livree'&&new Date(c.created_at)>=d14&&new Date(c.created_at)<d7).reduce((s,c)=>s+(c.total||0),0);
+  const cmds7=(cmds||[]).filter(c=>new Date(c.created_at)>=d7).length;
+  const cmdsPrev7=(cmds||[]).filter(c=>new Date(c.created_at)>=d14&&new Date(c.created_at)<d7).length;
+  const cli7=(clients||[]).filter(c=>c.created_at&&new Date(c.created_at)>=d7).length;
+  const cliPrev7=(clients||[]).filter(c=>c.created_at&&new Date(c.created_at)>=d14&&new Date(c.created_at)<d7).length;
+  const prod7=(prodsActifs||[]).filter(p=>p.created_at&&new Date(p.created_at)>=d7).length;
+  const prodPrev7=(prodsActifs||[]).filter(p=>p.created_at&&new Date(p.created_at)>=d14&&new Date(p.created_at)<d7).length;
+  trendHtml(caPrev7?((ca7-caPrev7)/caPrev7*100):(ca7?100:0),'kpi-ca-trend');
+  trendHtml(cmdsPrev7?((cmds7-cmdsPrev7)/cmdsPrev7*100):(cmds7?100:0),'kpi-cmds-trend');
+  trendHtml(cliPrev7?((cli7-cliPrev7)/cliPrev7*100):(cli7?100:0),'kpi-clients-trend');
+  trendHtml(prodPrev7?((prod7-prodPrev7)/prodPrev7*100):(prod7?100:0),'kpi-prods-trend');
+
+  const sparkDays=[];for(let i=6;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);d.setHours(0,0,0,0);sparkDays.push(d);}
+  const dayEnd=d=>{const n=new Date(d);n.setDate(n.getDate()+1);return n;};
+  drawSpark('spark-ca',sparkDays.map(d=>(cmds||[]).filter(c=>c.statut==='livree'&&new Date(c.created_at)>=d&&new Date(c.created_at)<dayEnd(d)).reduce((s,c)=>s+(c.total||0),0)),'#1a6b3c');
+  drawSpark('spark-cmds',sparkDays.map(d=>(cmds||[]).filter(c=>new Date(c.created_at)>=d&&new Date(c.created_at)<dayEnd(d)).length),'#2563eb');
+  drawSpark('spark-clients',sparkDays.map(d=>(clients||[]).filter(c=>c.created_at&&new Date(c.created_at)>=d&&new Date(c.created_at)<dayEnd(d)).length),'#d97706');
+  drawSpark('spark-prods',sparkDays.map(d=>(prodsActifs||[]).filter(p=>p.created_at&&new Date(p.created_at)>=d&&new Date(p.created_at)<dayEnd(d)).length),'#16a34a');
+
+  // ---- Évolution du CA (défaut 7 jours) ----
+  drawEvoChart(7);
+
+  // ---- Commandes aujourd'hui ----
+  const todayStart=new Date();todayStart.setHours(0,0,0,0);
+  const cmdsToday=(cmds||[]).filter(c=>new Date(c.created_at)>=todayStart);
+  document.getElementById('today-livree').textContent=cmdsToday.filter(c=>c.statut==='livree').length;
+  document.getElementById('today-prep').textContent=cmdsToday.filter(c=>c.statut==='en_preparation').length;
+  document.getElementById('today-livraison').textContent=cmdsToday.filter(c=>c.statut==='en_livraison').length;
+  document.getElementById('today-annulee').textContent=cmdsToday.filter(c=>c.statut==='annulee').length;
+
+  // ---- À traiter aujourd'hui ----
+  setTodoBadge('todo-cmds',(cmds||[]).filter(c=>c.statut==='en_attente').length);
+  try{
+    const [{data:vp},{data:rp}]=await Promise.all([
+      sb.from('boutiques').select('id').eq('statut','en_attente'),
+      sb.from('restaurants').select('id').eq('statut','en_attente')
+    ]);
+    setTodoBadge('todo-vendeurs',(vp||[]).length);
+    setTodoBadge('todo-restaurants',(rp||[]).length);
+  }catch(e){}
+  try{
+    const {data:pay}=await sb.from('paiements').select('id,statut');
+    setTodoBadge('todo-paiements',(pay||[]).filter(p=>p.statut==='en_attente'||p.statut==='en_cours').length);
+  }catch(e){}
+  try{
+    const {data:av}=await sb.from('avis').select('id,created_at');
+    setTodoBadge('todo-avis',(av||[]).filter(a=>new Date(a.created_at)>=todayStart).length);
+  }catch(e){}
+
+  // ---- Produits les plus vendus ----
+  const {data:lignes}=await sb.from('lignes_commande').select('produit_id,menu_id,nom_item,quantite,produits(image_url)');
+  const pm={};(lignes||[]).forEach(l=>{if(!l.produit_id)return;if(!pm[l.produit_id])pm[l.produit_id]={nom:l.nom_item,qty:0,img:l.produits?.image_url};pm[l.produit_id].qty+=l.quantite;});
   const tp=Object.values(pm).sort((a,b)=>b.qty-a.qty).slice(0,5);
   const tw=document.getElementById('top-produits');
-  if(!tp.length){tw.innerHTML='<div style="text-align:center;color:var(--g400);padding:20px">Aucune vente encore</div>';return;}
-  tw.innerHTML=tp.map((p,i)=>`<div class="top-item"><div class="top-rank">${i+1}</div><div class="top-img">${p.img?`<img src="${p.img}" style="width:100%;height:100%;object-fit:cover;border-radius:8px"/>`:'📦'}</div><div class="top-name">${p.nom}</div><div class="top-val">${p.qty} vendus</div></div>`).join('');
+  if(!tp.length){tw.innerHTML='<div style="text-align:center;color:var(--g400);padding:20px">Aucune vente encore</div>';}
+  else tw.innerHTML=tp.map((p,i)=>`<div class="top-item"><div class="top-rank">${i+1}</div><div class="top-img">${p.img?`<img src="${p.img}" style="width:100%;height:100%;object-fit:cover;border-radius:8px"/>`:'📦'}</div><div class="top-name">${p.nom}</div><div class="top-val">${p.qty} vendus</div></div>`).join('');
+
+  // ---- Répartition des commandes (par type de ligne : produits vs menus restaurant) ----
+  // NB: le schéma actuel ne distingue pas de catégorie "services" — approximation à partir des lignes de commande.
+  const nbProd=(lignes||[]).filter(l=>l.produit_id).length;
+  const nbResto=(lignes||[]).filter(l=>l.menu_id).length;
+  const nbAutre=(lignes||[]).length-nbProd-nbResto;
+  const repData=[nbProd,nbResto,nbAutre];
+  const repLabels=['Produits','Restaurants','Autres'];
+  const repColors=['#1a6b3c','#2563eb','#9ca3af'];
+  const oldRep=Chart.getChart('chart-repartition');if(oldRep)oldRep.destroy();
+  new Chart(document.getElementById('chart-repartition'),{type:'doughnut',data:{labels:repLabels,datasets:[{data:repData,backgroundColor:repColors,borderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:false}}}});
+  const repTotal=repData.reduce((a,b)=>a+b,0)||1;
+  document.getElementById('repartition-legend').innerHTML=repLabels.map((l,i)=>`<div class="donut-legend-item"><span class="donut-legend-left"><span class="donut-dot" style="background:${repColors[i]}"></span>${l}</span><strong>${Math.round(repData[i]/repTotal*100)}%</strong></div>`).join('');
+  document.getElementById('repartition-total').textContent=`Total : ${fmt((cmds||[]).length)} commande(s)`;
+
+  // ---- Activité récente ----
+  try{
+    const [{data:recentCmds},{data:recentVendeurs},{data:recentPay}]=await Promise.all([
+      sb.from('commandes').select('id,total,created_at').order('created_at',{ascending:false}).limit(4),
+      sb.from('boutiques').select('nom,created_at').order('created_at',{ascending:false}).limit(4),
+      sb.from('paiements').select('montant,statut,created_at').eq('statut','confirme').order('created_at',{ascending:false}).limit(4)
+    ]);
+    const items=[
+      ...(recentCmds||[]).map(c=>({ico:'🛒',bg:'var(--bll)',txt:`Nouvelle commande #${c.id.substring(0,8)}`,d:c.created_at})),
+      ...(recentVendeurs||[]).map(v=>({ico:'🏪',bg:'var(--vl)',txt:`Vendeur inscrit : ${v.nom||'—'}`,d:v.created_at})),
+      ...(recentPay||[]).map(p=>({ico:'✅',bg:'var(--grl)',txt:`Paiement reçu — ${fmt(p.montant)} FCFA`,d:p.created_at}))
+    ].filter(i=>i.d).sort((a,b)=>new Date(b.d)-new Date(a.d)).slice(0,6);
+    const ar=document.getElementById('activite-recente');
+    if(!items.length){ar.innerHTML='<div style="text-align:center;color:var(--g400);padding:20px">Aucune activité récente</div>';}
+    else ar.innerHTML=items.map(i=>`<div class="activity-row"><div class="activity-ico" style="background:${i.bg}">${i.ico}</div><div class="activity-txt">${i.txt}</div><div class="activity-time">${timeAgo(i.d)}</div></div>`).join('');
+  }catch(e){}
 }
 
 checkSession();
