@@ -450,7 +450,7 @@ let sessionId = null;
 let cartId = null;
 let cart = {};           // {produit_id: {prod, qty}}
 let allProducts = [];
-let history = [];        // Claude message history
+let history = [];        // ancien historique local (conservé pour compat, non utilisé par KORA)
 let isTyping = false;
 let suggestedIds = new Set();
 
@@ -525,6 +525,7 @@ async function loadProducts() {
   allProducts = data || [];
 }
 
+async function initSession() {
   // Tentative silencieuse vers Supabase si la table existe
   if (currentUser) {
     try {
@@ -688,194 +689,208 @@ async function executeTool(name, input) {
 }
 
 // ============================================================
-// MOTEUR IA — Groq (Llama 4 Scout) + Tool Calling
+// KORA — Moteur IA réel (Claude, tool calling natif)
 // ============================================================
+const KORA_TOOLS = [
+  {
+    name: 'search_products',
+    description: "Recherche des produits dans le catalogue Yéyé Market selon une requête, un budget maximum et/ou une catégorie.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: "Termes de recherche, ex: 'poisson fumé'" },
+        budget_max: { type: 'number', description: 'Budget maximum en FCFA' },
+        categorie: { type: 'string', description: "Catégorie de produit, ex: 'légumes'" },
+      },
+    },
+  },
+  {
+    name: 'get_product',
+    description: "Récupère les détails complets d'un produit précis via son ID.",
+    input_schema: {
+      type: 'object',
+      properties: { product_id: { type: 'string' } },
+      required: ['product_id'],
+    },
+  },
+  {
+    name: 'create_bundle',
+    description: 'Crée un panier de produits variés optimisé pour un budget total donné en FCFA.',
+    input_schema: {
+      type: 'object',
+      properties: { budget: { type: 'number', description: 'Budget total en FCFA' } },
+      required: ['budget'],
+    },
+  },
+  {
+    name: 'add_to_cart',
+    description: "Ajoute un ou plusieurs produits au panier de l'utilisateur.",
+    input_schema: {
+      type: 'object',
+      properties: {
+        product_ids: { type: 'array', items: { type: 'string' }, description: "IDs des produits à ajouter" },
+        quantities: { type: 'array', items: { type: 'number' }, description: 'Quantités correspondantes (optionnel, défaut 1)' },
+      },
+      required: ['product_ids'],
+    },
+  },
+  {
+    name: 'calculate_budget',
+    description: 'Propose des options de produits triées selon un budget et des priorités de catégories.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        budget: { type: 'number' },
+        priorites: { type: 'array', items: { type: 'string' }, description: "Catégories prioritaires, ex: ['légumes','poisson']" },
+      },
+      required: ['budget'],
+    },
+  },
+  {
+    name: 'suggest_bundle',
+    description: 'Suggère des produits complémentaires à un produit donné (vente croisée).',
+    input_schema: {
+      type: 'object',
+      properties: { product_id: { type: 'string' } },
+      required: ['product_id'],
+    },
+  },
+  {
+    name: 'show_cart',
+    description: "Retourne le contenu actuel du panier de l'utilisateur avec le total.",
+    input_schema: { type: 'object', properties: {} },
+  },
+];
+
+const KORA_SYSTEM_PROMPT = `Tu es KORA, l'assistant vendeur intelligent de Yéyé Market, une marketplace alimentaire au Bénin.
+
+Utilise les outils disponibles pour aider les clients à trouver des produits, composer un panier adapté à leur budget, et gérer leur commande.
+
+Règles :
+- Réponds toujours en français, ton chaleureux et direct, emojis avec modération.
+- Quand tu utilises search_products, create_bundle ou suggest_bundle, ne redécris pas la liste des produits dans ton texte — l'interface les affiche automatiquement sous forme de cartes. Contente-toi d'une courte phrase d'introduction.
+- Si le panier de l'utilisateur est déjà vide et qu'il demande à le voir, dis-le simplement sans halluciner de contenu.
+- Ne propose jamais de produit qui n'existe pas dans les résultats des outils.`;
+
+let claudeMessages = []; // historique de conversation au format natif Claude (content blocks)
+
 async function processAI(userMsg) {
   isTyping = true;
   document.getElementById('send-btn').disabled = true;
   showTyping();
-  history.push({ role: 'user', content: userMsg });
-  await delay(400);
-  hideTyping();
-  await smartFallbackEnhanced(userMsg);
+
+  claudeMessages.push({ role: 'user', content: userMsg });
+
+  try {
+    await runAgentLoop();
+  } catch (e) {
+    console.error('Erreur KORA:', e);
+    hideTyping();
+    addAIMsg("Désolé, une erreur est survenue. Réessayez dans un instant.");
+  }
+
   isTyping = false;
   document.getElementById('send-btn').disabled = false;
 }
 
-async function smartFallbackEnhanced(msg) {
-  const low = msg.toLowerCase();
-  const budget = parseInt((msg.match(/(\d[\d\s]*\d|\d+)/) || [])[0]?.replace(/\s/g,'') || '0');
+async function runAgentLoop() {
+  const MAX_STEPS = 5; // garde-fou anti-boucle infinie
+  let steps = 0;
 
-  // SALUTATIONS
-  if (/^(bonjour|bonsoir|salut|hello|bj|bjr|cc|coucou|hi)/.test(low)) {
-    const h = new Date().getHours();
-    const sal = h < 12 ? 'Bonjour' : h < 18 ? 'Bonne après-midi' : 'Bonsoir';
-    addAIMsg(sal + ' ! 👋 Je suis Yéyé Assistant, votre vendeur IA. Comment puis-je vous aider aujourd\'hui ?');
-    addSuggs(['Voir les promos 🔥', 'Marché frais 🌿', 'Mon budget', 'Voir mon panier']);
-    return;
-  }
+  while (steps < MAX_STEPS) {
+    steps++;
 
-  // MERCI / FIN
-  if (/merci|super|parfait|ok merci|bravo/.test(low)) {
-    addAIMsg('Avec plaisir ! 😊 N\'hésitez pas si vous avez besoin d\'autre chose.');
-    addSuggs(['Nouvelle commande', 'Voir mon panier', 'Promotions']);
-    return;
-  }
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: claudeMessages,
+        system: KORA_SYSTEM_PROMPT,
+        tools: KORA_TOOLS,
+        max_tokens: 1024,
+      }),
+    });
 
-  // PANIER
-  if (low.includes('panier') || low.includes('cart') || low.includes('voir commande')) {
-    if (Object.keys(cart).length > 0) {
-      openDrawer();
-      addAIMsg('Voici votre panier 🛒 — ' + Object.values(cart).reduce((s,i)=>s+i.qty,0) + ' article(s) pour ' + fmt(calcTotal()) + ' FCFA.');
-    } else {
-      addAIMsg('Votre panier est vide 🛒. Que souhaitez-vous acheter ?');
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    claudeMessages.push({ role: 'assistant', content: data.content });
+
+    hideTyping();
+
+    const textBlocks = data.content.filter((b) => b.type === 'text');
+    for (const t of textBlocks) {
+      if (t.text?.trim()) addAIMsg(t.text);
     }
-    addSuggs(['Légumes frais', 'Poisson fumé', '5000 FCFA de courses']);
-    return;
-  }
 
-  // VALIDER / COMMANDER
-  if (/valider|commander|passer commande|checkout|finaliser/.test(low)) {
-    if (Object.keys(cart).length === 0) {
-      addAIMsg('Votre panier est vide ! Ajoutez des produits d\'abord. 😊');
-      addSuggs(['Légumes frais', 'Poisson fumé', '5000 FCFA']);
-    } else {
-      addAIMsg('Super ! 🎉 Je vous redirige vers le paiement. Total : ' + fmt(calcTotal()) + ' FCFA.');
-      setTimeout(() => checkout(), 1200);
+    const toolBlocks = data.content.filter((b) => b.type === 'tool_use');
+    if (data.stop_reason !== 'tool_use' || toolBlocks.length === 0) {
+      break; // réponse finale obtenue
     }
-    return;
-  }
 
-  // SUIVRE COMMANDE
-  if (/suivre|tracking|où est|statut commande/.test(low)) {
-    await trackLastOrder();
-    return;
-  }
+    showTyping();
 
-  // PROMOTIONS
-  if (/promo|promotion|réduction|solde|offre/.test(low)) {
-    const promos = allProducts.filter(p => p.prix_promo && p.prix_promo < p.prix).slice(0, 6);
-    if (promos.length) {
-      addAIMsg('🔥 Voici nos meilleures promos du moment !');
-      addProds(promos);
-      addSuggs(['Ajouter au panier', 'Voir plus', 'Mon budget']);
-    } else {
-      addAIMsg('Pas de promotions en ce moment. Voici nos produits populaires :');
-      addProds(allProducts.slice(0, 5));
+    const toolResults = [];
+    for (const tb of toolBlocks) {
+      const result = await executeTool(tb.name, tb.input);
+      renderToolResult(tb.name, result);
+      toolResults.push({
+        type: 'tool_result',
+        tool_use_id: tb.id,
+        content: JSON.stringify(result),
+      });
     }
-    return;
+    claudeMessages.push({ role: 'user', content: toolResults });
   }
 
-  // NOUVEAUTÉS
-  if (/nouveau|nouveauté|arrivage|récent/.test(low)) {
-    const news = [...allProducts].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0)).slice(0, 5);
-    addAIMsg('✨ Voici nos dernières arrivées !');
-    addProds(news);
-    addSuggs(['Ajouter au panier', 'Voir les promos', 'Mon budget']);
-    return;
-  }
-
-  // BUDGET
-  if (budget >= 500) {
-    const res = await executeTool('create_bundle', { budget });
-    addAIMsg('🎁 Voici ce que je vous propose pour ' + fmt(budget) + ' FCFA !');
-    if (res.bundle?.length) addBundle(res.bundle, budget, res.total);
-    else addAIMsg('Pas assez de produits disponibles pour ce budget. Essayez un montant plus élevé.');
-    addSuggs(['Ajouter tout au panier', 'Autre budget', 'Valider commande']);
-    return;
-  }
-
-  // CATEGORIES
-  const catMap = {
-    'légume|legume|verdure|haricot|gombo|gboman|épinard': 'légumes',
-    'poisson|sardine|maquereau|capitaine|fumé|fume': 'poisson',
-    'viande|bœuf|boeuf|poulet|agneau|mouton': 'viande',
-    'fruit|banane|mangue|ananas|orange|papaye': 'fruits',
-    'céréale|cereale|riz|gari|maïs|mais|farine|semoule': 'céréales',
-    'huile|graisse|beurre': 'huile',
-    'épice|epice|piment|poivre|sel|cube': 'épices',
-    'lait|yaourt|fromage|œuf|oeuf|crème|creme': 'laitier',
-  };
-
-  for (const [pattern, catName] of Object.entries(catMap)) {
-    if (new RegExp(pattern).test(low)) {
-      const found = allProducts.filter(p =>
-        p.nom.toLowerCase().match(new RegExp(pattern)) ||
-        p.categories?.nom?.toLowerCase().includes(catName)
-      ).slice(0, 6);
-      if (found.length) {
-        addAIMsg('Voici nos ' + catName + ' disponibles 🌿');
-        addProds(found);
-        addSuggs(['Ajouter au panier', 'Voir mon panier', 'Autre produit']);
-        return;
-      }
-    }
-  }
-
-  // RECHERCHE GÉNÉRALE par mots du message
-  const words = low.split(/\s+/).filter(w => w.length > 3);
-  let found = [];
-  for (const w of words) {
-    found = allProducts.filter(p =>
-      p.nom.toLowerCase().includes(w) ||
-      p.categories?.nom?.toLowerCase().includes(w) ||
-      (p.description || '').toLowerCase().includes(w)
-    ).slice(0, 5);
-    if (found.length) break;
-  }
-
-  if (found.length) {
-    addAIMsg('Voici ce que j\'ai trouvé pour vous ! 🛒');
-    addProds(found);
-    addSuggs(['Ajouter au panier', 'Voir mon panier', 'Autre produit']);
-    return;
-  }
-
-  // DÉFAUT
-  addAIMsg('Je n\'ai pas trouvé ce que vous cherchez. 🤔 Dites-moi votre budget ou le produit souhaité !');
-  addSuggs(['5000 FCFA de courses', 'Légumes frais 🌿', 'Poisson fumé 🐟', 'Promos 🔥']);
+  hideTyping();
 }
 
-
-// FALLBACK INTELLIGENT (sans API)
-async function smartFallback(msg) {
-  const low = msg.toLowerCase();
-  const budget = parseInt((msg.match(/(\d+)/) || [])[1] || '0');
-
-  if (low.includes('panier') || low.includes('voir') && low.includes('cart')) {
-    if (Object.keys(cart).length > 0) { openDrawer(); addAIMsg('Voici votre panier !'); }
-    else addAIMsg('Votre panier est vide. Que souhaitez-vous acheter ?');
-    addSuggs(['Legumes frais', 'Poisson fume', '5000 FCFA']);
-    return;
-  }
-  if (budget >= 500) {
-    const res = await executeTool('create_bundle', { budget });
-    addAIMsg('Voici ce que je vous propose pour ' + fmt(budget) + ' FCFA !');
-    if (res.bundle?.length) addBundle(res.bundle, budget, res.total);
-    addSuggs(['Ajouter tout au panier', 'Autre budget', 'Valider commande']);
-    return;
-  }
-  // Recherche par mots-clés
-  const keys = ['poisson', 'viande', 'legume', 'gombo', 'gboman', 'gari', 'riz', 'huile', 'tomate', 'oignon', 'oeuf', 'haricot', 'piment', 'banane', 'mangue'];
-  let found = [];
-  for (const k of keys) {
-    if (low.includes(k) || low.includes(k.replace('e', 'é'))) {
-      found = allProducts.filter(p => !Object.keys(cart).includes(p.id) && (p.nom.toLowerCase().includes(k) || p.categories?.nom?.toLowerCase().includes(k))).slice(0, 5);
-      if (found.length) break;
-    }
-  }
-  if (found.length) {
-    addAIMsg('Voici ce que j\'ai trouvé !');
-    addProds(found);
-    addSuggs(['Ajouter au panier', 'Autre produit', 'Voir mon panier']);
-  } else {
-    addAIMsg('Dites-moi votre budget ou le produit que vous cherchez, je vous trouve les meilleures options !');
-    addSuggs(['5000 FCFA', 'Legumes frais', 'Poisson fume', 'Promotions']);
+function renderToolResult(name, result) {
+  if (name === 'search_products' && result.found?.length) {
+    addProds(result.found);
+  } else if (name === 'create_bundle' && result.bundle?.length) {
+    insertBundleCard(result.bundle, result.budget, result.total);
+  } else if (name === 'suggest_bundle' && result.suggestions?.length) {
+    addProds(result.suggestions);
+  } else if (name === 'add_to_cart') {
+    updateCartFloat();
   }
 }
 
-  } catch(_) {}
-  try { localStorage.setItem('yeye_history', JSON.stringify(history.slice(-20))); } catch(_) {}
+// Rendu de la carte "bundle" — nommée différemment de addBundle(btn)
+// (le handler de clic du bouton "Ajouter tout au panier", plus bas)
+// pour ne pas entrer en collision avec lui.
+function insertBundleCard(prods, budget, total) {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'bundle-wrap';
+  const ids = prods.map((p) => p.id).join(',');
+  const itemsHtml = prods
+    .map((p) => {
+      const price = p.prix_promo || p.prix;
+      return (
+        '<div class="bi">' +
+        '<div class="bi-img">' +
+        (p.image_url
+          ? '<img src="' + p.image_url + '" alt="' + esc(p.nom) + '" onerror="this.parentElement.textContent=\'' + catEmo(p.categories?.nom) + '\'"/>'
+          : catEmo(p.categories?.nom)) +
+        '</div>' +
+        '<div class="bi-name">' + esc(p.nom) + '</div>' +
+        '<div class="bi-price">' + fmt(price) + ' FCFA</div>' +
+        '</div>'
+      );
+    })
+    .join('');
+  wrap.innerHTML =
+    '<div class="bundle">' +
+    '<div class="bundle-head"><div class="bundle-head-ico">🎁</div><div class="bundle-head-txt">Panier suggéré — ' + fmt(budget) + ' FCFA</div></div>' +
+    '<div class="bundle-items">' + itemsHtml + '</div>' +
+    '<div class="bundle-foot"><div class="bundle-total"><span>Total panier</span><span>' + fmt(total) + ' FCFA</span></div>' +
+    '<button class="bundle-btn" data-ids="' + ids + '" onclick="addBundle(this)">Ajouter tout au panier</button>' +
+    '</div></div>';
+  chat.appendChild(wrap);
+  scroll();
 }
 
 // ============================================================
@@ -1097,7 +1112,6 @@ async function sendMsg() {
   input.value = '';
   input.style.height = 'auto';
   addUserMsg(text);
-  history.push({ role: 'user', content: text });
   await processAI(text);
 }
 
@@ -1109,6 +1123,7 @@ function sendQuick(text) {
 
 function resetChat() {
   document.getElementById('chat').innerHTML = '';
+  claudeMessages = [];
   history = [];
   suggestedIds = new Set();
   welcome();
@@ -1466,9 +1481,6 @@ async function autoAssignLivreur(cmdId, zoneId) {
   return null;
 }
 
-// Modifier onPaymentSuccess pour assigner livreur auto
-const _originalPaymentSuccess = window.onPaymentSuccess;
-
 // Override pour ajouter auto-assignation
 async function onPaymentSuccess(response) {
   if (!pendingOrderData) return;
@@ -1559,8 +1571,6 @@ async function trackLastOrder() {
     addSuggs(['Voir le catalogue', '5000 FCFA de courses', 'Promotions']);
   }
 }
-
-// Le tracking est déjà géré dans smartFallbackEnhanced
 
 checkSession();
 </script>
