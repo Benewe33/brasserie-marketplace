@@ -9,8 +9,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Yéyé Market"/>
-<link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png"/>
-<link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png"/>
+<link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192.png?v=2"/>
+<link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512.png?v=2"/>
 <title>Yéyé Market — Marketplace du Bénin</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>"/>
 <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
@@ -2037,7 +2037,20 @@ async function passOrder(){
   const reduction=_promoReduction||0;
   const total=Math.max(0,subtotal-reduction)+_deliveryFee;
   pendingOrder={adresse,zone_id,tel,momo,notes,items,total,frais:_deliveryFee,code_promo:_promoCode,reduction,promoId:_promoData?.id};
-  openKkiapayWidget({amount:total,api_key:'782f2ffff070438f6693d98f861b909f89ff09eb',sandbox:false,phone:momo,name:currentUser.email,callback:window.location.href,theme:'#1a6b3c'});
+  const kkiapayKey=await getPasserelleKey('kkiapay');
+  if(!kkiapayKey){toast('Paiement momentanément indisponible, réessayez plus tard.','err');return;}
+  openKkiapayWidget({amount:total,api_key:kkiapayKey,sandbox:false,phone:momo,name:currentUser.email,callback:window.location.href,theme:'#1a6b3c'});
+}
+let _passerellesCache=null;
+async function getPasserelleKey(code){
+  try{
+    if(!_passerellesCache){
+      const {data}=await sb.from('passerelles_paiement').select('code,cle_publique,actif').eq('actif',true);
+      _passerellesCache={};
+      (data||[]).forEach(p=>_passerellesCache[p.code]=p.cle_publique);
+    }
+    return _passerellesCache[code]||null;
+  }catch(e){console.warn('Passerelle non chargée:',e.message);return null;}
 }
 
 async function onKKiapaySuccess(response){
