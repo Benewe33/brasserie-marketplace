@@ -1,4 +1,4 @@
-const CACHE = 'yeye-v2';
+const CACHE = 'yeye-v3';
 const ASSETS = ['/', '/index.html'];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
@@ -14,9 +14,6 @@ self.addEventListener('activate', e => {
 });
 self.addEventListener('fetch', e => {
   const req = e.request;
-  // Ne gérer que les requêtes GET de notre propre origine.
-  // Tout le reste (KKiaPay, Google Fonts, Leaflet, Supabase, API...) passe
-  // directement au réseau sans interception du Service Worker.
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) {
     return;
   }
@@ -24,13 +21,11 @@ self.addEventListener('fetch', e => {
     caches.match(req).then(cached => cached || fetch(req))
   );
 });
-
 // ============================================================
 // NOTIFICATIONS PUSH (Firebase Cloud Messaging) — app fermée / arrière-plan
 // ============================================================
 importScripts('https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-compat.js');
-
 firebase.initializeApp({
   apiKey: "AIzaSyB2AhjG3Zw46zO3C_GPaqBHuTVvjJJESe8",
   authDomain: "yeyemarket-a3d09.firebaseapp.com",
@@ -39,10 +34,7 @@ firebase.initializeApp({
   messagingSenderId: "232655346156",
   appId: "1:232655346156:web:631ba36770df0415c548c9"
 });
-
 const messaging = firebase.messaging();
-
-// Affiche la notification quand l'app est fermée ou en arrière-plan
 messaging.onBackgroundMessage((payload) => {
   const title = (payload.notification && payload.notification.title) || 'YéyéMarket';
   const options = {
@@ -54,8 +46,6 @@ messaging.onBackgroundMessage((payload) => {
   };
   self.registration.showNotification(title, options);
 });
-
-// Au clic sur la notification : ramène l'utilisateur sur l'app (ou l'ouvre)
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   event.waitUntil(
