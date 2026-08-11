@@ -1534,17 +1534,13 @@ async function confirmerRamassage(){
   const mins=parseInt(document.getElementById('est-minutes').value)||20;
   if(mins<1||mins>180){toast('Estimation invalide (1-180 min)','err');return;}
   closeModal('m-estimation');
-  // Enregistre estimation + heure départ dans livraisons
-  const {data:livData}=await sb.from('livraisons').select('id').eq('commande_id',_estLivId).eq('livreur_id',currentLivreur.id).maybeSingle();
-  if(livData?.id){
-    await sb.from('livraisons').update({
-      estimation_minutes:mins,
-      heure_depart:new Date().toISOString()
-    }).eq('id',livData.id);
-    await updateLivraison(livData.id,'en_cours');
-  } else {
-    toast('Livraison introuvable','err');
-  }
+  // _estLivId est directement l'ID de la livraison (l.id passé depuis livCard)
+  const {error}=await sb.from('livraisons').update({
+    estimation_minutes:mins,
+    heure_depart:new Date().toISOString()
+  }).eq('id',_estLivId);
+  if(error){toast('Erreur: '+error.message,'err');return;}
+  await updateLivraison(_estLivId,'en_cours');
 }
 
 // COMMANDES DISPONIBLES — Accepter une livraison
