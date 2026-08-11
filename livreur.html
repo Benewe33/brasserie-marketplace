@@ -1539,10 +1539,10 @@ async function loadDispoCommandes() {
 
   el.innerHTML = '<div style="text-align:center;padding:32px;color:var(--g400)">⏳ Chargement...</div>';
 
-  // Commandes prêtes à livrer (validées mais sans livreur assigné)
+  // Commandes prêtes à livrer (prete ou en_preparation, sans livreur assigné)
   const { data: commandes, error } = await sb.from('commandes')
     .select('*, utilisateurs(nom, telephone), lignes_commande(quantite, produits(nom))')
-    .eq('statut', 'validee')
+    .in('statut', ['prete', 'en_preparation'])
     .is('livreur_id', null)
     .order('created_at', { ascending: false });
 
@@ -1609,8 +1609,8 @@ async function accepterCommande(commandeId) {
 
   if (livErr) { toast('❌ Erreur: ' + livErr.message, 'err'); loadDispoCommandes(); return; }
 
-  // Mettre à jour la commande : assignée à ce livreur, en attente de démarrage
-  await sb.from('commandes').update({ livreur_id: currentLivreur.id, statut: 'prete' }).eq('id', commandeId);
+  // Mettre à jour la commande : assignée à ce livreur, en route
+  await sb.from('commandes').update({ livreur_id: currentLivreur.id, statut: 'en_livraison' }).eq('id', commandeId);
 
   toast('✅ Commande acceptée ! Bonne livraison 🚴', 'ok');
 
