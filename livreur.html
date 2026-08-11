@@ -1177,7 +1177,7 @@ function livCard(l){
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
         <div class="liv-total">💰 ${fmt(l.commandes?.frais_livraison||500)} FCFA</div>
         <div style="display:flex;gap:6px">
-          ${l.statut==='assignee'?`<button class="btn btn-sm btn-p" onclick="updateLivraison('${l.id}','en_cours')">📦 Colis récupéré — démarrer</button>`:''}
+          ${l.statut==='assignee'?`<button class="btn btn-sm btn-p" onclick="ouvrirEstimationLivraison('${l.id}')">📦 Colis récupéré</button>`:''}
           ${l.statut==='en_cours'?`<button class="btn btn-sm btn-ok" onclick="ouvrirPreuveLivraison('${l.id}')">📸 Livré — photo de preuve</button>`:''}
         </div>
       </div>
@@ -1523,6 +1523,30 @@ function getSignatureData() {
 
 
 // ============================================================
+// Estimation livraison
+let _estLivId=null;
+function ouvrirEstimationLivraison(cmdId){
+  _estLivId=cmdId;
+  document.getElementById('est-minutes').value=20;
+  openModal('m-estimation');
+}
+async function confirmerRamassage(){
+  const mins=parseInt(document.getElementById('est-minutes').value)||20;
+  if(mins<1||mins>180){toast('Estimation invalide (1-180 min)','err');return;}
+  closeModal('m-estimation');
+  // Enregistre estimation + heure départ dans livraisons
+  const {data:livData}=await sb.from('livraisons').select('id').eq('commande_id',_estLivId).eq('livreur_id',currentLivreur.id).maybeSingle();
+  if(livData?.id){
+    await sb.from('livraisons').update({
+      estimation_minutes:mins,
+      heure_depart:new Date().toISOString()
+    }).eq('id',livData.id);
+    await updateLivraison(livData.id,'en_cours');
+  } else {
+    toast('Livraison introuvable','err');
+  }
+}
+
 // COMMANDES DISPONIBLES — Accepter une livraison
 // ============================================================
 let dispoSub = null;
@@ -1539,7 +1563,7 @@ async function loadDispoCommandes() {
 
   el.innerHTML = '<div style="text-align:center;padding:32px;color:var(--g400)">⏳ Chargement...</div>';
 
-  // Commandes prêtes à livrer (prete ou en_preparation, sans livreur assigné)
+  // Commandes prêtes à livrer (validées mais sans livreur assigné)
   const { data: commandes, error } = await sb.from('commandes')
     .select('*, utilisateurs(nom, telephone), lignes_commande(quantite, produits(nom))')
     .in('statut', ['prete', 'en_preparation'])
@@ -1609,8 +1633,8 @@ async function accepterCommande(commandeId) {
 
   if (livErr) { toast('❌ Erreur: ' + livErr.message, 'err'); loadDispoCommandes(); return; }
 
-  // Mettre à jour la commande : assignée à ce livreur, en route
-  await sb.from('commandes').update({ livreur_id: currentLivreur.id, statut: 'en_livraison' }).eq('id', commandeId);
+  // Mettre à jour la commande : assignée à ce livreur, en attente de démarrage
+  await sb.from('commandes').update({ livreur_id: currentLivreur.id, statut: 'en_preparation' }).eq('id', commandeId);
 
   toast('✅ Commande acceptée ! Bonne livraison 🚴', 'ok');
 
@@ -1697,5 +1721,26 @@ function subscribeDispoCommandes() {
     </div>
   </div>
 </div>
+
+<div class="overlay" id="m-estimation">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-head"><h3>⏱️ Estimation de livraison</h3><button class="modal-x" onclick="closeModal('m-estimation')">✕</button></div>
+    <div class="modal-body">
+      <p style="font-size:13px;color:var(--g600);margin-bottom:16px">Combien de minutes vous faudra-t-il pour livrer cette commande ?</p>
+      <div class="fgm">
+        <label>Durée estimée (minutes)</label>
+        <input type="number" id="est-minutes" min="1" max="180" value="20" style="font-size:24px;font-weight:800;text-align:center"/>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-sm" style="flex:1;background:var(--g100);color:var(--g700)" onclick="document.getElementById('est-minutes').value=10">10 min</button>
+        <button class="btn btn-sm" style="flex:1;background:var(--g100);color:var(--g700)" onclick="document.getElementById('est-minutes').value=20">20 min</button>
+        <button class="btn btn-sm" style="flex:1;background:var(--g100);color:var(--g700)" onclick="document.getElementById('est-minutes').value=30">30 min</button>
+        <button class="btn btn-sm" style="flex:1;background:var(--g100);color:var(--g700)" onclick="document.getElementById('est-minutes').value=45">45 min</button>
+      </div>
+      <button class="btn btn-ok" style="width:100%;margin-top:16px" onclick="confirmerRamassage()">🚴 Démarrer la livraison</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
