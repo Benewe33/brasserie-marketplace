@@ -21,6 +21,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://cdn.kkiapay.me/k.js"></script>
+<script src="https://cdn.fedapay.com/checkout.js?v=1.1.7"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -2037,20 +2038,42 @@ async function passOrder(){
   const reduction=_promoReduction||0;
   const total=Math.max(0,subtotal-reduction)+_deliveryFee;
   pendingOrder={adresse,zone_id,tel,momo,notes,items,total,frais:_deliveryFee,code_promo:_promoCode,reduction,promoId:_promoData?.id};
-  const kkiapayKey=await getPasserelleKey('kkiapay');
-  if(!kkiapayKey){toast('Paiement momentanément indisponible, réessayez plus tard.','err');return;}
-  openKkiapayWidget({amount:total,api_key:kkiapayKey,sandbox:false,phone:momo,name:currentUser.email,callback:window.location.href,theme:'#1a6b3c'});
+  const passerelle=await getActivePasserelle();
+  if(!passerelle||!passerelle.cle_publique){toast('Paiement momentanément indisponible, réessayez plus tard.','err');return;}
+  if(passerelle.code==='kkiapay'){
+    openKkiapayWidget({amount:total,api_key:passerelle.cle_publique,sandbox:false,phone:momo,name:currentUser.email,callback:window.location.href,theme:'#1a6b3c'});
+  }else if(passerelle.code==='fedapay'){
+    openFedapayWidget(passerelle.cle_publique,total,momo);
+  }else{
+    toast('Passerelle de paiement non reconnue : '+passerelle.code,'err');
+  }
 }
-let _passerellesCache=null;
-async function getPasserelleKey(code){
+async function getActivePasserelle(){
   try{
-    if(!_passerellesCache){
-      const {data}=await sb.from('passerelles_paiement').select('code,cle_publique,actif').eq('actif',true);
-      _passerellesCache={};
-      (data||[]).forEach(p=>_passerellesCache[p.code]=p.cle_publique);
-    }
-    return _passerellesCache[code]||null;
+    const {data}=await sb.from('passerelles_paiement').select('code,cle_publique').eq('actif',true).order('ordre').limit(1).maybeSingle();
+    return data||null;
   }catch(e){console.warn('Passerelle non chargée:',e.message);return null;}
+}
+function openFedapayWidget(publicKey,amount,momo){
+  try{
+    const [prenom,...reste]=(currentUser.user_metadata?.nom||currentUser.email||'Client').split(' ');
+    const widget=FedaPay.init({
+      public_key:publicKey,
+      transaction:{amount:Math.round(amount),description:'Commande YéyéMarket'},
+      customer:{email:currentUser.email,firstname:prenom||'Client',lastname:reste.join(' ')||'YéyéMarket',phone_number:{number:momo,country:'bj'}},
+      currency:{iso:'XOF'},
+      onComplete:(resp)=>{
+        if(resp.transaction && resp.transaction.status==='approved'){
+          onKKiapaySuccess({transactionId:resp.transaction.id});
+        }else if(resp.reason===FedaPay.DIALOG_DISMISSED){
+          toast('Paiement annulé','info');
+        }else{
+          toast('❌ Paiement non abouti','err');
+        }
+      }
+    });
+    widget.open();
+  }catch(e){toast('Erreur FedaPay : '+e.message,'err');}
 }
 
 async function onKKiapaySuccess(response){
