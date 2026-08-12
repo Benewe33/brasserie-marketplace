@@ -90,6 +90,19 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .page{display:none;padding-bottom:90px;min-height:100vh}
 .page.active{display:block}
 
+/* CARTE LIVRAISON EN COURS (accueil) */
+.home-liv-card{margin:16px 16px 0;background:#fff;border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 12px rgba(26,107,60,.12);border:1.5px solid var(--vl);cursor:pointer;transition:transform .15s,box-shadow .15s;-webkit-tap-highlight-color:transparent}
+.home-liv-card:active{transform:scale(.98);box-shadow:0 1px 4px rgba(26,107,60,.1)}
+.home-liv-ico{font-size:26px;flex-shrink:0}
+.home-liv-body{flex:1;min-width:0}
+.home-liv-title{font-size:13px;font-weight:700;color:var(--vd);margin-bottom:2px}
+.home-liv-sub{font-size:12px;color:var(--g600)}
+.home-liv-bar{height:4px;background:var(--g200);border-radius:2px;margin-top:7px;overflow:hidden}
+.home-liv-fill{height:4px;background:var(--vd);border-radius:2px;transition:width .5s}
+.home-liv-badge{flex-shrink:0;background:var(--vd);color:#fff;font-size:12px;font-weight:700;padding:6px 11px;border-radius:10px;white-space:nowrap;min-width:52px;text-align:center}
+.home-liv-badge.pulse{animation:livpulse 1.4s ease-in-out infinite}
+@keyframes livpulse{0%,100%{opacity:1}50%{opacity:.6}}
+
 /* HERO BANNER */
 .hero{margin:16px;border-radius:20px;background:linear-gradient(135deg,var(--theme-dark,#0d3d22) 0%,var(--vd) 55%,var(--v) 100%);padding:20px;position:relative;overflow:hidden}
 .hero::after{content:'🌿';position:absolute;right:-15px;bottom:-15px;font-size:100px;opacity:.1;line-height:1}
@@ -216,18 +229,6 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .t-title{font-size:14px;font-weight:700}
 .t-sub{font-size:12px;color:var(--g400);margin-top:2px}
 .t-step.pending .t-title,.t-step.pending .t-sub{color:var(--g400)}
-.s4-wrap{padding:20px 16px;background:#fff;border-radius:16px;margin:0 0 14px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.s4-track{position:relative;height:5px;background:var(--g200);border-radius:3px;margin:0 18px 22px}
-.s4-fill{height:100%;background:var(--vd);border-radius:3px;transition:width .6s ease}
-.s4-dots{display:flex;justify-content:space-between}
-.s4-dot{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
-.s4-ico{width:38px;height:38px;border-radius:50%;background:var(--g100);display:flex;align-items:center;justify-content:center;font-size:16px;border:2.5px solid var(--g200);transition:all .3s}
-.s4-dot.s4-on .s4-ico{background:var(--vd);color:#fff;border-color:var(--vd)}
-.s4-lbl{font-size:10px;font-weight:700;color:var(--g500);text-align:center;line-height:1.3}
-.s4-dot.s4-on .s4-lbl{color:var(--vd)}
-.cdw-card{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:16px;padding:18px;margin:14px 0;text-align:center;border:1.5px solid #bbf7d0}
-.cdw-bar{height:8px;background:#d1fae5;border-radius:4px;margin:10px 0 4px;overflow:hidden}
-.cdw-fill{height:100%;background:var(--vd);border-radius:4px;transition:width 1s linear}
 .livreur-card{background:var(--vl);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;margin-top:14px}
 .order-recap{background:var(--g50);border-radius:14px;padding:14px;margin-top:14px}
 .recap-row{display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid var(--g100)}
@@ -544,6 +545,9 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
       <p id="hero-sous">🛒 Courses · 🍽️ Restaurants · 🚚 Livraison rapide</p>
       <button class="hero-btn" id="hero-btn" onclick="heroBtnGo()">Voir le catalogue →</button>
     </div>
+    <!-- Carte commande en route (visible uniquement si livraison active) -->
+    <div id="home-livraison-card" style="display:none"></div>
+
     <div class="section-head section" style="margin-top:20px"><h2>🏷️ Catégories</h2></div>
     <div class="cats-grid" id="cat-scroll"></div>
 
@@ -1111,6 +1115,7 @@ function goPage(name,skipAutoLoad){
   if(name==='profile')loadProfileStats();
   if(name==='favoris')loadFavoris();
   if(name==='restaurants')loadRestaurantsPage();
+  if(name==='home')loadHomeLivraisonCard();
   window.scrollTo(0,0);
 }
 
@@ -1652,6 +1657,84 @@ async function loadHomeSections(){
     if(!d||!d.length){const r=await base().limit(30);d=(r.data||[]).sort(()=>Math.random()-0.5).slice(0,10);}
     fillRow('row-recommande',d,'Bientôt des recommandations');
   }catch(e){fillRow('row-recommande',[],'Indisponible');}
+
+  // Carte livraison en cours (en parallèle, ne bloque pas les sections)
+  loadHomeLivraisonCard();
+}
+
+// ============================================================
+// CARTE LIVRAISON EN COURS — ACCUEIL
+// ============================================================
+let _homeLivTimer=null;
+
+async function loadHomeLivraisonCard(){
+  const wrap=document.getElementById('home-livraison-card');
+  if(!wrap||!currentUser)return;
+  try{
+    const {data}=await sb.from('commandes')
+      .select('id,statut')
+      .eq('client_id',currentUser.id)
+      .eq('statut','en_livraison')
+      .order('created_at',{ascending:false})
+      .limit(1);
+    if(!data||!data.length){wrap.style.display='none';return;}
+    const cmdId=data[0].id;
+    // Récupère estimation + heure_depart
+    const {data:liv}=await sb.from('livraisons')
+      .select('estimation_minutes,heure_depart')
+      .eq('commande_id',cmdId)
+      .maybeSingle();
+    wrap.style.display='block';
+    _renderHomeLivCard(wrap,cmdId,liv);
+  }catch(e){wrap.style.display='none';}
+}
+
+function _renderHomeLivCard(wrap,cmdId,liv){
+  if(_homeLivTimer){clearInterval(_homeLivTimer);_homeLivTimer=null;}
+  const hasTimer=liv&&liv.estimation_minutes&&liv.heure_depart;
+  wrap.innerHTML=`<div class="home-liv-card" onclick="openTracking('${cmdId}')">
+    <div class="home-liv-ico">🚴</div>
+    <div class="home-liv-body">
+      <div class="home-liv-title">Commande en route</div>
+      <div class="home-liv-sub" id="home-liv-sub">Arrivée estimée en cours...</div>
+      <div class="home-liv-bar"><div class="home-liv-fill" id="home-liv-fill" style="width:10%"></div></div>
+    </div>
+    <div class="home-liv-badge pulse" id="home-liv-badge">🚴</div>
+  </div>`;
+
+  if(hasTimer){
+    const departTs=new Date(liv.heure_depart).getTime();
+    const totalMs=liv.estimation_minutes*60*1000;
+    function tick(){
+      const elapsed=Date.now()-departTs;
+      const reste=Math.max(0,totalMs-elapsed);
+      const pct=Math.min(100,Math.round((elapsed/totalMs)*100));
+      const mins=Math.floor(reste/60000);
+      const secs=Math.floor((reste%60000)/1000);
+      const sub=document.getElementById('home-liv-sub');
+      const fill=document.getElementById('home-liv-fill');
+      const badge=document.getElementById('home-liv-badge');
+      if(!sub)return clearInterval(_homeLivTimer);
+      if(reste<=0){
+        sub.textContent='Arrivée imminente !';
+        fill.style.width='100%';
+        badge.textContent='🎉';
+        badge.classList.remove('pulse');
+        clearInterval(_homeLivTimer);
+      }else{
+        sub.textContent='Arrivée estimée dans '+mins+' min '+String(secs).padStart(2,'0')+' s';
+        fill.style.width=pct+'%';
+        badge.textContent=mins+' min';
+      }
+    }
+    tick();
+    _homeLivTimer=setInterval(tick,1000);
+  }else{
+    const sub=document.getElementById('home-liv-sub');
+    if(sub)sub.textContent='Votre livreur est en chemin';
+    const fill=document.getElementById('home-liv-fill');
+    if(fill)fill.style.width='40%';
+  }
 }
 
 async function doSearch(q){
@@ -1967,20 +2050,11 @@ function updateQty(id,d){
   updateCartBadge();renderCart();
 }
 
-async function showCheckout(){
+function showCheckout(){
   if(!currentUser){toast('Connectez-vous pour commander','err');goPage('profile');return;}
-  _deliveryFee=null;
+  _deliveryFee=null; // les frais dépendent de la zone : pas de forfait tant qu'elle n'est pas choisie
   const items=Object.values(cart);
   const _sub=items.reduce((s,i)=>s+(i.prix_promo||i.prix)*i.qty,0);
-  const _gw=await getActivePasserelle();
-  const _gwName=_gw?.code==='fedapay'?'FedaPay':_gw?.code==='kkiapay'?'KKiaPay':'Paiement';
-  const _gwBadges=_gw?.code==='fedapay'
-    ?`<span style="background:#f97316;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">MTN MoMo</span>
-      <span style="background:#0066cc;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">Moov Money</span>
-      <span style="background:#6366f1;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">Visa/MC</span>`
-    :`<span style="background:#ffcb00;color:#000;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">MTN MoMo</span>
-      <span style="background:#0066cc;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">Moov Money</span>
-      <span style="background:#1a1a2e;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">Visa/MC</span>`;
   const content=document.getElementById('cart-content');
   content.innerHTML=`
     <div class="page-header"><button class="back-btn" onclick="renderCart()"><svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" width="18" height="18"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><h2>📦 Commander</h2></div>
@@ -1998,9 +2072,13 @@ async function showCheckout(){
         <h3>💳 Paiement</h3>
         <div style="background:var(--g50);border-radius:12px;padding:14px;margin-bottom:14px">
           <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-            <span style="font-size:13px;font-weight:700">🔒 \${_gwName} — Paiement sécurisé</span>
+            <span style="font-size:13px;font-weight:700">🔒 KKiaPay — Paiement sécurisé</span>
           </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">\${_gwBadges}</div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span style="background:#ffcb00;color:#000;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">MTN MoMo</span>
+            <span style="background:#0066cc;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">Moov Money</span>
+            <span style="background:#1a1a2e;color:#fff;font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px">Visa/MC</span>
+          </div>
         </div>
         <div class="fg"><label>Numéro Mobile Money *</label><input type="tel" id="chk-momo" placeholder="97 00 00 00"/></div>
       </div>
@@ -2252,36 +2330,10 @@ async function loadTracking(cmdId){
   if(cmd.statut==='annulee'){
     html+=`<div style="text-align:center;padding:32px;color:var(--r)"><div style="font-size:48px;margin-bottom:10px">❌</div><p style="font-weight:700;font-size:16px">Commande annulée</p></div>`;
   } else {
-    // 4-step visual progress bar
-    const s4steps=[
-      {ico:'✅',label:'Acceptée',done:['en_preparation','prete','en_livraison','livree'].includes(cmd.statut)},
-      {ico:'📦',label:'Colis pris',done:['en_livraison','livree'].includes(cmd.statut)},
-      {ico:'🚴',label:'En route',done:['en_livraison','livree'].includes(cmd.statut)},
-      {ico:'🎉',label:'Livré !',done:cmd.statut==='livree'},
-    ];
-    const s4done=s4steps.filter(s=>s.done).length;
-    const s4pct=[0,33,67,100][s4done]||0;
-    html+=`<div class="s4-wrap">
-      <div class="s4-track"><div class="s4-fill" style="width:${s4pct}%"></div></div>
-      <div class="s4-dots">${s4steps.map((s,i)=>`
-        <div class="s4-dot ${s.done?'s4-on':''}">
-          <div class="s4-ico">${s.done&&i<s4done-1?'✓':s.ico}</div>
-          <div class="s4-lbl">${s.label}</div>
-        </div>`).join('')}
-      </div>
-    </div>`;
-    // Countdown si le livreur est en route avec une estimation
-    if(cmd.statut==='en_livraison'&&liv?.estimation_minutes&&liv?.heure_depart){
-      const _dp=new Date(liv.heure_depart).getTime();
-      const _tot=liv.estimation_minutes*60000;
-      html+=`<div class="cdw-card">
-        <div style="font-size:12px;font-weight:700;color:var(--g600);margin-bottom:4px">⏱️ Livraison estimée dans</div>
-        <div id="cdw-time" style="font-size:32px;font-weight:900;color:var(--vd);letter-spacing:-1px">-- min</div>
-        <div class="cdw-bar"><div class="cdw-fill" id="cdw-fill" style="width:0%"></div></div>
-        <div style="font-size:11px;color:var(--g400);margin-top:2px">Estimation donnée par votre livreur</div>
-      </div>`;
-      setTimeout(()=>startCountdown(_dp,_tot),150);
-    }
+    html+=steps.map((s,i)=>{
+      const isDone=i<idx,isActive=i===idx,cls=isDone?'done':isActive?'active':'pending';
+      return `<div class="t-step ${cls}"><div class="t-dot">${isDone?'✓':s.ico}</div><div class="t-info"><div class="t-title">${s.label}</div><div class="t-sub">${isActive||isDone?s.sub:'En attente...'}</div></div></div>`;
+    }).join('');
   }
 
   if(liv?.livreurs&&(cmd.statut==='en_livraison'||cmd.statut==='livree')){
@@ -2491,26 +2543,6 @@ function fdateTime(d){
 // PARTNER MENU
 function openPartnerMenu(){document.getElementById('partner-menu').classList.add('open');document.getElementById('partner-overlay').classList.add('open');}
 function closePartnerMenu(){document.getElementById('partner-menu').classList.remove('open');document.getElementById('partner-overlay').classList.remove('open');}
-
-// Countdown livraison
-let _cdwTimer=null;
-function startCountdown(departTs,totalMs){
-  if(_cdwTimer)clearInterval(_cdwTimer);
-  function tick(){
-    const remaining=Math.max(0,totalMs-(Date.now()-departTs));
-    const mins=Math.floor(remaining/60000);
-    const secs=Math.floor((remaining%60000)/1000);
-    const pct=Math.min(100,Math.round((1-remaining/totalMs)*100));
-    const te=document.getElementById('cdw-time');
-    const fe=document.getElementById('cdw-fill');
-    if(!te){clearInterval(_cdwTimer);return;}
-    te.textContent=remaining>0?`${mins} min ${secs<10?'0'+secs:secs} s`:'🛵 Imminent !';
-    if(fe)fe.style.width=pct+'%';
-    if(remaining===0)clearInterval(_cdwTimer);
-  }
-  tick();
-  _cdwTimer=setInterval(tick,1000);
-}
 
 // KKiaPay
 window.addEventListener('kkiapay_success_payment',(e)=>onKKiapaySuccess(e.detail));
