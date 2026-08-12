@@ -1658,7 +1658,7 @@ async function loadHomeSections(){
     fillRow('row-recommande',d,'Bientôt des recommandations');
   }catch(e){fillRow('row-recommande',[],'Indisponible');}
 
-  // Carte livraison en cours (en parallèle, ne bloque pas les sections)
+  // Carte livraison en cours
   loadHomeLivraisonCard();
 }
 
@@ -1679,7 +1679,6 @@ async function loadHomeLivraisonCard(){
       .limit(1);
     if(!data||!data.length){wrap.style.display='none';return;}
     const cmdId=data[0].id;
-    // Récupère estimation + heure_depart
     const {data:liv}=await sb.from('livraisons')
       .select('estimation_minutes,heure_depart')
       .eq('commande_id',cmdId)
@@ -1701,7 +1700,6 @@ function _renderHomeLivCard(wrap,cmdId,liv){
     </div>
     <div class="home-liv-badge pulse" id="home-liv-badge">🚴</div>
   </div>`;
-
   if(hasTimer){
     const departTs=new Date(liv.heure_depart).getTime();
     const totalMs=liv.estimation_minutes*60*1000;
