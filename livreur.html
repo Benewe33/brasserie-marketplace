@@ -1177,7 +1177,7 @@ function livCard(l){
       <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px">
         <div class="liv-total">💰 ${fmt(l.commandes?.frais_livraison||500)} FCFA</div>
         <div style="display:flex;gap:6px">
-          ${l.statut==='assignee'?`<button class="btn btn-sm btn-p" onclick="ouvrirEstimationLivraison('${l.id}')">📦 Colis récupéré</button>`:''}
+          ${l.statut==='assignee'?`<button class="btn btn-sm btn-p" onclick="updateLivraison('${l.id}','en_cours')">📦 Colis récupéré — démarrer</button>`:''}
           ${l.statut==='en_cours'?`<button class="btn btn-sm btn-ok" onclick="ouvrirPreuveLivraison('${l.id}')">📸 Livré — photo de preuve</button>`:''}
         </div>
       </div>
@@ -1255,9 +1255,55 @@ async function confirmerLivraisonAvecPhoto(input){
 
 // ====== SUIVI GPS TEMPS RÉEL ======
 let _gpsWatchId=null;
+let _wakeLock=null;
+let _activeCommandeId=null; // commande en cours de livraison
+
+// --- Wake Lock : empêche l'écran de se verrouiller ---
+async function _acquireWakeLock(){
+  if(!('wakeLock' in navigator))return;
+  try{
+    if(_wakeLock)return; // déjà actif
+    _wakeLock=await navigator.wakeLock.request('screen');
+    _wakeLock.addEventListener('release',()=>{_wakeLock=null;});
+  }catch(e){console.warn('Wake lock non disponible:',e.message);}
+}
+function _releaseWakeLock(){
+  if(_wakeLock){_wakeLock.release();_wakeLock=null;}
+}
+
+// --- Reconnexion auto quand l'app revient au premier plan ---
+document.addEventListener('visibilitychange',async()=>{
+  if(document.visibilityState==='visible'){
+    // Réactive le Wake Lock (il est libéré automatiquement par le navigateur en arrière-plan)
+    if(_activeCommandeId&&_gpsWatchId===null){
+      await _acquireWakeLock();
+      demarrerSuiviGPS(_activeCommandeId);
+      toast('📡 GPS reconnecté','ok');
+    } else if(_activeCommandeId){
+      await _acquireWakeLock(); // renouvelle si libéré
+    }
+  } else {
+    // App part en arrière-plan pendant une livraison → alerte
+    if(_activeCommandeId){
+      // Tente une dernière position avant de partir
+      navigator.geolocation&&navigator.geolocation.getCurrentPosition(async(pos)=>{
+        await sb.from('livreur_positions').upsert({
+          commande_id:_activeCommandeId,
+          livreur_id:currentLivreur?.id,
+          lat:pos.coords.latitude,
+          lng:pos.coords.longitude,
+          updated_at:new Date().toISOString()
+        },{onConflict:'commande_id'});
+      },()=>{},{enableHighAccuracy:true,timeout:5000});
+    }
+  }
+});
+
 function demarrerSuiviGPS(commandeId){
   if(!navigator.geolocation){toast('GPS non supporté sur cet appareil','err');return;}
   arreterSuiviGPS(); // sécurité : pas de doublon
+  _activeCommandeId=commandeId;
+  _acquireWakeLock(); // garde l'écran allumé
   _gpsWatchId=navigator.geolocation.watchPosition(async (pos)=>{
     const {latitude,longitude}=pos.coords;
     const {error}=await sb.from('livreur_positions').upsert({
@@ -1270,11 +1316,16 @@ function demarrerSuiviGPS(commandeId){
     if(error)console.error('Position non envoyée:',error.message);
   },(err)=>{
     console.error('Erreur GPS:',err.message);
-    if(err.code===1)toast('Active la localisation pour le suivi','err');
+    if(err.code===1)toast('⚠️ Active la localisation pour le suivi','err');
+    // Tentative de relance après 10 secondes si erreur
+    if(err.code!==1){setTimeout(()=>{if(_activeCommandeId)demarrerSuiviGPS(_activeCommandeId);},10000);}
   },{enableHighAccuracy:true,maximumAge:5000,timeout:15000});
 }
+
 function arreterSuiviGPS(){
   if(_gpsWatchId!==null){navigator.geolocation.clearWatch(_gpsWatchId);_gpsWatchId=null;}
+  _activeCommandeId=null;
+  _releaseWakeLock();
 }
 
 async function loadLivraisons(){
@@ -1523,26 +1574,6 @@ function getSignatureData() {
 
 
 // ============================================================
-// Estimation livraison
-let _estLivId=null;
-function ouvrirEstimationLivraison(cmdId){
-  _estLivId=cmdId;
-  document.getElementById('est-minutes').value=20;
-  openModal('m-estimation');
-}
-async function confirmerRamassage(){
-  const mins=parseInt(document.getElementById('est-minutes').value)||20;
-  if(mins<1||mins>180){toast('Estimation invalide (1-180 min)','err');return;}
-  closeModal('m-estimation');
-  // _estLivId est directement l'ID de la livraison (l.id passé depuis livCard)
-  const {error}=await sb.from('livraisons').update({
-    estimation_minutes:mins,
-    heure_depart:new Date().toISOString()
-  }).eq('id',_estLivId);
-  if(error){toast('Erreur: '+error.message,'err');return;}
-  await updateLivraison(_estLivId,'en_cours');
-}
-
 // COMMANDES DISPONIBLES — Accepter une livraison
 // ============================================================
 let dispoSub = null;
@@ -1562,7 +1593,7 @@ async function loadDispoCommandes() {
   // Commandes prêtes à livrer (validées mais sans livreur assigné)
   const { data: commandes, error } = await sb.from('commandes')
     .select('*, utilisateurs(nom, telephone), lignes_commande(quantite, produits(nom))')
-    .in('statut', ['prete', 'en_preparation'])
+    .eq('statut', 'validee')
     .is('livreur_id', null)
     .order('created_at', { ascending: false });
 
@@ -1630,7 +1661,7 @@ async function accepterCommande(commandeId) {
   if (livErr) { toast('❌ Erreur: ' + livErr.message, 'err'); loadDispoCommandes(); return; }
 
   // Mettre à jour la commande : assignée à ce livreur, en attente de démarrage
-  await sb.from('commandes').update({ livreur_id: currentLivreur.id, statut: 'en_preparation' }).eq('id', commandeId);
+  await sb.from('commandes').update({ livreur_id: currentLivreur.id, statut: 'prete' }).eq('id', commandeId);
 
   toast('✅ Commande acceptée ! Bonne livraison 🚴', 'ok');
 
@@ -1717,26 +1748,5 @@ function subscribeDispoCommandes() {
     </div>
   </div>
 </div>
-
-<div class="overlay" id="m-estimation">
-  <div class="modal" style="max-width:360px">
-    <div class="modal-head"><h3>⏱️ Estimation de livraison</h3><button class="modal-x" onclick="closeModal('m-estimation')">✕</button></div>
-    <div class="modal-body">
-      <p style="font-size:13px;color:var(--g600);margin-bottom:16px">Combien de minutes vous faudra-t-il pour livrer cette commande ?</p>
-      <div class="fgm">
-        <label>Durée estimée (minutes)</label>
-        <input type="number" id="est-minutes" min="1" max="180" value="20" style="font-size:24px;font-weight:800;text-align:center"/>
-      </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button class="btn btn-sm" style="flex:1;background:var(--g100);color:var(--g700)" onclick="document.getElementById('est-minutes').value=10">10 min</button>
-        <button class="btn btn-sm" style="flex:1;background:var(--g100);color:var(--g700)" onclick="document.getElementById('est-minutes').value=20">20 min</button>
-        <button class="btn btn-sm" style="flex:1;background:var(--g100);color:var(--g700)" onclick="document.getElementById('est-minutes').value=30">30 min</button>
-        <button class="btn btn-sm" style="flex:1;background:var(--g100);color:var(--g700)" onclick="document.getElementById('est-minutes').value=45">45 min</button>
-      </div>
-      <button class="btn btn-ok" style="width:100%;margin-top:16px" onclick="confirmerRamassage()">🚴 Démarrer la livraison</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
