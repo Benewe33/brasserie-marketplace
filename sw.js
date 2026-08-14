@@ -1,13 +1,11 @@
-const CACHE = 'yeye-v4';
-const ASSETS = ['/', '/index.html'];
+const CACHE = 'yeye-v5';
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
   self.skipWaiting();
 });
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+      Promise.all(keys.map(k => caches.delete(k)))
     )
   );
   self.clients.claim();
@@ -17,8 +15,19 @@ self.addEventListener('fetch', e => {
   if (req.method !== 'GET' || new URL(req.url).origin !== self.location.origin) {
     return;
   }
+  const url = new URL(req.url);
+  // index.html et racine : toujours réseau (jamais de cache) pour avoir le code à jour
+  if(url.pathname === '/' || url.pathname === '/index.html'){
+    e.respondWith(fetch(req).catch(() => caches.match(req)));
+    return;
+  }
+  // Autres assets : cache en premier, réseau en fallback
   e.respondWith(
-    caches.match(req).then(cached => cached || fetch(req))
+    caches.match(req).then(cached => cached || fetch(req).then(resp => {
+      const clone = resp.clone();
+      caches.open(CACHE).then(c => c.put(req, clone));
+      return resp;
+    }))
   );
 });
 // ============================================================
