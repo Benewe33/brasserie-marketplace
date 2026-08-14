@@ -2572,7 +2572,8 @@ async function villeIds(){
   try{
     const {data,error}=await sb.from('boutiques').select('id').contains('villes',[_ville]);
     if(error){_villeBIds='all';} // colonne absente → aucun filtre (rétrocompatible)
-    else{_villeBIds=(data||[]).map(b=>b.id);}
+    else if(!data||!data.length){_villeBIds='all';} // aucune boutique configurée pour cette ville → tout afficher
+    else{_villeBIds=data.map(b=>b.id);}
   }catch(e){_villeBIds='all';}
   return _villeBIds;
 }

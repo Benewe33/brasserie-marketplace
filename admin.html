@@ -22,6 +22,8 @@
   --shadow-lg:0 10px 15px rgba(0,0,0,.1),0 4px 6px rgba(0,0,0,.05);
 }
 body{font-family:'Inter',sans-serif;background:var(--g50);color:var(--g900);min-height:100vh}
+/* Empêche le zoom iOS sur les inputs (font-size < 16px déclenche le zoom) */
+input,select,textarea{font-size:16px!important;}
 
 /* LOGIN */
 .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f4c2a 0%,#1a6b3c 60%,#0d3d22 100%)}
