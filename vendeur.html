@@ -254,6 +254,14 @@ tr:hover td{background:var(--g50)}
 .prow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--g100)}
 .prow:last-child{border-bottom:none}
 @media(max-width:768px){.grid-params{grid-template-columns:1fr!important}}
+/* Mise en avant checkboxes */
+.sec-checks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.sec-chk{display:flex;align-items:center;gap:8px;padding:9px 11px;border:1.5px solid var(--g200);border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--g600);transition:all .15s;user-select:none}
+.sec-chk:hover{border-color:var(--v)}
+.sec-chk input{width:17px;height:17px;accent-color:var(--vd);cursor:pointer;flex-shrink:0}
+.sec-chk:has(input:checked){border-color:var(--vd);background:var(--vl);color:var(--vd);font-weight:600}
+/* Empêche zoom iOS sur inputs */
+input,select,textarea{font-size:16px!important}
 </style>
 </head>
 <body>
@@ -775,19 +783,41 @@ tr:hover td{background:var(--g50)}
         <div class="fgm"><label>Unité</label><select id="prod-unite"><option value="kg">kg</option><option value="g">g</option><option value="litre">litre</option><option value="pièce">pièce</option><option value="sachet">sachet</option><option value="boîte">boîte</option></select></div>
         <div class="fgm"><label>Stock *</label><input type="number" id="prod-stock"/></div>
         <div class="fgm fcol"><label>Description</label><textarea id="prod-desc"></textarea></div>
+        <div class="fgm fcol"><label>Origine / Provenance <span style="font-weight:400;color:var(--g400)">(pour « Produits locaux »)</span></label><input type="text" id="prod-origine" placeholder="Ex : Abomey, Parakou, Producteur local..."/></div>
+        <div class="fgm fcol">
+          <label>📌 Mise en avant — sections de l'accueil</label>
+          <div class="sec-checks">
+            <label class="sec-chk"><input type="checkbox" class="prod-section" value="populaires"/> <span>🔥 Les plus populaires</span></label>
+            <label class="sec-chk"><input type="checkbox" class="prod-section" value="promos"/> <span>🏷️ Promotions du jour</span></label>
+            <label class="sec-chk"><input type="checkbox" class="prod-section" value="locaux"/> <span>🌍 Produits locaux</span></label>
+            <label class="sec-chk"><input type="checkbox" class="prod-section" value="nouveautes"/> <span>✨ Nouveautés</span></label>
+            <label class="sec-chk"><input type="checkbox" class="prod-section" value="recommande"/> <span>❤️ Recommandé pour vous</span></label>
+          </div>
+          <p style="font-size:11px;color:var(--g400);margin-top:6px">Si aucune case n'est cochée, le produit reste classé automatiquement (promo, nouveauté, etc.).</p>
+        </div>
         <div class="fgm fcol">
           <label>🎨 Variantes <span style="font-weight:400;opacity:.6">(tailles, couleurs, poids — prix &amp; stock par déclinaison)</span></label>
           <div id="var-list" class="var-list"></div>
           <button type="button" class="var-add-btn" onclick="addVariantRow()">＋ Ajouter une variante</button>
           <p style="font-size:11px;opacity:.6;margin-top:6px">Laissez vide pour un produit simple. Avec des variantes, le client choisit une combinaison et c'est le prix/stock de la variante qui s'applique.</p>
         </div>
-        <div class="fgm fcol">
-          <label>Photo produit</label>
-          <div class="upzone"><input type="file" accept="image/*" onchange="uploadApp(this,'produits','prod-url','prod-prev','prod-prog')"/>
-          <div class="uico">📸</div><p>Glisse ou <strong>clique</strong></p></div>
-          <div class="up-prog" id="prod-prog"><div class="up-prog-bar" id="prod-prog-bar"></div></div>
-          <img class="up-prev" id="prod-prev" alt=""/>
-          <input type="hidden" id="prod-url"/>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px" class="fcol">
+          <div class="fgm">
+            <label>📸 Photo principale *</label>
+            <div class="upzone"><input type="file" accept="image/*" onchange="uploadApp(this,'produits','prod-url','prod-prev','prod-prog')"/>
+            <div class="uico">📸</div><p>Glisse ou <strong>clique</strong></p></div>
+            <div class="up-prog" id="prod-prog"><div class="up-prog-bar" id="prod-prog-bar"></div></div>
+            <img class="up-prev" id="prod-prev" alt=""/>
+            <input type="hidden" id="prod-url"/>
+          </div>
+          <div class="fgm">
+            <label>🖼️ Photo secondaire</label>
+            <div class="upzone"><input type="file" accept="image/*" onchange="uploadApp(this,'produits','prod-url-2','prod-prev-2','prod-prog-2')"/>
+            <div class="uico">🖼️</div><p>Glisse ou <strong>clique</strong></p></div>
+            <div class="up-prog" id="prod-prog-2"><div class="up-prog-bar" id="prod-prog-2-bar"></div></div>
+            <img class="up-prev" id="prod-prev-2" alt=""/>
+            <input type="hidden" id="prod-url-2"/>
+          </div>
         </div>
       </div>
     </div>
@@ -1925,9 +1955,12 @@ async function loadProds(){
 
 function openProd(){
   document.getElementById('prod-id').value='';
-  ['prod-nom','prod-prix','prod-promo','prod-stock','prod-desc'].forEach(id=>document.getElementById(id).value='');
+  ['prod-nom','prod-prix','prod-promo','prod-stock','prod-desc','prod-origine'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   document.getElementById('prod-url').value='';
   document.getElementById('prod-prev').style.display='none';
+  document.getElementById('prod-url-2').value='';
+  document.getElementById('prod-prev-2').style.display='none';
+  document.querySelectorAll('.prod-section').forEach(c=>c.checked=false);
   renderVariantRows([]);
   document.getElementById('m-prod-title').textContent='Ajouter un produit';
   document.getElementById('prod-save-btn').textContent='Ajouter';
@@ -1941,9 +1974,15 @@ function editProd(p){
   document.getElementById('prod-promo').value=p.prix_promo||'';
   document.getElementById('prod-stock').value=p.stock||'';
   document.getElementById('prod-desc').value=p.description||'';
+  const og=document.getElementById('prod-origine');if(og)og.value=p.origine||'';
+  const secs=Array.isArray(p.sections)?p.sections:[];
+  document.querySelectorAll('.prod-section').forEach(c=>c.checked=secs.includes(c.value));
   document.getElementById('prod-url').value=p.image_url||'';
   document.getElementById('prod-prev').src=p.image_url||'';
   document.getElementById('prod-prev').style.display=p.image_url?'block':'none';
+  document.getElementById('prod-url-2').value=p.image_url_2||'';
+  document.getElementById('prod-prev-2').src=p.image_url_2||'';
+  document.getElementById('prod-prev-2').style.display=p.image_url_2?'block':'none';
   loadVariantsForEdit(p.id);
   document.getElementById('m-prod-title').textContent='Modifier : '+p.nom;
   document.getElementById('prod-save-btn').textContent='Enregistrer';
@@ -1957,7 +1996,7 @@ async function saveProd(){
   const prix=parseFloat(document.getElementById('prod-prix').value);
   const stock=parseInt(document.getElementById('prod-stock').value);
   if(!nom||!prix||isNaN(stock)){toast('Nom, prix et stock obligatoires','err');return;}
-  const payload={nom,prix,stock,boutique_id:currentBoutique.id,categorie_id:document.getElementById('prod-cat').value||null,description:document.getElementById('prod-desc').value,unite:document.getElementById('prod-unite').value,prix_promo:parseFloat(document.getElementById('prod-promo').value)||null,image_url:document.getElementById('prod-url').value||null,actif:true};
+  const payload={nom,prix,stock,boutique_id:currentBoutique.id,categorie_id:document.getElementById('prod-cat').value||null,description:document.getElementById('prod-desc').value,unite:document.getElementById('prod-unite').value,prix_promo:parseFloat(document.getElementById('prod-promo').value)||null,origine:(document.getElementById('prod-origine')?.value||'').trim()||null,sections:[...document.querySelectorAll('.prod-section:checked')].map(c=>c.value),image_url:document.getElementById('prod-url').value||null,image_url_2:document.getElementById('prod-url-2').value||null,actif:true};
   const {data:saved,error}=id
     ?await sb.from('produits').update(payload).eq('id',id).select('id').single()
     :await sb.from('produits').insert(payload).select('id').single();
