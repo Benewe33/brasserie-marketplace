@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>KORA Menu — YéyéMarket</title>
+  <meta name="description" content="Choisis ton budget et tes préférences — KORA génère ton menu béninois de la semaine et ta liste de courses." />
+  <meta name="theme-color" content="#f6f3ec" />
+  <link rel="icon" href="favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── TOKENS: LIGHT ── */
+    :root {
+      --bg:              #f6f3ec;
+      --bg-card:         #ffffff;
+      --bg-subtle:       #eef5f0;
+      --green-dark:      #1a3828;
+      --green-mid:       #2d5a3d;
+      --green-accent:    #3a6b4a;
+      --green-light-bg:  #e0ede5;
+      --text-dark:       #1a3828;
+      --text-mid:        #3a5446;
+      --text-light:      #6a8878;
+      --border:          #dceade;
+      --card-shadow:     0 2px 14px rgba(26,56,40,0.07);
+      --card-shadow-hover: 0 6px 24px rgba(26,56,40,0.13);
+      --radius:          18px;
+      --radius-sm:       11px;
+      --font-display:    'Bricolage Grotesque', system-ui, sans-serif;
+      --font-body:       'DM Sans', system-ui, sans-serif;
+    }
+
+    /* ── TOKENS: DARK (system) ── */
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg:              #111c15;
+        --bg-card:         #192419;
+        --bg-subtle:       #1e2e22;
+        --green-dark:      #c8e6d4;
+        --green-mid:       #a3cfb6;
+        --green-accent:    #7dbf98;
+        --green-light-bg:  #1e3028;
+        --text-dark:       #e0f0e8;
+        --text-mid:        #a8c4b4;
+        --text-light:      #6a9878;
+        --border:          #2a3e2e;
+        --card-shadow:     0 2px 14px rgba(0,0,0,0.35);
+        --card-shadow-hover: 0 6px 24px rgba(0,0,0,0.5);
+      }
+    }
+    /* ── TOKENS: DARK (explicit) ── */
+    :root[data-theme="dark"] {
+      --bg:              #111c15;
+      --bg-card:         #192419;
+      --bg-subtle:       #1e2e22;
+      --green-dark:      #c8e6d4;
+      --green-mid:       #a3cfb6;
+      --green-accent:    #7dbf98;
+      --green-light-bg:  #1e3028;
+      --text-dark:       #e0f0e8;
+      --text-mid:        #a8c4b4;
+      --text-light:      #6a9878;
+      --border:          #2a3e2e;
+      --card-shadow:     0 2px 14px rgba(0,0,0,0.35);
+      --card-shadow-hover: 0 6px 24px rgba(0,0,0,0.5);
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text-dark);
+      min-height: 100vh;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 40px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--green-dark);
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: var(--green-dark);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--bg);
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .logo { font-family: var(--font-display); font-weight: 700; }
+    .nav-link {
+      color: var(--text-mid);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-link:hover { color: var(--green-dark); }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 40px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: center;
+    }
+    .hero-text h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.08;
+      color: var(--green-dark);
+      letter-spacing: -2px;
+      margin-bottom: 10px;
+      text-wrap: balance;
+    }
+    .hero-accent {
+      color: var(--green-accent);
+      font-family: var(--font-display);
+      font-size: clamp(1.05rem, 2.5vw, 1.2rem);
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+    .hero-desc {
+      color: var(--text-mid);
+      font-size: 1rem;
+      line-height: 1.65;
+      margin-bottom: 28px;
+      max-width: 420px;
+    }
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-dark);
+      color: var(--bg);
+      border: none;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: 0.97rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-primary:hover {
+      background: var(--green-mid);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26,56,40,0.2);
+    }
+    .btn-primary svg { transition: transform 0.2s; }
+    .btn-primary:hover svg { transform: translateX(3px); }
+    .btn-primary:focus-visible { outline: 2px solid var(--green-accent); outline-offset: 3px; }
+
+    .social-proof {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .avatars {
+      display: flex;
+    }
+    .avatar {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 2px solid var(--bg);
+      background: var(--green-light-bg);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.7rem;
+      margin-left: -6px;
+      overflow: hidden;
+    }
+    .avatar:first-child { margin-left: 0; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .social-text { font-size: 0.8rem; color: var(--text-light); line-height: 1.3; }
+    .social-text strong { color: var(--text-dark); display: block; font-size: 0.88rem; font-weight: 600; }
+
+    /* Hero image zone */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .phone-mockup {
+      width: 260px;
+      background: var(--green-dark);
+      border-radius: 36px;
+      padding: 14px 12px;
+      box-shadow: 0 24px 70px rgba(26,56,40,0.28), 0 4px 20px rgba(26,56,40,0.15);
+      position: relative;
+      z-index: 2;
+    }
+    .phone-screen {
+      background: var(--bg-card);
+      border-radius: 24px;
+      overflow: hidden;
+      font-size: 0.7rem;
+    }
+    .phone-header {
+      background: var(--green-dark);
+      color: var(--bg);
+      padding: 10px 12px 8px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.74rem;
+      text-align: center;
+    }
+    .phone-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .phone-dish-img {
+      width: 38px; height: 38px;
+      border-radius: 8px;
+      background: var(--green-light-bg);
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .phone-dish-info { flex: 1; }
+    .phone-dish-name { font-weight: 600; font-size: 0.68rem; color: var(--text-dark); line-height: 1.2; }
+    .phone-dish-time { font-size: 0.6rem; color: var(--text-light); }
+    .phone-dish-price { font-weight: 700; font-size: 0.72rem; color: var(--green-accent); font-variant-numeric: tabular-nums; }
+
+    .food-deco {
+      position: absolute;
+      font-size: 4rem;
+      opacity: 0.85;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,0.15));
+      z-index: 1;
+    }
+    .food-deco-1 { top: -10px; right: -30px; transform: rotate(15deg); font-size: 3.5rem; }
+    .food-deco-2 { bottom: 20px; left: -40px; transform: rotate(-10deg); font-size: 3rem; }
+    .food-deco-3 { top: 30px; left: -20px; font-size: 2.5rem; transform: rotate(5deg); }
+
+    /* ── COMMENT ÇA MARCHE ── */
+    .section-how {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 60px 40px;
+      text-align: center;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3.5vw, 2.1rem);
+      font-weight: 800;
+      color: var(--green-dark);
+      letter-spacing: -0.8px;
+      margin-bottom: 48px;
+      text-wrap: balance;
+    }
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: left;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .step-icon-wrap {
+      width: 60px; height: 60px;
+      background: var(--green-light-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1.4rem;
+    }
+    .step-content { flex: 1; }
+    .step-num-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .step-num {
+      width: 22px; height: 22px;
+      background: var(--green-dark);
+      color: var(--bg);
+      border-radius: 50%;
+      font-size: 0.68rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step-title { font-family: var(--font-display); font-weight: 700; font-size: 1rem; color: var(--text-dark); }
+    .step-desc { font-size: 0.9rem; color: var(--text-light); line-height: 1.55; }
+
+    /* ── PLATS SHOWCASE ── */
+    .section-dishes {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 40px 60px;
+    }
+    .section-dishes h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.4rem, 3vw, 1.85rem);
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.6px;
+      margin-bottom: 28px;
+      text-wrap: balance;
+    }
+    .dish-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .dish-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--card-shadow);
+      cursor: pointer;
+      transition: transform 0.18s, box-shadow 0.18s;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid transparent;
+    }
+    .dish-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--card-shadow-hover);
+      border-color: var(--border);
+    }
+    .dish-card:focus-visible { outline: 2px solid var(--green-accent); outline-offset: 2px; }
+    .dish-img {
+      width: 72px; height: 72px;
+      border-radius: var(--radius-sm);
+      flex-shrink: 0;
+      overflow: hidden;
+      position: relative;
+      background: var(--bg-subtle);
+    }
+    .dish-img-photo {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s;
+    }
+    .dish-card:hover .dish-img-photo { transform: scale(1.06); }
+    .dish-info { flex: 1; min-width: 0; }
+    .dish-name { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; color: var(--text-dark); margin-bottom: 4px; }
+    .dish-meta { display: flex; align-items: center; gap: 8px; }
+    .dish-time { font-size: 0.78rem; color: var(--text-light); display: flex; align-items: center; gap: 3px; }
+    .tag {
+      display: inline-block;
+      padding: 2px 9px;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.1px;
+    }
+    .tag-local    { background: #dceedd; color: #1e5a2a; }
+    .tag-rapide   { background: #fef3cd; color: #7a5500; }
+    .tag-healthy  { background: #d6eedd; color: #1e5a2a; }
+    .tag-festif   { background: #f5e6d8; color: #6a3010; }
+    .tag-populaire{ background: #e8e0f5; color: #4a2080; }
+    .dish-right { display: flex; align-items: center; gap: 10px; }
+    .dish-price {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--text-dark);
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+    .dish-arrow {
+      color: var(--text-light);
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    /* ── GÉNÉRATION IA ── */
+    .section-ia {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 40px 60px;
+    }
+    .ia-container {
+      background: var(--bg-card);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: var(--card-shadow);
+      border: 1px solid var(--border);
+    }
+    .ia-container h2 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .ia-container > p {
+      color: var(--text-light);
+      font-size: 0.9rem;
+      margin-bottom: 28px;
+    }
+    .ia-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      margin-bottom: 6px;
+    }
+    .form-group select,
+    .form-group input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      color: var(--text-dark);
+      background: var(--bg);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .form-group select:focus,
+    .form-group input:focus {
+      border-color: var(--green-accent);
+      box-shadow: 0 0 0 3px rgba(58,107,74,0.12);
+    }
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: '▾';
+      position: absolute;
+      right: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+      pointer-events: none;
+    }
+
+    .btn-generate {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 15px;
+      background: var(--green-dark);
+      color: var(--bg);
+      border: none;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-generate:hover:not(:disabled) {
+      background: var(--green-mid);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(26,56,40,0.2);
+    }
+    .btn-generate:disabled { opacity: 0.65; cursor: not-allowed; }
+    .btn-generate:focus-visible { outline: 2px solid var(--green-accent); outline-offset: 3px; }
+
+    /* Spinner */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── RÉSULTAT MENU ── */
+    #menu-result { display: none; margin-top: 32px; }
+    .menu-result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .menu-result-header h3 {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--text-dark);
+      letter-spacing: -0.3px;
+    }
+    /* Week planner strip */
+    .week-strip {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-bottom: 28px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .week-card {
+      background: var(--bg-card);
+      border-radius: 14px;
+      padding: 12px 10px;
+      border: 1.5px solid var(--border);
+      min-width: 104px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .week-card:hover { transform: translateY(-2px); box-shadow: var(--card-shadow-hover); }
+    .week-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--day-color, var(--green-accent));
+      border-radius: 14px 14px 0 0;
+    }
+    .week-day-label {
+      font-size: 0.58rem;
+      font-weight: 800;
+      color: var(--day-color, var(--green-accent));
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      margin-top: 4px;
+    }
+    .week-dish-name {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 0.78rem;
+      color: var(--text-dark);
+      line-height: 1.3;
+      flex: 1;
+    }
+    .week-badges {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-top: 2px;
+    }
+    .week-time-badge, .week-cost-badge {
+      font-size: 0.65rem;
+      color: var(--text-light);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .week-cost-badge {
+      color: var(--day-color, var(--green-accent));
+      font-weight: 700;
+    }
+
+    /* Liste de courses */
+    .shopping-list {
+      background: var(--green-light-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+    }
+    .shopping-list h4 {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--text-dark);
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .shopping-categories { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 16px; }
+    .shopping-cat h5 {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--green-accent);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 8px;
+    }
+    .shopping-cat ul { list-style: none; }
+    .shopping-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+      cursor: pointer;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    .shopping-checkbox {
+      width: 16px; height: 16px;
+      border: 2px solid var(--green-accent);
+      border-radius: 4px;
+      flex-shrink: 0;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background: transparent;
+      transition: background 0.15s, border-color 0.15s;
+      position: relative;
+    }
+    .shopping-checkbox:checked {
+      background: var(--green-accent);
+    }
+    .shopping-checkbox:checked::after {
+      content: '';
+      position: absolute;
+      left: 3px; top: 1px;
+      width: 5px; height: 8px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg);
+    }
+    .shopping-item-text {
+      font-size: 0.85rem;
+      color: var(--text-mid);
+      transition: opacity 0.2s, text-decoration 0.2s;
+      line-height: 1.4;
+    }
+    .shopping-checkbox:checked ~ .shopping-item-text {
+      text-decoration: line-through;
+      opacity: 0.45;
+    }
+
+    .btn-order {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px;
+      background: var(--green-dark);
+      color: var(--bg);
+      border: none;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 20px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-order:hover {
+      background: var(--green-mid);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(26,56,40,0.2);
+    }
+    .btn-order:focus-visible { outline: 2px solid var(--green-accent); outline-offset: 3px; }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      max-width: 1100px;
+      margin: 0 auto 60px;
+      padding: 0 40px;
+    }
+    .cta-banner-inner {
+      background: #1a3828;
+      border-radius: 24px;
+      padding: 50px 48px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 30px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-banner-inner::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: 180px;
+      width: 240px; height: 240px;
+      background: rgba(255,255,255,0.03);
+      border-radius: 50%;
+    }
+    .cta-banner-text h2 {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-weight: 800;
+      color: #e8f5ee;
+      letter-spacing: -1.2px;
+      margin-bottom: 8px;
+      text-wrap: balance;
+    }
+    .cta-banner-text p { color: rgba(232,245,238,0.65); font-size: 1rem; margin-bottom: 28px; }
+    .btn-cta-white {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #f6f3ec;
+      color: #1a3828;
+      padding: 14px 28px;
+      border-radius: 50px;
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      border: none;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.15s;
+    }
+    .btn-cta-white:hover {
+      opacity: 0.94;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+    }
+    .btn-cta-white:focus-visible { outline: 2px solid #f6f3ec; outline-offset: 3px; }
+
+    .social-proof-dark {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,0.08);
+      padding: 10px 16px;
+      border-radius: 50px;
+      margin-top: 16px;
+      color: rgba(232,245,238,0.75);
+      font-size: 0.8rem;
+    }
+
+    .cta-visual {
+      font-size: 5.5rem;
+      line-height: 1;
+      filter: drop-shadow(0 8px 20px rgba(0,0,0,0.25));
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 28px 40px;
+      text-align: center;
+      background: var(--bg);
+    }
+    .footer-links {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px 20px;
+      margin-bottom: 12px;
+    }
+    .footer-links a {
+      color: var(--text-light);
+      text-decoration: none;
+      font-size: 0.8rem;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--text-dark); }
+    .footer-copy { font-size: 0.76rem; color: var(--text-light); }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1a3828;
+      color: #e8f5ee;
+      padding: 12px 20px;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 1000;
+      pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── REDUCED MOTION ── */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 16px 20px; }
+      .hero { grid-template-columns: 1fr; padding: 20px 20px 40px; gap: 30px; }
+      .hero-visual { order: -1; }
+      .phone-mockup { width: 200px; }
+      .section-how, .section-dishes, .section-ia, .cta-banner { padding-left: 20px; padding-right: 20px; }
+      .ia-form { grid-template-columns: 1fr; }
+      .cta-banner-inner { grid-template-columns: 1fr; text-align: center; padding: 36px 28px; }
+      .cta-visual { display: none; }
+      .week-strip { grid-template-columns: repeat(7, minmax(96px, 1fr)); }
+      .shopping-categories { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .shopping-categories { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="logo">
+      <div class="logo-icon">Yé</div>
+      YéyéMarket
+    </a>
+    <a href="index.html" class="nav-link">← Retour au marché</a>
+  </nav>
+
+  <!-- HERO -->
+  <section style="background: var(--bg);">
+    <div class="hero">
+      <div class="hero-text">
+        <h1>Qu'est-ce qu'on mange ce soir&nbsp;?</h1>
+        <p class="hero-accent">Plus jamais cette question.</p>
+        <p class="hero-desc">KORA prépare tes repas de la semaine et ta liste de courses selon ton budget et tes préférences — avec les meilleurs produits du marché béninois.</p>
+        <a href="#generer" class="btn-primary">
+          Commencer gratuitement
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+        </a>
+        <div class="social-proof">
+          <div class="avatars">
+            <div class="avatar">👩🏾</div>
+            <div class="avatar">👨🏿</div>
+            <div class="avatar">👩🏽</div>
+          </div>
+          <div class="social-text">
+            <strong>+500 familles béninoises</strong>
+            utilisent déjà KORA Menu
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-visual">
+        <span class="food-deco food-deco-1">🌿</span>
+        <span class="food-deco food-deco-2">🍅</span>
+        <span class="food-deco food-deco-3">🐟</span>
+        <div class="phone-mockup">
+          <div class="phone-screen">
+            <div class="phone-header">🗓 Menu cette semaine</div>
+            <div class="phone-menu-item">
+              <div class="phone-dish-img" style="background: linear-gradient(145deg, #2a4a1a, #6a8a3a); border-radius: 8px; overflow: hidden;">
+                <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=76&h=76&fit=crop&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">
+              </div>
+              <div class="phone-dish-info">
+                <div class="phone-dish-name">Gboma Dessi</div>
+                <div class="phone-dish-time">⏱ 30 min · LUN</div>
+              </div>
+              <div class="phone-dish-price">850 F</div>
+            </div>
+            <div class="phone-menu-item">
+              <div class="phone-dish-img" style="background: linear-gradient(145deg, #9a2a1a, #d4603a); border-radius: 8px; overflow: hidden;">
+                <img src="https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=76&h=76&fit=crop&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">
+              </div>
+              <div class="phone-dish-info">
+                <div class="phone-dish-name">Amiwo tomate</div>
+                <div class="phone-dish-time">⏱ 20 min · MAR</div>
+              </div>
+              <div class="phone-dish-price">650 F</div>
+            </div>
+            <div class="phone-menu-item">
+              <div class="phone-dish-img" style="background: linear-gradient(145deg, #7a4a10, #c89a40); border-radius: 8px; overflow: hidden;">
+                <img src="https://images.unsplash.com/photo-1574484284002-952d92456975?w=76&h=76&fit=crop&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">
+              </div>
+              <div class="phone-dish-info">
+                <div class="phone-dish-name">Poulet yassa</div>
+                <div class="phone-dish-time">⏱ 45 min · MER</div>
+              </div>
+              <div class="phone-dish-price">1 200 F</div>
+            </div>
+            <div class="phone-menu-item">
+              <div class="phone-dish-img" style="background: linear-gradient(145deg, #3a3a1a, #7a6a2a); border-radius: 8px; overflow: hidden;">
+                <img src="https://images.unsplash.com/photo-1519984388953-d2406bc725e1?w=76&h=76&fit=crop&q=80" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">
+              </div>
+              <div class="phone-dish-info">
+                <div class="phone-dish-name">Poisson braisé</div>
+                <div class="phone-dish-time">⏱ 35 min · JEU</div>
+              </div>
+              <div class="phone-dish-price">950 F</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMENT ÇA MARCHE -->
+  <section class="section-how">
+    <h2 class="section-title">Comment ça marche&nbsp;?</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-icon-wrap">💰</div>
+        <div class="step-content">
+          <div class="step-num-row">
+            <div class="step-num">1</div>
+            <div class="step-title">Tu choisis ton budget</div>
+          </div>
+          <div class="step-desc">Ton budget en francs CFA, le nombre de personnes, tes goûts — en quelques clics.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon-wrap">🤖</div>
+        <div class="step-content">
+          <div class="step-num-row">
+            <div class="step-num">2</div>
+            <div class="step-title">KORA prépare ta semaine</div>
+          </div>
+          <div class="step-desc">L'IA génère des repas simples et variés avec des plats béninois et africains, pile dans ton budget.</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-icon-wrap">🛒</div>
+        <div class="step-content">
+          <div class="step-num-row">
+            <div class="step-num">3</div>
+            <div class="step-title">Ta liste est prête</div>
+          </div>
+          <div class="step-desc">Classée par rayon, pour faire ton marché sans réfléchir — ou commander directement sur YéyéMarket.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SHOWCASE PLATS -->
+  <section class="section-dishes">
+    <h2>Des repas que tu auras vraiment envie de cuisiner.</h2>
+    <div class="dish-cards">
+      <div class="dish-card">
+        <div class="dish-img" style="background: linear-gradient(145deg, #2a4a1a 0%, #6a8a3a 50%, #4a6a2a 100%);">
+          <img class="dish-img-photo" src="https://images.unsplash.com/photo-1547592180-85f173990554?w=144&h=144&fit=crop&q=80" alt="Gboma Dessi" loading="lazy" onerror="this.style.display='none'">
+        </div>
+        <div class="dish-info">
+          <div class="dish-name">Gboma Dessi au poisson fumé</div>
+          <div class="dish-meta">
+            <span class="dish-time">⏱ 30 min</span>
+            <span class="tag tag-local">local</span>
+          </div>
+        </div>
+        <div class="dish-right">
+          <span class="dish-price">850 FCFA</span>
+          <span class="dish-arrow">›</span>
+        </div>
+      </div>
+      <div class="dish-card">
+        <div class="dish-img" style="background: linear-gradient(145deg, #9a2a1a 0%, #d4603a 50%, #b04020 100%);">
+          <img class="dish-img-photo" src="https://images.unsplash.com/photo-1565299507177-b0ac66763828?w=144&h=144&fit=crop&q=80" alt="Amiwo" loading="lazy" onerror="this.style.display='none'">
+        </div>
+        <div class="dish-info">
+          <div class="dish-name">Amiwo sauce tomate piment</div>
+          <div class="dish-meta">
+            <span class="dish-time">⏱ 20 min</span>
+            <span class="tag tag-rapide">rapide</span>
+          </div>
+        </div>
+        <div class="dish-right">
+          <span class="dish-price">650 FCFA</span>
+          <span class="dish-arrow">›</span>
+        </div>
+      </div>
+      <div class="dish-card">
+        <div class="dish-img" style="background: linear-gradient(145deg, #7a4a10 0%, #c89a40 50%, #a07020 100%);">
+          <img class="dish-img-photo" src="https://images.unsplash.com/photo-1574484284002-952d92456975?w=144&h=144&fit=crop&q=80" alt="Poulet yassa" loading="lazy" onerror="this.style.display='none'">
+        </div>
+        <div class="dish-info">
+          <div class="dish-name">Poulet braisé yassa oignon</div>
+          <div class="dish-meta">
+            <span class="dish-time">⏱ 45 min</span>
+            <span class="tag tag-populaire">populaire</span>
+          </div>
+        </div>
+        <div class="dish-right">
+          <span class="dish-price">1 200 FCFA</span>
+          <span class="dish-arrow">›</span>
+        </div>
+      </div>
+      <div class="dish-card">
+        <div class="dish-img" style="background: linear-gradient(145deg, #3a3a1a 0%, #7a6a2a 50%, #5a5010 100%);">
+          <img class="dish-img-photo" src="https://images.unsplash.com/photo-1519984388953-d2406bc725e1?w=144&h=144&fit=crop&q=80" alt="Poisson braisé" loading="lazy" onerror="this.style.display='none'">
+        </div>
+        <div class="dish-info">
+          <div class="dish-name">Poisson braisé sauce graine</div>
+          <div class="dish-meta">
+            <span class="dish-time">⏱ 35 min</span>
+            <span class="tag tag-healthy">healthy</span>
+          </div>
+        </div>
+        <div class="dish-right">
+          <span class="dish-price">950 FCFA</span>
+          <span class="dish-arrow">›</span>
+        </div>
+      </div>
+      <div class="dish-card">
+        <div class="dish-img" style="background: linear-gradient(145deg, #8a6a40 0%, #c4a870 50%, #a08050 100%);">
+          <img class="dish-img-photo" src="https://images.unsplash.com/photo-1512058564366-18510be2db19?w=144&h=144&fit=crop&q=80" alt="Igname pilée" loading="lazy" onerror="this.style.display='none'">
+        </div>
+        <div class="dish-info">
+          <div class="dish-name">Igname pilée sauce arachide</div>
+          <div class="dish-meta">
+            <span class="dish-time">⏱ 40 min</span>
+            <span class="tag tag-festif">festif</span>
+          </div>
+        </div>
+        <div class="dish-right">
+          <span class="dish-price">780 FCFA</span>
+          <span class="dish-arrow">›</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GÉNÉRATION IA -->
+  <section class="section-ia" id="generer">
+    <div class="ia-container">
+      <h2>✨ Génère ton menu de la semaine</h2>
+      <p>KORA crée un programme personnalisé avec ta liste de courses en moins de 30 secondes.</p>
+
+      <div class="ia-form">
+        <div class="form-group">
+          <label>Budget hebdomadaire (FCFA)</label>
+          <div class="select-wrap">
+            <select id="budget">
+              <option value="3000">Moins de 3 000 F</option>
+              <option value="5000" selected>3 000 – 5 000 F</option>
+              <option value="8000">5 000 – 8 000 F</option>
+              <option value="12000">8 000 – 12 000 F</option>
+              <option value="20000">12 000 F et plus</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Nombre de personnes</label>
+          <div class="select-wrap">
+            <select id="personnes">
+              <option value="1">1 personne</option>
+              <option value="2" selected>2 personnes</option>
+              <option value="4">4 personnes</option>
+              <option value="6">6 personnes et plus</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Préférences alimentaires</label>
+          <div class="select-wrap">
+            <select id="preferences">
+              <option value="tout">Tout type de plats</option>
+              <option value="poisson">Poisson & fruits de mer</option>
+              <option value="viande">Viande & volaille</option>
+              <option value="vegetarien">Végétarien</option>
+              <option value="local">Plats locaux béninois</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-generate" id="btn-generate" onclick="genererMenu()">
+        <span class="spinner" id="spinner"></span>
+        <span id="btn-text">🍽 Générer mon menu de la semaine</span>
+      </button>
+
+      <!-- RÉSULTAT -->
+      <div id="menu-result">
+        <div class="menu-result-header">
+          <h3>🗓 Ton menu de la semaine</h3>
+          <button onclick="genererMenu()" style="background:none;border:1.5px solid #cce0d4;border-radius:50px;padding:6px 14px;font-size:0.8rem;color:var(--green-accent);cursor:pointer;font-weight:600;">
+            ↺ Régénérer
+          </button>
+        </div>
+        <div class="week-strip" id="week-grid"></div>
+
+        <div class="shopping-list">
+          <h4>🛒 Ta liste de courses</h4>
+          <div class="shopping-categories" id="shopping-categories"></div>
+        </div>
+
+        <a href="index.html" class="btn-order">
+          Commander sur YéyéMarket →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <div class="cta-banner">
+    <div class="cta-banner-inner">
+      <div class="cta-banner-text">
+        <h2>Ta semaine est prête.</h2>
+        <p>Il ne reste plus qu'à cuisiner — et à savourer.</p>
+        <a href="#generer" class="btn-cta-white">
+          Commencer gratuitement →
+        </a>
+        <br/>
+        <div class="social-proof-dark">
+          👥 +500 familles béninoises nous font déjà confiance
+        </div>
+      </div>
+      <div class="cta-visual">🧺</div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-links">
+      <a href="index.html">Marché</a>
+      <a href="confidentialite.html">Politique de confidentialité</a>
+      <a href="mailto:contact@yeyemarket.com">Contact</a>
+    </div>
+    <p class="footer-copy">© 2026 YéyéMarket · Propulsé par KORA AI</p>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+  // ── Scroll smooth ──
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const el = document.querySelector(a.getAttribute('href'));
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // ── Toast ──
+  function showToast(msg, dur = 3000) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), dur);
+  }
+
+  // ── Génération menu ──
+  async function genererMenu() {
+    const budget    = document.getElementById('budget').value;
+    const personnes = document.getElementById('personnes').value;
+    const prefs     = document.getElementById('preferences').value;
+    const btn       = document.getElementById('btn-generate');
+    const spinner   = document.getElementById('spinner');
+    const btnText   = document.getElementById('btn-text');
+    const result    = document.getElementById('menu-result');
+
+    const budgetLabel = {
+      '3000':  'moins de 3 000 FCFA',
+      '5000':  'entre 3 000 et 5 000 FCFA',
+      '8000':  'entre 5 000 et 8 000 FCFA',
+      '12000': 'entre 8 000 et 12 000 FCFA',
+      '20000': '12 000 FCFA et plus'
+    }[budget];
+
+    const prefsLabel = {
+      'tout':       'tout type de plats',
+      'poisson':    'poisson et fruits de mer',
+      'viande':     'viande et volaille',
+      'vegetarien': 'cuisine végétarienne',
+      'local':      'plats locaux béninois'
+    }[prefs];
+
+    // Loading
+    btn.disabled = true;
+    spinner.style.display = 'block';
+    btnText.textContent = 'KORA réfléchit…';
+    result.style.display = 'none';
+
+    const prompt = `Tu es KORA, l'assistant culinaire de YéyéMarket au Bénin.
+
+Génère un menu de la semaine (lundi au dimanche, 1 repas par soir) pour ${personnes} personne(s) avec un budget de ${budgetLabel} par semaine et une préférence pour ${prefsLabel}.
+
+Utilise des plats béninois et africains authentiques (Gboma Dessi, Amiwo, Igname pilée, Poulet yassa, Riz sauce arachide, Haricots wele, Poisson braisé, Gbégui, sauce graine, etc.).
+
+Réponds UNIQUEMENT en JSON valide avec ce format exact (sans markdown ni backticks) :
+{
+  "menu": [
+    {"jour": "Lundi", "plat": "Nom du plat", "temps": "XX min", "cout_par_personne": "XXX"},
+    {"jour": "Mardi", "plat": "...", "temps": "...", "cout_par_personne": "..."},
+    {"jour": "Mercredi", "plat": "...", "temps": "...", "cout_par_personne": "..."},
+    {"jour": "Jeudi", "plat": "...", "temps": "...", "cout_par_personne": "..."},
+    {"jour": "Vendredi", "plat": "...", "temps": "...", "cout_par_personne": "..."},
+    {"jour": "Samedi", "plat": "...", "temps": "...", "cout_par_personne": "..."},
+    {"jour": "Dimanche", "plat": "...", "temps": "...", "cout_par_personne": "..."}
+  ],
+  "courses": {
+    "Légumes & épices": ["item1", "item2", "item3"],
+    "Protéines": ["item1", "item2"],
+    "Féculents & céréales": ["item1", "item2"],
+    "Condiments": ["item1", "item2"]
+  }
+}`;
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: prompt, stream: false })
+      });
+
+      if (!res.ok) throw new Error('Erreur API');
+      const data = await res.json();
+      const text = data.response || data.message || data.content || '';
+
+      // Parse JSON
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('Format invalide');
+      const parsed = JSON.parse(jsonMatch[0]);
+
+      afficherMenu(parsed);
+    } catch (err) {
+      console.error(err);
+      // Fallback menu si API KO
+      afficherMenu(getFallbackMenu(prefs));
+      showToast('⚠️ Menu généré en mode hors-ligne');
+    } finally {
+      btn.disabled = false;
+      spinner.style.display = 'none';
+      btnText.textContent = '🍽 Générer mon menu de la semaine';
+    }
+  }
+
+  const DAY_ABBR = {
+    'Lundi':'LUN','Mardi':'MAR','Mercredi':'MER','Jeudi':'JEU',
+    'Vendredi':'VEN','Samedi':'SAM','Dimanche':'DIM'
+  };
+  const DAY_COLORS = [
+    '#3a6b4a','#6b5a3a','#2a6b5a','#5a3a6b','#6b3a3a','#3a5a6b','#3a6b3a'
+  ];
+
+  function afficherMenu(data) {
+    const grid = document.getElementById('week-grid');
+    const cats = document.getElementById('shopping-categories');
+    const result = document.getElementById('menu-result');
+
+    // Week planner strip
+    grid.innerHTML = '';
+    (data.menu || []).forEach((item, i) => {
+      const color = DAY_COLORS[i % DAY_COLORS.length];
+      const abbr  = DAY_ABBR[item.jour] || item.jour.slice(0,3).toUpperCase();
+      grid.innerHTML += `
+        <div class="week-card" style="--day-color:${color}">
+          <div class="week-day-label">${abbr}</div>
+          <div class="week-dish-name">${item.plat}</div>
+          <div class="week-badges">
+            <span class="week-time-badge">⏱ ${item.temps}</span>
+            <span class="week-cost-badge">${item.cout_par_personne} F/pers.</span>
+          </div>
+        </div>`;
+    });
+
+    // Shopping list with checkboxes
+    cats.innerHTML = '';
+    const courses = data.courses || {};
+    Object.entries(courses).forEach(([cat, items]) => {
+      const labels = (items || []).map((item, idx) => {
+        const id = `item-${cat.replace(/\W/g,'')}-${idx}`;
+        return `<label class="shopping-item" for="${id}">
+          <input type="checkbox" class="shopping-checkbox" id="${id}">
+          <span class="shopping-item-text">${item}</span>
+        </label>`;
+      }).join('');
+      cats.innerHTML += `
+        <div class="shopping-cat">
+          <h5>${cat}</h5>
+          ${labels}
+        </div>`;
+    });
+
+    result.style.display = 'block';
+    result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function getFallbackMenu(prefs) {
+    return {
+      menu: [
+        { jour: "Lundi",    plat: "Gboma Dessi au poisson fumé",      temps: "30 min", cout_par_personne: "850" },
+        { jour: "Mardi",    plat: "Amiwo sauce tomate piment",         temps: "20 min", cout_par_personne: "650" },
+        { jour: "Mercredi", plat: "Poulet braisé yassa oignon",        temps: "45 min", cout_par_personne: "1 200" },
+        { jour: "Jeudi",    plat: "Riz sauce arachide légumes",        temps: "35 min", cout_par_personne: "700" },
+        { jour: "Vendredi", plat: "Poisson braisé sauce graine",       temps: "35 min", cout_par_personne: "950" },
+        { jour: "Samedi",   plat: "Igname pilée sauce légumes",        temps: "40 min", cout_par_personne: "780" },
+        { jour: "Dimanche", plat: "Haricots wele sauce huile rouge",   temps: "25 min", cout_par_personne: "600" }
+      ],
+      courses: {
+        "Légumes & épices": ["Épinards (gboma)", "Tomates", "Oignons", "Piments", "Ail", "Gingembre"],
+        "Protéines": ["Poisson fumé", "Poulet entier", "Poisson frais", "Haricots"],
+        "Féculents & céréales": ["Farine de maïs", "Riz", "Igname", "Huile de palme"],
+        "Condiments": ["Cube Maggi", "Sel", "Pâte d'arachide", "Graine de palme"]
+      }
+    };
+  }
+</script>
+
+</body>
+</html>

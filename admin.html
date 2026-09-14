@@ -306,6 +306,11 @@ tr:hover td{background:var(--g50)}
       <button class="sb-btn" onclick="go('menus',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2M7 2v20M21 15V2a5 5 0 00-5 5v6h5zm0 0v7"/></svg><span class="sb-label">Menus restaurants</span>
       </button>
+      <button class="sb-btn" onclick="go('kora',this)" style="position:relative">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2a10 10 0 110 20A10 10 0 0112 2z"/><path d="M8 12s1-3 4-3 4 3 4 3"/><circle cx="9" cy="9" r="1" fill="currentColor" stroke="none"/><circle cx="15" cy="9" r="1" fill="currentColor" stroke="none"/></svg>
+        <span class="sb-label">KORA Menu IA</span>
+        <span class="sb-badge" style="background:linear-gradient(90deg,#3a6b4a,#1a3828);color:#fff">IA</span>
+      </button>
       <div class="sb-sec">Commandes</div>
       <button class="sb-btn" onclick="go('commandes',this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><span class="sb-label">Commandes</span>
@@ -448,6 +453,98 @@ tr:hover td{background:var(--g50)}
       <div class="card">
         <div class="card-head"><h2>🍽️ Menus restaurants</h2></div>
         <div class="card-body"><div class="tbl-wrap"><table><thead><tr><th>Photo</th><th>Nom</th><th>Restaurant</th><th>Prix</th><th>Disponible</th><th>Actions</th></tr></thead><tbody id="menus-body"></tbody></table></div></div>
+      </div>
+    </div>
+
+    <!-- KORA MENU IA -->
+    <div class="sec" id="sec-kora">
+      <!-- Stats row -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:20px">
+        <div class="card" style="padding:18px 20px">
+          <div style="font-size:11px;font-weight:600;color:var(--g400);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Statut</div>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0"></div>
+            <div style="font-size:15px;font-weight:700;color:var(--g900)">Actif</div>
+          </div>
+        </div>
+        <div class="card" style="padding:18px 20px">
+          <div style="font-size:11px;font-weight:600;color:var(--g400);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Page publique</div>
+          <a href="menu.html" target="_blank" style="font-size:13px;font-weight:600;color:var(--vd);text-decoration:none">menu.html ↗</a>
+        </div>
+        <div class="card" style="padding:18px 20px">
+          <div style="font-size:11px;font-weight:600;color:var(--g400);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Plats showcase</div>
+          <div style="font-size:22px;font-weight:800;color:var(--g900)" id="kora-dishes-count">5</div>
+        </div>
+        <div class="card" style="padding:18px 20px">
+          <div style="font-size:11px;font-weight:600;color:var(--g400);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px">Menus générés</div>
+          <div style="font-size:22px;font-weight:800;color:var(--g900)" id="kora-gen-count">—</div>
+        </div>
+      </div>
+
+      <!-- Preview card + plats phares -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px">
+        <!-- Preview -->
+        <div class="card" style="overflow:hidden">
+          <div style="background:linear-gradient(135deg,#1a3828,#2d5a3d);padding:24px 20px;position:relative;overflow:hidden">
+            <div style="position:absolute;right:-10px;bottom:-10px;font-size:72px;opacity:.07">🍲</div>
+            <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">KORA · IA Culinaire</div>
+            <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:4px">Menu béninois de la semaine</div>
+            <div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:16px">Budget · Recettes · Liste de courses</div>
+            <a href="menu.html" target="_blank" style="display:inline-flex;align-items:center;gap:6px;background:#fff;color:#1a3828;padding:9px 18px;border-radius:20px;font-size:13px;font-weight:700;text-decoration:none">Ouvrir la page ↗</a>
+          </div>
+          <div style="padding:16px 20px">
+            <div style="font-size:12px;font-weight:700;color:var(--g600);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px">Comment ça marche</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--g700)"><span style="width:22px;height:22px;border-radius:50%;background:var(--vl);color:var(--vd);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">1</span>Client choisit budget + préférences</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--g700)"><span style="width:22px;height:22px;border-radius:50%;background:var(--vl);color:var(--vd);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">2</span>KORA génère 7 repas béninois via Groq IA</div>
+              <div style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--g700)"><span style="width:22px;height:22px;border-radius:50%;background:var(--vl);color:var(--vd);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">3</span>Liste de courses → commande sur YéyéMarket</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plats phares editables -->
+        <div class="card">
+          <div class="card-head"><h2>🍽 Plats en vitrine</h2></div>
+          <div style="padding:0 16px 16px">
+            <table style="width:100%;border-collapse:collapse">
+              <thead><tr style="border-bottom:1px solid var(--g100)">
+                <th style="text-align:left;padding:8px 4px;font-size:11px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Plat</th>
+                <th style="text-align:right;padding:8px 4px;font-size:11px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Prix</th>
+                <th style="text-align:right;padding:8px 4px;font-size:11px;color:var(--g400);font-weight:600;text-transform:uppercase;letter-spacing:.5px">Tag</th>
+              </tr></thead>
+              <tbody id="kora-plats-body">
+                <tr style="border-bottom:1px solid var(--g50)"><td style="padding:10px 4px;font-size:13px;font-weight:600">Gboma Dessi</td><td style="text-align:right;font-size:13px;color:var(--g600)">850 F</td><td style="text-align:right"><span style="background:#dceedd;color:#1e5a2a;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">local</span></td></tr>
+                <tr style="border-bottom:1px solid var(--g50)"><td style="padding:10px 4px;font-size:13px;font-weight:600">Amiwo sauce tomate</td><td style="text-align:right;font-size:13px;color:var(--g600)">650 F</td><td style="text-align:right"><span style="background:#fef3cd;color:#7a5500;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">rapide</span></td></tr>
+                <tr style="border-bottom:1px solid var(--g50)"><td style="padding:10px 4px;font-size:13px;font-weight:600">Poulet yassa</td><td style="text-align:right;font-size:13px;color:var(--g600)">1 200 F</td><td style="text-align:right"><span style="background:#e8e0f5;color:#4a2080;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">populaire</span></td></tr>
+                <tr style="border-bottom:1px solid var(--g50)"><td style="padding:10px 4px;font-size:13px;font-weight:600">Poisson braisé</td><td style="text-align:right;font-size:13px;color:var(--g600)">950 F</td><td style="text-align:right"><span style="background:#d6eedd;color:#1e5a2a;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">healthy</span></td></tr>
+                <tr><td style="padding:10px 4px;font-size:13px;font-weight:600">Igname pilée</td><td style="text-align:right;font-size:13px;color:var(--g600)">780 F</td><td style="text-align:right"><span style="background:#f5e6d8;color:#6a3010;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600">festif</span></td></tr>
+              </tbody>
+            </table>
+            <p style="font-size:11px;color:var(--g400);margin-top:10px">Ces plats sont affichés en vitrine sur menu.html. Modifie menu.html pour les changer.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- API config card -->
+      <div class="card">
+        <div class="card-head"><h2>⚙️ Configuration technique</h2></div>
+        <div style="padding:0 20px 20px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div style="background:var(--g50);border-radius:10px;padding:14px">
+            <div style="font-size:11px;color:var(--g400);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">API</div>
+            <div style="font-size:13px;font-weight:700;color:var(--g900)">/api/chat</div>
+            <div style="font-size:11px;color:var(--g400);margin-top:2px">Vercel Edge Function</div>
+          </div>
+          <div style="background:var(--g50);border-radius:10px;padding:14px">
+            <div style="font-size:11px;color:var(--g400);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">Modèle IA</div>
+            <div style="font-size:13px;font-weight:700;color:var(--g900)">llama-3.3-70b</div>
+            <div style="font-size:11px;color:var(--g400);margin-top:2px">via Groq API</div>
+          </div>
+          <div style="background:var(--g50);border-radius:10px;padding:14px">
+            <div style="font-size:11px;color:var(--g400);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px">Fallback</div>
+            <div style="font-size:13px;font-weight:700;color:#22c55e">Actif</div>
+            <div style="font-size:11px;color:var(--g400);margin-top:2px">Menu hors-ligne intégré</div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1298,14 +1395,14 @@ function showApp(){
 }
 
 // NAVIGATION
-const titles={dashboard:'Tableau de bord',categories:'Catégories',produits:'Produits',menus:'Menus restaurants',commandes:'Commandes',livraisons:'Livraisons',vendeurs:'Vendeurs',restaurants:'Restaurants',livreurs:'Livreurs',comptes:'Créer des comptes',support:'Support & Messagerie',zones:'Zones de livraison',rapports:'Rapports & Ventes',paiements:'Paiements',avis:'Avis & Signalements',promotions:'Promotions',carte:'Carte temps réel',parametres:'Paramètres',live:'Temps réel'};
+const titles={dashboard:'Tableau de bord',categories:'Catégories',produits:'Produits',menus:'Menus restaurants',commandes:'Commandes',livraisons:'Livraisons',vendeurs:'Vendeurs',restaurants:'Restaurants',livreurs:'Livreurs',comptes:'Créer des comptes',support:'Support & Messagerie',zones:'Zones de livraison',rapports:'Rapports & Ventes',paiements:'Paiements',avis:'Avis & Signalements',promotions:'Promotions',carte:'Carte temps réel',parametres:'Paramètres',live:'Temps réel',kora:'KORA Menu IA'};
 function go(name,btn){
   document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.sb-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById('sec-'+name).classList.add('active');
   btn.classList.add('active');
   document.getElementById('ptitle').textContent=titles[name]||name;
-  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),agences:()=>loadAgences('en_attente'),zones:loadZonesTable,clients:loadClients,rapports:()=>loadRapports(currentRapportDays),comptes:()=>{loadZonesSelect('cv-zone');loadZonesSelect('cr-zone');loadZonesSelect('cl-zone');loadAgents();},support:()=>{loadSupConvs();subscribeSupport();},paiements:loadPaiements,avis:loadAvis,promotions:loadPromotions,carte:initCarte,parametres:loadParametres,live:initLive};
+  const loaders={categories:loadCats,produits:loadProds,menus:loadMenus,commandes:()=>loadCmd('all'),livraisons:loadLivraisons,vendeurs:()=>loadService('boutiques','en_attente'),restaurants:()=>loadService('restaurants','en_attente'),livreurs:()=>loadService('livreurs','en_attente'),agences:()=>loadAgences('en_attente'),zones:loadZonesTable,clients:loadClients,rapports:()=>loadRapports(currentRapportDays),comptes:()=>{loadZonesSelect('cv-zone');loadZonesSelect('cr-zone');loadZonesSelect('cl-zone');loadAgents();},support:()=>{loadSupConvs();subscribeSupport();},paiements:loadPaiements,avis:loadAvis,promotions:loadPromotions,carte:initCarte,parametres:loadParametres,live:initLive,kora:loadKora};
   if(loaders[name])loaders[name]();
 }
 
@@ -2241,6 +2338,11 @@ async function loadParametres(){  try{
 }
 // --- Galerie diaporama bannière ---
 let _banImgs=[];
+function loadKora() {
+  // KORA Menu IA - page statique, pas de chargement de données requis
+  // On peut éventuellement afficher des stats depuis la table parametres
+}
+
 function renderBanGallery(){
   const g=document.getElementById('ban-gallery');if(!g)return;
   g.innerHTML=_banImgs.map((url,i)=>`<div class="ban-thumb"><img src="${url}" alt=""/><button class="ban-x" onclick="removeBanImg(${i})">✕</button>${i===0?'<div class="ban-main">PRINCIPALE</div>':''}</div>`).join('');
