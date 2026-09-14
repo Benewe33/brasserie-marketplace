@@ -1108,9 +1108,9 @@
           <div class="shopping-categories" id="shopping-categories"></div>
         </div>
 
-        <a href="index.html" class="btn-order">
+        <button class="btn-order" onclick="commanderSurYeye()">
           Commander sur YéyéMarket →
-        </a>
+        </button>
       </div>
     </div>
   </section>
@@ -1319,6 +1319,26 @@ Réponds UNIQUEMENT en JSON valide avec ce format exact (sans markdown ni backti
       }
     };
   }
+
+function commanderSurYeye() {
+  // Collecter les items cochés
+  const checked = [...document.querySelectorAll('.shopping-checkbox:checked')]
+    .map(cb => cb.nextElementSibling?.textContent?.trim())
+    .filter(Boolean);
+  
+  if (checked.length === 0) {
+    // Rien de coché — envoyer quand même vers YéyéMarket
+    window.location.href = 'index.html';
+    return;
+  }
+  
+  // Sauvegarder dans localStorage
+  try {
+    localStorage.setItem('koraShoppingList', JSON.stringify(checked));
+  } catch(e) {}
+  
+  window.location.href = 'index.html';
+}
 </script>
 
 </body>

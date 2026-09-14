@@ -499,6 +499,11 @@ body{font-family:'Inter',sans-serif;background:#f0f2f5;min-height:100vh;display:
 .dish .d-add{position:absolute;bottom:6px;right:6px;width:30px;height:30px;border-radius:9px;background:var(--vd);color:#fff;border:none;font-size:19px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.2)}
 .dish.indispo{opacity:.5}
 .dish.indispo .d-add{display:none}
+
+.kora-chip{background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.18);border-radius:20px;padding:5px 12px;color:#fff;font-size:12px;font-weight:600;cursor:pointer;transition:background .15s,opacity .15s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.kora-chip:hover{background:rgba(255,255,255,0.22)}
+.kora-chip.done{opacity:.4;text-decoration:line-through}
+.kora-chip.done::before{content:'✓ '}
 </style>
 </head>
 <body>
@@ -2688,6 +2693,7 @@ document.addEventListener('keydown',e=>{
 
 
 initFirebaseApp();
+initKoraPanel();
 checkSession();
 loadCategories();
 loadHomeSections();
@@ -3102,7 +3108,61 @@ if (urlPage) setTimeout(() => goPage(urlPage), 500);
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
-<script defer src="/_vercel/insights/script.js"></script>
+<script defer src="/_vercel/insights/script.js">
+// ---- KORA SHOPPING PANEL ----
+function initKoraPanel(){
+  let list;
+  try{ list=JSON.parse(localStorage.getItem('koraShoppingList')||'null'); }catch(e){}
+  if(!list||!list.length)return;
+  localStorage.removeItem('koraShoppingList');
+  const panel=document.getElementById('kora-panel');
+  const countEl=document.getElementById('kora-panel-count');
+  const itemsEl=document.getElementById('kora-panel-items');
+  if(!panel)return;
+  countEl.textContent=list.length+' ingrédient'+(list.length>1?'s':'');
+  itemsEl.innerHTML='';
+  list.forEach(item=>{
+    const chip=document.createElement('button');
+    chip.className='kora-chip';
+    chip.textContent=item;
+    chip.onclick=()=>{
+      chip.classList.add('done');
+      // Recherche le produit
+      const si=document.getElementById('search-input');
+      if(si){si.value=item;doSearch(item);}
+      goPage('catalogue');
+      // Scroll top
+      window.scrollTo(0,0);
+    };
+    itemsEl.appendChild(chip);
+  });
+  panel.style.display='block';
+  // Auto-go catalogue
+  goPage('catalogue');
+}
+function closeKoraPanel(){
+  const p=document.getElementById('kora-panel');
+  if(p)p.style.display='none';
+}
+</script>
 
+
+<!-- KORA SHOPPING PANEL -->
+<div id="kora-panel" style="display:none;position:fixed;bottom:80px;left:0;right:0;z-index:9999;padding:0 12px;pointer-events:none">
+  <div id="kora-panel-inner" style="background:#1a3828;border-radius:20px;padding:16px 18px;box-shadow:0 8px 32px rgba(0,0,0,0.35);pointer-events:all;max-height:55vh;display:flex;flex-direction:column">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-shrink:0">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:28px;height:28px;background:rgba(255,255,255,0.15);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px">✨</div>
+        <div>
+          <div style="color:rgba(255,255,255,0.55);font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase">KORA · Liste de courses</div>
+          <div style="color:#fff;font-size:13px;font-weight:800" id="kora-panel-count"></div>
+        </div>
+      </div>
+      <button onclick="closeKoraPanel()" style="background:rgba(255,255,255,0.1);border:none;border-radius:50%;width:28px;height:28px;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>
+    </div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:10px;flex-shrink:0">Touche un ingrédient pour le rechercher</div>
+    <div id="kora-panel-items" style="overflow-y:auto;display:flex;flex-wrap:wrap;gap:7px;padding-bottom:2px"></div>
+  </div>
+</div>
 </body>
 </html>
