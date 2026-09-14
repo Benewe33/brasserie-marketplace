@@ -2411,7 +2411,6 @@ function renderKoraPlats(){
 }
 
 /* ── KORA PHOTO UPLOAD ── */
-const SUPA_BUCKET = 'kora-images';
 
 function koraPreviewUrl(url) {
   if (!url) { _resetUploadZone(); return; }
@@ -2441,55 +2440,53 @@ function koraUploadPhoto(input) {
 }
 
 async function _koraUploadFile(file) {
-  if (file.size > 5 * 1024 * 1024) { toast('Photo trop grande (max 5 MB)', 'err'); return; }
+  if (file.size > 15 * 1024 * 1024) { toast('Photo trop grande (max 15 MB)', 'err'); return; }
 
-  // Show spinner
   const spinner = document.getElementById('km-upload-spinner');
   const label = document.getElementById('km-upload-label');
   const sub = document.getElementById('km-upload-sub');
   if (spinner) spinner.style.display = 'block';
-  if (label) label.textContent = 'Upload en cours…';
+  if (label) label.textContent = 'Compression en cours…';
   if (sub) sub.textContent = '';
 
-  // Unique filename
-  const ext = file.name.split('.').pop().toLowerCase();
-  const fname = `plat-${Date.now()}-${Math.random().toString(36).slice(2,7)}.${ext}`;
-
   try {
-    const res = await fetch(
-      `${SUPA_URL}/storage/v1/object/${SUPA_BUCKET}/${fname}`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${SUPA_KEY}`,
-          'Content-Type': file.type,
-          'x-upsert': 'true'
-        },
-        body: file
-      }
-    );
-    if (!res.ok) {
-      const err = await res.text();
-      // Bucket might not exist yet
-      if (err.includes('Bucket not found') || err.includes('404')) {
-        throw new Error('Bucket "kora-images" introuvable — voir instructions ci-dessous');
-      }
-      throw new Error(`Upload échoué (${res.status}): ${err.slice(0,100)}`);
-    }
-    // Public URL
-    const publicUrl = `${SUPA_URL}/storage/v1/object/public/${SUPA_BUCKET}/${fname}`;
-    document.getElementById('km-img').value = publicUrl;
+    // Compress via Canvas — no Storage bucket needed
+    const dataUri = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = ev => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          const MAX = 900;
+          let w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            if (w > h) { h = Math.round(h * MAX / w); w = MAX; }
+            else       { w = Math.round(w * MAX / h); h = MAX; }
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(canvas.toDataURL('image/jpeg', 0.80));
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
 
-    // Show preview
+    document.getElementById('km-img').value = dataUri;
+
+    // Preview
     const prev = document.getElementById('km-upload-preview');
-    if (prev) prev.innerHTML = `<img src="${publicUrl}" style="width:100%;height:100%;object-fit:cover">`;
-    if (label) label.textContent = '✓ Photo uploadée';
-    if (sub) sub.textContent = fname;
-    toast('📷 Photo uploadée !', 'ok');
+    if (prev) prev.innerHTML = `<img src="${dataUri}" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`;
+    if (label) label.textContent = '✓ Photo prête';
+    const kb = Math.round(dataUri.length * 0.75 / 1024);
+    if (sub) sub.textContent = `${file.name} · ${kb} KB compressé`;
+    toast('📷 Photo ajoutée !', 'ok');
   } catch(e) {
-    toast('Erreur upload: ' + e.message, 'err');
+    toast('Erreur photo: ' + e.message, 'err');
     if (label) label.textContent = 'Cliquer pour réessayer';
-    if (sub) sub.textContent = e.message.includes('Bucket') ? '→ Créer le bucket "kora-images" dans Supabase Storage' : '';
+    if (sub) sub.textContent = '';
     _resetUploadZone();
   } finally {
     if (spinner) spinner.style.display = 'none';
