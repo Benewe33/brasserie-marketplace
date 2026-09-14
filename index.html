@@ -3189,6 +3189,35 @@ function closeKoraPanel(){
 }
 // Appel après chargement complet de la page
 window.addEventListener('load', function(){ initKoraPanel(); });
+
+// ── KORA TEMPS RÉEL ──
+// Quand l'utilisateur est sur index.html dans un onglet ET navigue sur menu.html
+// dans un autre onglet, le `storage` event notifie index.html dès que
+// koraCartProducts / koraShoppingList sont écrits dans le menu.
+window.addEventListener('storage', function(e){
+  if(e.key==='koraCartProducts'&&e.newValue&&e.newValue!=='null'){
+    // Nouveau lot de produits matchés arrivé depuis menu.html
+    _koraRealTimeNotify();
+    initKoraPanel();
+  }
+  if(e.key==='koraShoppingList'&&e.newValue&&e.newValue!=='null'){
+    // Ingrédients non-matchés arrivés depuis menu.html
+    initKoraPanel();
+  }
+});
+
+// Petite animation de notification KORA temps réel
+function _koraRealTimeNotify(){
+  var badge=document.getElementById('cart-badge')||document.getElementById('nav-cart-badge');
+  if(!badge)return;
+  badge.style.transition='transform .15s ease, box-shadow .15s ease';
+  badge.style.transform='scale(1.55)';
+  badge.style.boxShadow='0 0 0 4px rgba(58,107,74,.35)';
+  setTimeout(function(){
+    badge.style.transform='';
+    badge.style.boxShadow='';
+  },400);
+}
 </script>
 </body>
 </html>
