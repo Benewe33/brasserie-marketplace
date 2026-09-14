@@ -1,4 +1,4 @@
-const CACHE = 'yeye-v5';
+const CACHE = 'yeye-v6';
 self.addEventListener('install', e => {
   self.skipWaiting();
 });
@@ -16,12 +16,12 @@ self.addEventListener('fetch', e => {
     return;
   }
   const url = new URL(req.url);
-  // index.html et racine : toujours réseau (jamais de cache) pour avoir le code à jour
-  if(url.pathname === '/' || url.pathname === '/index.html'){
+  // Tous les fichiers HTML : toujours réseau (jamais de cache) pour avoir le code à jour
+  if(url.pathname.endsWith('.html') || url.pathname === '/'){
     e.respondWith(fetch(req).catch(() => caches.match(req)));
     return;
   }
-  // Autres assets : cache en premier, réseau en fallback
+  // Autres assets (CSS, JS, images, fonts) : cache en premier, réseau en fallback
   e.respondWith(
     caches.match(req).then(cached => cached || fetch(req).then(resp => {
       const clone = resp.clone();
