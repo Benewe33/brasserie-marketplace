@@ -2693,7 +2693,6 @@ document.addEventListener('keydown',e=>{
 
 
 initFirebaseApp();
-initKoraPanel();
 checkSession();
 loadCategories();
 loadHomeSections();
@@ -3109,41 +3108,6 @@ if (urlPage) setTimeout(() => goPage(urlPage), 500);
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
 </script>
 <script defer src="/_vercel/insights/script.js">
-// ---- KORA SHOPPING PANEL ----
-function initKoraPanel(){
-  let list;
-  try{ list=JSON.parse(localStorage.getItem('koraShoppingList')||'null'); }catch(e){}
-  if(!list||!list.length)return;
-  localStorage.removeItem('koraShoppingList');
-  const panel=document.getElementById('kora-panel');
-  const countEl=document.getElementById('kora-panel-count');
-  const itemsEl=document.getElementById('kora-panel-items');
-  if(!panel)return;
-  countEl.textContent=list.length+' ingrédient'+(list.length>1?'s':'');
-  itemsEl.innerHTML='';
-  list.forEach(item=>{
-    const chip=document.createElement('button');
-    chip.className='kora-chip';
-    chip.textContent=item;
-    chip.onclick=()=>{
-      chip.classList.add('done');
-      // Recherche le produit
-      const si=document.getElementById('search-input');
-      if(si){si.value=item;doSearch(item);}
-      goPage('catalogue');
-      // Scroll top
-      window.scrollTo(0,0);
-    };
-    itemsEl.appendChild(chip);
-  });
-  panel.style.display='block';
-  // Auto-go catalogue
-  goPage('catalogue');
-}
-function closeKoraPanel(){
-  const p=document.getElementById('kora-panel');
-  if(p)p.style.display='none';
-}
 </script>
 
 
@@ -3164,5 +3128,42 @@ function closeKoraPanel(){
     <div id="kora-panel-items" style="overflow-y:auto;display:flex;flex-wrap:wrap;gap:7px;padding-bottom:2px"></div>
   </div>
 </div>
+
+<script>
+// ---- KORA SHOPPING PANEL ----
+function initKoraPanel(){
+  var list;
+  try{ list=JSON.parse(localStorage.getItem('koraShoppingList')||'null'); }catch(e){}
+  if(!list||!list.length)return;
+  localStorage.removeItem('koraShoppingList');
+  var panel=document.getElementById('kora-panel');
+  var countEl=document.getElementById('kora-panel-count');
+  var itemsEl=document.getElementById('kora-panel-items');
+  if(!panel)return;
+  countEl.textContent=list.length+' ingrédient'+(list.length>1?'s':'');
+  itemsEl.innerHTML='';
+  list.forEach(function(item){
+    var chip=document.createElement('button');
+    chip.className='kora-chip';
+    chip.textContent=item;
+    chip.onclick=function(){
+      chip.classList.add('done');
+      var si=document.getElementById('search-input');
+      if(si){si.value=item;if(typeof doSearch==='function')doSearch(item);}
+      if(typeof goPage==='function')goPage('catalogue');
+      window.scrollTo(0,0);
+    };
+    itemsEl.appendChild(chip);
+  });
+  panel.style.display='block';
+  if(typeof goPage==='function')goPage('catalogue');
+}
+function closeKoraPanel(){
+  var p=document.getElementById('kora-panel');
+  if(p)p.style.display='none';
+}
+// Appel après chargement complet de la page
+window.addEventListener('load', function(){ initKoraPanel(); });
+</script>
 </body>
 </html>
