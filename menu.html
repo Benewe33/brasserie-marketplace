@@ -1746,12 +1746,17 @@ async function _syncDishCards() {
     const card = document.querySelector(`.dish-card[data-idx="${idx}"]`);
     if (!card) return;
 
-    // Image
+    // Image — avec fallback sur KORA_DEFAULTS si l'URL échoue (ex: Storage 403)
     if (plat.image_url) {
       const img = card.querySelector('.dish-img-photo');
       if (img) {
         img.src = plat.image_url;
         img.alt = plat.nom;
+        img.onerror = function() {
+          const def = KORA_DEFAULTS[idx];
+          if (def && def.image_url) { this.src = def.image_url; }
+          this.onerror = null; // évite les boucles infinies
+        };
       }
     }
 
@@ -1776,6 +1781,16 @@ async function _syncDishCards() {
     }
   });
 }
+
+// ── Sync en temps réel depuis l'admin ──
+// Quand l'admin enregistre un plat dans un autre onglet, localStorage change
+// → on vide le cache et on resynchronise les cartes.
+window.addEventListener('storage', function(e) {
+  if (e.key === 'koraPlatsUpdated' && e.newValue) {
+    _kPlats = null; // vide le cache
+    _syncDishCards();
+  }
+});
 
 document.addEventListener('DOMContentLoaded', () => { _syncDishCards(); });
 </script>

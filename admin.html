@@ -2578,6 +2578,8 @@ async function saveKoraPlat(){
       if(idx===-1)_koraPlats.push(data);else _koraPlats[idx]=data;
     }
     toast('✅ Plat enregistré','ok');closeKoraModal();renderKoraPlats();
+    // Notifie les autres onglets (menu.html) qu'il faut recharger les plats
+    try { localStorage.setItem('koraPlatsUpdated', Date.now().toString()); } catch(_){}
   }catch(e){toast('Erreur: '+(e.message||e),'err');}
 }
 
@@ -2588,6 +2590,7 @@ async function deleteKoraPlat(){
   const {error}=await sb.from('kora_plats').delete().eq('id',p.id);
   if(error){toast('Erreur: '+error.message,'err');return;}
   _koraPlats.splice(idx,1);toast('Plat supprimé','ok');closeKoraModal();renderKoraPlats();
+  try { localStorage.setItem('koraPlatsUpdated', Date.now().toString()); } catch(_){}
 }
 
 function koraAddPlat(){openKoraModal(-1);}
