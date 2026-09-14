@@ -83,6 +83,7 @@
       min-height: 100vh;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      padding-bottom: env(safe-area-inset-bottom);
     }
 
     /* ── NAV ── */
@@ -90,7 +91,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 18px 40px;
+      padding: max(18px, env(safe-area-inset-top)) 40px 18px;
       max-width: 1100px;
       margin: 0 auto;
     }
@@ -899,7 +900,7 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 768px) {
-      nav { padding: 16px 20px; }
+      nav { padding: max(16px, env(safe-area-inset-top)) 20px 16px; }
       .hero { grid-template-columns: 1fr; padding: 20px 20px 40px; gap: 24px; }
       .hero-visual { order: -1; }
       .phone-mockup { width: 210px; }
@@ -924,7 +925,7 @@
       /* Très petit écran — cacher le phone mockup, garder seulement la vitrine */
       .hero-visual { display: none; }
       .hero { padding: 16px 16px 32px; }
-      nav { padding: 14px 16px; }
+      nav { padding: max(14px, env(safe-area-inset-top)) 16px 14px; }
       .section-how, .section-dishes, .section-ia, .cta-banner { padding-left: 16px; padding-right: 16px; }
       /* Cartes plats full-width sans border-radius excessif */
       .dish-card { padding: 14px 12px; gap: 12px; border-radius: 12px; min-height: 72px; }
