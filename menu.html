@@ -1563,6 +1563,48 @@ function addPlatToList(idx) {
 
 // Fermer avec Escape
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { document.getElementById('plat-overlay').classList.remove('open'); document.body.style.overflow = ''; }});
+
+// ── Mise à jour des cartes depuis Supabase ──
+// Les cartes HTML sont statiques par défaut ; cette fonction les synchronise
+// avec les données réelles de kora_plats dès le chargement de la page.
+async function _syncDishCards() {
+  const plats = await _loadKoraPlats();
+  plats.forEach((plat, idx) => {
+    const card = document.querySelector(`.dish-card[data-idx="${idx}"]`);
+    if (!card) return;
+
+    // Image
+    if (plat.image_url) {
+      const img = card.querySelector('.dish-img-photo');
+      if (img) {
+        img.src = plat.image_url;
+        img.alt = plat.nom;
+      }
+    }
+
+    // Nom
+    const nameEl = card.querySelector('.dish-name');
+    if (nameEl && plat.nom) nameEl.textContent = plat.nom;
+
+    // Prix
+    const priceEl = card.querySelector('.dish-price');
+    if (priceEl && plat.cout) priceEl.textContent = plat.cout.toLocaleString('fr-FR') + ' FCFA';
+
+    // Temps
+    const timeEl = card.querySelector('.dish-time');
+    if (timeEl && plat.temps) timeEl.textContent = '⏱ ' + plat.temps;
+
+    // Tag (classe dynamique)
+    const tagEl = card.querySelector('.dish-meta .tag');
+    if (tagEl && plat.tag) {
+      // Remplace les classes tag-* par la nouvelle
+      tagEl.className = `tag tag-${plat.tag}`;
+      tagEl.textContent = plat.tag;
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => { _syncDishCards(); });
 </script>
 
 </body>
