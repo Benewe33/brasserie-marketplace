@@ -3132,15 +3132,40 @@ if (urlPage) setTimeout(() => goPage(urlPage), 500);
 <script>
 // ---- KORA SHOPPING PANEL ----
 function initKoraPanel(){
+  // 1. Produits matchés → ajout direct au panier
+  var cartProds;
+  try{ cartProds=JSON.parse(localStorage.getItem('koraCartProducts')||'null'); }catch(e){}
+  if(cartProds&&cartProds.length){
+    localStorage.removeItem('koraCartProducts');
+    var added=0;
+    cartProds.forEach(function(prod){
+      if(!prod||!prod.id)return;
+      // Ajoute au panier local (même objet attendu par addToCart)
+      if(typeof cart!=='undefined'){
+        if(cart[prod.id])cart[prod.id].qty+=1;
+        else cart[prod.id]={...prod,qty:1};
+        added++;
+      }
+    });
+    if(added>0&&typeof updateCartBadge==='function')updateCartBadge();
+    if(added>0&&typeof toast==='function')toast('🛒 '+added+' produit'+(added>1?'s':'')+' KORA ajouté'+(added>1?'s':'')+' au panier !','ok');
+  }
+
+  // 2. Ingrédients non matchés → panel de liste de courses manuelle
   var list;
   try{ list=JSON.parse(localStorage.getItem('koraShoppingList')||'null'); }catch(e){}
+  if(cartProds&&cartProds.length&&(!list||!list.length)){
+    // Tout a été matché → aller direct au panier
+    if(typeof goPage==='function')setTimeout(function(){goPage('cart');},300);
+    return;
+  }
   if(!list||!list.length)return;
   localStorage.removeItem('koraShoppingList');
   var panel=document.getElementById('kora-panel');
   var countEl=document.getElementById('kora-panel-count');
   var itemsEl=document.getElementById('kora-panel-items');
   if(!panel)return;
-  countEl.textContent=list.length+' ingrédient'+(list.length>1?'s':'');
+  countEl.textContent=list.length+' ingrédient'+(list.length>1?'s':'')+' à trouver';
   itemsEl.innerHTML='';
   list.forEach(function(item){
     var chip=document.createElement('button');

@@ -460,6 +460,21 @@
     .plat-total-label { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
     .plat-total-price { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; color: var(--green-dark); font-variant-numeric: tabular-nums; }
     .plat-sheet-actions { display: flex; gap: 10px; }
+    /* ── INGREDIENT PRODUCT MATCH ── */
+    .ing-match-wrap {
+      display: flex; align-items: center; gap: 7px;
+      margin-top: 5px; padding: 5px 8px;
+      background: var(--green-light-bg); border-radius: 8px;
+      font-size: 0.76rem; color: var(--green-mid);
+    }
+    .ing-match-wrap img {
+      width: 22px; height: 22px; border-radius: 5px;
+      object-fit: cover; flex-shrink: 0;
+    }
+    .ing-match-nom { font-weight: 600; color: var(--text-dark); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ing-match-prix { font-weight: 700; color: var(--green-dark); white-space: nowrap; }
+    .ing-match-pending { font-size: 0.72rem; color: var(--text-light); margin-top: 4px; }
+    .ing-nomatch { display: none; } /* on cache si pas de match */
     .btn-add-ingredients {
       flex: 1; background: var(--green-dark); color: #fff; border: none; border-radius: 12px;
       padding: 14px; font-family: var(--font-display); font-weight: 700; font-size: 0.95rem;
@@ -1490,6 +1505,41 @@ const KORA_DEFAULTS = [
 
 let _kPlats = null; // cache des plats
 
+// ── MATCHING INGRÉDIENT → PRODUIT YÉYÉMARKET ──
+// Mots génériques à ignorer pour prendre le mot clé suivant
+const _GENERICS = new Set(['farine','huile','pate','pâte','sauce','sel','cube','épices','epices','beurre','sucre','eau','lait','crème','creme','jus','poudre','extrait']);
+
+function _ingKeyword(nom) {
+  // Nettoie et extrait le meilleur mot-clé de recherche
+  const clean = nom.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'') // retire accents pour l'extraction
+    .replace(/[()d\']/g,' ').replace(/\s+/g,' ').trim();
+  const words = clean.split(' ').filter(w => w.length > 2 && !['de','du','des','le','la','les','un','une','et','au','aux','sur','en','a'].includes(w));
+  // Si le premier mot est générique, prend le suivant
+  for (const w of words) {
+    if (!_GENERICS.has(w)) return w;
+  }
+  return words[0] || nom.split(' ')[0];
+}
+
+const _matchCache = {}; // évite les requêtes en double
+
+async function _matchIngredient(nom) {
+  const kw = _ingKeyword(nom);
+  if (_matchCache[kw] !== undefined) return _matchCache[kw];
+  try {
+    const res = await fetch(
+      `${SUPA_URL_M}/rest/v1/produits?nom=ilike.*${encodeURIComponent(kw)}*&actif=eq.true&select=id,nom,prix,prix_promo,image_url,unite,stock&order=stock.desc&limit=1`,
+      { headers: { apikey: SUPA_KEY_M, Authorization: `Bearer ${SUPA_KEY_M}` } }
+    );
+    if (!res.ok) { _matchCache[kw] = null; return null; }
+    const data = await res.json();
+    const prod = (Array.isArray(data) && data[0]) || null;
+    _matchCache[kw] = prod;
+    return prod;
+  } catch(e) { _matchCache[kw] = null; return null; }
+}
+
 async function _loadKoraPlats() {
   if (_kPlats) return _kPlats;
   try {
@@ -1535,11 +1585,12 @@ function openPlatModal(idx) {
       ? `<div class="plat-no-ingredients">Aucun ingrédient configuré pour ce plat.<br><small>L'admin peut les ajouter dans le panneau KORA.</small></div>`
       : `<p class="plat-sheet-section">Ingrédients</p>
          <ul class="plat-ingredients">
-           ${produits.map(p => `
-             <li class="plat-ingredient">
-               <div>
+           ${produits.map((p, i) => `
+             <li class="plat-ingredient" data-ing="${i}">
+               <div style="flex:1;min-width:0">
                  <div class="ing-name">${p.nom || '—'}</div>
                  ${p.quantite ? `<div class="ing-qty">${p.quantite}</div>` : ''}
+                 <div class="ing-match-pending" id="im-${idx}-${i}">Recherche sur YéyéMarket…</div>
                </div>
                <span class="ing-price">${Number(p.prix || 0).toLocaleString('fr-FR')} FCFA</span>
              </li>
@@ -1566,11 +1617,39 @@ function openPlatModal(idx) {
       </div>` : ''}
       <div class="plat-sheet-actions">
         <button class="btn-add-ingredients" onclick="addPlatToList(${idx})">
-          🛒 Ajouter les ingrédients à ma liste
+          🛒 Ajouter au panier YéyéMarket
         </button>
         <button class="btn-close-plat" onclick="closePlatModal()">✕</button>
       </div>
     `;
+
+    // Matching asynchrone ingrédient → produit YéyéMarket
+    produits.forEach((ing, i) => {
+      const placeholder = document.getElementById(`im-${idx}-${i}`);
+      if (!placeholder) return;
+      _matchIngredient(ing.nom).then(prod => {
+        if (!placeholder.isConnected) return; // modal fermée entre-temps
+        if (prod) {
+          const prix = prod.prix_promo || prod.prix;
+          placeholder.className = 'ing-match-wrap';
+          placeholder.dataset.prodId   = prod.id;
+          placeholder.dataset.prodNom  = prod.nom;
+          placeholder.dataset.prodPrix = prix;
+          placeholder.dataset.prodImg  = prod.image_url || '';
+          placeholder.dataset.prodUnite= prod.unite || 'u';
+          placeholder.innerHTML = `
+            ${prod.image_url ? `<img src="${prod.image_url}" onerror="this.style.display='none'">` : '🛒'}
+            <span class="ing-match-nom">Dispo : ${prod.nom}</span>
+            <span class="ing-match-prix">${Number(prix).toLocaleString('fr-FR')} FCFA</span>
+          `;
+        } else {
+          placeholder.textContent = ''; // rien à afficher, pas de match
+          placeholder.className = 'ing-nomatch';
+        }
+      }).catch(() => {
+        if (placeholder.isConnected) { placeholder.textContent=''; placeholder.className='ing-nomatch'; }
+      });
+    });
   });
 }
 
@@ -1587,16 +1666,52 @@ function addPlatToList(idx) {
     const produits = Array.isArray(plat.produits) ? plat.produits : [];
     if (produits.length === 0) { closePlatModal(); return; }
 
-    const items = produits.map(p => p.nom + (p.quantite ? ` (${p.quantite})` : ''));
-    let existing = [];
-    try { existing = JSON.parse(localStorage.getItem('koraShoppingList') || '[]'); } catch(e){}
-    const merged = [...new Set([...existing, ...items])];
-    try { localStorage.setItem('koraShoppingList', JSON.stringify(merged)); } catch(e){}
+    // Sépare les ingrédients : matchés (→ panier direct) vs non matchés (→ liste de courses)
+    const matched = [];    // produits YéyéMarket à ajouter au panier
+    const unmatched = [];  // ingrédients sans produit trouvé
 
-    // Feedback visuel
+    produits.forEach((p, i) => {
+      const el = document.getElementById(`im-${idx}-${i}`);
+      if (el && el.dataset.prodId) {
+        matched.push({
+          id:     el.dataset.prodId,
+          nom:    el.dataset.prodNom,
+          prix:   Number(el.dataset.prodPrix),
+          prix_promo: null,
+          unite:  el.dataset.prodUnite || 'u',
+          image_url: el.dataset.prodImg || null,
+          boutiques: { nom: 'YéyéMarket' }
+        });
+      } else {
+        unmatched.push(p.nom + (p.quantite ? ` (${p.quantite})` : ''));
+      }
+    });
+
+    // Produits matchés → localStorage pour ajout automatique au panier
+    if (matched.length > 0) {
+      let existing = [];
+      try { existing = JSON.parse(localStorage.getItem('koraCartProducts') || '[]'); } catch(e){}
+      // Dédoublonne par id
+      const byId = {};
+      [...existing, ...matched].forEach(p => { byId[p.id] = p; });
+      try { localStorage.setItem('koraCartProducts', JSON.stringify(Object.values(byId))); } catch(e){}
+    }
+
+    // Ingrédients non matchés → liste de courses manuelle
+    if (unmatched.length > 0) {
+      let existing = [];
+      try { existing = JSON.parse(localStorage.getItem('koraShoppingList') || '[]'); } catch(e){}
+      const merged = [...new Set([...existing, ...unmatched])];
+      try { localStorage.setItem('koraShoppingList', JSON.stringify(merged)); } catch(e){}
+    }
+
     const btn = document.querySelector('.btn-add-ingredients');
-    if (btn) { btn.textContent = '✓ Ingrédients ajoutés !'; btn.style.background = '#2d5a3d'; btn.disabled = true; }
-    setTimeout(() => { closePlatModal(); window.location.href = 'index.html'; }, 900);
+    const matchedCount = matched.length;
+    const label = matchedCount > 0
+      ? `✓ ${matchedCount} produit${matchedCount>1?'s':''} ajouté${matchedCount>1?'s':''} au panier !`
+      : '✓ Liste de courses mise à jour !';
+    if (btn) { btn.textContent = label; btn.style.background = '#2d5a3d'; btn.disabled = true; }
+    setTimeout(() => { closePlatModal(); window.location.href = 'index.html'; }, 1000);
   });
 }
 
